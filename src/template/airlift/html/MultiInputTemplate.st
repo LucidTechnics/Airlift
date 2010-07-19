@@ -1,0 +1,1 @@
+$type, name, value, maxLength, checked, displayLength, id, inputClass:{t, n, v, m, c, d, id, ic | <span>$v$</span> <input class="$ic$" type="$t$" name="$n$" value="$v$" maxlength="$m$" $c$ size="$d$" id="$id$" /> }; separator="\n"$

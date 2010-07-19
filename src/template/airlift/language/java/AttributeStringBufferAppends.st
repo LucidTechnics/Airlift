@@ -1,0 +1,1 @@
+$name, getterName:{n,g | stringBuffer.append("$n$:").append($g$).append("\n"); }; separator="\n"$

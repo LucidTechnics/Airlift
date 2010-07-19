@@ -1,0 +1,1318 @@
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/docs/appdev/sample/src/mypackage/Hello.java,34
+public final class Hello 38,1377
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/jsp/plugin/applet/Clock2.java,526
+public class Clock2 29,916
+    public void init(Clock2.init40,1536
+    public void plotpoints(Clock2.plotpoints64,2513
+    public void circle(Clock2.circle76,2991
+    public void paint(Clock2.paint99,3473
+    public void start(Clock2.start177,6442
+    public void stop(Clock2.stop182,6532
+    public void run(Clock2.run186,6586
+    public void update(Clock2.update197,6854
+    public String getAppletInfo(Clock2.getAppletInfo201,6916
+    public String[][] getParameterInfo(Clock2.getParameterInfo205,7043
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/validators/DebugValidator.java,110
+public class DebugValidator 40,1455
+    public ValidationMessage[] validate(DebugValidator.validate60,2213
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/RequestParamExample.java,42
+public class RequestParamExample 34,1090
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/BookBean.java,238
+public class BookBean 21,813
+    public BookBean(BookBean.BookBean26,920
+    public String getTitle(BookBean.getTitle32,1077
+    public String getAuthor(BookBean.getAuthor36,1146
+    public String getIsbn(BookBean.getIsbn40,1217
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/FindBookSimpleTag.java,152
+public class FindBookSimpleTag 29,1056
+    public void doTag(FindBookSimpleTag.doTag36,1338
+    public void setVar(FindBookSimpleTag.setVar41,1523
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/EchoAttributesTag.java,123
+public class EchoAttributesTag 31,1117
+    public void setDynamicAttribute(EchoAttributesTag.setDynamicAttribute47,1607
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/TileSimpleTag.java,149
+public class TileSimpleTag 28,997
+    public void setColor(TileSimpleTag.setColor39,1371
+    public void setLabel(TileSimpleTag.setLabel43,1453
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/RepeatSimpleTag.java,93
+public class RepeatSimpleTag 29,1037
+    public void setNum(RepeatSimpleTag.setNum39,1336
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/HelloWorldSimpleTag.java,41
+public class HelloWorldSimpleTag 28,998
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/simpletag/ShuffleSimpleTag.java,243
+public class ShuffleSimpleTag 30,1110
+    public void setFragment1(ShuffleSimpleTag.setFragment170,2408
+    public void setFragment2(ShuffleSimpleTag.setFragment274,2511
+    public void setFragment3(ShuffleSimpleTag.setFragment378,2614
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/el/Functions.java,205
+public class Functions 24,940
+    public static String reverse(Functions.reverse25,965
+    public static int numVowels(Functions.numVowels29,1084
+    public static String caps(Functions.caps40,1345
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/jsp2/examples/FooBean.java,166
+public class FooBean 21,813
+    public FooBean(FooBean.FooBean24,865
+    public String getBar(FooBean.getBar28,930
+    public void setBar(FooBean.setBar32,995
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/servletToJsp.java,83
+public class servletToJsp 19,817
+    public void doGet servletToJsp.doGet21,866
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/CookieExample.java,36
+public class CookieExample 34,1084
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/colors/ColorGameBean.java,826
+public class ColorGameBean 21,834
+    public void processRequest(ColorGameBean.processRequest32,1152
+    public void setColor2(ColorGameBean.setColor254,1591
+    public void setColor1(ColorGameBean.setColor158,1649
+    public void setAction(ColorGameBean.setAction62,1707
+    public String getColor2(ColorGameBean.getColor268,1825
+    public String getColor1(ColorGameBean.getColor172,1885
+    public int getAttempts(ColorGameBean.getAttempts76,1945
+    public boolean getHint(ColorGameBean.getHint80,2001
+    public boolean getSuccess(ColorGameBean.getSuccess84,2078
+    public boolean getHintTaken(ColorGameBean.getHintTaken98,2358
+    public void reset(ColorGameBean.reset102,2420
+    public void setIntval(ColorGameBean.setIntval107,2498
+    public int getIntval(ColorGameBean.getIntval111,2558
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/RequestInfoExample.java,41
+public class RequestInfoExample 34,1094
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/filters/RequestDumperFilter.java,231
+public final class RequestDumperFilter 48,1658
+    public void destroy(RequestDumperFilter.destroy67,2147
+    public void init(RequestDumperFilter.init177,6327
+    public String toString(RequestDumperFilter.toString187,6516
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/filters/SetCharacterEncodingFilter.java,268
+public class SetCharacterEncodingFilter 59,2538
+    public void destroy(SetCharacterEncodingFilter.destroy91,3308
+    public void init(SetCharacterEncodingFilter.init132,4532
+    protected String selectEncoding(SetCharacterEncodingFilter.selectEncoding164,5633
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/filters/ExampleFilter.java,207
+public final class ExampleFilter 47,1750
+    public void destroy(ExampleFilter.destroy72,2367
+    public void init(ExampleFilter.init115,3657
+    public String toString(ExampleFilter.toString126,3915
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/listeners/SessionListener.java,621
+public final class SessionListener40,1514
+    public void attributeAdded(SessionListener.attributeAdded62,2070
+    public void attributeRemoved(SessionListener.attributeRemoved75,2406
+    public void attributeReplaced(SessionListener.attributeReplaced88,2747
+    public void contextDestroyed(SessionListener.contextDestroyed101,3087
+    public void contextInitialized(SessionListener.contextInitialized114,3349
+    public void sessionCreated(SessionListener.sessionCreated127,3613
+    public void sessionDestroyed(SessionListener.sessionDestroyed139,3861
+    private void log(SessionListener.log154,4203
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/listeners/ContextListener.java,472
+public final class ContextListener38,1421
+    public void attributeAdded(ContextListener.attributeAdded59,1959
+    public void attributeRemoved(ContextListener.attributeRemoved72,2270
+    public void attributeReplaced(ContextListener.attributeReplaced85,2586
+    public void contextDestroyed(ContextListener.contextDestroyed98,2893
+    public void contextInitialized(ContextListener.contextInitialized111,3155
+    private void log(ContextListener.log127,3511
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/compressionFilters/CompressionFilterTestServlet.java,51
+public class CompressionFilterTestServlet 31,1099
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/compressionFilters/CompressionFilter.java,313
+public class CompressionFilter 41,1454
+    public void init(CompressionFilter.init71,2094
+    public void destroy(CompressionFilter.destroy104,3236
+    public void setFilterConfig(CompressionFilter.setFilterConfig206,7158
+    public FilterConfig getFilterConfig(CompressionFilter.getFilterConfig214,7330
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/compressionFilters/CompressionServletResponseWrapper.java,1039
+public class CompressionServletResponseWrapper 35,1322
+    public CompressionServletResponseWrapper(CompressionServletResponseWrapper.CompressionServletResponseWrapper44,1617
+    public void setContentType(CompressionServletResponseWrapper.setContentType103,2904
+    public void setCompressionThreshold(CompressionServletResponseWrapper.setCompressionThreshold115,3200
+    public void setDebugLevel(CompressionServletResponseWrapper.setDebugLevel126,3450
+    public ServletOutputStream createOutputStream(CompressionServletResponseWrapper.createOutputStream137,3720
+    public void finishResponse(CompressionServletResponseWrapper.finishResponse154,4132
+    public void flushBuffer(CompressionServletResponseWrapper.flushBuffer175,4623
+    public ServletOutputStream getOutputStream(CompressionServletResponseWrapper.getOutputStream190,5126
+    public PrintWriter getWriter(CompressionServletResponseWrapper.getWriter212,5813
+    public void setContentLength(CompressionServletResponseWrapper.setContentLength242,6813
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/compressionFilters/CompressionResponseStream.java,841
+public class CompressionResponseStream35,1267
+    public CompressionResponseStream(CompressionResponseStream.CompressionResponseStream47,1575
+    public void setDebugLevel(CompressionResponseStream.setDebugLevel113,3148
+    protected void setBuffer(CompressionResponseStream.setBuffer121,3318
+    public void close(CompressionResponseStream.close133,3720
+    public void flush(CompressionResponseStream.flush167,4657
+    public void flushToGZip(CompressionResponseStream.flushToGZip182,5000
+    public void write(CompressionResponseStream.write204,5615
+    public void write(CompressionResponseStream.write229,6246
+    public void write(CompressionResponseStream.write246,6755
+    public void writeToGZip(CompressionResponseStream.writeToGZip284,7884
+    public boolean closed(CompressionResponseStream.closed318,8923
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/cal/Entries.java,276
+public class Entries 22,859
+  public Entries Entries.Entries30,1097
+  public int getRows Entries.getRows37,1249
+  public Entry getEntry Entries.getEntry41,1297
+  public int getIndex Entries.getIndex45,1389
+  public void processRequest Entries.processRequest51,1515
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/cal/TableBean.java,523
+public class TableBean 22,859
+  public TableBean TableBean.TableBean32,1038
+  public void setName TableBean.setName38,1184
+  public String getName TableBean.getName42,1245
+  public void setEmail TableBean.setEmail46,1303
+  public String getEmail TableBean.getEmail50,1370
+  public String getDate TableBean.getDate54,1428
+  public Entries getEntries TableBean.getEntries58,1484
+  public void processRequest TableBean.processRequest62,1547
+  public boolean getProcessError TableBean.getProcessError91,2547
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/cal/JspCalendar.java,1402
+public class JspCalendar 22,823
+    public JspCalendar(JspCalendar.JspCalendar26,904
+    public int getYear(JspCalendar.getYear33,1035
+    public String getMonth(JspCalendar.getMonth37,1110
+    public String getDay(JspCalendar.getDay50,1415
+    public int getMonthInt(JspCalendar.getMonthInt62,1667
+    public String getDate(JspCalendar.getDate66,1747
+    public String getCurrentDate(JspCalendar.getCurrentDate70,1851
+    public String getNextDate(JspCalendar.getNextDate77,2017
+    public String getPrevDate(JspCalendar.getPrevDate82,2145
+    public String getTime(JspCalendar.getTime87,2273
+    public int getDayOfMonth(JspCalendar.getDayOfMonth91,2369
+    public int getDayOfYear(JspCalendar.getDayOfYear95,2454
+    public int getWeekOfYear(JspCalendar.getWeekOfYear99,2537
+    public int getWeekOfMonth(JspCalendar.getWeekOfMonth103,2622
+    public int getDayOfWeek(JspCalendar.getDayOfWeek107,2709
+    public int getHour(JspCalendar.getHour111,2797
+    public int getMinute(JspCalendar.getMinute115,2879
+    public int getSecond(JspCalendar.getSecond120,2955
+    public int getEra(JspCalendar.getEra125,3033
+    public String getUSTimeZone(JspCalendar.getUSTimeZone129,3102
+    public int getZoneOffset(JspCalendar.getZoneOffset136,3294
+    public int getDSTOffset(JspCalendar.getDSTOffset141,3392
+    public int getAMPM(JspCalendar.getAMPM146,3492
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/cal/Entry.java,277
+public class Entry 20,802
+  public Entry Entry.Entry26,878
+  public String getHour Entry.getHour32,964
+  public String getColor Entry.getColor36,1020
+  public String getDescription Entry.getDescription41,1130
+  public void setDescription Entry.setDescription46,1252
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/num/NumberGuessBean.java,397
+public class NumberGuessBean 26,895
+  public NumberGuessBean(NumberGuessBean.NumberGuessBean33,994
+  public void setGuess(NumberGuessBean.setGuess37,1041
+  public boolean getSuccess(NumberGuessBean.getSuccess62,1452
+  public String getHint(NumberGuessBean.getHint66,1509
+  public int getNumGuesses(NumberGuessBean.getNumGuesses70,1564
+  public void reset(NumberGuessBean.reset74,1623
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/SessionExample.java,37
+public class SessionExample 34,1085
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/chat/ChatServlet.java,475
+public class ChatServlet39,1250
+    public void init(ChatServlet.init46,1489
+    public void destroy(ChatServlet.destroy54,1812
+    public class MessageSender ChatServlet.MessageSender180,6872
+        public MessageSender(ChatServlet.MessageSender.MessageSender185,7049
+        public void stop(ChatServlet.MessageSender.stop188,7101
+        public void send(ChatServlet.MessageSender.send200,7518
+        public void run(ChatServlet.MessageSender.run211,7893
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/RequestHeaderExample.java,43
+public class RequestHeaderExample 34,1091
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/checkbox/CheckTest.java,139
+public class CheckTest 20,807
+    public String[] getFruit(CheckTest.getFruit24,888
+    public void setFruit(CheckTest.setFruit28,939
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/HelloWorldExample.java,40
+public class HelloWorldExample 32,1033
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/dates/JspCalendar.java,1308
+public class JspCalendar 21,824
+    public JspCalendar(JspCalendar.JspCalendar24,883
+    public int getYear(JspCalendar.getYear30,1013
+    public String getMonth(JspCalendar.getMonth34,1088
+    public String getDay(JspCalendar.getDay47,1393
+    public int getMonthInt(JspCalendar.getMonthInt59,1645
+    public String getDate(JspCalendar.getDate63,1725
+    public String getTime(JspCalendar.getTime68,1829
+    public int getDayOfMonth(JspCalendar.getDayOfMonth72,1925
+    public int getDayOfYear(JspCalendar.getDayOfYear76,2010
+    public int getWeekOfYear(JspCalendar.getWeekOfYear80,2093
+    public int getWeekOfMonth(JspCalendar.getWeekOfMonth84,2178
+    public int getDayOfWeek(JspCalendar.getDayOfWeek88,2265
+    public int getHour(JspCalendar.getHour92,2353
+    public int getMinute(JspCalendar.getMinute96,2435
+    public int getSecond(JspCalendar.getSecond101,2511
+    public static void main(JspCalendar.main105,2586
+    private static void p(JspCalendar.p122,3105
+    public int getEra(JspCalendar.getEra127,3175
+    public String getUSTimeZone(JspCalendar.getUSTimeZone131,3244
+    public int getZoneOffset(JspCalendar.getZoneOffset138,3436
+    public int getDSTOffset(JspCalendar.getDSTOffset143,3534
+    public int getAMPM(JspCalendar.getAMPM148,3634
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/sessions/DummyCart.java,416
+public class DummyCart 21,832
+    private void addItem(DummyCart.addItem26,957
+    private void removeItem(DummyCart.removeItem30,1032
+    public void setItem(DummyCart.setItem34,1113
+    public void setSubmit(DummyCart.setSubmit38,1184
+    public String[] getItems(DummyCart.getItems42,1249
+    public void processRequest(DummyCart.processRequest48,1377
+    private void reset(DummyCart.reset61,1756
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/error/Smart.java,117
+public class Smart 21,805
+  public String getName Smart.getName25,851
+  public void setName Smart.setName29,900
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/util/HTMLFilter.java,97
+public final class HTMLFilter 27,974
+    public static String filter(HTMLFilter.filter37,1316
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/examples/FooTag.java,388
+public class FooTag 29,1000
+    private final void setAtt(FooTag.setAtt35,1114
+    public void setAtt1(FooTag.setAtt139,1211
+    public void setAtt2(FooTag.setAtt243,1288
+    public void setAtt3(FooTag.setAtt347,1361
+    public int doStartTag(FooTag.doStartTag56,1519
+    public void doInitBody(FooTag.doInitBody61,1619
+    public int doAfterBody(FooTag.doAfterBody66,1747
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/examples/FooTagExtraInfo.java,119
+public class FooTagExtraInfo 21,842
+    public VariableInfo[] getVariableInfo(FooTagExtraInfo.getVariableInfo22,894
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/examples/ExampleTagBase.java,602
+public abstract class ExampleTagBase 22,870
+    public void setParent(ExampleTagBase.setParent24,933
+    public void setBodyContent(ExampleTagBase.setBodyContent28,1010
+    public void setPageContext(ExampleTagBase.setPageContext32,1103
+    public Tag getParent(ExampleTagBase.getParent36,1208
+    public int doStartTag(ExampleTagBase.doStartTag40,1276
+    public int doEndTag(ExampleTagBase.doEndTag44,1359
+    public void doInitBody(ExampleTagBase.doInitBody51,1560
+    public int doAfterBody(ExampleTagBase.doAfterBody54,1618
+    public void release(ExampleTagBase.release58,1702
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/examples/LogTag.java,194
+public class LogTag 27,943
+    public void setToBrowser(LogTag.setToBrowser32,1029
+    public int doStartTag(LogTag.doStartTag41,1262
+    public int doAfterBody(LogTag.doAfterBody45,1358
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/classes/examples/ShowSource.java,142
+public class ShowSource28,938
+    public void setJspFile(ShowSource.setJspFile33,1012
+    public int doEndTag(ShowSource.doEndTag37,1096
+
+workspace/build/tomcat/apache-tomcat-6.0.20/webapps/examples/WEB-INF/jsp/applet/Clock2.java,526
+public class Clock2 28,915
+    public void init(Clock2.init39,1535
+    public void plotpoints(Clock2.plotpoints63,2512
+    public void circle(Clock2.circle75,2990
+    public void paint(Clock2.paint98,3472
+    public void start(Clock2.start176,6441
+    public void stop(Clock2.stop181,6531
+    public void run(Clock2.run185,6585
+    public void update(Clock2.update196,6853
+    public String getAppletInfo(Clock2.getAppletInfo200,6915
+    public String[][] getParameterInfo(Clock2.getParameterInfo204,7042
+
+src/java/hannibal/SecurityContext.java,40
+public interface SecurityContext17,609
+
+src/java/hannibal/ErrorImpl.java,195
+public class ErrorImplSecurityContext.ErrorImpl17,609
+	private ErrorImpl(ErrorImpl.ErrorImpl21,690
+	public ErrorImpl(ErrorImpl.ErrorImpl23,727
+	public ErrorImpl(ErrorImpl.ErrorImpl29,839
+
+src/java/hannibal/AbstractDomain.java,64
+public interface AbstractDomainErrorImpl.AbstractDomain17,609
+
+src/java/hannibal/MessageImpl.java,606
+public class MessageImplAbstractDomain.MessageImpl17,609
+	protected MessageImpl(MessageImpl.MessageImpl24,769
+	public MessageImpl(MessageImpl.MessageImpl26,801
+	public MessageImpl(MessageImpl.MessageImpl32,916
+	public String getName(MessageImpl.getName38,1052
+	public String getMessage(MessageImpl.getMessage39,1095
+	public String getCategory(MessageImpl.getCategory40,1144
+	public void setName(MessageImpl.setName42,1197
+	public void setMessage(MessageImpl.setMessage43,1251
+	public void setCategory(MessageImpl.setCategory44,1317
+	public String toString(MessageImpl.toString46,1389
+
+src/java/hannibal/MessageManager.java,931
+public class MessageManagerMessageImpl.MessageManager17,609
+	public MessageManager(MessageManager.MessageManager21,704
+	public MessageManager(MessageManager.MessageManager26,820
+	public void add(MessageManager.add38,1085
+	public void add(MessageManager.add43,1186
+	public void add(MessageManager.add48,1316
+	public void add(MessageManager.add58,1527
+	public void add(MessageManager.add69,1710
+	public void add(MessageManager.add79,2000
+	public java.util.Iterator propertySet(MessageManager.propertySet97,2452
+	public Message getMessage(MessageManager.getMessage102,2551
+	public java.util.List<Message> getMessageList(MessageManager.getMessageList119,2856
+	public java.util.List<Message> getMessageList(MessageManager.getMessageList131,3126
+	public java.util.Map<String, java.util.List<Message>> getMessageMap(MessageManager.getMessageMap143,3385
+	public boolean isEmpty(MessageManager.isEmpty148,3550
+
+src/java/hannibal/Error.java,51
+public interface ErrorMessageManager.Error17,609
+
+src/java/hannibal/service/rest/Service.java,52
+public abstract class Service<Error.Service20,636
+
+src/java/hannibal/service/Service.java,49
+public interface Service<Service.Service19,630
+
+src/java/hannibal/Clockable.java,334
+public interface ClockableService.Clockable2,18
+	public enum HASH_ALGORITHM Clockable.HASH_ALGORITHM4,47
+	public enum HASH_ALGORITHM { SHA,Clockable.HASH_ALGORITHM.SHA4,47
+	public enum HASH_ALGORITHM { SHA, SHA1,Clockable.HASH_ALGORITHM.SHA14,47
+	public enum HASH_ALGORITHM { SHA, SHA1, MD5 Clockable.HASH_ALGORITHM.MD54,47
+
+src/java/hannibal/AppProfile.java,56
+public interface AppProfileClockable.AppProfile17,609
+
+src/java/hannibal/servlet/rest/RestSecurityFilter.java,243
+public final class RestSecurityFilterAppProfile.RestSecurityFilter26,869
+	public void init(RestSecurityFilter.init33,1067
+	public void destroy(RestSecurityFilter.destroy39,1185
+	public boolean allowed(RestSecurityFilter.allowed63,1671
+
+src/java/hannibal/servlet/rest/ContentContext.java,504
+public abstract class ContentContextRestSecurityFilter.ContentContext18,606
+	public Redirect getRedirect(ContentContext.getRedirect31,956
+	public void setRedirect(ContentContext.setRedirect32,1008
+	public void redirect(ContentContext.redirect34,1080
+	public boolean isRedirect(ContentContext.isRedirect43,1249
+	public String getRedirectUri(ContentContext.getRedirectUri48,1319
+	public class RedirectContentContext.Redirect53,1395
+		public Redirect(ContentContext.Redirect.Redirect58,1488
+
+src/java/hannibal/servlet/rest/RestfulSecurityContext.java,461
+public class RestfulSecurityContextContentContext.RestfulSecurityContext20,711
+	public RestfulSecurityContext(RestfulSecurityContext.RestfulSecurityContext25,864
+	public boolean allowed(RestfulSecurityContext.allowed27,904
+	public boolean allowed(RestfulSecurityContext.allowed78,2744
+	private java.util.Set<String> createRoleSet(RestfulSecurityContext.createRoleSet147,5054
+	private boolean checkAllowed(RestfulSecurityContext.checkAllowed161,5365
+
+src/java/hannibal/servlet/rest/SimpleHandlerContext.java,236
+public class SimpleHandlerContextRestfulSecurityContext.SimpleHandlerContext27,927
+    public SimpleHandlerContext(SimpleHandlerContext.SimpleHandlerContext30,989
+	public ContentContext execute(SimpleHandlerContext.execute32,1031
+
+src/java/hannibal/servlet/rest/RestServlet.java,1610
+public class RestServletSimpleHandlerContext.RestServlet32,1079
+	public Map<String, Object> getRedirectContextMap(RestServlet.getRedirectContextMap40,1294
+	public void setRedirectContextMap(RestServlet.setRedirectContextMap41,1377
+    protected RestConfiguration getRestConfiguration(RestServlet.getRestConfiguration43,1501
+    protected void setRestConfiguration(RestServlet.setRestConfiguration44,1586
+    public void init(RestServlet.init47,1727
+	private void set404NotFound(RestServlet.set404NotFound284,9238
+	private void set500InternalServerError(RestServlet.set500InternalServerError290,9393
+    private boolean isValidMethod(RestServlet.isValidMethod296,9571
+    private String prepareMethod(RestServlet.prepareMethod315,10083
+	public Object getRedirectValue(RestServlet.getRedirectValue327,10258
+    protected HandlerContext getHandlerContext(RestServlet.getHandlerContext332,10355
+	public String determinePrimaryKeyName(RestServlet.determinePrimaryKeyName337,10449
+	public boolean isDomainName(RestServlet.isDomainName344,10696
+	public boolean isUriACollection(RestServlet.isUriACollection353,11004
+	public String prepareImplicitHandler(RestServlet.prepareImplicitHandler360,11224
+	public String prepareGenericHandler(RestServlet.prepareGenericHandler371,11770
+	public String getErrorHandler(RestServlet.getErrorHandler378,12063
+	public void extractDomainInformation(RestServlet.extractDomainInformation395,12629
+	public String determinePrefix(RestServlet.determinePrefix402,12905
+	public hannibal.AppProfile getAppProfile(RestServlet.getAppProfile432,13751
+
+src/java/hannibal/servlet/rest/ErrorHandlerContext.java,221
+public class ErrorHandlerContextRestServlet.ErrorHandlerContext29,1012
+    public ErrorHandlerContext(ErrorHandlerContext.ErrorHandlerContext34,1152
+	public ContentContext execute(ErrorHandlerContext.execute36,1193
+
+src/java/hannibal/servlet/rest/RestContext.java,1122
+public class RestContextErrorHandlerContext.RestContext22,712
+	public Map<String, Object> getUriParameterMap(RestContext.getUriParameterMap28,851
+	public void setUriParameterMap(RestContext.setUriParameterMap29,928
+	public RestContext(RestContext.RestContext31,1024
+	public RestContext(RestContext.RestContext36,1090
+	public String getThisDomain(RestContext.getThisDomain41,1179
+	public List<String> getDomainNames(RestContext.getDomainNames61,1642
+	public Set<String> getDomainIds(RestContext.getDomainIds73,1908
+	public List<String> getThisDomainIds(RestContext.getThisDomainIds82,2089
+	public List<String> getOtherDomainIds(RestContext.getOtherDomainIds99,2406
+	public Boolean hasIdentifier(RestContext.hasIdentifier109,2632
+	public String getIdValue(RestContext.getIdValue114,2738
+	public String constructDomainId(RestContext.constructDomainId119,2845
+	public String extractDomainObjectPath(RestContext.extractDomainObjectPath134,3206
+	public Map<String, String> extractDomainObjectPaths(RestContext.extractDomainObjectPaths139,3346
+	public String toString(RestContext.toString172,4106
+
+src/java/hannibal/servlet/rest/HandlerException.java,798
+public class HandlerExceptionRestContext.HandlerException17,605
+	public enum ErrorCode HandlerException.ErrorCode20,675
+	public enum ErrorCode { NO_ERROR_CODE,HandlerException.ErrorCode.NO_ERROR_CODE20,675
+	public enum ErrorCode { NO_ERROR_CODE, HANDLER_NOT_FOUND HandlerException.ErrorCode.HANDLER_NOT_FOUND20,675
+	public ErrorCode getErrorCode(HandlerException.getErrorCode24,795
+	public HandlerException(HandlerException.HandlerException26,856
+	public HandlerException(HandlerException.HandlerException31,924
+	public HandlerException(HandlerException.HandlerException37,1045
+	public HandlerException(HandlerException.HandlerException42,1104
+	public HandlerException(HandlerException.HandlerException48,1216
+	public HandlerException(HandlerException.HandlerException53,1302
+
+src/java/hannibal/servlet/rest/HandlerContext.java,76
+public abstract class HandlerContextHandlerException.HandlerContext28,920
+
+src/java/hannibal/servlet/rest/SimpleContentContext.java,710
+public class SimpleContentContextHandlerContext.SimpleContentContext17,605
+	public String getContent(SimpleContentContext.getContent26,828
+    public void setContent(SimpleContentContext.setContent40,1080
+    public String getType(SimpleContentContext.getType42,1149
+    public void setType(SimpleContentContext.setType43,1194
+	public String getResponseCode(SimpleContentContext.getResponseCode45,1251
+	public void setResponseCode(SimpleContentContext.setResponseCode46,1309
+    public SimpleContentContext(SimpleContentContext.SimpleContentContext48,1396
+    public SimpleContentContext(SimpleContentContext.SimpleContentContext53,1467
+	public void debug(SimpleContentContext.debug59,1582
+
+src/java/hannibal/servlet/rest/HtmlHandlerContext.java,224
+public class HtmlHandlerContextSimpleContentContext.HtmlHandlerContext29,1012
+    public HtmlHandlerContext(HtmlHandlerContext.HtmlHandlerContext34,1137
+	public ContentContext execute(HtmlHandlerContext.execute36,1177
+
+src/java/hannibal/domain/Link.java,798
+public class LinkHtmlHandlerContext.Link3,26
+	public String getHref(Link.getHref14,219
+	public String getRel(Link.getRel15,261
+	public String getRev(Link.getRev16,301
+	public String getDomain(Link.getDomain17,341
+	public String getId(Link.getId18,387
+	public String getHreflang(Link.getHreflang19,425
+	public String getTitle(Link.getTitle20,475
+	public String getLabel(Link.getLabel21,519
+	public void setHref(Link.setHref23,565
+	public void setRel(Link.setRel24,618
+	public void setRev(Link.setRev25,667
+	public void setDomain(Link.setDomain26,716
+	public void setId(Link.setId27,777
+	public void setHreflang(Link.setHreflang28,822
+	public void setTitle(Link.setTitle29,891
+	public void setLabel(Link.setLabel30,948
+	public String toString(Link.toString32,1007
+
+src/java/hannibal/domain/ActiveRecord.java,53
+public interface ActiveRecordLink.ActiveRecord3,26
+
+src/java/hannibal/domain/DomainConfiguration.java,4065
+public class DomainConfigurationActiveRecord.DomainConfiguration25,771
+    private Map<String, DomainEntry> getDomainEntryMap(DomainConfiguration.getDomainEntryMap33,1014
+    private void setDomainEntryMap(DomainConfiguration.setDomainEntryMap34,1098
+    public DomainConfiguration(DomainConfiguration.DomainConfiguration36,1214
+	public DomainEntry init(DomainConfiguration.init41,1317
+    public DomainEntry init(DomainConfiguration.init55,1649
+	public DomainEntry init(DomainConfiguration.init66,2012
+    public class DomainEntryDomainConfiguration.DomainEntry75,2295
+		public String getName(DomainConfiguration.DomainEntry.getName85,2589
+		public String getDisplay(DomainConfiguration.DomainEntry.getDisplay86,2632
+		public String getPlural(DomainConfiguration.DomainEntry.getPlural87,2681
+		public String getRepresentationString(DomainConfiguration.DomainEntry.getRepresentationString88,2728
+		public boolean getValidateAllFields(DomainConfiguration.DomainEntry.getValidateAllFields89,2803
+		private Map<String, FieldEntry> getFieldEntryMap(DomainConfiguration.DomainEntry.getFieldEntryMap90,2873
+		private List<String> getFieldEntryList(DomainConfiguration.DomainEntry.getFieldEntryList91,2952
+		public DomainEntry setName(DomainConfiguration.DomainEntry.setName93,3025
+		public DomainEntry setDisplay(DomainConfiguration.DomainEntry.setDisplay94,3099
+		public DomainEntry setPlural(DomainConfiguration.DomainEntry.setPlural95,3186
+		public DomainEntry setRepresentationString(DomainConfiguration.DomainEntry.setRepresentationString96,3268
+		public DomainEntry setValidateAllFields(DomainConfiguration.DomainEntry.setValidateAllFields97,3406
+		public void setFieldEntryMap(DomainConfiguration.DomainEntry.setFieldEntryMap98,3533
+		public void setFieldEntryList(DomainConfiguration.DomainEntry.setFieldEntryList99,3640
+		public DomainEntry(DomainConfiguration.DomainEntry.DomainEntry101,3743
+		public FieldEntry init(DomainConfiguration.DomainEntry.init108,3910
+		public FieldEntry getFieldEntry(DomainConfiguration.DomainEntry.getFieldEntry125,4248
+		public List<String> getFieldNames(DomainConfiguration.DomainEntry.getFieldNames130,4353
+		public void remove(DomainConfiguration.DomainEntry.remove135,4454
+	public class FieldEntryDomainConfiguration.FieldEntry142,4607
+		public String getName(DomainConfiguration.FieldEntry.getName149,4808
+		public String getType(DomainConfiguration.FieldEntry.getType150,4851
+		public Map<String, Object> getVRuleMap(DomainConfiguration.FieldEntry.getVRuleMap151,4894
+		public Map<String, Object> getDRuleMap(DomainConfiguration.FieldEntry.getDRuleMap152,4958
+		public FieldEntry setName(DomainConfiguration.FieldEntry.setName154,5023
+		public FieldEntry setType(DomainConfiguration.FieldEntry.setType155,5103
+		protected void setVRuleMap(DomainConfiguration.FieldEntry.setVRuleMap157,5186
+		protected void setDRuleMap(DomainConfiguration.FieldEntry.setDRuleMap158,5272
+		FieldEntry(DomainConfiguration.FieldEntry.FieldEntry160,5360
+		FieldEntry(DomainConfiguration.FieldEntry.FieldEntry166,5478
+		FieldEntry(DomainConfiguration.FieldEntry.FieldEntry167,5533
+		public FieldEntry addVRule(DomainConfiguration.FieldEntry.addVRule169,5608
+		public FieldEntry addDRule(DomainConfiguration.FieldEntry.addDRule176,5739
+		public void clearVRules(DomainConfiguration.FieldEntry.clearVRules183,5870
+	public boolean hasVRule(DomainConfiguration.hasVRule186,5929
+	public DomainEntry getDomainEntry(DomainConfiguration.getDomainEntry200,6236
+	public boolean isDomainEntry(DomainConfiguration.isDomainEntry205,6364
+	public boolean isCollection(DomainConfiguration.isCollection212,6519
+	public boolean isFieldEntry(DomainConfiguration.isFieldEntry219,6681
+	public String getDisplay(DomainConfiguration.getDisplay227,6957
+	public String getPlural(DomainConfiguration.getPlural232,7053
+	public FieldEntry getFieldEntry(DomainConfiguration.getFieldEntry237,7150
+	public List<String> getFieldNames(DomainConfiguration.getFieldNames251,7454
+
+src/java/hannibal/dao/DataSourceFactory.java,330
+public class DataSourceFactoryDomainConfiguration.DataSourceFactory21,681
+	private DataSourceFactory(DataSourceFactory.DataSourceFactory26,805
+    public synchronized static DataSourceFactory getInstance(DataSourceFactory.getInstance31,879
+	public javax.sql.DataSource getDataSource(DataSourceFactory.getDataSource50,1827
+
+src/java/hannibal/dao/Key.java,50
+public interface KeyDataSourceFactory.Key17,596
+
+src/java/hannibal/dao/db/simpledb/ParameterizedRowMapper.java,75
+public interface ParameterizedRowMapper<Key.ParameterizedRowMapper17,608
+
+src/java/hannibal/dao/db/simpledb/Dao.java,79
+public class DaoParameterizedRowMapper.Dao17,608
+	public Dao(Dao.Dao20,655
+
+src/java/hannibal/dao/db/simpledb/SimpleDbTemplate.java,336
+public class SimpleDbTemplateDao.SimpleDbTemplate19,642
+	protected TypicaUtil getTypicaUtil(SimpleDbTemplate.getTypicaUtil23,709
+	protected void setTypicaUtil(SimpleDbTemplate.setTypicaUtil24,770
+	public SimpleDbTemplate(SimpleDbTemplate.SimpleDbTemplate26,856
+	public <T> java.util.List<T> query(SimpleDbTemplate.query31,983
+
+src/java/hannibal/dao/db/spring/Dao.java,76
+public class DaoSimpleDbTemplate.Dao19,671
+    public Dao(Dao.Dao22,720
+
+src/java/hannibal/dao/db/s3/Dao.java,181
+public class DaoDao.Dao19,636
+	protected JetsetUtil getJetsetUtil(Dao.getJetsetUtil23,690
+	protected void setJetsetUtil(Dao.setJetsetUtil24,751
+    public Dao(Dao.Dao26,836
+
+src/java/hannibal/generator/SqlGenerator.java,3509
+public class SqlGeneratorDao.SqlGenerator23,764
+    public DatabaseTypes getDatabaseTypes(SqlGenerator.getDatabaseTypes51,3248
+    public void setDatabaseTypes(SqlGenerator.setDatabaseTypes57,3355
+    public SqlGenerator(SqlGenerator.SqlGenerator62,3479
+    public SqlGenerator(SqlGenerator.SqlGenerator67,3528
+    public void generate(SqlGenerator.generate72,3642
+	public String generateCreateTableSql(SqlGenerator.generateCreateTableSql143,7956
+	public String generateCreateChangeEventTableSql(SqlGenerator.generateCreateChangeEventTableSql191,10236
+	public String generateDropTableSql(SqlGenerator.generateDropTableSql255,13410
+	public String generateDropChangeEventTableSql(SqlGenerator.generateDropChangeEventTableSql275,14073
+	public String generateCreateIndexSql(SqlGenerator.generateCreateIndexSql295,14762
+	public String generateDropIndexSql(SqlGenerator.generateDropIndexSql380,18820
+	public String generateCreatePrimaryKeyIndexSql(SqlGenerator.generateCreatePrimaryKeyIndexSql415,20380
+	public String generateCreateAutoIncrementSql(SqlGenerator.generateCreateAutoIncrementSql452,21944
+	public String generateCreateForeignKeyIndexSql(SqlGenerator.generateCreateForeignKeyIndexSql495,23911
+	public String generateSelectSql(SqlGenerator.generateSelectSql539,26120
+	public String generateBoundSelectSql(SqlGenerator.generateBoundSelectSql575,27474
+	public String generateFindByForeignKeySql(SqlGenerator.generateFindByForeignKeySql611,28833
+	public String generateBoundFindByForeignKeySql(SqlGenerator.generateBoundFindByForeignKeySql656,30609
+	public String generateFindThisRangeSql(SqlGenerator.generateFindThisRangeSql700,32401
+	public String generateBoundFindThisRangeSql(SqlGenerator.generateBoundFindThisRangeSql736,33866
+	public String generateFindByThisAttributeSql(SqlGenerator.generateFindByThisAttributeSql772,35284
+	public String generateBoundFindByThisForeignKeySql(SqlGenerator.generateBoundFindByThisForeignKeySql812,36826
+	public String generateBoundCollectForChangeSql(SqlGenerator.generateBoundCollectForChangeSql857,38507
+	public String generateFindSql(SqlGenerator.generateFindSql892,39910
+	public String generateExistsSql(SqlGenerator.generateExistsSql933,41452
+	public String generateBoundFindSql(SqlGenerator.generateBoundFindSql938,41581
+	public String generateUpdateSql(SqlGenerator.generateUpdateSql980,43153
+	public String generateBoundUpdateSql(SqlGenerator.generateBoundUpdateSql1028,44850
+	public String generateInsertSql(SqlGenerator.generateInsertSql1069,46346
+	public String generateInsertChangeEventSql(SqlGenerator.generateInsertChangeEventSql1111,47903
+	public String generateBoundInsertSql(SqlGenerator.generateBoundInsertSql1156,49647
+	public String generateDeleteSql(SqlGenerator.generateDeleteSql1197,51269
+	public String generateBoundDeleteSql(SqlGenerator.generateBoundDeleteSql1228,52314
+	public String generateCreateDdlSql(SqlGenerator.generateCreateDdlSql1258,53384
+	public String generateDropDdlSql(SqlGenerator.generateDropDdlSql1274,54199
+    public String getNullableConstraint(SqlGenerator.getNullableConstraint1282,54466
+    public String extractTableName(SqlGenerator.extractTableName1294,54698
+    protected String extractForeignKeyColumnName(SqlGenerator.extractForeignKeyColumnName1317,55261
+	public DomainObjectModel getForeignDomainObjectModel(SqlGenerator.getForeignDomainObjectModel1356,56792
+	public String findPrimaryKey(SqlGenerator.findPrimaryKey1385,57984
+
+src/java/hannibal/generator/SpringCfgGenerator.java,605
+public class SpringCfgGeneratorSqlGenerator.SpringCfgGenerator30,953
+	public void generate(SpringCfgGenerator.generate35,1211
+	public String generateSpringDaoConfig(SpringCfgGenerator.generateSpringDaoConfig62,2581
+	public String generateSpringControllerConfig(SpringCfgGenerator.generateSpringControllerConfig73,3147
+	public String generateSpringMappingConfig(SpringCfgGenerator.generateSpringMappingConfig90,3986
+	public String generateSpringWebConfig(SpringCfgGenerator.generateSpringWebConfig107,4809
+	public String generateServiceConfig(SpringCfgGenerator.generateServiceConfig117,5197
+
+src/java/hannibal/generator/LuceneGenerator.java,290
+public class LuceneGeneratorSpringCfgGenerator.LuceneGenerator30,953
+	public void generate(LuceneGenerator.generate35,1203
+	public String generateSearcher(LuceneGenerator.generateSearcher46,1696
+	public String generateSearcherFactory(LuceneGenerator.generateSearcherFactory124,5403
+
+src/java/hannibal/generator/Annotation.java,642
+public class AnnotationLuceneGenerator.Annotation20,651
+	public String getName(Annotation.getName25,743
+	public Map<String, Object> getParameterMap(Annotation.getParameterMap26,785
+	public void setName(Annotation.setName28,858
+	public void setParameterMap(Annotation.setParameterMap29,911
+	public Annotation(Annotation.Annotation31,1011
+	public void addParameterValue(Annotation.addParameterValue36,1089
+	public Object getParameterValue(Annotation.getParameterValue41,1206
+	public String toString(Annotation.toString46,1309
+	public boolean equals(Annotation.equals57,1595
+	public int hashCode(Annotation.hashCode74,1884
+
+src/java/hannibal/generator/Template.java,33
+public interface Template17,618
+
+src/java/hannibal/generator/DomainObjectModel.java,3137
+public class DomainObjectModelTemplate.DomainObjectModel26,832
+	public String getPackageName(DomainObjectModel.getPackageName43,1403
+	public String getClassName(DomainObjectModel.getClassName44,1460
+	public String getAppName(DomainObjectModel.getAppName45,1537
+	public Map<Attribute, Set<Annotation>> getAttributeAnnotationSetMap(DomainObjectModel.getAttributeAnnotationSetMap46,1586
+	public Map<String, Attribute> getAttributeNameMap(DomainObjectModel.getAttributeNameMap47,1696
+	public Set<String> getAnnotationNameSet(DomainObjectModel.getAnnotationNameSet48,1780
+	public List<Attribute> getAttributeList(DomainObjectModel.getAttributeList49,1854
+	public Set<String> getDirectSuperClassSet(DomainObjectModel.getDirectSuperClassSet50,1924
+	public String getRootPackageName(DomainObjectModel.getRootPackageName51,2002
+	public boolean getIsClockable(DomainObjectModel.getIsClockable52,2067
+	protected Set getReservedPropertyNameSet(DomainObjectModel.getReservedPropertyNameSet53,2125
+	public int getAttributeCount(DomainObjectModel.getAttributeCount54,2206
+	public void setPackageName(DomainObjectModel.setPackageName56,2270
+	public void setClassName(DomainObjectModel.setClassName57,2366
+	public void setAppName(DomainObjectModel.setAppName58,2464
+	public void setAttributeAnnotationSetMap(DomainObjectModel.setAttributeAnnotationSetMap59,2530
+	public void setAttributeNameMap(DomainObjectModel.setAttributeNameMap60,2693
+	public void setAnnotationNameSet(DomainObjectModel.setAnnotationNameSet61,2811
+	public void setAttributeList(DomainObjectModel.setAttributeList62,2922
+	public void setDirectSuperClassSet(DomainObjectModel.setDirectSuperClassSet63,3021
+	public void setRootPackageName(DomainObjectModel.setRootPackageName64,3140
+	public void setTableName(DomainObjectModel.setTableName65,3238
+	public void setIsClockable(DomainObjectModel.setIsClockable66,3312
+	protected void setReservedPropertyNameSet(DomainObjectModel.setReservedPropertyNameSet67,3395
+	public void setAttributeCount(DomainObjectModel.setAttributeCount68,3525
+	public DomainObjectModel(DomainObjectModel.DomainObjectModel70,3619
+	public boolean isClockable(DomainObjectModel.isClockable87,4229
+	public void addAnnotation(DomainObjectModel.addAnnotation92,4293
+	public Attribute getAttributeByName(DomainObjectModel.getAttributeByName124,5634
+	public Iterator<Attribute> getAttributes(DomainObjectModel.getAttributes129,5741
+	public Annotation getAnnotation(DomainObjectModel.getAnnotation134,5855
+	public List<Attribute> getAttribute(DomainObjectModel.getAttribute160,6512
+	public boolean contains(DomainObjectModel.contains182,7077
+	public String toString(DomainObjectModel.toString196,7392
+	public String getFullyQualifiedClassName(DomainObjectModel.getFullyQualifiedClassName210,7969
+	public String upperTheFirstCharacter(DomainObjectModel.upperTheFirstCharacter215,8089
+	public void mergeDomain(DomainObjectModel.mergeDomain231,8408
+	public String getTableName(DomainObjectModel.getTableName250,9135
+	public boolean isAbstractDomain(DomainObjectModel.isAbstractDomain285,10271
+
+src/java/hannibal/generator/PropertyUtilGenerator.java,232
+public class PropertyUtilGeneratorDomainObjectModel.PropertyUtilGenerator30,953
+	public void generate(PropertyUtilGenerator.generate35,1209
+	public String generatePropertyUtil(PropertyUtilGenerator.generatePropertyUtil46,1665
+
+src/java/hannibal/generator/TargetDatabase.java,77
+public @interface TargetDatabasePropertyUtilGenerator.TargetDatabase19,700
+
+src/java/hannibal/generator/DatabaseTypes.java,544
+public class DatabaseTypesPropertyUtilGenerator.DatabaseTypes17,602
+    public String getVar(DatabaseTypes.getVar28,984
+    public String getNum(DatabaseTypes.getNum33,1044
+    public String getDate(DatabaseTypes.getDate38,1104
+    public String getDatetime(DatabaseTypes.getDatetime43,1166
+    public String getTimestamp(DatabaseTypes.getTimestamp48,1236
+    public String getTime(DatabaseTypes.getTime53,1308
+    public String getYear(DatabaseTypes.getYear58,1370
+    public DatabaseTypes(DatabaseTypes.DatabaseTypes63,1432
+
+src/java/hannibal/generator/S3Generator.java,366
+public class S3Generator30,953
+	public void generate(S3Generator.generate35,1199
+	public String generateDao(S3Generator.generateDao46,1679
+	public String generateDaoFactory(S3Generator.generateDaoFactory267,15344
+	public String generateController(S3Generator.generateController277,15682
+	public String generateService(S3Generator.generateService288,16227
+
+src/java/hannibal/generator/DbUtilsGenerator.java,188
+public class DbUtilsGeneratorS3Generator.DbUtilsGenerator30,953
+	public void generate(DbUtilsGenerator.generate35,1204
+	public String generateDao(DbUtilsGenerator.generateDao46,1686
+
+src/java/hannibal/generator/OracleDatabaseTypes.java,619
+public final class OracleDatabaseTypes DbUtilsGenerator.OracleDatabaseTypes17,602
+    public String getVar(OracleDatabaseTypes.getVar28,1011
+    public String getNum(OracleDatabaseTypes.getNum33,1075
+    public String getDate(OracleDatabaseTypes.getDate38,1135
+    public String getDatetime(OracleDatabaseTypes.getDatetime43,1197
+    public String getTimestamp(OracleDatabaseTypes.getTimestamp48,1267
+    public String getTime(OracleDatabaseTypes.getTime53,1339
+    public String getYear(OracleDatabaseTypes.getYear58,1401
+    public OracleDatabaseTypes(OracleDatabaseTypes.OracleDatabaseTypes63,1463
+
+src/java/hannibal/generator/SpringGenerator.java,390
+public class SpringGenerator30,953
+	public void generate(SpringGenerator.generate35,1203
+	public String generateDao(SpringGenerator.generateDao46,1683
+	public String generateDaoFactory(SpringGenerator.generateDaoFactory281,16495
+	public String generateController(SpringGenerator.generateController291,16837
+	public String generateService(SpringGenerator.generateService302,17386
+
+src/java/hannibal/generator/JavaGenerator.java,882
+public class JavaGeneratorSpringGenerator.JavaGenerator30,953
+	public void generate(JavaGenerator.generate35,1201
+	public String generateApplicationProfile(JavaGenerator.generateApplicationProfile54,2222
+	public String generateDomainSubInterface(JavaGenerator.generateDomainSubInterface90,3953
+	public String generateInterface(JavaGenerator.generateInterface123,5464
+	public String generateDomainObject(JavaGenerator.generateDomainObject191,8772
+	public String generateActiveRecord(JavaGenerator.generateActiveRecord340,15994
+	protected class PropertyOrderJavaGenerator.PropertyOrder525,25059
+		protected PropertyOrder(JavaGenerator.PropertyOrder.PropertyOrder531,25189
+		@Override(JavaGenerator.PropertyOrder.@Override537,25302
+		@Override(JavaGenerator.PropertyOrder.@Override543,25372
+		public int compareTo(JavaGenerator.PropertyOrder.compareTo562,25780
+
+src/java/hannibal/generator/PhpGenerator.java,333
+public class PhpGeneratorJavaGenerator.PhpGenerator23,764
+	public void generate(PhpGenerator.generate28,1010
+	public String generateDomainObject(PhpGenerator.generateDomainObject47,1890
+	public String generateActiveRecord(PhpGenerator.generateActiveRecord84,3709
+	public String generateDao(PhpGenerator.generateDao145,7051
+
+src/java/hannibal/generator/Compiler.java,2630
+public class Compiler30,1069
+	public Set<String> getAnnotationNameSet(Compiler.getAnnotationNameSet39,1380
+	public Set<Element> getElementSet(Compiler.getElementSet40,1454
+	public Set<String> getDomainClassNameSet(Compiler.getDomainClassNameSet41,1516
+	public Map<String, DomainObjectModel> getPreGenerationMap(Compiler.getPreGenerationMap42,1592
+	public Map<String, DomainObjectModel> getElementNameToDomainObjectModelMap(Compiler.getElementNameToDomainObjectModelMap43,1684
+	public void setAnnotationNameSet(Compiler.setAnnotationNameSet45,1811
+	public void setElementSet(Compiler.setElementSet46,1922
+	public void setDomainClassNameSet(Compiler.setDomainClassNameSet47,2006
+	public void setPreGenerationMap(Compiler.setPreGenerationMap48,2121
+	public void setElementNameToDomainObjectModelMap(Compiler.setElementNameToDomainObjectModelMap49,2247
+	public Compiler(Compiler.Compiler51,2444
+	private void init(Compiler.init60,2762
+	public boolean process(Compiler.process84,4015
+	private void generateFiles(Compiler.generateFiles258,10970
+	private String getFullClassName(Compiler.getFullClassName404,16915
+	private String determineType(Compiler.determineType409,17116
+	private String determineReturnType(Compiler.determineReturnType426,17461
+	private DomainObjectModel createNewDomainObjectModel(Compiler.createNewDomainObjectModel454,18340
+	private void prepareDomainObjectModel(Compiler.prepareDomainObjectModel476,19293
+	private DomainObjectModel createNewDomainObjectModel(Compiler.createNewDomainObjectModel493,20002
+	private DomainObjectModel getRelevantDomainObjectModel(Compiler.getRelevantDomainObjectModel506,20532
+	private String deriveFullyQualifiedClassName(Compiler.deriveFullyQualifiedClassName521,21115
+	private boolean isGetter(Compiler.isGetter526,21342
+	private boolean isSetter(Compiler.isSetter539,21586
+	private String deduceAttributeName(Compiler.deduceAttributeName552,21830
+	private void spawnInterfaceClasses(Compiler.spawnInterfaceClasses570,22326
+	private void processRowList(Compiler.processRowList692,27562
+	private void generateInterfaceFiles(Compiler.generateInterfaceFiles763,30525
+	private boolean isNullable(Compiler.isNullable782,31219
+	private boolean isPrimaryKey(Compiler.isPrimaryKey787,31358
+	private boolean isAutoIncrementPrimaryKey(Compiler.isAutoIncrementPrimaryKey792,31497
+	private boolean isForeignKey(Compiler.isForeignKey797,31656
+	private boolean isSearchable(Compiler.isSearchable803,31859
+	private String getJavaType(Compiler.getJavaType809,32077
+	public boolean isClockable(Compiler.isClockable840,33075
+
+src/java/hannibal/generator/OracleSqlGenerator.java,1410
+public class OracleSqlGenerator Compiler.OracleSqlGenerator23,742
+    public OracleSqlGenerator(OracleSqlGenerator.OracleSqlGenerator47,3139
+    public DatabaseTypes getDatabaseTypes(OracleSqlGenerator.getDatabaseTypes53,3215
+    public void setDatabaseTypes(OracleSqlGenerator.setDatabaseTypes59,3316
+    public void generate(OracleSqlGenerator.generate65,3471
+    public String generateDropSequenceSql(OracleSqlGenerator.generateDropSequenceSql82,4042
+    public String generateCreatePrimaryKeyIndexSql(OracleSqlGenerator.generateCreatePrimaryKeyIndexSql95,4695
+    public String generateCreateAutoIncrementSql(OracleSqlGenerator.generateCreateAutoIncrementSql131,6429
+    public String generateSelectSql(OracleSqlGenerator.generateSelectSql174,8709
+    public String generateBoundSelectSql(OracleSqlGenerator.generateBoundSelectSql211,10243
+    public String generateFindByForeignKeySql(OracleSqlGenerator.generateFindByForeignKeySql248,11788
+    public String generateBoundFindByForeignKeySql(OracleSqlGenerator.generateBoundFindByForeignKeySql294,13812
+    public String generateFindThisRangeSql(OracleSqlGenerator.generateFindThisRangeSql339,15860
+    public String generateBoundFindThisRangeSql(OracleSqlGenerator.generateBoundFindThisRangeSql376,17491
+    public String generateBoundFindByThisForeignKeySql(OracleSqlGenerator.generateBoundFindByThisForeignKeySql413,19102
+
+src/java/hannibal/generator/Datable.java,33
+public @interface Datable19,700
+
+src/java/hannibal/generator/Attribute.java,417
+public class Attribute17,619
+	public String getName(Attribute.getName22,694
+	public String getType(Attribute.getType23,737
+	public void setName(Attribute.setName25,782
+	public void setType(Attribute.setType26,836
+	public Attribute(Attribute.Attribute28,892
+	public String toString(Attribute.toString30,919
+	public boolean equals(Attribute.equals41,1199
+	public int hashCode(Attribute.hashCode58,1514
+
+src/java/hannibal/generator/Generator.java,2328
+public abstract class GeneratorAttribute.Generator29,1011
+    protected Set getPersistableSet(Generator.getPersistableSet35,1302
+    protected Set getNumericSet(Generator.getNumericSet36,1368
+    protected StringTemplateGroup getStringTemplateGroup(Generator.getStringTemplateGroup41,1547
+	protected void setPersistableSet(Generator.setPersistableSet43,1641
+    protected void setNumericSet(Generator.setNumericSet44,1735
+    protected void setStringTemplateGroup(Generator.setStringTemplateGroup45,1816
+    public DatabaseTypes getDatabaseTypes(Generator.getDatabaseTypes49,2021
+    public void setDatabaseTypes(Generator.setDatabaseTypes54,2113
+    public Generator(Generator.Generator59,2237
+    protected String getNullableConstraint(Generator.getNullableConstraint104,3967
+    protected String getDatabaseType(Generator.getDatabaseType116,4202
+    protected String lowerTheFirstCharacter(Generator.lowerTheFirstCharacter168,5855
+    protected String upperTheFirstCharacter(Generator.upperTheFirstCharacter173,5998
+    protected String getSetterName(Generator.getSetterName178,6138
+    protected String getGetterName(Generator.getGetterName183,6253
+    protected String findValue(Generator.findValue188,6368
+	protected Object findRawValue(Generator.findRawValue208,6813
+    protected String extractField(Generator.extractField220,7046
+    protected String extractLabel(Generator.extractLabel244,7656
+    protected String prepareParameterValue(Generator.prepareParameterValue266,8180
+    protected void writeResourceFile(Generator.writeResourceFile278,8514
+    protected void writeResourceFile(Generator.writeResourceFile283,8765
+    protected void writeJavaFile(Generator.writeJavaFile307,9598
+    protected void writeJavaFile(Generator.writeJavaFile312,9769
+    protected boolean isPersistable(Generator.isPersistable335,10460
+    protected String generateResultSetGetter(Generator.generateResultSetGetter348,10777
+    public boolean isNumericType(Generator.isNumericType429,12728
+	protected String determineFormatUtilString(Generator.determineFormatUtilString434,12835
+	public String createHannibalType(Generator.createHannibalType460,14127
+	public boolean isArrayType(Generator.isArrayType465,14254
+	public void printMessage(Generator.printMessage470,14365
+
+src/java/hannibal/generator/MySqlGenerator.java,60
+public class MySqlGeneratorGenerator.MySqlGenerator17,618
+
+src/java/hannibal/generator/Securable.java,60
+public @interface SecurableMySqlGenerator.Securable19,700
+
+src/java/hannibal/generator/Persistable.java,121
+public @interface PersistableMySqlGenerator.Persistable19,700
+    public enum Semantic MySqlGenerator.Semantic21,734
+
+src/java/hannibal/generator/JavaScriptGenerator.java,325
+public class JavaScriptGeneratorMySqlGenerator.JavaScriptGenerator25,837
+	public void generate(JavaScriptGenerator.generate30,1005
+	public String generateValidationContext(JavaScriptGenerator.generateValidationContext45,1779
+	public String generateValidationObject(JavaScriptGenerator.generateValidationObject56,2456
+
+src/java/hannibal/generator/Undoable.java,63
+public @interface UndoableJavaScriptGenerator.Undoable19,700
+
+src/java/hannibal/generator/Presentable.java,120
+public @interface PresentableJavaScriptGenerator.Presentable19,700
+	public enum Type JavaScriptGenerator.Type21,734
+
+src/java/hannibal/generator/Searchable.java,67
+public @interface SearchableJavaScriptGenerator.Searchable19,700
+
+src/java/hannibal/rest/RestConfiguration.java,1601
+public class RestConfigurationJavaScriptGenerator.RestConfiguration23,695
+    public String getAppName(RestConfiguration.getAppName31,896
+    public Route getRoot(RestConfiguration.getRoot32,947
+    public List<Config> getConfigList(RestConfiguration.getConfigList33,991
+    public DomainConfiguration getDomainConfiguration(RestConfiguration.getDomainConfiguration34,1054
+	private String getCurrentUri(RestConfiguration.getCurrentUri35,1142
+    public RestConfiguration setAppName(RestConfiguration.setAppName37,1199
+    public void setRoot(RestConfiguration.setRoot38,1293
+    public void setConfigList(RestConfiguration.setConfigList39,1348
+    public void setDomainConfiguration(RestConfiguration.setDomainConfiguration40,1434
+	private void setCurrentUri(RestConfiguration.setCurrentUri41,1563
+    public RestConfiguration(RestConfiguration.RestConfiguration43,1643
+	public RestConfiguration init(RestConfiguration.init49,1782
+	public RestConfiguration hasUri(RestConfiguration.hasUri55,1887
+	public RestConfiguration hasName(RestConfiguration.hasName60,1977
+	public RestConfiguration supportedByMethod(RestConfiguration.supportedByMethod65,2066
+	public static boolean isUriACollection(RestConfiguration.isUriACollection95,2764
+    public RestConfiguration supportedByMethod(RestConfiguration.supportedByMethod109,3044
+    public class ConfigRestConfiguration.Config118,3275
+		Config(RestConfiguration.Config.Config124,3388
+		public String toString(RestConfiguration.Config.toString131,3562
+    public String toString(RestConfiguration.toString137,3677
+
+src/java/hannibal/rest/security/S3Principal.java,316
+public class S3PrincipalRestConfiguration.S3Principal17,606
+	public String getName(S3Principal.getName22,694
+	public void  setName(S3Principal.setName23,736
+	public String toString(S3Principal.toString25,792
+	public int hashCode(S3Principal.hashCode30,845
+	public boolean equals(S3Principal.equals35,932
+
+src/java/hannibal/rest/security/tomcat/S3UserManager.java,948
+public class S3UserManager22,699
+	private String getBucketName(S3UserManager.getBucketName28,811
+	private String getSecretKey(S3UserManager.getSecretKey29,866
+	private String getAccessKey(S3UserManager.getAccessKey30,919
+	public void setBucketName(S3UserManager.setBucketName32,973
+	public void setSecretKey(S3UserManager.setSecretKey33,1050
+	public void setAccessKey(S3UserManager.setAccessKey34,1123
+	public S3UserManager(S3UserManager.S3UserManager36,1197
+	protected String getPassword(S3UserManager.getPassword43,1370
+	public boolean hasRole(S3UserManager.hasRole52,1720
+	public void addUser(S3UserManager.addUser57,1829
+	public void addPassword(S3UserManager.addPassword64,2040
+	public void updatePassword(S3UserManager.updatePassword71,2284
+	public void addRole(S3UserManager.addRole76,2392
+	public List<String> getRoles(S3UserManager.getRoles84,2735
+	public List<String> getUsers(S3UserManager.getUsers98,3087
+
+src/java/hannibal/rest/security/tomcat/S3Realm.java,847
+public class S3RealmS3UserManager.S3Realm26,884
+	public String getBucketName(S3Realm.getBucketName33,1011
+	public String getSecretKey(S3Realm.getSecretKey34,1065
+	public String getAccessKey(S3Realm.getAccessKey35,1117
+	public void setBucketName(S3Realm.setBucketName37,1170
+	public void setSecretKey(S3Realm.setSecretKey38,1247
+	public void setAccessKey(S3Realm.setAccessKey39,1320
+	public S3Realm(S3Realm.S3Realm41,1394
+	public String getInfo(S3Realm.getInfo47,1566
+	protected String getName(S3Realm.getName53,1758
+	protected String getPassword(S3Realm.getPassword59,1908
+	protected Principal getPrincipal(S3Realm.getPrincipal67,2171
+	public boolean hasRole(S3Realm.hasRole75,2376
+	public List<String> getRoles(S3Realm.getRoles89,2688
+	public void start(S3Realm.start98,3005
+	public void stop(S3Realm.stop103,3110
+
+src/java/hannibal/rest/DefaultRestConfiguration.java,327
+public class DefaultRestConfigurationS3Realm.DefaultRestConfiguration18,598
+    public Route getUriMapping(DefaultRestConfiguration.getUriMapping23,698
+    public void setUriMapping(DefaultRestConfiguration.setUriMapping24,754
+    public DefaultRestConfiguration(DefaultRestConfiguration.DefaultRestConfiguration26,834
+
+src/java/hannibal/rest/ConfigurationContext.java,96
+public abstract class ConfigurationContextDefaultRestConfiguration.ConfigurationContext20,635
+
+src/java/hannibal/rest/Route.java,1085
+public class RouteConfigurationContext.Route28,846
+	public String getName(Route.getName42,1181
+	public int getType(Route.getType43,1223
+	public Route getParent(Route.getParent44,1262
+	public Map<String, Route> getRouteMap(Route.getRouteMap45,1307
+	public String getHandlerName(Route.getHandlerName46,1369
+	public void setName(Route.setName48,1427
+	public void setType(Route.setType63,1705
+	public void setParent(Route.setParent64,1755
+	public void setRouteMap(Route.setRouteMap65,1815
+	public void setHandlerName(Route.setHandlerName66,1896
+	public Route(Route.Route68,1979
+	public Route(Route.Route75,2084
+	public Route add(Route.add81,2147
+	public Route find(Route.find124,3305
+	private Route find(Route.find159,3974
+	public static void addDomainName(Route.addDomainName203,5160
+	public static void addBindings(Route.addBindings221,5575
+	public static String strip(Route.strip242,6184
+	private Route getVariableRoute(Route.getVariableRoute254,6385
+	public boolean exists(Route.exists266,6561
+	public String toString(Route.toString271,6646
+
+src/java/hannibal/rest/DefaultConfigurationContext.java,182
+public class DefaultConfigurationContextRoute.DefaultConfigurationContext32,974
+    public RestConfiguration getConfiguration(DefaultConfigurationContext.getConfiguration37,1130
+
+src/java/hannibal/rest/Method.java,240
+public enum MethodDefaultConfigurationContext.Method18,598
+    GET,Method.GET20,619
+    POST,Method.POST21,628
+    PUT,Method.PUT22,638
+    DELETE,Method.DELETE23,647
+    HEAD,Method.HEAD24,659
+    OPTIONSMethod.OPTIONS25,669
+
+src/java/hannibal/Message.java,47
+public interface MessageMethod.Message17,609
+
+src/java/hannibal/search/Searcher.java,89
+public class SearcherMessage.Searcher10,133
+	public Searcher(Searcher.Searcher12,157
+
+src/java/hannibal/HannibalException.java,275
+public class HannibalExceptionSearcher.HannibalException18,593
+	public HannibalException(HannibalException.HannibalException21,654
+	public HannibalException(HannibalException.HannibalException26,726
+	public HannibalException(HannibalException.HannibalException31,789
+
+src/java/hannibal/util/DayZeroUtil.java,420
+public class DayZeroUtilHannibalException.DayZeroUtil26,789
+	public void createPasswordEntry(DayZeroUtil.createPasswordEntry28,816
+	public boolean comparePassword(DayZeroUtil.comparePassword33,1037
+	public void createDayZeroActive(DayZeroUtil.createDayZeroActive40,1349
+	public void deleteDayZeroActive(DayZeroUtil.deleteDayZeroActive46,1674
+	public String encryptPassword(DayZeroUtil.encryptPassword51,1838
+
+src/java/hannibal/util/JavascriptingUtil.java,1167
+public class JavascriptingUtilDayZeroUtil.JavascriptingUtil34,1070
+	private Set<String> getScriptResourceSet(JavascriptingUtil.getScriptResourceSet42,1284
+	private Scriptable getScope(JavascriptingUtil.getScope43,1358
+	private Map<String, Object> getBindingsMap(JavascriptingUtil.getBindingsMap44,1407
+	private void setScriptResourceSet(JavascriptingUtil.setScriptResourceSet46,1478
+	public void setScope(JavascriptingUtil.setScope47,1590
+    public void setBindingsMap(JavascriptingUtil.setBindingsMap48,1651
+    public JavascriptingUtil(JavascriptingUtil.JavascriptingUtil50,1749
+    public void bind(JavascriptingUtil.bind56,1886
+	public void loadScript(JavascriptingUtil.loadScript61,1985
+	private InputStream findScript(JavascriptingUtil.findScript103,3053
+	private Object executeScript(JavascriptingUtil.executeScript174,5355
+	private Object executeScript(JavascriptingUtil.executeScript205,6132
+	public Object executeScriptResource(JavascriptingUtil.executeScriptResource243,7073
+    public Object executeScriptResource(JavascriptingUtil.executeScriptResource264,7557
+    public Object execute(JavascriptingUtil.execute278,7906
+
+src/java/hannibal/util/XhtmlTemplateUtil.java,2162
+public class XhtmlTemplateUtilJavascriptingUtil.XhtmlTemplateUtil22,744
+	public static StringTemplate createFormTemplate(XhtmlTemplateUtil.createFormTemplate26,878
+	public static StringTemplate createFieldSetTemplate(XhtmlTemplateUtil.createFieldSetTemplate40,1438
+	public static StringTemplate createInputTemplate(XhtmlTemplateUtil.createInputTemplate50,1757
+	public static StringTemplate createSelectTemplate(XhtmlTemplateUtil.createSelectTemplate66,2304
+	public static StringTemplate createSelectOptionTemplate(XhtmlTemplateUtil.createSelectOptionTemplate79,3082
+	public static StringTemplate createInputTemplate(XhtmlTemplateUtil.createInputTemplate84,3230
+	public static StringTemplate createReadOnlyInputTemplate(XhtmlTemplateUtil.createReadOnlyInputTemplate99,3912
+	public static StringTemplate createTextAreaTemplate(XhtmlTemplateUtil.createTextAreaTemplate114,4612
+	public static StringTemplate createTextAreaTemplate(XhtmlTemplateUtil.createTextAreaTemplate130,5070
+	public static StringTemplate createReadOnlyTextAreaTemplate(XhtmlTemplateUtil.createReadOnlyTextAreaTemplate143,5603
+	public static StringTemplate createFormEntryTemplate(XhtmlTemplateUtil.createFormEntryTemplate156,6152
+	public static StringTemplate createErrorFormEntryTemplate(XhtmlTemplateUtil.createErrorFormEntryTemplate174,6808
+	public static StringTemplate createHiddenFormEntryTemplate(XhtmlTemplateUtil.createHiddenFormEntryTemplate186,7307
+	public static StringTemplate createHiddenFormEntryTemplate(XhtmlTemplateUtil.createHiddenFormEntryTemplate196,7670
+	public static StringTemplate createAnchorTemplate(XhtmlTemplateUtil.createAnchorTemplate207,8124
+	public static StringTemplate createTableTemplate(XhtmlTemplateUtil.createTableTemplate220,8571
+	public static StringTemplate createTableTemplate(XhtmlTemplateUtil.createTableTemplate233,9105
+	public static StringTemplate createThTemplate(XhtmlTemplateUtil.createThTemplate242,9331
+	public static StringTemplate createTrTemplate(XhtmlTemplateUtil.createTrTemplate247,9463
+	public static StringTemplate createMultiInputTemplate(XhtmlTemplateUtil.createMultiInputTemplate256,9710
+
+src/java/hannibal/util/FormatUtil.java,562
+public class FormatUtilXhtmlTemplateUtil.FormatUtil17,597
+	public static String format(FormatUtil.format22,774
+	public static String format(FormatUtil.format34,921
+	public static String format(FormatUtil.format39,1035
+	public static String format(FormatUtil.format44,1168
+	public static String format(FormatUtil.format49,1308
+	public static String format(FormatUtil.format70,1656
+	public static String format(FormatUtil.format82,1814
+	public static String format(FormatUtil.format94,1995
+	public static String format(FormatUtil.format99,2110
+
+src/java/hannibal/util/Browser.java,1547
+public final class BrowserFormatUtil.Browser24,806
+	public Browser(Browser.Browser26,835
+	public String executeRequest(Browser.executeRequest28,857
+	public String createQueryString(Browser.createQueryString46,1248
+	public String get(Browser.get68,1789
+	public String get(Browser.get73,1854
+	public String post(Browser.post84,2137
+	public String put(Browser.put91,2321
+	public String delete(Browser.delete98,2502
+	public String delete(Browser.delete103,2574
+	public String head(Browser.head110,2764
+	public String head(Browser.head115,2831
+	public String options(Browser.options122,3015
+	public String options(Browser.options127,3088
+	public String trace(Browser.trace134,3281
+	public String trace(Browser.trace139,3350
+	public String encode(Browser.encode146,3537
+	public class BrowserResponseBrowser.BrowserResponse162,3786
+		public int getStatusCode(Browser.BrowserResponse.getStatusCode168,3910
+		public String getStatusMessage(Browser.BrowserResponse.getStatusMessage169,3962
+		private StringBuffer getContent(Browser.BrowserResponse.getContent170,4023
+		private void setStatusCode(Browser.BrowserResponse.setStatusCode172,4082
+		private void setStatusMessage(Browser.BrowserResponse.setStatusMessage173,4158
+		private void setContent(Browser.BrowserResponse.setContent174,4249
+		public String getResponse(Browser.BrowserResponse.getResponse176,4323
+		protected BrowserResponse(Browser.BrowserResponse.BrowserResponse178,4422
+		protected void append(Browser.BrowserResponse.append184,4517
+
+src/java/hannibal/util/HannibalUtil.java,2170
+public class HannibalUtilBrowser.HannibalUtil25,635
+	public static String toJson(HannibalUtil.toJson29,729
+	public static String toJson(HannibalUtil.toJson34,838
+	public static Object fromJson(HannibalUtil.fromJson39,977
+	public static org.apache.commons.beanutils.BeanUtilsBean createBeanUtilsBean(HannibalUtil.createBeanUtilsBean44,1104
+	public static String createHannibalType(HannibalUtil.createHannibalType78,3158
+	public static java.util.Map<String, String> describe(HannibalUtil.describe101,3626
+	public static java.util.Map<String, String> describe(HannibalUtil.describe117,4126
+	public static boolean isWhitespace(HannibalUtil.isWhitespace208,7013
+	public static String upperTheFirstCharacter(HannibalUtil.upperTheFirstCharacter213,7116
+	public static String lowerTheFirstCharacter(HannibalUtil.lowerTheFirstCharacter218,7227
+	public static <T extends Annotation> T getMethodAnnotation(HannibalUtil.getMethodAnnotation223,7339
+	public static String getAttributeType(HannibalUtil.getAttributeType239,7839
+	public static void populateFromRequestMap(HannibalUtil.populateFromRequestMap255,8285
+	public static void populateFromRestContext(HannibalUtil.populateFromRestContext367,12014
+	public static boolean isDomainName(HannibalUtil.isDomainName425,14027
+	public static boolean isUriACollection(HannibalUtil.isUriACollection443,14512
+	public static String determinePrimaryKeyName(HannibalUtil.determinePrimaryKeyName463,14988
+	public static void extractDomainInformation(HannibalUtil.extractDomainInformation482,15621
+	public static hannibal.domain.Link HannibalUtil.Link504,16285
+		catch HannibalUtil.Link.catch544,17688
+	public static String generateStringFromArray(HannibalUtil.generateStringFromArray556,17880
+	protected static class SqlDateInstanceCreatorHannibalUtil.SqlDateInstanceCreator580,18311
+		public java.sql.Date createInstance(HannibalUtil.SqlDateInstanceCreator.createInstance582,18421
+	protected static class SqlTimestampInstanceCreatorHannibalUtil.SqlTimestampInstanceCreator587,18513
+		public java.sql.Timestamp createInstance(HannibalUtil.SqlTimestampInstanceCreator.createInstance589,18633
+
+src/java/hannibal/util/DatabaseUtil.java,2570
+public class DatabaseUtilHannibalUtil.DatabaseUtil9,166
+	public static String getString(DatabaseUtil.getString13,219
+	public static Date getDate(DatabaseUtil.getDate28,461
+	public static Timestamp getTimestamp(DatabaseUtil.getTimestamp43,701
+	public static java.util.Date getTimestampAsDate(DatabaseUtil.getTimestampAsDate58,971
+	public static Double getDouble(DatabaseUtil.getDouble73,1282
+	public static Integer getInt(DatabaseUtil.getInt88,1550
+	public static Long getLong(DatabaseUtil.getLong103,1805
+	public static Boolean getBoolean(DatabaseUtil.getBoolean118,2059
+	public static java.math.BigDecimal getBigDecimal(DatabaseUtil.getBigDecimal133,2334
+	public static Short getShort(DatabaseUtil.getShort148,2610
+	public static Float getFloat(DatabaseUtil.getFloat163,2861
+	public static java.sql.Time getTime(DatabaseUtil.getTime178,3112
+	public static Byte getByte(DatabaseUtil.getByte193,3362
+	public static String getString(DatabaseUtil.getString208,3608
+	public static Date getDate(DatabaseUtil.getDate223,3851
+	public static Timestamp getTimestamp(DatabaseUtil.getTimestamp238,4092
+	public static java.util.Date getTimestampAsDate(DatabaseUtil.getTimestampAsDate253,4363
+	public static Double getDouble(DatabaseUtil.getDouble268,4675
+	public static Integer getInt(DatabaseUtil.getInt283,4944
+	public static Long getLong(DatabaseUtil.getLong298,5200
+	public static Boolean getBoolean(DatabaseUtil.getBoolean313,5455
+	public static java.math.BigDecimal getBigDecimal(DatabaseUtil.getBigDecimal328,5731
+	public static Short getShort(DatabaseUtil.getShort343,6008
+	public static Float getFloat(DatabaseUtil.getFloat358,6260
+	public static java.sql.Time getTime(DatabaseUtil.getTime373,6512
+	public static Byte getByte(DatabaseUtil.getByte388,6763
+	public static void setString(DatabaseUtil.setString403,7010
+	public static void setInteger(DatabaseUtil.setInteger416,7292
+	public static void setInteger(DatabaseUtil.setInteger429,7589
+	public static void setDouble(DatabaseUtil.setDouble435,7757
+	public static void setDouble(DatabaseUtil.setDouble448,8052
+	public static void setDate(DatabaseUtil.setDate454,8225
+	public static void setTimestamp(DatabaseUtil.setTimestamp467,8537
+	public static void setTimestamp(DatabaseUtil.setTimestamp480,8869
+	public static void setLong(DatabaseUtil.setLong493,9171
+	public static void setLong(DatabaseUtil.setLong506,9456
+	public static void setBoolean(DatabaseUtil.setBoolean512,9621
+	public static void setBoolean(DatabaseUtil.setBoolean525,9919
+
+src/java/hannibal/util/DayZeroShutdown.java,119
+public class DayZeroShutdownDatabaseUtil.DayZeroShutdown25,788
+	public static void main(DayZeroShutdown.main27,819
+
+src/java/hannibal/util/HtmlUtil.java,744
+public class HtmlUtilDayZeroShutdown.HtmlUtil15,376
+	public static String toRdfa(HtmlUtil.toRdfa20,486
+	public static String toRdfa(HtmlUtil.toRdfa54,1625
+	public static String toAtom(HtmlUtil.toAtom120,4289
+	public static String toForm(HtmlUtil.toForm179,6088
+	public static String toFieldSet(HtmlUtil.toFieldSet192,6655
+	public static String toTable(HtmlUtil.toTable418,17162
+	public static boolean isClockProperty(HtmlUtil.isClockProperty536,21743
+	public static boolean isHiddenClockProperty(HtmlUtil.isHiddenClockProperty543,22069
+	public static String preparePath(HtmlUtil.preparePath548,22241
+	public static boolean isLinkArray(HtmlUtil.isLinkArray553,22333
+	public static boolean isLink(HtmlUtil.isLink559,22595
+
+src/java/hannibal/util/PropertyUtil.java,815
+public class PropertyUtil21,675
+    private PropertyUtil(PropertyUtil.PropertyUtil27,888
+    public synchronized String getProperty(PropertyUtil.getProperty33,1059
+    public synchronized String getProperty(PropertyUtil.getProperty40,1273
+    public synchronized void setProperty(PropertyUtil.setProperty47,1517
+	public synchronized void loadProperties(PropertyUtil.loadProperties54,1728
+	public synchronized void loadProperties(PropertyUtil.loadProperties59,1853
+	public synchronized boolean loadProperties(PropertyUtil.loadProperties84,2672
+    public synchronized void reloadProperties(PropertyUtil.reloadProperties104,3107
+	public synchronized static PropertyUtil getInstance(PropertyUtil.getInstance122,3553
+	public synchronized Properties getProperties(PropertyUtil.getProperties127,3638
+
+src/java/hannibal/util/JetsetUtil.java,941
+public class JetsetUtilPropertyUtil.JetsetUtil33,1085
+    public AWSCredentials getCredentials(JetsetUtil.getCredentials39,1215
+    public void setCredentials(JetsetUtil.setCredentials40,1282
+	public JetsetUtil(JetsetUtil.JetsetUtil42,1375
+    public JetsetUtil(JetsetUtil.JetsetUtil44,1401
+    public S3Service createService(JetsetUtil.createService49,1530
+    public S3Bucket createBucket(JetsetUtil.createBucket65,1809
+	public void deleteBucket(JetsetUtil.deleteBucket81,2087
+    public S3Object putObject(JetsetUtil.putObject93,2298
+	public void deleteObject(JetsetUtil.deleteObject112,2816
+	public S3Object getObject(JetsetUtil.getObject124,3095
+	public S3Object[] listObjects(JetsetUtil.listObjects141,3463
+	public List<String> getContentList(JetsetUtil.getContentList157,3869
+	public String getContent(JetsetUtil.getContent171,4278
+	public String getContentAsString(JetsetUtil.getContentAsString188,4635
+
+src/java/hannibal/util/TypicaUtil.java,507
+public class TypicaUtilJetsetUtil.TypicaUtil22,722
+	private String getAccessKey(TypicaUtil.getAccessKey28,804
+	private String getSecretKey(TypicaUtil.getSecretKey29,857
+	public void setAccessKey(TypicaUtil.setAccessKey31,911
+	public void setSecretKey(TypicaUtil.setSecretKey32,984
+	public TypicaUtil(TypicaUtil.TypicaUtil34,1058
+	public TypicaUtil(TypicaUtil.TypicaUtil36,1083
+	public String sendMessage(TypicaUtil.sendMessage42,1203
+	public String getMessage(TypicaUtil.getMessage61,1646
+
+src/java/hannibal/util/IdGenerator.java,292
+public class IdGeneratorTypicaUtil.IdGenerator6,110
+	public static String generate(IdGenerator.generate10,208
+	public static String generate(IdGenerator.generate21,660
+	public static String hash(IdGenerator.hash33,1014
+	public static String bytesToHex(IdGenerator.bytesToHex52,1438
+
+src/java/hannibal/util/DayZeroInit.java,106
+public class DayZeroInitIdGenerator.DayZeroInit25,788
+	public static void main(DayZeroInit.main27,815
+
+src/java/hannibal/util/ScriptingUtil.java,963
+public class ScriptingUtilDayZeroInit.ScriptingUtil30,952
+    private String getType(ScriptingUtil.getType37,1140
+    private ScriptEngineManager getScriptEngineManager(ScriptingUtil.getScriptEngineManager38,1186
+    private ScriptEngine getScriptEngine(ScriptingUtil.getScriptEngine39,1275
+    private ScriptContext getScriptContext(ScriptingUtil.getScriptContext40,1343
+    public void setType(ScriptingUtil.setType42,1419
+    public void setScriptEngineManager(ScriptingUtil.setScriptEngineManager43,1475
+    public void setScriptEngine(ScriptingUtil.setScriptEngine44,1604
+    public void setScriptContext(ScriptingUtil.setScriptContext45,1698
+    public ScriptingUtil(ScriptingUtil.ScriptingUtil47,1802
+    public ScriptingUtil(ScriptingUtil.ScriptingUtil52,1856
+    public void init(ScriptingUtil.init59,2047
+    public Object executeScript(ScriptingUtil.executeScript67,2275
+		public Object execute(ScriptingUtil.execute92,3016

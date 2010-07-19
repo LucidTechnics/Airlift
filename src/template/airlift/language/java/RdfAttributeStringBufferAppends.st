@@ -1,0 +1,1 @@
+$name, type, getterName:{n, t, g | if (_filterSet == null || _filterSet.contains("$n$") == _contains) \{ stringBuffer.append("<li property=\"$n$\" type=\"$t$\" >").append($g$()).append("</li>\n"); \} }; separator="\n"$

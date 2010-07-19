@@ -1,0 +1,1 @@
+$name, getterName, domainName, path, type:{n, g, d, p, t | if (_filterSet == null || _filterSet.contains("$n$") == _contains) \{ stringBuffer.append("<li property=\"$n$\" type=\"hannibal:link\" ><a href=\"$p$/").append($g$()).append("\" rel=\"$d$\" type=\"$t$\" >").append($g$()).append("</a></li>\n"); \} }; separator="\n"$

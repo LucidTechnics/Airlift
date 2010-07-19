@@ -1,0 +1,1 @@
+<a id="$containerId$" class="$containerClass; separator=" "$" href="$href$" hreflang="$hreflang$" rel="$rel$" rev="$rev$" target="$target$">$label$</a>
