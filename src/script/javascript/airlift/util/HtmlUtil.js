@@ -509,3 +509,64 @@ airlift.toTable(_config, _collection)
 
 	return tableTemplate.toString();
 }
+
+airlift.toAtom = function(_config)
+{
+	var path = (airlift.isDefined(_config.path) === true) ? preparePath(_config.path) : preparePath(PATH);
+	var baseUri = (airlift.isDefined(_config.baseUri) === true) ? _config.baseUri : "";
+	var title = (airlift.isDefined(_config.title) === true) ? _config.title : "id";
+	var description = (airlift.isDefined(_config.description) === true) ? _config.description : "";
+	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : false;
+	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
+	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : new Packages.java.util.ArrayList();
+	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;
+	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
+	
+	var feedString = "";
+
+	var feed = new Packages.com.sun.syndication.feed.synd.SyndFeedImpl();
+
+	feed.setFeedType("atom_1.0");
+	feed.setTitle(title);
+	feed.setLink(baseUri);
+	feed.setDescription(description);
+
+	var entries = new Packages.java.util.ArrayList();
+
+	var entry;
+	var description;
+
+	for (var activeRecord in Iterator(collection))
+	{
+		description = new Packages.com.sun.syndication.feed.synd.SyndContentImpl();
+		description.setType("application/xhtml+xml");
+		description.setValue(activeRecord.rdfa(path, null, filter, include));
+
+		entry = new Packages.com.sun.syndication.feed.synd.SyndEntryImpl();
+
+		entry.setTitle(title);
+
+		var primaryKeyValue = "";
+
+		var propertyMap = activeRecord.describe();
+
+		if (propertyMap.keySet().contains("id") === true)
+		{
+			primaryKeyValue = propertyMap.get("id");
+		}
+
+		entry.setLink((new Packages.java.lang.StringBuffer(preparePath(baseUri))).append("/").append(primaryKeyValue).toString());
+		entry.setPublishedDate(new Packages.java.util.Date());
+		entry.setDescription(description);
+
+		entries.add(entry);
+	}
+
+	feed.setEntries(entries);
+
+	var output = new Packages.com.sun.syndication.io.SyndFeedOutput();
+
+	feedString = output.outputString(feed);
+
+	return feedString;
+}
