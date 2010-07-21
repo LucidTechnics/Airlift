@@ -65,27 +65,42 @@ public class AirliftUtil
 		return errorString;
 	}
 
-	public static String createHannibalType(String _javaType)
+	public static String toJson(java.util.List _list)
 	{
-		String hannibalType = "airlift:string";
+		return new GsonBuilder().create().toJson(_list);
+	}
+
+	public static String toJson(Object _object)
+	{
+		return new GsonBuilder().create().toJson(_object);
+	}
+
+	public static Object fromJson(String _json, Class _class)
+	{
+		return new GsonBuilder().create().fromJson(_json, _class);
+	}
+
+	public static String createAirliftType(String _javaType)
+	{
+		String airliftType = "airlift:string";
 		String[] tokenArray = _javaType.split("\\.");
 
 		String type = tokenArray[tokenArray.length - 1].toLowerCase();
 
 		if (type.startsWith("int") == true)
 		{
-			hannibalType = "airlift:int";
+			airliftType = "airlift:int";
 		}
 		else if (type.startsWith("char") == true)
 		{
-			hannibalType = "airlift:char";
+			airliftType = "airlift:char";
 		}
 		else
 		{
-			hannibalType = "airlift:" + type;
+			airliftType = "airlift:" + type;
 		}
 
-		return hannibalType;
+		return airliftType;
 	}
 
 	public static boolean isWhitespace(String _string)
@@ -221,6 +236,97 @@ public class AirliftUtil
 		}
 
 		return stringBuffer.toString().replaceAll(",$", "") + "]";
+	}
+
+	public static java.util.Map<String, String> describe(Object _do)
+	{
+		java.util.Map<String, String> descriptionMap = new java.util.HashMap<String, String>();
+
+		try
+		{
+			org.apache.commons.beanutils.PropertyUtilsBean propertyUtilsBean = new org.apache.commons.beanutils.PropertyUtilsBean();
+
+			java.beans.PropertyDescriptor[] descriptorArray = propertyUtilsBean.getPropertyDescriptors(_do);
+
+			for (java.beans.PropertyDescriptor propertyDescriptor: descriptorArray)
+			{
+				if ("class".equalsIgnoreCase(propertyDescriptor.getName()) == false)
+				{
+					java.lang.reflect.Method getter = propertyDescriptor.getReadMethod();
+
+					Object rawValue = getter.invoke(_do, new Object[0]);
+					String value = null;
+
+					if (java.sql.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
+					{
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+
+						String mask = "MM-dd-yyyy";
+
+						if (datable != null)
+						{
+							String[] datePatternArray = datable.dateTimePatterns();
+
+							if (datePatternArray != null && datePatternArray.length > 0)
+							{
+								mask = datePatternArray[0];
+							}
+						}
+
+						value = airlift.util.FormatUtil.format((java.util.Date)rawValue, mask);
+					}
+					else if (java.util.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
+					{
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+
+						String mask = "MM-dd-yyyy HH:mm:ss";
+
+						if (datable != null)
+						{
+							String[] patternArray = datable.dateTimePatterns();
+
+							if (patternArray != null && patternArray.length > 0)
+							{
+								mask = patternArray[0];
+							}
+						}
+
+						value = airlift.util.FormatUtil.format((java.util.Date) rawValue, mask);
+
+					}
+					else if (java.sql.Timestamp.class.equals(propertyDescriptor.getPropertyType()) == true)
+					{
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+
+						String mask = "MM-dd-yyyy HH:mm:ss";
+
+						if (datable != null)
+						{
+							String[] patternArray = datable.dateTimePatterns();
+
+							if (patternArray != null && patternArray.length > 0)
+							{
+								mask = patternArray[0];
+							}
+						}
+
+						value = airlift.util.FormatUtil.format((java.sql.Timestamp) rawValue, mask);
+					}
+					else
+					{
+						value = (rawValue == null) ? null : rawValue.toString();
+					}
+
+					descriptionMap.put(propertyDescriptor.getName(), value);
+				}
+			}
+
+			return descriptionMap;
+		}		
+		catch(Throwable t)
+		{
+			throw  new RuntimeException(t);
+		}
 	}
 
 	protected static class SqlDateInstanceCreator

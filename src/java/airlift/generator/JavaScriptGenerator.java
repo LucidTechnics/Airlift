@@ -62,9 +62,12 @@ public class JavaScriptGenerator
 		{
 			Attribute attribute = (Attribute) attributes.next();
 			String name = attribute.getName();
-			Annotation datable = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Datable");
 
+			Annotation datable = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Datable");
+			Annotation persist = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Persistable");
+			
 			String requestDatable = findValue(datable, "isDatable()");
+			String isForeignKey = findValue(persist, "mapTo()");
 			
 			if (processedDatable == false)
 			{
@@ -73,7 +76,12 @@ public class JavaScriptGenerator
 			}
 
 			processedDatable = true;
-			
+
+			if ("false".equals(isForeignKey) == false)
+			{
+				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "this.foreignKeySet.add(\"" + name + "\");");
+			}
+
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; }");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");

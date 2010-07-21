@@ -11,20 +11,15 @@ else if (typeof airlift != "object")
 
 airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 {
-	/*var activeRecord = {};
-
-	$defineProperty; separator="\n"$
-
-	$getMethod; separator="\n"$
-
-	$setMethod; separator="\n"$
-*/
 	var activeRecord = {};
 
 	activeRecord.error = false;
 	activeRecord.dao = new Packages.$package$.airlift.dao.$upperCaseFirstLetterDomainClassName$Dao(PERSISTENCE_MANAGER);
 	activeRecord.messageManager = new Packages.airlift.MessageManager();
+	activeRecord.foreignKeySet = new Packages.java.util.HashSet();
 
+	$addNameToForeignKeySet; separator="\n"$
+	
 	var allowedDateTimePatterns = $dateTimePatterns$ ;
 
 	var javaDateTimePatternArray = java.lang.reflect.Array.newInstance(Packages.java.lang.String, allowedDateTimePatterns.length);
@@ -35,6 +30,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray);
 
+	activeRecord.isForeignKey = function(_propertyName)
+	{
+		return foreignKeySet.contains(_propertyName);
+	}
+	
 	activeRecord.rdfa = function(_rdfaMetaData)
 	{
 		var include = false;
@@ -44,7 +44,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var path = (airlift.isDefined(rdfaMetaData.path) === true) ? rdfaMetaData.path : PATH;
 		var appName = (airlift.isDefined(rdfaMetaData.appName) === true) ? rdfaMetaData.appName : APP_NAME;
-		var anchorField = (airlift.isDefined(rdfaMetaData.anchorField) === true) ? rdfaMetaData.anchorField : activeRecord.retrieveOrderedPropertyList().get(0);
+		var anchorField = (airlift.isDefined(rdfaMetaData.anchorField) === true) ? rdfaMetaData.anchorField : "id";
 
 		if (airlift.isDefined(rdfaMetaData.include) === true)
 		{
@@ -57,12 +57,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			include = false;
 		}
 
-		return airlift.util.HtmlUtil.toRdfa(path, appName, anchorField, filter, include, this);
+		return airlift.toRdfa({path: path, appName. anchorField : anchorField, filter: filter, contains: include, activeRecord: this});
 	};
 
 	activeRecord.json = function()
 	{
-		return airlift.util.HtmlUtil.toJson(this);
+		return airlift.util.AirliftUtil.toJson(this.createDO());
 	};
 
 	activeRecord.form = function(_formMetaData)
@@ -90,7 +90,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var error = (airlift.isDefined(formMetaData.error) === true) ? formMetaData.error : activeRecord.error;
 
-		return airlift.util.HtmlUtil.toForm(path, method, domainName, buttonName, filter, include, error, this);
+		return airlift.toForm({path: path, method: method, domainName: domainName, buttonName: buttonName, filter: filter, contains: include, error: error, activeRecord: this});
 	};
 
 	activeRecord.exists = function(_id)
@@ -141,7 +141,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return this.dao.collect(_offset, _limit, _orderBy);
 	};
-	
+
+	activeRecord.retrieveDomainInterface = function()
+	{
+		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
+	}
+
 	//For every collect method do the same.
 	$collectByAttribute; separator="\n\n"$
 
@@ -160,7 +165,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		return this.messageManager.getMessageMap();
 	}
-			
+
+	activeRecord.getMessageList = function(_name)
+	{
+		return this.messageManager.getMessageList(_name);
+	}
+
 	activeRecord.hasMessages = function()
 	{
 		return (getMessageMap().isEmpty() == false);
@@ -260,6 +270,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		return throwable;
+	}
+
+	activeRecord.describe = function()
+	{
+		return Packages.airlift.util.AirliftUtil.describe(this.createDO());
 	}
 
 	activeRecord.populateFromRequestMap = function(_attributeMap)

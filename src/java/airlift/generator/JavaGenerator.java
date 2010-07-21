@@ -395,7 +395,7 @@ public class JavaGenerator
 				{
 					isSearchable = findValue(search, "isSearchable()");
 				}
-				
+
 				hasPrimaryKey = true;
 
 				StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");

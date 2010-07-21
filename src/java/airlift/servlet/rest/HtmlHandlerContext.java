@@ -87,26 +87,12 @@ public class HtmlHandlerContext
 
 		Map<String, String> domainPathMap = restContext.extractDomainObjectPaths(path);
 
-		airlift.util.PropertyUtil.getInstance().loadProperties("/airlift/airlift.properties", "airlift.cfg");
-
-		String logVariables = airlift.util.PropertyUtil.getInstance().getProperty("airlift.cfg", "airlift.log.handler.variables");
-
-		if ("yes".equalsIgnoreCase(logVariables) == true)
-		{
-			log.info("domainName: " + domainName);
-			log.info("base: " + base);
-			log.info("path: " + path);
-			log.info("uri: " + base + path);
-			log.info("id:" + id);
-			log.info("title: " + title);
-			log.info("handlerName: " + _handlerName);
-			log.info("servletName: " + servletName);
-			log.info("queryString: " + queryString);
-			log.info("appName: " + _appName);
-			log.info("method: " + _method);
-			log.info("domainHasId: " + domainHasId);
-			log.info("domainObjectPaths: " + domainPathMap);
-		}
+		log.info("base: " + base);
+		log.info("path: " + path);
+		log.info("uri: " + base + path);
+		log.info("handlerName: " + _handlerName);
+		log.info("queryString: " + queryString);
+		log.info("domainObjectPaths: " + domainPathMap);
 		
 		String userName = (_httpServletRequest.getUserPrincipal() != null) ? _httpServletRequest.getUserPrincipal().getName() : null;
 
