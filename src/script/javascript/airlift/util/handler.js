@@ -118,46 +118,42 @@ airlift.partition = function(_collection, _attribute)
 };
 
 //l - create a new java.util.ArrayList
-airlift.l = function(_list)
+airlift.l = function(_list, _size)
 {
-	var list = (_list instanceof Packages.java.util.List) ? _list : new Packages.java.util.ArrayList();
-	var jsList = Object.beget(list);
-
-	jsList.collection = list;
+	var list = {};
 	
-	jsList.a = function(_value)
+	list.a = function(_value)
 	{
-		var value = (airlift.isDefined(_value.javaAR) === true) ? _value.javaAR : _value;
-
-		list.add(value);
-		return jsList;
+		this.add(_value);
+		return list;
 	};
 
-	jsList.g = function(_index)
+	list.g = function(_index)
 	{
-		return jsList.get(_index);
+		return this.get(_index);
 	};
 
-	jsList.every = function(_function)
+	list.every = function(_function)
 	{
 		airlift.every(list, _function);
+		return list;
 	}
 			
-	jsList.partition = function(_attribute)
+	list.partition = function(_attribute)
 	{
 		return airlift.partition(list, _attribute);
 	};
 
-	jsList.split = function(_function)
+	list.split = function(_function)
 	{
 		return airlift.split(list, _function);
 	};
 
-	jsList.__iterator__ = function()
+	list.__iterator__ = function()
 	{
 		var myIterator = {};
 
-		myIterator.iterator = list.iterator();
+		myIterator.iterator = this.iterator();
 		
 		myIterator.next = function()
 		{
@@ -178,50 +174,55 @@ airlift.l = function(_list)
 		return myIterator;
 	};
 
-	jsList.i = function()
+	list.i = function()
 	{
-		return Iterator(jsList);
+		return Iterator(list);
 	}
 
-	return new Packages.java.util.List(jsList);
+	var size = (airlift.isDefined(_size) === true) ? _size : 10;
+	
+	list = new JavaAdapter(Packages.java.util.ArrayList(size), list);
+
+	if (airlift.isDefined(_list) === true)
+	{
+		list.addAll(_list);
+	}
+	
+	return list;
 };
 
 //s - create a new java.util.HashSet
-airlift.s = function(_set)
+airlift.s = function(_set, _size)
 {
-	var set = (_set instanceof Packages.java.util.Set) ? _set : new Packages.java.util.HashSet();
-	var jsSet = Object.beget(set);
-
-	jsSet.collection = set;
+	var set = {};
 	
-	jsSet.a = function(_value)
+	set.a = function(_value)
 	{
-		var value = (airlift.isDefined(_value.javaAR) === true) ? _value.javaAR : _value;
-
-		set.add(value);
-		return jsSet;
+		this.add(_value);
+		return this;
 	};
 
-	jsSet.every = function(_function)
+	set.every = function(_function)
 	{
 		airlift.every(set, _function);
+		return this;
 	}
 
-	jsSet.partition = function(_attribute)
+	set.partition = function(_attribute)
 	{
 		return airlift.partition(set, _attribute);
 	};
 
-	jsSet.split = function(_function)
+	set.split = function(_function)
 	{
 		return airlift.split(set, _function);
 	};
 
-	jsSet.__iterator__ = function()
+	set.__iterator__ = function()
 	{
 		var myIterator = {};
 
-		myIterator.iterator = set.iterator();
+		myIterator.iterator = this.iterator();
 
 		myIterator.next = function()
 		{
@@ -242,64 +243,81 @@ airlift.s = function(_set)
 		return myIterator;
 	};
 
-	jsSet.i = function()
+	set.i = function()
 	{
-		return Iterator(jsSet);
+		return Iterator(set);
 	}
 
-	return new Packages.java.util.Set(jsSet);
+	var size = (airlift.isDefined(_size) === true) ? _size : 10;
+
+	set = new JavaAdapter(Packages.java.util.HashSet(size), set);
+
+	if (airlift.isDefined(_set) === true)
+	{
+		set.addAll(_set);
+	}
+
+	return set;
 };
 
 //m - create a new java.util.HashMap
-airlift.m = function(_map)
+airlift.m = function(_map, _size)
 {
-	var map = (_map instanceof Packages.java.util.Map) ? _map : new Packages.java.util.HashMap();
-	var jsMap = Object.beget(map);
+	var map = {};
 
-	jsMap.map = map;
-	
-	jsMap.p = function(_key, _value)
+	map.p = function(_key, _value)
 	{
-		map.put(_key, _value);
-		return jsMap;
+		this.put(_key, _value);
+		return this;
 	};
 
-	jsMap.everyKey = function(_function)
+	map.everyKey = function(_function)
 	{
-		airlift.every(map.keySet(), _function);
+		airlift.every(this.keySet(), _function);
+		return this;
 	}
 
-	jsMap.everyValue = function(_function)
+	map.everyValue = function(_function)
 	{
-		airlift.every(map.values(), _function);
+		airlift.every(this.values(), _function);
+		return this;
 	}
 
-	jsMap.partitionKeys = function(_attribute)
+	map.partitionKeys = function(_attribute)
 	{
-		return airlift.partition(map.keySet(), _attribute);
+		return airlift.partition(this.keySet(), _attribute);
 	};
 
-	jsMap.splitKeys = function(_attribute)
+	map.splitKeys = function(_attribute)
 	{
-		return airlift.split(map.keySet(), _attribute);
+		return airlift.split(this.keySet(), _attribute);
 	};
 
-	jsMap.partitionValues = function(_attribute)
+	map.partitionValues = function(_attribute)
 	{
-		return airlift.partition(map.values(), _attribute);
+		return airlift.partition(this.values(), _attribute);
 	};
 
-	jsMap.split = function(_attribute)
+	map.split = function(_attribute)
 	{
-		return airlift.split(map.values(), _attribute);
+		return airlift.split(this.values(), _attribute);
 	};
 
-	jsMap.i = function()
+	map.i = function()
 	{
-		return Iterator(map.entrySet().iterator());
+		return Iterator(this.entrySet().iterator());
 	}
 
-	return new Packages.java.util.Map(jsMap);
+	var size = (airlift.isDefined(_size) === true) ? _size : 89;
+
+	map = new JavaAdapter(Packages.java.util.HashMap(size), map);
+
+	if (airlift.isDefined(_map) === true)
+	{
+		map.putAll(_map);
+	}
+
+	return map;
 };
 
 //a - create a new java array of the specified type

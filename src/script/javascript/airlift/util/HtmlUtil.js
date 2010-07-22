@@ -249,7 +249,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					var label = (airlift.isDefined(methodPresentable) === true && airlift.isDefined(methodPresentable.label()) === true && (new Packages.java.util.String()).equals(methodPresentable.label()) === false  && Packages.org.apache.commons.lang.StringUtils.isWhitespace(methodPresentable.label()) === false) ? methodPresentable.label() : property;
 					var textAreaRows = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.textAreaRows() : 5;
 					var textAreaColumns = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.textAreaColumns() : 100;
-					var allowedValues = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.allowedValues() : Packages.java.lang.reflect.Array.newInstance(java.lang.String, 0);
+					var allowedValues = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.allowedValues() : airlift.a(java.lang.String, 0);
 					var maxLength = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.maxLength() : 100;
 					var nullable = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.nullable() : true;
 

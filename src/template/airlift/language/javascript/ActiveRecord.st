@@ -147,6 +147,20 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
 	}
 
+	activeRecord.convertToActiveRecordCollection = function(_collection)
+	{
+		var collection = airlift.l();
+
+		for (var do in Iterator(_collection))
+		{
+			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
+			activeRecord.copyFrom(do);
+			collection.a(activeRecord);
+		}
+
+		return collection;
+	}
+
 	//For every collect method do the same.
 	$collectByAttribute; separator="\n\n"$
 

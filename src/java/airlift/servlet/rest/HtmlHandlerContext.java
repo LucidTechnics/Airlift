@@ -149,6 +149,7 @@ public class HtmlHandlerContext
 			scriptResources[1] = "/airlift/util/xhtml.js";
 			scriptResources[2] = "/airlift/util/error.js";
 			scriptResources[3] = "/airlift/util/handler.js";
+			scriptResources[3] = "/airlift/util/HtmlUtil.js";
 			scriptResources[4] = _handlerName;
 
 			scriptingUtil.executeScript(scriptResources);
