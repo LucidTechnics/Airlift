@@ -1,10 +1,19 @@
-public java.util.Collection<$className$> collectBy$uppercaseAttribute$Range($rangeType$ _begin, $rangeType$ _end, int _offset, int _limit, String _orderBy)
+dao.collectBy$uppercaseAttribute$Range = function(_begin, _end, _config)
 {
-	String sql = "$findByRangeSql$";
+	var config = (airlift.isDefined(_config) === true) ? _config : {};
 
-	Query query = this.persistenceManager.newQuery(sql);
-	query.setOrdering(_orderBy);
-	query.setRange(_offset, _limit);
+	var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
+	var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
+	var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
+	var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : "id";
 
-	return (java.util.Collection<$className$>) query.execute(_begin, _end);
+	orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
+	
+	sql = "$findByRangeSql$";
+
+	var query = PERSISTENCE_MANAGER.newQuery(sql);
+	query.setOrdering(orderBy);
+	query.setRange(offset, limit);
+
+	return query.execute(_begin, _end);
 }

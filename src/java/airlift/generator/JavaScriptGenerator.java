@@ -33,16 +33,121 @@ public class JavaScriptGenerator
 				DomainObjectModel _domainObjectModel,
 				Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
 	{
-		String generatedString = generateValidationObject(_domainObjectModel, _appName);
+		String generatedString = generateValidationObject(_domainObjectModel);
 		String fileName =  "javascript/airlift/validation/domain/" + _domainObjectModel.getClassName() + "Validator.js";
 		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
 
-		generatedString = generateActiveRecord(_domainObjectModel, _appName);
+		generatedString = generateDao(_domainObjectModel);
+		fileName =  "javascript/airlift/dao/" + _domainObjectModel.getClassName() + ".js";
+		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+
+		generatedString = generateActiveRecord(_domainObjectModel);
 		fileName =  "javascript/airlift/activerecord/" + _domainObjectModel.getClassName() + ".js";
 		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
 	}
 
-	public String generateActiveRecord(DomainObjectModel _domainObjectModel, String _appName)
+	public String generateDao(DomainObjectModel _domainObjectModel)
+	{
+		String domainName = _domainObjectModel.getClassName();
+		SqlGenerator databaseGenerator = new SqlGenerator();
+
+		StringTemplate daoStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/Dao");
+		StringTemplate primaryKeyMethodsStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/PrimaryKeyMethods");
+		StringTemplate updateMethodStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/UpdateMethod");
+		StringTemplate updateMethodNotSupportedStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/UpdateMethodNotSupported");
+
+		java.util.Iterator attributes = _domainObjectModel.getAttributes();
+
+		boolean hasPrimaryKey = false;
+		boolean updateIsAvailable = false;
+
+		String isUndoable = "false";
+
+		while (attributes.hasNext() == true)
+		{
+			String isSearchable = "false";
+
+			Attribute attribute = (Attribute) attributes.next();
+			Annotation persist = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Persistable");
+			Annotation search = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Searchable");
+			Annotation undo = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Undoable");
+
+			isUndoable = (undo != null) ? findValue(undo, "isUndoable()") : "false";
+
+			String requestPersistence = findValue(persist, "isPersistable()");
+			String requestSearchable = findValue(persist, "isSearchable()");			
+
+			if ("true".equals(requestPersistence) == true)
+			{
+				String type = attribute.getType();
+
+				if (isPersistable(type) == false)
+				{
+					throw new RuntimeException("No persistence support for complex object types like: " + type);
+				}
+
+				String fieldName = attribute.getName();
+				String name = attribute.getName();
+				String isPrimaryKey = findValue(persist, "isPrimaryKey()");
+				String rangeable = findValue(persist, "rangeable()");
+				String isImmutable = findValue(persist, "immutable()");
+
+				if (search != null)
+				{
+					isSearchable = findValue(search, "isSearchable()");
+				}
+
+				hasPrimaryKey = true;
+
+				StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");
+
+				daoAttributeStringTemplate.setAttribute("findByThisAttributeSql", databaseGenerator.generateFindByThisAttributeSql(_domainObjectModel, fieldName));
+				daoAttributeStringTemplate.setAttribute("attributeName", name);
+				daoAttributeStringTemplate.setAttribute("attributeType", type);
+				daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+				daoAttributeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+				daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());
+
+				StringTemplate daoRangeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoRange");
+
+				daoRangeStringTemplate.setAttribute("findByRangeSql", databaseGenerator.generateFindThisRangeSql(_domainObjectModel, fieldName));
+				daoRangeStringTemplate.setAttribute("rangeType", type);
+				daoRangeStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
+				daoRangeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+				daoStringTemplate.setAttribute("collectByRange", daoRangeStringTemplate.toString());
+			}
+		}
+
+		if (_domainObjectModel.isClockable() == true)
+		{
+			updateIsAvailable = true;
+		}
+
+		if (hasPrimaryKey == true)
+		{
+			updateMethodStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+			updateMethodStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
+			primaryKeyMethodsStringTemplate.setAttribute("updateMethod", updateMethodStringTemplate.toString());
+
+			primaryKeyMethodsStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
+			primaryKeyMethodsStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+			primaryKeyMethodsStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
+
+			daoStringTemplate.setAttribute("primaryKeyMethods", primaryKeyMethodsStringTemplate.toString());
+		}
+
+		daoStringTemplate.setAttribute("generatorComment", comment);
+		daoStringTemplate.setAttribute("upperCaseFirstLetterDomainClassName", upperTheFirstCharacter(domainName));
+		daoStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
+		daoStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
+		daoStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+		daoStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
+		daoStringTemplate.setAttribute("selectAllSql", databaseGenerator.generateSelectSql(_domainObjectModel));
+
+		return daoStringTemplate.toString();
+	}
+
+	public String generateActiveRecord(DomainObjectModel _domainObjectModel)
 	{
 		String domainName = _domainObjectModel.getClassName();
 		StringTemplate activeRecordStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ActiveRecord");
@@ -96,7 +201,7 @@ public class JavaScriptGenerator
 		return activeRecordStringTemplate.toString();
 	}
 
-	public String generateValidationObject(DomainObjectModel _domainObjectModel, String _appName)
+	public String generateValidationObject(DomainObjectModel _domainObjectModel)
 	{
 		StringTemplate validationObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ValidationObject");
 
@@ -262,7 +367,6 @@ public class JavaScriptGenerator
 		}
 		
 		validationObjectStringTemplate.setAttribute("className", _domainObjectModel.getClassName());
-		validationObjectStringTemplate.setAttribute("upperCaseAppName", _appName.toUpperCase());
 		validationObjectStringTemplate.setAttribute("generatorComment", comment);
 
 		return validationObjectStringTemplate.toString();

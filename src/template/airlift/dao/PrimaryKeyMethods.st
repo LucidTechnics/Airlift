@@ -1,21 +1,21 @@
-public boolean exists(String _id)
+dao.exists = function(_id)
 {
-	return (get(_id) != null);
+	return (airlift.isDefined(this.get(_id)) === true);
 }
 
-public $className$ get(String _id)
+dao.get = function(_id)
 {
-	return ($className$) this.persistenceManager.getObjectById($className$Jdo.class, _id);
+	return PERSISTENCE_MANAGER.getObjectById(Packages.java.lang.Class.forName("$package$.airlift.domain.$className$Jdo"), _id);
 }
 
 $updateMethod$
 
-public void del($className$Jdo _$lowerCaseClassName$)
+dao.del = function(_$lowerCaseClassName$)
 {
-	persistenceManager.deletePersistent(_$lowerCaseClassName$);
+	PERSISTENCE_MANAGER.deletePersistent(_$lowerCaseClassName$);
 }
 
-public void delete($className$Jdo _$lowerCaseClassName$)
+dao["delete"] = function(_$lowerCaseClassName$)
 {
 	del(_$lowerCaseClassName$);
 }

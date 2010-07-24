@@ -20,7 +20,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	$getMethod; separator="\n"$
 	
 	activeRecord.error = false;
-	activeRecord.dao = new Packages.$package$.airlift.dao.$upperCaseFirstLetterDomainClassName$Dao(PERSISTENCE_MANAGER);
+	activeRecord.dao = airlift.dao("$upperCaseFirstLetterDomainClassName$");
 	activeRecord.messageManager = new Packages.airlift.MessageManager();
 	activeRecord.foreignKeySet = new Packages.java.util.HashSet();
 

@@ -1,40 +1,51 @@
-package $package$.airlift.dao;
+//$comment$
 
-import $package$.airlift.domain.$className$;
-import $package$.airlift.domain.$className$Jdo;
+var airlift;
 
-import javax.jdo.Query;
-import javax.jdo.PersistenceManager;
-
-@javax.annotation.Generated
-(
-	value="hannibal.generator.Generator",
-	comments="$generatorJavaComment$",
-	date = "$dateTimestamp$"
-)
-   
-public class $className$Dao
+if (!airlift)
 {
-	PersistenceManager persistenceManager = null;
+	airlift = {};
+}
+else if (typeof airlift != "object")
+{
+	throw new Error("airlift already exists and it is not an object");
+}
+
+importClass(Packages.$package$.airlift.domain.$className$);
+importClass(Packages.$package$.airlift.domain.$className$Jdo);
+
+importClass(Packages.javax.jdo.Query);
+importClass(Packages.javax.jdo.PersistenceManager);
+
+airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
+{
+	var dao = {};
 	
-	public $className$Dao(PersistenceManager _persistenceManager) { this.persistenceManager = _persistenceManager; }
-
-	public java.util.Collection<$className$> collect(int _offset, int _limit, String _orderBy)
+	dao.collect = function(_config)
 	{
-		String sql = "$selectAllSql$";
+		var config = (airlift.isDefined(_config) === true) ? _config : {};
+		
+		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
+		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
+		var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
+		var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : "id";
 
-		Query query = this.persistenceManager.newQuery(sql);
-		query.setOrdering(_orderBy);
-		query.setRange(_offset, _limit);
+		orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
+		
+		var sql = "$selectAllSql$";
 
-		return (java.util.Collection<$className$>) query.execute();
+		var query = PERSISTENCE_MANAGER.newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(offset, limit);
+
+		return query.execute();
 	}
 
-	public void insert($className$Jdo _$lowerCaseClassName$)
+	dao.insert = function(_$lowerCaseClassName$)
 	{
-		_$lowerCaseClassName$.setId(airlift.util.IdGenerator.generate(12));
+		_$lowerCaseClassName$.setId(Packages.airlift.util.IdGenerator.generate(12));
 		
-		this.persistenceManager.makePersistent(_$lowerCaseClassName$);
+		PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
 	}
 
 	$insertChangeEvent$
@@ -44,4 +55,6 @@ public class $className$Dao
 	$collectByAttribute; separator="\n\n"$
 
 	$collectByRange; separator="\n\n"$
-}	
+
+	return dao;
+};

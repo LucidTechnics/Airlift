@@ -1,6 +1,6 @@
-public void update($className$Jdo _$lowerCaseClassName$)
+dao.update = function(_$lowerCaseClassName$)
 {
-	if (_$lowerCaseClassName$.getId() == null) { throw new RuntimeException("Cannot update. Null id found for object: " + _$lowerCaseClassName$); }
+	if (airlift.isDefined(_$lowerCaseClassName$.getId()) === true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _$lowerCaseClassName$ }; }
 
-	persistenceManager.makePersistent(_$lowerCaseClassName$);
+	PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
 }

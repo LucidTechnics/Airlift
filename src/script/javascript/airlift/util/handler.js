@@ -43,6 +43,18 @@ airlift.ar = function(_domainName)
 	return airlift["create" + domainName]();
 };
 
+airlift.dao = function(_domainName)
+{
+	var domainName = (airlift.isDefined(_domainName) === true) ? Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_domainName) : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(DOMAIN_NAME);
+
+	if (airlift.isDefined(airlift["create" + domainName + "Dao"]) !== true)
+	{
+		airlift.ls("javascript/airlift/dao/" + domainName + ".js");
+	}
+
+	return airlift["create" + domainName + "Dao"]();
+};
+
 //t - create StringTemplate
 airlift.t = function(_templateName, _locale)
 {
@@ -130,6 +142,9 @@ airlift.l = function(_list)
 
 	list.g = function(_index)
 	{
+
+		//Does this list return a active record or just a collection of
+		//Java adapters.
 		return this.get(_index);
 	};
 
@@ -473,6 +488,16 @@ airlift.renderError = function(_errorMap)
 
 	return stringBuffer.toString();
 };
+
+airlift.sb = function()
+{
+	return new Packages.java.lang.StringBuffer();
+}
+
+airlift.jst = function(_string)
+{
+	return new Packages.java.lang.String();
+}
 
 airlift.ic = function(_className)
 {

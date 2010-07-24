@@ -1,6 +1,7 @@
-public int insertChangeEvent(String _changeEventId, String _method, $className$Jdo _$lowerCaseClassName$)
+dao.insertChangeEvent = function(_changeEventId, _method, _$lowerCaseClassName$)
 {
-	final String sql = "$insertChangeEventSql$";
+	//Not using this template right now.  Needs to be converted!!!!
+	var sql = "$insertChangeEventSql$";
 
 	return update(sql, _changeEventId, _method, $objectGetterList$);
 }

@@ -49,10 +49,6 @@ public class JavaGenerator
 		generatedString = generateDomainSubInterface(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName();
 		writeJavaFile(fileName, generatedString, _element);
-
-		generatedString = generateDao(_domainObjectModel);
-		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.dao." + _domainObjectModel.getClassName() + "Dao";
-		writeJavaFile(fileName, generatedString, _element);
 	}
 
 	public String generateApplicationProfile(Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
@@ -532,7 +528,6 @@ public class JavaGenerator
 			if ("true".equals(requestPersistence) == true)
 			{
 				String type = attribute.getType();
-
 				if (isPersistable(type) == false)
 				{
 					throw new RuntimeException("No persistence support for complex object types like: " + type);
@@ -596,16 +591,6 @@ public class JavaGenerator
 		daoStringTemplate.setAttribute("selectAllSql", databaseGenerator.generateSelectSql(_domainObjectModel));
 
 	    return daoStringTemplate.toString();
-	}
-
-	public String generateDaoFactory(String _rootPackageName)
-	{
-		StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoFactory");
-
-		stringTemplate.setAttribute("package", _rootPackageName);
-		stringTemplate.setAttribute("generatorComment", comment);
-
-		return stringTemplate.toString();
 	}
 	
 	protected class PropertyOrder

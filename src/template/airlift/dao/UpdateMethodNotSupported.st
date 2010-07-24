@@ -1,4 +1,4 @@
-public void update($className$Jdo _$lowerCaseClassName$)
+dao.update = function(_$lowerCaseClassName$)
 {
-	throw new RuntimeException("Update not supported for $className$");
+	throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Update not supported for $className$"};
 }
