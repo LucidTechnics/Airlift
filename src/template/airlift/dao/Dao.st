@@ -1,6 +1,7 @@
 package $package$.airlift.dao;
 
-import $package$.airlift.domain.$className$Impl;
+import $package$.airlift.domain.$className$;
+import $package$.airlift.domain.$className$Jdo;
 
 import javax.jdo.Query;
 import javax.jdo.PersistenceManager;
@@ -18,7 +19,7 @@ public class $className$Dao
 	
 	public $className$Dao(PersistenceManager _persistenceManager) { this.persistenceManager = _persistenceManager; }
 
-	public java.util.Collection<$className$Impl> collect(int _offset, int _limit, String _orderBy)
+	public java.util.Collection<$className$> collect(int _offset, int _limit, String _orderBy)
 	{
 		String sql = "$selectAllSql$";
 
@@ -26,10 +27,10 @@ public class $className$Dao
 		query.setOrdering(_orderBy);
 		query.setRange(_offset, _limit);
 
-		return (java.util.Collection<$className$Impl>) query.execute();
+		return (java.util.Collection<$className$>) query.execute();
 	}
 
-	public void insert($className$Impl _$lowerCaseClassName$)
+	public void insert($className$Jdo _$lowerCaseClassName$)
 	{
 		_$lowerCaseClassName$.setId(airlift.util.IdGenerator.generate(12));
 		

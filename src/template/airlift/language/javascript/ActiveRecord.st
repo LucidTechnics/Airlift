@@ -13,6 +13,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 {
 	var activeRecord = {};
 
+	$defineProperty; separator="\n"$
+
+	$setMethod; separator="\n"$
+
+	$getMethod; separator="\n"$
+	
 	activeRecord.error = false;
 	activeRecord.dao = new Packages.$package$.airlift.dao.$upperCaseFirstLetterDomainClassName$Dao(PERSISTENCE_MANAGER);
 	activeRecord.messageManager = new Packages.airlift.MessageManager();
@@ -32,32 +38,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.isForeignKey = function(_propertyName)
 	{
-		return foreignKeySet.contains(_propertyName);
+		return this.foreignKeySet.contains(_propertyName);
 	}
 	
-	activeRecord.rdfa = function(_rdfaMetaData)
+	activeRecord.rdfa = function(_config)
 	{
-		var include = false;
-		var filter = null;
+		var config = (airlift.isDefined(_config) === true) ? _config :  {};
+		config.activeRecord = this;
 
-		var rdfaMetaData = (airlift.isDefined(_rdfaMetaData) === true) ? _rdfaMetaData :  {};
-
-		var path = (airlift.isDefined(rdfaMetaData.path) === true) ? rdfaMetaData.path : PATH;
-		var appName = (airlift.isDefined(rdfaMetaData.appName) === true) ? rdfaMetaData.appName : APP_NAME;
-		var anchorField = (airlift.isDefined(rdfaMetaData.anchorField) === true) ? rdfaMetaData.anchorField : "id";
-
-		if (airlift.isDefined(rdfaMetaData.include) === true)
-		{
-			filter = rdfaMetaData.include;
-			include = true;
-		}
-		else if (airlift.isDefined(rdfaMetaData.exclude) === true)
-		{
-			filter = rdfaMetaData.exclude;
-			include = false;
-		}
-
-		return airlift.toRdfa({path: path, appName. anchorField : anchorField, filter: filter, contains: include, activeRecord: this});
+		return airlift.toRdfa(config);
 	};
 
 	activeRecord.json = function()
@@ -139,7 +128,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "GET", true);
 
-		return this.dao.collect(_offset, _limit, _orderBy);
+		return this.convertToActiveRecordArray(this.dao.collect(_offset, _limit, _orderBy));
 	};
 
 	activeRecord.retrieveDomainInterface = function()
@@ -147,15 +136,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
 	}
 
-	activeRecord.convertToActiveRecordCollection = function(_collection)
+	activeRecord.convertToActiveRecordArray = function(_collection)
 	{
-		var collection = airlift.l();
+		var collection = [];
 
-		for (var do in Iterator(_collection))
+		for (var dataObject in Iterator(_collection))
 		{
 			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			activeRecord.copyFrom(do);
-			collection.a(activeRecord);
+			activeRecord.copyFrom(dataObject);
+			collection.push(activeRecord);
 		}
 
 		return collection;
@@ -240,15 +229,39 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.copyFrom = function(_$allLowerCaseClassName$)
 	{
-		Packages.org.apache.commons.beanutils.PropertyUtils.copyProperties(this, _$allLowerCaseClassName$);
+		var orderedPropertyList = this.retrieveOrderedPropertyList();
+
+		for (var property in Iterator(orderedPropertyList))
+		{
+			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+			
+			this[setter](_$allLowerCaseClassName$[getter]());
+		}
 	}
 
 	activeRecord.copyTo = function(_$allLowerCaseClassName$)
 	{
-		Packages.org.apache.commons.beanutils.PropertyUtils.copyProperties(_$allLowerCaseClassName$, this);
+		var orderedPropertyList = this.retrieveOrderedPropertyList();
+
+		for (var property in Iterator(orderedPropertyList))
+		{
+			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+
+			_$allLowerCaseClassName$[setter](this[getter]());
+		}
 	}
 
 	activeRecord.createDO = function()
+	{
+		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Jdo();
+		this.copyTo($allLowerCaseClassName$);
+
+		return $allLowerCaseClassName$;
+	}
+
+	activeRecord.createImpl = function()
 	{
 		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Impl();
 		this.copyTo($allLowerCaseClassName$);
@@ -391,8 +404,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return errorMap;
 	}
-
-	activeRecord = new JavaAdapter(Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Impl, activeRecord);
 	
 	return activeRecord;
 };

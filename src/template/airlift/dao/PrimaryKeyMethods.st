@@ -3,21 +3,19 @@ public boolean exists(String _id)
 	return (get(_id) != null);
 }
 
-public $className$Impl get(String _id)
+public $className$ get(String _id)
 {
-	$className$Impl $lowerCaseClassName$, detached = null;
-	
-	return ($className$Impl) this.persistenceManager.getObjectById($className$Impl.class, _id);
+	return ($className$) this.persistenceManager.getObjectById($className$Jdo.class, _id);
 }
 
 $updateMethod$
 
-public void del($className$Impl _$lowerCaseClassName$)
+public void del($className$Jdo _$lowerCaseClassName$)
 {
 	persistenceManager.deletePersistent(_$lowerCaseClassName$);
 }
 
-public void delete($className$Impl _$lowerCaseClassName$)
+public void delete($className$Jdo _$lowerCaseClassName$)
 {
 	del(_$lowerCaseClassName$);
 }

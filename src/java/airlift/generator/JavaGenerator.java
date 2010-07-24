@@ -42,6 +42,10 @@ public class JavaGenerator
 		String fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Impl";
 		writeJavaFile(fileName, generatedString, _element);
 
+		generatedString = generateJdoDomainObject(_domainObjectModel);
+		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Jdo";
+		writeJavaFile(fileName, generatedString, _element);
+
 		generatedString = generateDomainSubInterface(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName();
 		writeJavaFile(fileName, generatedString, _element);
@@ -207,15 +211,6 @@ public class JavaGenerator
 			String scope = "public";
 			String getterName = getGetterName(name);
 			String setterName = getSetterName(name);
-
-			if ("id".equals(name) == true)
-			{
-				attributeStringTemplate.setAttribute("annotation", "@Persistent @PrimaryKey");
-			}
-			else
-			{
-				attributeStringTemplate.setAttribute("annotation", "@Persistent");
-			}
 			
 			attributeStringTemplate.setAttribute("scope", "private");
 			attributeStringTemplate.setAttribute("type", type);
@@ -334,6 +329,164 @@ public class JavaGenerator
 			stringBufferStringTemplate.setAttribute("name", "updateDate");
 		}
 		
+		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
+		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);
+		domainObjectStringTemplate.setAttribute("attributeSetters", setterStringTemplate);
+		domainObjectStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
+		domainObjectStringTemplate.setAttribute("generatorComment", comment	);
+		domainObjectStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
+		domainObjectStringTemplate.setAttribute("fullClassName", _domainObjectModel.getFullyQualifiedClassName());
+		domainObjectStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+
+		return domainObjectStringTemplate.toString();
+	}
+
+	public String generateJdoDomainObject(DomainObjectModel _domainObjectModel)
+	{
+		StringTemplate attributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeDeclaration");
+		StringTemplate getterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeGetterDeclaration");
+		StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeSetterDeclaration");
+		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
+		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
+
+		Iterator attributes = _domainObjectModel.getAttributes();
+
+		while (attributes.hasNext() == true)
+		{
+			Attribute attribute = (Attribute) attributes.next();
+
+			String name = attribute.getName();
+			String type = attribute.getType();
+			String scope = "public";
+			String getterName = getGetterName(name);
+			String setterName = getSetterName(name);
+
+			if ("id".equals(name) == true)
+			{
+				attributeStringTemplate.setAttribute("annotation", "@Persistent @PrimaryKey");
+			}
+			else
+			{
+				attributeStringTemplate.setAttribute("annotation", "@Persistent");
+			}
+
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", type);
+			attributeStringTemplate.setAttribute("name", name);
+
+			getterStringTemplate.setAttribute("scope", scope);
+			getterStringTemplate.setAttribute("type", type);
+			getterStringTemplate.setAttribute("getterName", getterName);
+			getterStringTemplate.setAttribute("name", name);
+
+			setterStringTemplate.setAttribute("scope", scope);
+			setterStringTemplate.setAttribute("type", type);
+			setterStringTemplate.setAttribute("setterName", setterName);
+			setterStringTemplate.setAttribute("name", name);
+
+			printMessage("Checking is type: " + type);
+
+			if (isArrayType(type) == true)
+			{
+				stringBufferStringTemplate.setAttribute("getterName", "airlift.util.AirliftUtil.generateStringFromArray(" + getterName + "())");
+			}
+			else
+			{
+				stringBufferStringTemplate.setAttribute("getterName", getterName + "()");
+			}
+
+			stringBufferStringTemplate.setAttribute("name", name);
+
+		}
+
+		if (_domainObjectModel.isClockable() == true)
+		{
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", "java.lang.String");
+			attributeStringTemplate.setAttribute("name", "source");
+
+			getterStringTemplate.setAttribute("scope", "public");
+			getterStringTemplate.setAttribute("type", "java.lang.String");
+			getterStringTemplate.setAttribute("getterName", "getSource");
+			getterStringTemplate.setAttribute("name", "source");
+
+			setterStringTemplate.setAttribute("scope", "public");
+			setterStringTemplate.setAttribute("type", "java.lang.String");
+			setterStringTemplate.setAttribute("setterName", "setSource");
+			setterStringTemplate.setAttribute("name", "source");
+
+			stringBufferStringTemplate.setAttribute("getterName", "getSource()");
+			stringBufferStringTemplate.setAttribute("name", "source");
+
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", "java.lang.Integer");
+			attributeStringTemplate.setAttribute("name", "clock");
+
+			getterStringTemplate.setAttribute("scope", "public");
+			getterStringTemplate.setAttribute("type", "java.lang.Integer");
+			getterStringTemplate.setAttribute("getterName", "getClock");
+			getterStringTemplate.setAttribute("name", "clock");
+
+			setterStringTemplate.setAttribute("scope", "public");
+			setterStringTemplate.setAttribute("type", "java.lang.Integer");
+			setterStringTemplate.setAttribute("setterName", "setClock");
+			setterStringTemplate.setAttribute("name", "clock");
+
+			stringBufferStringTemplate.setAttribute("getterName", "getClock()");
+			stringBufferStringTemplate.setAttribute("name", "clock");
+
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", "java.lang.String");
+			attributeStringTemplate.setAttribute("name", "hash");
+
+			getterStringTemplate.setAttribute("scope", "public");
+			getterStringTemplate.setAttribute("type", "java.lang.String");
+			getterStringTemplate.setAttribute("getterName", "getHash");
+			getterStringTemplate.setAttribute("name", "hash");
+
+			setterStringTemplate.setAttribute("scope", "public");
+			setterStringTemplate.setAttribute("type", "java.lang.String");
+			setterStringTemplate.setAttribute("setterName", "setHash");
+			setterStringTemplate.setAttribute("name", "hash");
+
+			stringBufferStringTemplate.setAttribute("getterName", "getHash()");
+			stringBufferStringTemplate.setAttribute("name", "hash");
+
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", "java.util.Date");
+			attributeStringTemplate.setAttribute("name", "createDate");
+
+			getterStringTemplate.setAttribute("scope", "public");
+			getterStringTemplate.setAttribute("type", "java.util.Date");
+			getterStringTemplate.setAttribute("getterName", "getCreateDate");
+			getterStringTemplate.setAttribute("name", "createDate");
+
+			setterStringTemplate.setAttribute("scope", "public");
+			setterStringTemplate.setAttribute("type", "java.util.Date");
+			setterStringTemplate.setAttribute("setterName", "setCreateDate");
+			setterStringTemplate.setAttribute("name", "createDate");
+
+			stringBufferStringTemplate.setAttribute("getterName", "getCreateDate()");
+			stringBufferStringTemplate.setAttribute("name", "createDate");
+
+			attributeStringTemplate.setAttribute("scope", "private");
+			attributeStringTemplate.setAttribute("type", "java.util.Date");
+			attributeStringTemplate.setAttribute("name", "updateDate");
+
+			getterStringTemplate.setAttribute("scope", "public");
+			getterStringTemplate.setAttribute("type", "java.util.Date");
+			getterStringTemplate.setAttribute("getterName", "getUpdateDate");
+			getterStringTemplate.setAttribute("name", "updateDate");
+
+			setterStringTemplate.setAttribute("scope", "public");
+			setterStringTemplate.setAttribute("type", "java.util.Date");
+			setterStringTemplate.setAttribute("setterName", "setUpdateDate");
+			setterStringTemplate.setAttribute("name", "updateDate");
+
+			stringBufferStringTemplate.setAttribute("getterName", "getUpdateDate()");
+			stringBufferStringTemplate.setAttribute("name", "updateDate");
+		}
+
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeSetters", setterStringTemplate);

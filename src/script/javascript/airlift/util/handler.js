@@ -118,7 +118,7 @@ airlift.partition = function(_collection, _attribute)
 };
 
 //l - create a new java.util.ArrayList
-airlift.l = function(_list, _size)
+airlift.l = function(_list)
 {
 	var list = {};
 	
@@ -179,9 +179,7 @@ airlift.l = function(_list, _size)
 		return Iterator(list);
 	}
 
-	var size = (airlift.isDefined(_size) === true) ? _size : 10;
-	
-	list = new JavaAdapter(Packages.java.util.ArrayList(size), list);
+	list = new JavaAdapter(Packages.java.util.ArrayList, list);
 
 	if (airlift.isDefined(_list) === true)
 	{
@@ -192,7 +190,7 @@ airlift.l = function(_list, _size)
 };
 
 //s - create a new java.util.HashSet
-airlift.s = function(_set, _size)
+airlift.s = function(_set)
 {
 	var set = {};
 	
@@ -248,9 +246,7 @@ airlift.s = function(_set, _size)
 		return Iterator(set);
 	}
 
-	var size = (airlift.isDefined(_size) === true) ? _size : 10;
-
-	set = new JavaAdapter(Packages.java.util.HashSet(size), set);
+	set = new JavaAdapter(Packages.java.util.HashSet, set);
 
 	if (airlift.isDefined(_set) === true)
 	{
@@ -261,7 +257,7 @@ airlift.s = function(_set, _size)
 };
 
 //m - create a new java.util.HashMap
-airlift.m = function(_map, _size)
+airlift.m = function(_map)
 {
 	var map = {};
 
@@ -308,9 +304,7 @@ airlift.m = function(_map, _size)
 		return Iterator(this.entrySet().iterator());
 	}
 
-	var size = (airlift.isDefined(_size) === true) ? _size : 89;
-
-	map = new JavaAdapter(Packages.java.util.HashMap(size), map);
+	map = new JavaAdapter(Packages.java.util.HashMap, map);
 
 	if (airlift.isDefined(_map) === true)
 	{

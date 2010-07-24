@@ -256,7 +256,7 @@ public class DomainObjectModel
 
 	public String getTableName()
 	{
-		return getBuildPackageName().trim() + ".airlift.domain." + getClassName().trim() + "Impl";
+		return getBuildPackageName().trim() + ".airlift.domain." + getClassName().trim() + "Jdo";
 	}
 
 	public boolean isAbstractDomain()

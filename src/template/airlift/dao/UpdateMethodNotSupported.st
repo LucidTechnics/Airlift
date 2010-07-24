@@ -1,4 +1,4 @@
-public void update($className$Impl _$lowerCaseClassName$)
+public void update($className$Jdo _$lowerCaseClassName$)
 {
-	throw new RuntimeException("Update not supported for $className$Impl");
+	throw new RuntimeException("Update not supported for $className$");
 }

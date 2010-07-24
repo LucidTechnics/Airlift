@@ -1,4 +1,4 @@
-public void update($className$Impl _$lowerCaseClassName$)
+public void update($className$Jdo _$lowerCaseClassName$)
 {
 	if (_$lowerCaseClassName$.getId() == null) { throw new RuntimeException("Cannot update. Null id found for object: " + _$lowerCaseClassName$); }
 

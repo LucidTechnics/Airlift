@@ -1,4 +1,4 @@
-public int insertChangeEvent(String _changeEventId, String _method, $className$Impl _$lowerCaseClassName$)
+public int insertChangeEvent(String _changeEventId, String _method, $className$Jdo _$lowerCaseClassName$)
 {
 	final String sql = "$insertChangeEventSql$";
 
