@@ -9,6 +9,9 @@ else if (typeof airlift != "object")
 	throw new Error("airlift already exists and it is not an object");
 }
 
+//Debugging to the web page.  Text sent to this method preppends text
+//to the CONTENT_CONTEXT so that it shows up at the top of the web
+//page. Very convenient. 
 airlift.d = function(_id)
 {
 	var string = ">>>>" + HANDLER_NAME + ":" + _id;
@@ -16,13 +19,13 @@ airlift.d = function(_id)
 	CONTENT_CONTEXT.debug(string);
 };
 
-//ls - loadScript
+//ls - load JavaScript scripts 
 airlift.ls = function(_scriptName)
 {
 	SCRIPTING.loadScript(_scriptName);
 };
 
-
+//Security checks via the Security context.
 airlift.checkAllowed = function(_domainClassName, _domainName, _method, _isCollection)
 {
 	var isCollection = (airlift.isDefined(_isCollection) === true) ? _isCollection : false;
@@ -30,7 +33,8 @@ airlift.checkAllowed = function(_domainClassName, _domainName, _method, _isColle
 	securityContext.allowed(_domainClassName, _domainName,  _method, REQUEST, isCollection); 
 };
 
-//ar - Active Record
+//ar - Create an active record for the provided domain name.  If not
+//domain name is provided the default DOMAIN_NAME is used instead.
 airlift.ar = function(_domainName)
 {
 	var domainName = (airlift.isDefined(_domainName) === true) ? Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_domainName) : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(DOMAIN_NAME);
@@ -43,6 +47,8 @@ airlift.ar = function(_domainName)
 	return airlift["create" + domainName]();
 };
 
+//ar - Create the DAO for the provided domain name.  If not
+//domain name is provided the default DOMAIN_NAME is used instead.
 airlift.dao = function(_domainName)
 {
 	var domainName = (airlift.isDefined(_domainName) === true) ? Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_domainName) : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(DOMAIN_NAME);
@@ -55,11 +61,13 @@ airlift.dao = function(_domainName)
 	return airlift["create" + domainName + "Dao"]();
 };
 
+//Convenience method for creating a blank StringTemplate object
 airlift.stringTemplate = function()
 {
 	return new Packages.org.antlr.stringtemplate.StringTemplate();
 }
-//t - create StringTemplate
+
+//t - create StringTemplate object for a given locale.
 airlift.t = function(_templateName, _locale)
 {
 	LOG.info("Creating template: " + _templateName);
@@ -72,7 +80,7 @@ airlift.t = function(_templateName, _locale)
 	return template;
 };
 
-//every - execution function on every member of collection
+//every - execution function on every member of java.util.Collection
 airlift.every = function(_collection, _function)
 {
 	if (airlift.isDefined(_collection) === true)
@@ -84,7 +92,7 @@ airlift.every = function(_collection, _function)
 	}
 };
 
-//split - separate collection members by function evaluation of true
+//split - separate java.util.Collection members by function evaluation of true
 //and false.
 airlift.split = function(_collection, _function)
 {
@@ -102,7 +110,7 @@ airlift.split = function(_collection, _function)
 	return [first, second];
 };
 
-//partition - separate collection into lists partitioned by _attribute
+//partition - separate java.util.Collection into lists partitioned by _attribute
 //value
 airlift.partition = function(_collection, _attribute)
 {
@@ -134,7 +142,7 @@ airlift.partition = function(_collection, _attribute)
 	return [orderedKeys, partitionMap];
 };
 
-//l - create a new java.util.ArrayList
+//l - create an enhanced java.util.ArrayList
 airlift.l = function(_list)
 {
 	var list = {};
@@ -209,7 +217,7 @@ airlift.l = function(_list)
 	return list;
 };
 
-//s - create a new java.util.HashSet
+//s - create an enhanced java.util.HashSet
 airlift.s = function(_set)
 {
 	var set = {};
@@ -276,7 +284,7 @@ airlift.s = function(_set)
 	return set;
 };
 
-//m - create a new java.util.HashMap
+//m - create an enhanced java.util.HashMap
 airlift.m = function(_map)
 {
 	var map = {};
@@ -334,33 +342,34 @@ airlift.m = function(_map)
 	return map;
 };
 
-//a - create a new java array of the specified type
+//a - Convenience method to create a new Java array of the specified type
 airlift.a = function(_javaType, _size)
 {
 	return Packages.java.lang.reflect.Array.newInstance(_javaType, _size);
 };
 
-//g - create an id generator
+//g - Convenience method to create an id generator
 airlift.g = function()
 {
 	return Packages.airlift.util.IdGenerator.generate();
 };
 
-//p - print using java.lang.System.out.println
+//p - Convenience method to print using java.lang.System.out.println
 airlift.p = function(_message)
 {
 	OUT.println(_message);
 };
 
-//mm - create a message manager
+//mm - Convenience method create a message manager
 airlift.mm = function()
 {
 	return new Packages.airlift.MessageManager();
 };
 
-airlift.exists = function(_id, _domainName, _appName)
+
+airlift.exists = function(_id, _domainName)
 {
-	var activeRecord = airlift.ar(_domainName, _appName);
+	var activeRecord = airlift.ar(_domainName);
 
 	var id = (airlift.isDefined(_id) === true) ? _id : ID;
 

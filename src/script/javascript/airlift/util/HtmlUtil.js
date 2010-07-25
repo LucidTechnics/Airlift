@@ -102,10 +102,14 @@ airlift.toRdfa = function(_config)
 			{
 				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
 				var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
-
 				var value = propertyValue;
-
 				var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
+
+				LOG.info("property: " + _property);
+				LOG.info("propertyValue: " + propertyValue);
+				LOG.info("propertyDescriptor: " + propertyDescriptor);
+				LOG.info("type: " + type);
+				LOG.info("value: " + value);
 
 				if ((airlift.isDefined(filter) === false) ||
 					  (airlift.string("")).equalsIgnoreCase(filter) === true ||
@@ -124,7 +128,7 @@ airlift.toRdfa = function(_config)
 					}
 					else if (_property.equalsIgnoreCase("id") === true)
 					{
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(path).append("\" rel=\"airlift:self\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(path).append("\" rel=\"airlift:self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
 					}
 					else if (activeRecord.isForeignKey(_property) === true)
 					{

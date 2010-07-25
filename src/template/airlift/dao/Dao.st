@@ -43,9 +43,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.insert = function(_$lowerCaseClassName$)
 	{
-		_$lowerCaseClassName$.setId(Packages.airlift.util.IdGenerator.generate(12));
+		var id = Packages.airlift.util.IdGenerator.generate(12);
+		_$lowerCaseClassName$.setId(id);
 		
 		PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
+
+		return id;
 	}
 
 	$insertChangeEvent$

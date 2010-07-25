@@ -80,7 +80,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "GET");
 
-		this.dao.get(_id);
+		var jdo = this.dao.get(_id);
+		this.copyFrom(jdo);
 
 		return activeRecord;
 	};
@@ -96,7 +97,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "POST");
 
-		return this.dao.insert(this.createDO());
+		this.setId(this.dao.insert(this.createDO()));
 	};
 
 	activeRecord.del = function()
