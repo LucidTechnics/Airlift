@@ -557,7 +557,7 @@ airlift.toAtom = function(_config)
 	{
 		var description = new Packages.com.sun.syndication.feed.synd.SyndContentImpl();
 		description.setType("application/xhtml+xml");
-		description.setValue(_activeRecord.rdfa(path, null, filter, include));
+		description.setValue(_activeRecord.rdfa({path: path, filter: filter, contains: contains}));
 
 		var entry = new Packages.com.sun.syndication.feed.synd.SyndEntryImpl();
 
