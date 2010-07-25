@@ -55,14 +55,19 @@ airlift.dao = function(_domainName)
 	return airlift["create" + domainName + "Dao"]();
 };
 
+airlift.stringTemplate = function()
+{
+	return new Packages.org.antlr.stringtemplate.StringTemplate();
+}
 //t - create StringTemplate
 airlift.t = function(_templateName, _locale)
 {
-	LOG.info("Creating template: " + template.name);
-	var template = TEMPLATE.getInstanceOf(_templateName);
-	
-	var localeProperties = airlift.loadLocaleProperties(_locale);
-	template.setAttribute("messages", localeProperties);
+	LOG.info("Creating template: " + _templateName);
+	var template = (airlift.isDefined(_templateName) === true) ? TEMPLATE.getInstanceOf(_templateName) : airlift.stringTemplate();
+
+	//TODO figure how this would work using AppEngine.
+	//var localeProperties = airlift.loadLocaleProperties(_locale);
+	//template.setAttribute("messages", localeProperties);
 
 	return template;
 };
@@ -494,9 +499,14 @@ airlift.sb = function()
 	return new Packages.java.lang.StringBuffer();
 }
 
-airlift.jst = function(_string)
+airlift.string = function(_string)
 {
-	return new Packages.java.lang.String();
+	return (airlift.isDefined(_string) === true) ? new Packages.java.lang.String(_string) : new Packages.java.lang.String();
+}
+
+airlift.integer = function(_integer)
+{
+	return (airlift.isDefined(_integer) === true) ? new Packages.java.lang.Integer(_integer) : new Packages.java.lang.Integer();
 }
 
 airlift.ic = function(_className)

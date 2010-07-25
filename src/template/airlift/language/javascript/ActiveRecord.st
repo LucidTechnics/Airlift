@@ -54,32 +54,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return airlift.util.AirliftUtil.toJson(this.createDO());
 	};
 
-	activeRecord.form = function(_formMetaData)
+	activeRecord.form = function(_config)
 	{
-		var include = false;
-		var filter = activeRecord.pkName();
+		return airlift.toForm(_config, this);
+	};
 
-		var formMetaData = (airlift.isDefined(_formMetaData) === true) ? _formMetaData :  {};
-
-		var path = (airlift.isDefined(formMetaData.path) === true) ? formMetaData.path : PATH;
-		var method = (airlift.isDefined(formMetaData.method) === true) ? formMetaData.method : "POST";
-		var domainName = (airlift.isDefined(formMetaData.domainName) === true) ? formMetaData.domainName : retrieveDomainName();
-		var buttonName = (airlift.isDefined(formMetaData.buttonName) === true) ? formMetaData.buttonName : "submit";
-
-		if (airlift.isDefined(formMetaData.include) === true)
-		{
-			filter = formMetaData.include;
-			include = true;
-		}
-		else if (airlift.isDefined(formMetaData.exclude) === true)
-		{
-			filter = formMetaData.exclude;
-			include = false;
-		}
-
-		var error = (airlift.isDefined(formMetaData.error) === true) ? formMetaData.error : activeRecord.error;
-
-		return airlift.toForm({path: path, method: method, domainName: domainName, buttonName: buttonName, filter: filter, contains: include, error: error, activeRecord: this});
+	activeRecord.table = function(_config)
+	{
+		return airlift.toTable(_config);
+	};
+	
+	activeRecord.atom = function(_config)
+	{
+		return airlift.toAtom(_config);
 	};
 
 	activeRecord.exists = function(_id)
@@ -196,7 +183,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.retrieveOrderedPropertyList = function()
 	{
-		var propertyList = new java.util.ArrayList();
+		var propertyList = [];
 
 		$addPropertyName; separator="\n"$
 
@@ -230,27 +217,34 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.copyFrom = function(_$allLowerCaseClassName$)
 	{
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
+		var that = this;
 
-		for (var property in Iterator(orderedPropertyList))
+		var copyProperty = function(_property, _index, _array)
 		{
-			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
-			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
-			
-			this[setter](_$allLowerCaseClassName$[getter]());
+			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+			that[setter](_$allLowerCaseClassName$[getter]());
 		}
+
+		orderedPropertyList.forEach(copyProperty);
 	}
 
 	activeRecord.copyTo = function(_$allLowerCaseClassName$)
 	{
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 
-		for (var property in Iterator(orderedPropertyList))
-		{
-			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
-			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+		var that = this;
 
-			_$allLowerCaseClassName$[setter](this[getter]());
+		var copyProperty = function(_property, _index, _array)
+		{
+			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+			_$allLowerCaseClassName$[setter](that[getter]());
 		}
+
+		orderedPropertyList.forEach(copyProperty);
 	}
 
 	activeRecord.createDO = function()

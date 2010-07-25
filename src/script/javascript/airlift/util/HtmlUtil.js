@@ -11,7 +11,7 @@ else if (typeof airlift != "object")
 
 airlift.preparePath = function(_path)
 {
-	return (new Packages.java.lang.String(_path)).replaceAll("/$", "");
+	return (airlift.string(_path)).replaceAll("/$", "");
 }
 
 airlift.findValue = function(_annotation, _attributeName)
@@ -59,7 +59,7 @@ airlift.isLink = function(_propertyName, _domainName)
 
 airlift.isHiddenClockProperty = function(_property)
 {
-	return ((new Packages.java.lang.String("clock")).equalsIgnoreCase(_property) === true || (new Packages.java.lang.String("hash")).equalsIgnoreCase(_property) === true);
+	return ((airlift.string("clock")).equalsIgnoreCase(_property) === true || (airlift.string("hash")).equalsIgnoreCase(_property) === true);
 }
 
 airlift.isClockProperty = function(_property)
@@ -84,7 +84,7 @@ airlift.toRdfa = function(_config)
 
 	if (airlift.isDefined(activeRecord) === true)
 	{
-		var stringBuffer = new Packages.java.lang.StringBuffer();
+		var stringBuffer = airlift.sb();
 		stringBuffer.append("<ul class=\"" + appName + ":" + domainName + "\" >").append("\n");
 
 		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
@@ -93,49 +93,51 @@ airlift.toRdfa = function(_config)
 		
 		if (dataObject instanceof Packages.airlift.Clockable)
 		{
-			orderedPropertyList.add("clock");
+			orderedPropertyList.push("clock");
 		}
 
-		for (var property in Iterator(orderedPropertyList))
+		var processProperties = function(_property, _index, _array)
 		{
-			if (property.equalsIgnoreCase("class") === false)
+			if (_property.equalsIgnoreCase("class") === false)
 			{
-				var propertyValue = (propertyMap.get(property) === null) ? " " : propertyMap.get(property);
-				var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, property);
+				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
+				var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
 
 				var value = propertyValue;
 
 				var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
 
-				if ((airlift.isDefined(filter) === null) ||
-					  (new Packages.java.lang.String("")).equalsIgnoreCase(filter) === true ||
+				if ((airlift.isDefined(filter) === false) ||
+					  (airlift.string("")).equalsIgnoreCase(filter) === true ||
 					  (Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true) ||
-					  (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, property) === contains))
+					  (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains))
 				{
-					if (activeRecord.isForeignKey(property) === false && property.equalsIgnoreCase("id") === false)
+					if (activeRecord.isForeignKey(_property) === false && _property.equalsIgnoreCase("id") === false)
 					{
-						if (property.equalsIgnoreCase(anchorProperty) === true)
+						if (_property.equalsIgnoreCase(anchorProperty) === true)
 						{
 							var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path, domainName, "", "", value);
 							value = anchorTemplate.toString();
 						}
 
-						stringBuffer.append("<li property=\"").append(property).append("\" class=\"").append(type).append("\" >").append(value).append("</li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"").append(type).append("\" >").append(value).append("</li>\n");
 					}
-					else if (property.equalsIgnoreCase("id") === true)
+					else if (_property.equalsIgnoreCase("id") === true)
 					{
-						stringBuffer.append("<li property=\"").append(property).append("\" class=\"airlift:link\" ><a href=\"").append(path).append("\" rel=\"airlift:self\" class=\"").append(type).append("\" >").append(propertyMap.get(property)).append("</a></li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(path).append("\" rel=\"airlift:self\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
 					}
-					else if (activeRecord.isForeignKey(property) === true)
+					else if (activeRecord.isForeignKey(_property) === true)
 					{
-						var foreignDomainName = airlift.determineForeignDomainName(dataObject, property);
-						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(property);
-						stringBuffer.append("<li property=\"").append(property).append("\" class=\"airlift:link\" ><a href=\"").append(relationPath).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(propertyMap.get(property)).append("</a></li>\n");
+						var foreignDomainName = airlift.determineForeignDomainName(dataObject, _property);
+						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
 					}
 				}
 			}
 		}
 
+		orderedPropertyList.forEach(processProperties);
+		
 		stringBuffer.append("</ul>\n");
 		rdfa = stringBuffer.toString();
 	}
@@ -143,30 +145,36 @@ airlift.toRdfa = function(_config)
 	return rdfa;
 }
 
-
 airlift.toForm = function(_config)
 {
-	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(_uri, _groupName, _buttonName);
-	var slice = Array.prototype.slice();
-	var argumentArray = slice.apply(arguments, 1);
-	
-	for (var i in argumentArray)
+	var config = (airlift.isDefined(_config) === true) ? _config :  {};
+
+	var buttonName = (airlift.isDefined(config.buttonName) === true) ? config.buttonName : "submit";
+	var groupName = (airlift.isDefined(config.groupName) === true) ? config.groupName : "";
+	var path = (airlift.isDefined(config.path) === true) ? config.path : PATH;
+
+	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(path, groupName, buttonName);
+	var slice = Array.prototype.slice;
+	var argumentArray = slice.apply(arguments, [1]);
+
+	var processFieldSet = function(_activeRecord, _index, _array)
 	{
-		var activeRecord = argumentArray[i];
-		var fieldSet = toFieldSet(_config, activeRecord);
+		var fieldSet = airlift.toFieldSet(config, _activeRecord);
 		formTemplate.setAttribute("fieldSet", fieldSet);
 	}
+
+	argumentArray.forEach(processFieldSet);
 
 	return formTemplate.toString();
 }
 
 airlift.toFieldSet = function(_config, _activeRecord)
 {
-	var method = (airlift.isDefined(_config.method) === true) ? _config.method : METHOD;
-	var groupName = (airlift.isDefined(_config.groupName) === true) ? _config.groupName : _activeRecord.retrieveDomainName();
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : "";
+	var method = (airlift.isDefined(_config.method) === true) ? airlift.string(_config.method) : airlift.string("POST");
+	var groupName = (airlift.isDefined(_config.groupName) === true) ? airlift.string(_config.groupName) : _activeRecord.retrieveDomainName();
+	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : airlift.string("");
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
-	var error = (airlift.isDefined(_config.error) === true) ? _config.error : "";
+	var error = (airlift.isDefined(_config.error) === true) ? _config.error : false;
 	var domainInterfaceClass = 	_activeRecord.retrieveDomainInterface();
 	
 	var stringTemplateGroup = new Packages.org.antlr.stringtemplate.StringTemplateGroup("airlift");
@@ -185,11 +193,11 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	if (airlift.isDefined(fieldSetName) === false) { fieldSetName = _activeRecord.retrieveDomainName(); }
 
 	var fieldSetTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFieldSetTemplate(fieldSetName, _activeRecord.retrieveDomainName());
-	fieldSetTemplate.setAttribute("fieldSetId", _groupName + "_fieldSet");
+	fieldSetTemplate.setAttribute("fieldSetId", groupName + "_fieldSet");
 
-	if (domainInterfaceClassisAnnotationPresent(Packages.java.lang.Class.forName("airlift.generator.Presentable")) === true)
+	if (domainInterfaceClass.isAnnotationPresent(Packages.java.lang.Class.forName("airlift.generator.Presentable")) === true)
 	{
-		formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.method.override", _method);
+		formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.method.override", method);
 		fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 
 		var propertyMap = _activeRecord.describe();
@@ -202,18 +210,20 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 		var count = 0;
 
-		for (var property in Iterator(orderedPropertyList))
+		var processProperties = function(_property, _index, _array)
 		{
-			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			var messageList = _activeRecord.getMessageList(property);
+			var messageList = _activeRecord.getMessageList(_property);
 
-			var messageString = "";
+			var messageString = airlift.appender("", " ");
 
 			for (var message in Iterator(messageList))
 			{
-				messageString += " " + message.getMessage();
+				messageString.append(message.getMessage());
 			}
+
+			messageString = messageString.toString();
 
 			var method = domainInterfaceClass.getMethod(getter);
 			var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
@@ -221,97 +231,97 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 			var formStringBufferStringTemplate = stringTemplateGroup.getInstanceOf("airlift/language/java/FormAttributeStringBufferAppends");
 
-			if ( (airlift.isLinkArray(property, _activeRecord.retrieveDomainName()) == false &&
-				  airlift.isLink(property, _activeRecord.retrieveDomainName()) == false) &&
+			if ( (airlift.isLinkArray(_property, _activeRecord.retrieveDomainName()) == false &&
+				  airlift.isLink(_property, _activeRecord.retrieveDomainName()) == false) &&
 				 (
-				  airlift.isDefined(filter) === null ||
-				  (new Packages.java.lang.String("")).equalsIgnoreCase(filter) === true ||
+				  airlift.isDefined(filter) === false ||
+				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
 				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, property) === contains ||
-				  airlift.isHiddenClockProperty(property) === true))
+				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains ||
+				  airlift.isHiddenClockProperty(_property) === true))
 			{
-				if (airlift.isHiddenClockProperty(property) === true && method.equalsIgnoreCase("PUT") === true)
+				if (airlift.isHiddenClockProperty(_property) === true && method.equalsIgnoreCase("PUT") === true)
 				{
-					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(property));							
-					formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(property, groupName, value);
+					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(_property));							
+					formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
 					fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 				}
-				else if (airlift.isClockProperty(property) === false)
+				else if (airlift.isClockProperty(_property) === false)
 				{
-					LOG.info("Processing property: " + property);
+					LOG.info("Processing property: " + _property);
 
-					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(property));
-					var propertyDescriptor = org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, property);
-					var type = airlift.createAirliftType(propertyDescriptor.getPropertyType().getName());
+					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(_property));
+					var propertyDescriptor = org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
+					var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
 
 					var inputType = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.inputType() : Packages.airlift.generator.Presentable.Type.TEXT;
 
-					var displayLength = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.displayLength() : 20;
+					var displayLength = (airlift.isDefined(methodPresentable) === true) ? airlift.integer(methodPresentable.displayLength()) : airlift.integer(20);
 					var readOnly = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.readOnly() : false;
-					var label = (airlift.isDefined(methodPresentable) === true && airlift.isDefined(methodPresentable.label()) === true && (new Packages.java.lang.String()).equals(methodPresentable.label()) === false  && Packages.org.apache.commons.lang.StringUtils.isWhitespace(methodPresentable.label()) === false) ? methodPresentable.label() : property;
-					var textAreaRows = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.textAreaRows() : 5;
-					var textAreaColumns = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.textAreaColumns() : 100;
+					var label = (airlift.isDefined(methodPresentable) === true && airlift.isDefined(methodPresentable.label()) === true && (airlift.string("")).equals(methodPresentable.label()) === false  && Packages.org.apache.commons.lang.StringUtils.isWhitespace(methodPresentable.label()) === false) ? methodPresentable.label() : _property;
+					var textAreaRows = (airlift.isDefined(methodPresentable) === true) ? airlift.integer(methodPresentable.textAreaRows()) : airlift.integer(5);
+					var textAreaColumns = (airlift.isDefined(methodPresentable) === true) ? airlift.integer(methodPresentable.textAreaColumns()) : airlift.integer(100);
 					var allowedValues = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.allowedValues() : airlift.a(Packages.java.lang.String, 0);
-					var maxLength = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.maxLength() : 100;
+					var maxLength = (airlift.isDefined(methodPersistable) === true) ? airlift.integer(methodPersistable.maxLength()) : airlift.integer(100);
 					var nullable = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.nullable() : true;
 
 					var inputClass = ""; if (nullable === false) { inputClass = "required";	}
 
 					switch(inputType)
 					{
-						case HIDDEN:
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(property, groupName, value);
+						case Packages.airlift.generator.Presentable.Type.HIDDEN:
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
 							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 
 							break;
 
-						case TEXT:
+						case Packages.airlift.generator.Presentable.Type.TEXT:
 
-							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("text", value, maxLength, displayLength, property, groupName, readOnly, inputClass);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(property, label, messageString, inputTemplate, error);
-							formEntryTemplate.setAttribute("count", groupName + "_" + property + "_li_" + count);
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("text", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
 							break;
 
-						case PASSWORD:
-							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", value, maxLength, displayLength, property, groupName, readOnly, inputClass);
-							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(property, label, messageString, inputTemplate, error);
-							formEntryTemplate.setAttribute("count", groupName + "_" + property + "_li_" + count);
+						case Packages.airlift.generator.Presentable.Type.PASSWORD:
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
+							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
 							break;
 
-						case TEXTAREA:
-							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTextAreaTemplate(value, textAreaRows, textAreaColumns, property, groupName, readOnly);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(property, label, messageString, inputTemplate, error);
-							formEntryTemplate.setAttribute("count", groupName + "_" + property + "_li_" + count);
+						case Packages.airlift.generator.Presentable.Type.TEXTAREA:
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTextAreaTemplate(value, textAreaRows, textAreaColumns, _property, groupName, readOnly);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
 							break;
 
-						case RADIO:
-						case CHECKBOX:
+						case Packages.airlift.generator.Presentable.Type.RADIO:
+						case Packages.airlift.generator.Presentable.Type.CHECKBOX:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createMultiInputTemplate();
 							var multiType =  (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(inputType.toString(), "radio") === true) ? "radio" : "checkbox" ;
 
-							if ((new Packages.java.lang.String("airlift:boolean")).equalsIgnoreCase(type) === true)
+							if ((airlift.string("airlift:boolean")).equalsIgnoreCase(type) === true)
 							{
-								var checked = ((new Packages.java.lang.String("true")).equalsIgnoreCase(propertyMap.get(property)) === true) ? "checked" : "";
+								var checked = ((airlift.string("true")).equalsIgnoreCase(propertyMap.get(_property)) === true) ? "checked" : "";
 
 								inputTemplate.setAttribute("type", multiType);
-								inputTemplate.setAttribute("name", property);
+								inputTemplate.setAttribute("name", _property);
 								inputTemplate.setAttribute("value", "");
 								inputTemplate.setAttribute("maxLength", maxLength);
 								inputTemplate.setAttribute("checked", checked);
 								inputTemplate.setAttribute("displayLength", displayLength);
-								inputTemplate.setAttribute("id", groupName + "_" + property);
+								inputTemplate.setAttribute("id", groupName + "_" + _property);
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
 							else
@@ -319,47 +329,47 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								for (var i in allowedValues)
 								{
 									var allowedValue = allowedValues[i];
-									var checked = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(property), allowedValue) === true) ? "checked" : "";
+									var checked = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(_property), allowedValue) === true) ? "checked" : "";
 
 									inputTemplate.setAttribute("type", multiType);
-									inputTemplate.setAttribute("name", property);
+									inputTemplate.setAttribute("name", _property);
 									inputTemplate.setAttribute("value", allowedValue);
 									inputTemplate.setAttribute("maxLength", maxLength);
 									inputTemplate.setAttribute("checked", checked);
 									inputTemplate.setAttribute("displayLength", displayLength);
-									inputTemplate.setAttribute("id", groupName + "_" + property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
+									inputTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
 									inputTemplate.setAttribute("inputClass", inputClass);
 								}
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(property, label, messageString, inputTemplate, error);
-							formEntryTemplate.setAttribute("count", groupName + "_" + property + "_li_" + count);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
 							break;
 
-						case SELECT:
-							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectTemplate(property, groupName, 1, false, false);
+						case Packages.airlift.generator.Presentable.Type.SELECT:
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectTemplate(_property, groupName, 1, false, false);
 
 							for (var i in allowedValues)
 							{
 								var allowedValue = allowedValues[i];
 								
-								var selected = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(property), allowedValue) === true) ? "selected" : "";
+								var selected = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(_property), allowedValue) === true) ? "selected" : "";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
 								selectOptionTemplate.setAttribute("value", allowedValue);
 								selectOptionTemplate.setAttribute("selected", selected);
-								selectOptionTemplate.setAttribute("id", groupName + "_" + property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
+								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(property, label, messageString, inputTemplate, error);
-							formEntryTemplate.setAttribute("count", groupName + "_" + property + "_li_" + count);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
@@ -368,11 +378,13 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						default:
 							throw new RuntimeException("Cannot create form. Unknown airlift.generator.Presentable.inputType() value:" + inputType +
-								" for field: " + property + " on domain interface : " + domainInterfaceClass.getName() + " used to generate class: " + _activeRecord.getClass().getName());
+								" for field: " + _property + " on domain interface : " + domainInterfaceClass.getName() + " used to generate class: " + _activeRecord.getClass().getName());
 					}
 				}
 			}
 		}
+
+		orderedPropertyList.forEach(processProperties);
 	}
 	else
 	{
@@ -384,57 +396,59 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 airlift.toTable = function(_config, _collection)
 {
-	_path, _tf, _anchorProperty, _filter, _include, _collection
-
-	var path = (airlift.isDefined(_config.path) === true) ? preparePath(_config.path) : preparePath(PATH);
-	var tf = (airlift.isDefined(_config.tf) === true) ? _config.tf : "";
-	var anchorProperty = (airlift.isDefined(_config.anchorProperty) === true) ? _config.anchorProperty : "id";
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : "";
-	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
-	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : new Packages.java.util.ArrayList();
-	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;
+	var config = (airlift.isDefined(_config) === true) ? _config : {};
+	
+	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : airlift.preparePath(PATH);
+	var tf = (airlift.isDefined(config.tf) === true) ? config.tf : "";
+	var anchorProperty = (airlift.isDefined(config.anchorProperty) === true) ? config.anchorProperty : "id";
+	var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+	var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+	var collection = (airlift.isDefined(config.collection) === true) ? config.collection : [];
+	var domainName = (airlift.isDefined(config.domainName) === true) ? config.domainName : DOMAIN_NAME;
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 							  
 	var tableTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTableTemplate(tf);
 	var thTemplate = Packages.airlift.util.XhtmlTemplateUtil.createThTemplate();
-	var headerSet = false;
 	var headerTypeSet = false;
 
-	if (collection.isEmpty() == true)
+	if (collection.length === true)
 	{
-		log.info("Collection to process into table is empty");
+		LOG.info("Collection to process into table is empty");
 	}
 
-	for (var activeRecord in Iterator(collection))
+	var renderTable = function(_activeRecord, _index, _collection)
 	{
-		log.info("Processing active record: " + activeRecord);
+		LOG.info("Processing active record: " + _activeRecord);
 
-		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
-		var propertyMap = activeRecord.describe();
+		var orderedPropertyList = _activeRecord.retrieveOrderedPropertyList();
+		var propertyMap = _activeRecord.describe();
 
-		var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + activeRecord.retrieveDomainName() + "\"");
-
-		for (var property in Iterator(orderedPropertyList))
+		var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + _activeRecord.retrieveDomainName() + "\"");
+		var setHeader = false;
+		
+		if (_index === 0) { setHeader = true; }
+		
+		var processProperties = function(_property, _index, _array)
 		{
-			LOG.info("Processing property: " + property);
-			LOG.info("with value: " + propertyMap.get(property));
+			LOG.info("Processing property: " + _property);
+			LOG.info("with value: " + propertyMap.get(_property));
 
-			if (airlift.isClockProperty(property) === false &&
-				  (filter === null ||
-				   (new Packages.java.lang.String("")).equalsIgnoreCase(filter) === true ||
+			if (airlift.isClockProperty(_property) === false &&
+				  (airlift.isDefined(filter) === false ||
+				   (airlift.string("")).equalsIgnoreCase(filter) === true ||
 				   Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) == true ||
-				   Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, property) == contains))
+				   Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) == contains))
 			{
-				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(property);
+				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 				var method = domainInterfaceClass.getMethod(getter);
 				var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 				var methodPersistable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
 
-				if (headerSet === false)
+				if (setHeader === true)
 				{
 					if (headerTypeSet === false)
 					{
-						tableTemplate.setAttribute("id", activeRecord.retrieveDomainName());
+						tableTemplate.setAttribute("id", _activeRecord.retrieveDomainName());
 							//JQuery Table Sorter Integration
 						tableTemplate.setAttribute("class", "tablesorter");
 							//tableTemplate.setAttribute("theadAttribute",
@@ -443,92 +457,93 @@ airlift.toTable = function(_config, _collection)
 					}
 
 					var label = (airlift.isDefined(methodPresentable) === true && airlift.isDefined(methodPresentable.label()) === true &&
-								 (new Packages.java.lang.String("")).equals(methodPresentable.label()) === false  &&
-								 Packages.org.apache.commons.lang.StringUtils.isWhitespace(methodPresentable.label()) === false) ? methodPresentable.label() : property;
+								 (airlift.string("")).equals(methodPresentable.label()) === false  &&
+								 Packages.org.apache.commons.lang.StringUtils.isWhitespace(methodPresentable.label()) === false) ? methodPresentable.label() : _property;
 					thTemplate.setAttribute("th", label);
-					thTemplate.setAttribute("tha", "class=\"" + property + "\"");
+					thTemplate.setAttribute("tha", "class=\"" + _property + "\"");
 				}
 
 					//if property is a primary or foreign key you
 					//should bind an anchor instead
-				var propertyValue = (propertyMap.get(property) === null) ? " " : propertyMap.get(property);
+				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
 
-				LOG.info("Property type is: " + APP_PROFILE.getAttributeType(activeRecord.retrieveDomainName(),	property));
+				LOG.info("Property type is: " + APP_PROFILE.getAttributeType(_activeRecord.retrieveDomainName(),	_property));
 
-				if (airlift.isLinkArray(property, activeRecord.retrieveDomainName()) === true)
+				if (airlift.isLinkArray(_property, _activeRecord.retrieveDomainName()) === true)
 				{
 					LOG.info("printing the array of links");
-					trTemplate.setAttribute("td", generateStringFromArray(Packages.org.apache.commons.beanutils.PropertyUtils.getProperty(activeRecord.createImpl(), property)));
+					trTemplate.setAttribute("td", generateStringFromArray(Packages.org.apache.commons.beanutils.PropertyUtils.getProperty(_activeRecord.createImpl(), _property)));
 				}
-				else if (property.equalsIgnoreCase(anchorProperty) === true)
+				else if (_property.equalsIgnoreCase(anchorProperty) === true)
 				{
-					LOG.info("Property: " + property + " is an anchor property");
+					LOG.info("Property: " + _property + " is an anchor property");
 					var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path + "/" + propertyMap.get("id"),
-						activeRecord.retrieveDomainName(), "", "", propertyValue);
+						_activeRecord.retrieveDomainName(), "", "", propertyValue);
 					trTemplate.setAttribute("td", anchorTemplate.toString());
 				}
-				else if (activeRecord.isForeignKey(property) === true &&
-						 property.equalsIgnoreCase(anchorProperty) === false)
+				else if (_activeRecord.isForeignKey(_property) === true &&
+						 _property.equalsIgnoreCase(anchorProperty) === false)
 				{
-					LOG.info("Property: " + property + " is a foreign key");
+					LOG.info("Property: " + _property + " is a foreign key");
 					var mapTo = methodPersistable.mapTo();
 					LOG.info("map to is: " + mapTo);
 					var foreignDomainName = (mapTo != null) ? mapTo.split("\\.")[0].toLowerCase() : null;
 					LOG.info("foreign domain name is: " + foreignDomainName);
-					LOG.info("domain name is: " + activeRecord.retrieveDomainName());
+					LOG.info("domain name is: " + _activeRecord.retrieveDomainName());
 					LOG.info("path is: " + path);
 
 					var foreignPath = path.toLowerCase().replaceAll("\\/$", "").
-										 replaceAll(activeRecord.retrieveDomainName().toLowerCase() + "$", foreignDomainName);
+										 replaceAll(_activeRecord.retrieveDomainName().toLowerCase() + "$", foreignDomainName);
 
 					LOG.info("foreign path is: " + foreignPath);
 
 					var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(
-						foreignPath + "/" + propertyMap.get(property),
+						foreignPath + "/" + propertyMap.get(_property),
 						foreignDomainName, "", "", propertyValue);
 					trTemplate.setAttribute("td", anchorTemplate.toString());
 				}
 				else
 				{
-					LOG.info("Property: " + property + " is a regular attribute");
+					LOG.info("Property: " + _property + " is a regular attribute");
 
 					trTemplate.setAttribute("td", propertyValue);
 				}
 
-				trTemplate.setAttribute("tda", "class=\"" + property + "\"");
+				trTemplate.setAttribute("tda", "class=\"" + _property + "\"");
 			}
 			else
 			{
-				LOG.info("Not processing property: " + property);
+				LOG.info("Not processing property: " + _property);
 			}
 		}
 
-		if (headerSet === false)
+		orderedPropertyList.forEach(processProperties);
+
+		if (setHeader === true)
 		{
 			tableTemplate.setAttribute("th", thTemplate.toString());
-			headerSet = true;
 		}
 
 		tableTemplate.setAttribute("tb", trTemplate.toString());
 	}
 
+	collection.forEach(renderTable);
+	
 	return tableTemplate.toString();
 }
 
 airlift.toAtom = function(_config)
 {
-	var path = (airlift.isDefined(_config.path) === true) ? preparePath(_config.path) : preparePath(PATH);
+	var path = (airlift.isDefined(_config.path) === true) ? airlift.preparePath(_config.path) : airlift.preparePath(PATH);
 	var baseUri = (airlift.isDefined(_config.baseUri) === true) ? _config.baseUri : "";
 	var title = (airlift.isDefined(_config.title) === true) ? _config.title : "id";
 	var description = (airlift.isDefined(_config.description) === true) ? _config.description : "";
 	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : false;
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
-	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : new Packages.java.util.ArrayList();
+	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : [];
 	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 	
-	var feedString = "";
-
 	var feed = new Packages.com.sun.syndication.feed.synd.SyndFeedImpl();
 
 	feed.setFeedType("atom_1.0");
@@ -538,40 +553,37 @@ airlift.toAtom = function(_config)
 
 	var entries = new Packages.java.util.ArrayList();
 
-	var entry;
-	var description;
-
-	for (var activeRecord in Iterator(collection))
+	var renderAtom = function(_activeRecord, _index, _collection)
 	{
-		description = new Packages.com.sun.syndication.feed.synd.SyndContentImpl();
+		var description = new Packages.com.sun.syndication.feed.synd.SyndContentImpl();
 		description.setType("application/xhtml+xml");
-		description.setValue(activeRecord.rdfa(path, null, filter, include));
+		description.setValue(_activeRecord.rdfa(path, null, filter, include));
 
-		entry = new Packages.com.sun.syndication.feed.synd.SyndEntryImpl();
+		var entry = new Packages.com.sun.syndication.feed.synd.SyndEntryImpl();
 
 		entry.setTitle(title);
 
 		var primaryKeyValue = "";
 
-		var propertyMap = activeRecord.describe();
+		var propertyMap = _activeRecord.describe();
 
 		if (propertyMap.keySet().contains("id") === true)
 		{
 			primaryKeyValue = propertyMap.get("id");
 		}
 
-		entry.setLink((new Packages.java.lang.StringBuffer(preparePath(baseUri))).append("/").append(primaryKeyValue).toString());
+		entry.setLink((airlift.sb(airlift.preparePath(baseUri))).append("/").append(primaryKeyValue).toString());
 		entry.setPublishedDate(new Packages.java.util.Date());
 		entry.setDescription(description);
 
 		entries.add(entry);
 	}
 
+	collection.forEach(renderAtom);
+
 	feed.setEntries(entries);
 
 	var output = new Packages.com.sun.syndication.io.SyndFeedOutput();
 
-	feedString = output.outputString(feed);
-
-	return feedString;
+	return output.outputString(feed);
 }
