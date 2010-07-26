@@ -16,6 +16,7 @@ public class AppProfile
 	private static final java.util.Map<String, String> map = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
+	private static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
 	private static final airlift.servlet.rest.RestfulSecurityContext securityContext = new airlift.servlet.rest.RestfulSecurityContext();
 	private static final airlift.servlet.rest.RestfulCachingContext cachingContext = new airlift.servlet.rest.RestfulCachingContext();
 	
@@ -32,6 +33,9 @@ public class AppProfile
 
 		//Domain attribute types
 		$addToDomainAttributeTypeMap; separator="\n"$
+
+		//Concept Map
+		$addToConceptMap; separator="\n"$
 
 		//Restful security context
 		$addToSecurityContext; separator="\n"$
@@ -87,5 +91,10 @@ public class AppProfile
 	public airlift.CachingContext getCachingContext()
 	{
 		return this.cachingContext;
+	}
+
+	public String getConcept(String _conceptHandle)
+	{
+		return this.conceptMap.get(_conceptHandle);
 	}
 }

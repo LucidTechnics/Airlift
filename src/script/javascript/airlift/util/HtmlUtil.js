@@ -85,7 +85,7 @@ airlift.toRdfa = function(_config)
 	if (airlift.isDefined(activeRecord) === true)
 	{
 		var stringBuffer = airlift.sb();
-		stringBuffer.append("<ul class=\"" + appName + ":" + domainName + "\" >").append("\n");
+		stringBuffer.append("<ul class=\"" + appName + ":" + domainName + "\" concept=\"" + APP_PROFILE.getConcept(domainName) + "\" >").append("\n");
 
 		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
 		var dataObject = activeRecord.createImpl();
@@ -124,17 +124,17 @@ airlift.toRdfa = function(_config)
 							value = anchorTemplate.toString();
 						}
 
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"").append(type).append("\" >").append(value).append("</li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"").append(type).append("\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" >").append(value).append("</li>\n");
 					}
 					else if (_property.equalsIgnoreCase("id") === true)
 					{
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(path).append("\" rel=\"airlift:self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" ><a href=\"").append(path).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
 					}
 					else if (activeRecord.isForeignKey(_property) === true)
 					{
 						var foreignDomainName = airlift.determineForeignDomainName(dataObject, _property);
 						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"airlift:link\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
 					}
 				}
 			}

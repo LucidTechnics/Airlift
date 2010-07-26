@@ -76,10 +76,18 @@ public class JavaGenerator
 				template.setAttribute("addToDomainToClassMap", "domainToClassMap.put(\"" +
 									  domainObjectModel.getClassName().toLowerCase() + "\", \"" +
 									  domainObjectModel.getRootPackageName() + ".domaininterface." + domainObjectModel.getClassName() + "\");");
+				//TODO Need to refactor annotations into class level
+				//and attribute level annotations.
+				template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \""  + "\");");
 
+				
 				for (Attribute attribute: domainObjectModel.getAttributeNameMap().values())
 				{
 					template.setAttribute("addToDomainAttributeTypeMap", "map.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + attribute.getType() + "\");");
+
+					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
+					String concept = findValue(persist, "concept()");
+					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + concept + "\");");
 				}
 			}
 		}

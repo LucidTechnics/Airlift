@@ -56,7 +56,7 @@ public class DomainObjectModel
 	public boolean getIsClockable() { return isClockable; }
 	protected Set getReservedPropertyNameSet() { return reservedPropertyNameSet; }
 	public int getAttributeCount()  { return attributeCount; }
-	
+
 	public void setPackageName(String _packageName) { packageName = _packageName.toLowerCase(); }
 	public void setBuildPackageName(String _buildPackageName) { buildPackageName = _buildPackageName; }
 	public void setClassName(String _className) { className = upperTheFirstCharacter(_className); }
@@ -71,7 +71,7 @@ public class DomainObjectModel
 	public void setIsClockable(boolean _isClockable) { isClockable = _isClockable; }
 	protected void setReservedPropertyNameSet(Set _reservedPropertyNameSet) { reservedPropertyNameSet = _reservedPropertyNameSet; }
 	public void setAttributeCount(int _attributeCount) { attributeCount = _attributeCount; }
-
+	
     private static Logger log = Logger.getLogger(DomainObjectModel.class.getName());
 
 	public DomainObjectModel()

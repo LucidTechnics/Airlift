@@ -21,10 +21,10 @@ public class Attribute
 
 	public String getName() { return name; }
 	public String getType() { return type; }
-
+	
 	public void setName(String _name) { name = _name; }
 	public void setType(String _type) { type = _type; }
-
+	
 	public Attribute() {}
 	
 	public String toString()
