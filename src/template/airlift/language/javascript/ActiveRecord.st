@@ -164,7 +164,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.hasMessages = function()
 	{
-		return (getMessageMap().isEmpty() == false);
+		return (this.getMessageMap().isEmpty() === false);
 	}
 
 	activeRecord.getAppProfile = function()
@@ -276,19 +276,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	 * @return The exception experienced if the copy was not successful.
 	 */
 
-	activeRecord.copyProperty = function(_propertyName, _value)
+	activeRecord.copyProperty = function(_impl, _propertyName, _value)
 	{
 		var throwable;
 		
 		try 
 		{ 
-			this.beanUtilsBean.copyProperty(this, _propertyName, _value); 
+			this.beanUtilsBean.copyProperty(_impl, _propertyName, _value); 
 		} 
 		catch(t) 
 		{
 			throwable = t;
-			LOGGER.warning("Unable to copy property: " + _propertyName + " to domain: " + retrieveDomainName());
-			LOGGER.warning(t.toString());
+			LOG.warning("Unable to copy property: " + _propertyName + " to domain: " + retrieveDomainName());
+			LOG.warning(t.toString());
 		}
 
 		return throwable;
@@ -299,11 +299,25 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.airlift.util.AirliftUtil.describe(this.createDO());
 	}
 
+	activeRecord.getPresentableAnnotation = function(_propertyName)
+	{
+		var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_propertyName);
+		var method = this.retrieveDomainInterface().getMethod(getter);
+
+		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
+	}
+	
 	activeRecord.populateFromRequestMap = function(_attributeMap)
 	{
-		for (var property in Iterator(this.retrieveOrderedPropertyList()))
+		var orderedPropertyList = this.retrieveOrderedPropertyList();
+		var that = this;
+		var impl = this.createImpl();
+		
+		var processProperty = function(_property, _index, _array)
 		{
-			var methodPresentable = getAppProfile().getPresentableAnnotation(property);
+			var property = new Packages.java.lang.String(_property);
+			
+			var methodPresentable = that.getPresentableAnnotation(property);
 
 			if ((airlift.isDefined(methodPresentable) === true) &&
 				(methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
@@ -328,7 +342,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 					result = stringBuffer.toString();
 				}
 
-				var attributeType = this.getAttributeType(property);
+				var attributeType = that.getAttributeType(property);
 
 				if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
 					  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
@@ -355,11 +369,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 				if (airlift.isDefined(result) === true)
 				{
-					if (airlift.isDefined(this.copyProperty(property, result)) === true
+					if (airlift.isDefined(that.copyProperty(impl, property, result)) === true
 						  && airlift.isDefined(result) === true && Packages.airlift.util.Airlift.isWhitespace(result) !== true)
 					{
-						this.copyProperty(property, null);
-						this.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
+						that.copyProperty(impl, property, null);
+						that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
 					}
 				}
 			}
@@ -367,23 +381,26 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			{
 				if (airlift.isDefined(_attributeMap.get(property)) === true)
 				{
-					if (airlift.isDefined(copyProperty(property, _attributeMap.get(property))) === true)
+					if (airlift.isDefined(that.copyProperty(impl, property, _attributeMap.get(property))) === true)
 					{
-						this.copyProperty(property, null);
+						that.copyProperty(impl, property, null);
 
 						var valueArray = _attributeMap.get(property);
 
 						if  (airlift.isDefined(valueArray) === true && valueArray.length > 0 &&
 							 airlift.isDefined(valueArray[0]) === true  && Packages.airlift.util.Airlift.isWhitespace(valueArray[0]) !== true)
 						{
-							this.addMessage(property, "conversion", valueArray[0] + " is an invalid entry for " + property + ".");
+							that.addMessage(property, "conversion", valueArray[0] + " is an invalid entry for " + property + ".");
 						}
 					}
 				}
 			}
 		}
 
-		LOGGER.info("The active record now has these values after populateFromRequestMap: " + toString());
+		orderedPropertyList.forEach(processProperty);
+		this.copyFrom(impl);
+
+		LOG.info("The active record now has these values after populateFromRequestMap: " + toString());
 	}
 			
 	activeRecord.populate = function(_attributeMap, _restContext, _method)

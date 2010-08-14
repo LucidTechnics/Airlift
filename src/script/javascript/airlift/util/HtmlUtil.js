@@ -246,7 +246,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 			{
 				if (airlift.isHiddenClockProperty(_property) === true && method.equalsIgnoreCase("PUT") === true)
 				{
-					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(_property));							
+					var value = (airlift.isDefined(propertyMap.get(_property)) === true) ? Packages.airlift.util.FormatUtil.format(propertyMap.get(_property)) : "";
 					formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
 					fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 				}
@@ -254,7 +254,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 				{
 					LOG.info("Processing property: " + _property);
 
-					var value = Packages.airlift.util.FormatUtil.format(propertyMap.get(_property));
+					var value = (airlift.isDefined(propertyMap.get(_property)) === true) ? Packages.airlift.util.FormatUtil.format(propertyMap.get(_property)) : "";
 					var propertyDescriptor = org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
 					var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
 

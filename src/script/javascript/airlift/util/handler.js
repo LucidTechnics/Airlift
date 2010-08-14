@@ -366,6 +366,19 @@ airlift.mm = function()
 	return new Packages.airlift.MessageManager();
 };
 
+airlift.populate = function(_domainName, _appName)
+{
+	var activeRecord = airlift.ar(_domainName, _appName);
+	var errorMap = activeRecord.populate(REQUEST.getParameterMap(), REST_CONTEXT, METHOD);
+
+	if (errorMap.isEmpty() === false)
+	{
+		activeRecord.error = true;
+		activeRecord.addMessage(errorMap);
+	}
+
+	return [activeRecord, errorMap];
+};
 
 airlift.exists = function(_id, _domainName)
 {
@@ -401,7 +414,7 @@ airlift.collect = function(_domainName, _request, _appName)
 
 	limit = (airlift.isDefined(limit) === true) ? limit[0] : 10;
 	offset = (airlift.isDefined(offset) === true) ? offset[0] : 0;
-	orderBy = (airlift.isDefined(orderBy) === true) ? orderBy[0] : activeRecord.retrievePrimaryKeyName() + " ASC";
+	orderBy = (airlift.isDefined(orderBy) === true) ? orderBy[0] : "id ASC";
 	
 	list = activeRecord.collect(offset, limit, orderBy);
 
@@ -417,7 +430,7 @@ airlift.post = function(_domainName, _appName)
 
 	if (errorMap.isEmpty() === true)
 	{
-		activeRecord[activeRecord.retrievePrimaryKeyName()] =  airlift.g();
+		activeRecord["id"] =  airlift.g();
 	}
 	
 	if (arguments.length > 2)
@@ -435,7 +448,7 @@ airlift.post = function(_domainName, _appName)
 		activeRecord.insert();
 	}
 
-	return [activeRecord, errorMap, activeRecord[activeRecord.retrievePrimaryKeyName()]];
+	return [activeRecord, errorMap, activeRecord["id"]];
 };
 
 airlift.put = function(_domainName, _appName)
