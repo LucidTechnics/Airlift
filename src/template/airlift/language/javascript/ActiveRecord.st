@@ -71,14 +71,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.exists = function(_id)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "GET");
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET");
 
 		return this.dao.exists(_id);
 	};
 
 	activeRecord.get = function(_id)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "GET");
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET");
 
 		var jdo = this.dao.get(_id);
 		this.copyFrom(jdo);
@@ -88,21 +88,21 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.update = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "PUT");
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "PUT");
 
 		return this.dao.update(this.createDO());
 	};
 
 	activeRecord.insert = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "POST");
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "POST");
 
 		this.setId(this.dao.insert(this.createDO()));
 	};
 
 	activeRecord.del = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "DELETE");
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "DELETE");
 
 		return this.dao.del(id);
 	};
@@ -114,7 +114,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.collect = function(_offset, _limit, _orderBy)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", $domainName$, "GET", true);
+		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET", true);
 
 		return this.convertToActiveRecordArray(this.dao.collect(_offset, _limit, _orderBy));
 	};

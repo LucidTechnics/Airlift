@@ -191,8 +191,8 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; }");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");
 
-			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_name, _offset, _limit, _orderBy) { return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_name, _offset, _limit, _orderBy)); }");
-			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _offset, _limit, _orderBy) { return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_begin, _end, _offset, _limit, _orderBy)); }");
+			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_name, _offset, _limit, _orderBy) { airlift.checkAllowed(\"$fullyQualifiedDomainClassName$\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_name, _offset, _limit, _orderBy)); }");
+			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _offset, _limit, _orderBy) { airlift.checkAllowed(\"$fullyQualifiedDomainClassName$\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_begin, _end, _offset, _limit, _orderBy)); }");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 			activeRecordStringTemplate.setAttribute("validateAttribute", "errorArray.concat(" + upperTheFirstCharacter(domainName) + "Validator.validate" + upperTheFirstCharacter(name) + "(this." + name + "));");
