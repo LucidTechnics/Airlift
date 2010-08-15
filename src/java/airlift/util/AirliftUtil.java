@@ -118,12 +118,12 @@ public class AirliftUtil
 		return StringUtils.uncapitalize(_string);
 	}
 
-	public static <T extends Annotation> T getMethodAnnotation(Object _object, String _attributeName, Class<T> _annotationClass)
+	public static <T extends Annotation> T getMethodAnnotation(Class _class, String _attributeName, Class<T> _annotationClass)
 	{
 		try
 		{
 			String getter = "get" + upperTheFirstCharacter(_attributeName);
-			java.lang.reflect.Method method = _object.getClass().getMethod(getter);
+			java.lang.reflect.Method method = _class.getMethod(getter);
 			
 			return method.getAnnotation(_annotationClass);
 		}
@@ -259,7 +259,7 @@ public class AirliftUtil
 
 					if (java.sql.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
 
 						String mask = "MM-dd-yyyy";
 
@@ -277,7 +277,7 @@ public class AirliftUtil
 					}
 					else if (java.util.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
 
 						String mask = "MM-dd-yyyy HH:mm:ss";
 
@@ -296,7 +296,7 @@ public class AirliftUtil
 					}
 					else if (java.sql.Timestamp.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do, propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
 
 						String mask = "MM-dd-yyyy HH:mm:ss";
 

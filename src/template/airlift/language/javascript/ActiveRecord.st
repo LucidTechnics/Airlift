@@ -191,6 +191,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return propertyList;
 	}
 
+	activeRecord.retrieveOrderedForeignKeyList = function()
+	{
+		var foreignKeyList = [];
+
+		$addForeignKeyName; separator="\n"$
+
+		return foreignKeyList;
+	}
+
 	activeRecord.validateProperty = function(_property, _value)
 	{
 		var errorArray = [];
@@ -399,7 +408,66 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		
 		return errorMap;
 	}
-			
+
+	activeRecord.populateFromRestContext = function(_restContext)
+	{
+		var impl = this.createImpl();
+		var orderedForeignKeyList = this.retrieveOrderedForeignKeyList();
+
+		var processForeignKeys = function(_foreignKeyName, _index, _array)
+		{
+			var persistable = Packages.airlift.util.AirliftUtil.getMethodAnnotation(this.retrieveDomainInterface(),
+				_foreignKeyName, Packages.java.lang.Class.forName("airlift.generator.Persistable"));
+
+			var mapTo = persistable.mapTo();
+			var tokenArray = mapTo.split("\\.");
+
+			var foreignDomainName = tokenArray[0];
+			var foreignAttributeName = null;
+
+			if (tokenArray.length === 2)
+			{
+				foreignAttributeName = tokenArray[1];
+			}
+			else
+			{
+				foreignAttributeName = "id";
+			}
+
+			var value = _restContext.getIdValue(foreignDomainName + "." + foreignAttributeName);
+
+			if (airlift.isDefined(value) === true)
+			{
+				var throwable = this.copyProperty(impl, foreignKeyName, value);
+
+				if (throwable && value && Packages.airlift.util.AirliftUtil.isWhitespace(value) !== true)
+				{
+					this.copyProperty(foreignKeyName, null);
+					this.addMessage(foreignKeyName, "conversion", value + " is an invalid entry for " + foreignKeyName + ".");
+				}
+			}
+		}
+
+		orderedForeignKeyList.forEach(processForeignKeys);
+
+		var id = _restContext.getIdValue(this.retrieveDomainName() + "." + "id");
+
+		if (airlift.isDefined(id) === true)
+		{
+			var throwable = this.copyProperty(impl, "id", id);
+
+			if (throwable && id && Packages.airlift.util.AirliftUtil.isWhitespace(id) !== true)
+			{
+				this.id = null;
+				this.addMessage("id", "conversion", id + "  is an invalid entry for " + _activeRecord.retrievePrimaryKeyName() + ".");
+			}
+		}
+
+		this.copyFrom(impl);
+		
+		LOG.info("The active record now has these values after populateFromRestContext: " + this.createImpl());
+	}
+	
 	activeRecord.populate = function(_attributeMap, _restContext, _method)
 	{
 		var errorMap = this.populateFromRequestMap(_attributeMap);
