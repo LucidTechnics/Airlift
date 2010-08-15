@@ -5,11 +5,11 @@ dao.collectBy$uppercaseAttribute$Range = function(_begin, _end, _config)
 	var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
 	var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
 	var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
-	var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : "id";
+	var orderBy = (airlift.isDefined(_config.orderBy) === true && _config.orderBy.length > 0) ? "$attribute$," + _config.orderBy : "$attribute$";
 
 	orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
 	
-	sql = "$findByRangeSql$";
+	var sql = "$findByRangeSql$";
 
 	var query = PERSISTENCE_MANAGER.newQuery(sql);
 	query.setOrdering(orderBy);

@@ -1,1 +1,1 @@
-SELECT FROM $tableName$ WHERE $rangeField$ >== lowerBound && $rangeField$ <== upperBound
+SELECT FROM $tableName$ WHERE $rangeField$ >= lowerBound && $rangeField$ <= upperBound

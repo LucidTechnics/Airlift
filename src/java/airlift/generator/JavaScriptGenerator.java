@@ -113,6 +113,7 @@ public class JavaScriptGenerator
 				daoRangeStringTemplate.setAttribute("findByRangeSql", databaseGenerator.generateFindThisRangeSql(_domainObjectModel, fieldName));
 				daoRangeStringTemplate.setAttribute("rangeParameters", type + " lowerBound, " + type + " upperBound");
 				daoRangeStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
+				daoRangeStringTemplate.setAttribute("attribute", name);
 				daoRangeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 				daoStringTemplate.setAttribute("collectByRange", daoRangeStringTemplate.toString());
 			}
@@ -192,7 +193,7 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");
 
 			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_name, _config) { airlift.checkAllowed(\"" + _domainObjectModel.getFullyQualifiedClassName() + "\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_name, _config)); }");
-			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { airlift.checkAllowed(\"" + _domainObjectModel.getFullyQualifiedClassName() + "\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_begin, _end, _config)); }");
+			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { airlift.checkAllowed(\"" + _domainObjectModel.getFullyQualifiedClassName() + "\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config)); }");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 		}
