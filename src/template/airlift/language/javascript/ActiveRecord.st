@@ -191,21 +191,22 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return propertyList;
 	}
 
-	activeRecord.validate = function(_errorMap)
+	activeRecord.validateProperty = function(_property, _value)
 	{
-		var errorMap = (airlift.isDefined(_errorMap) === true) ? _errorMap : new java.util.HashMap();
 		var errorArray = [];
-
-		this.messageManager.add(errorMap);
 
 		airlift.ls("/javascript/airlift/validation/domain/$upperCaseFirstLetterDomainClassName$Validator.js");
 
-		$validateAttribute; separator="\n"$
+		errorArray = errorArray.concat($upperCaseFirstLetterDomainClassName$Validator["validate" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property)](_value));
 
-		for (var i in errorArray)
+		var messageManager = this.messageManager;
+		
+		var addErrorToMessageManager = function(_error, _index, _array)
 		{
-			this.messageManager.add(errorArray[i].name, errorArray[i].category, errorArray[i].message);
+			messageManager.add(_error.name, _error.category, _error.message);
 		}
+
+		errorArray.forEach(addErrorToMessageManager);
 
 		return this.messageManager.getMessageMap();
 	}
@@ -307,8 +308,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 	}
 	
-	activeRecord.populateFromRequestMap = function(_attributeMap)
+	activeRecord.populateFromRequestMap = function(_attributeMap, _errorMap)
 	{
+		var errorMap = (airlift.isDefined(_errorMap) === true) ? _errorMap : new java.util.HashMap();
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 		var impl = this.createImpl();
@@ -379,20 +381,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			}
 			else
 			{
-				if (airlift.isDefined(_attributeMap.get(property)) === true)
+				var valueArray = _attributeMap.get(property);
+				var value = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
+				errorMap = that.validateProperty(property, value + "");
+
+				if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
 				{
-					if (airlift.isDefined(that.copyProperty(impl, property, _attributeMap.get(property))) === true)
-					{
-						that.copyProperty(impl, property, null);
-
-						var valueArray = _attributeMap.get(property);
-
-						if  (airlift.isDefined(valueArray) === true && valueArray.length > 0 &&
-							 airlift.isDefined(valueArray[0]) === true  && Packages.airlift.util.Airlift.isWhitespace(valueArray[0]) !== true)
-						{
-							that.addMessage(property, "conversion", valueArray[0] + " is an invalid entry for " + property + ".");
-						}
-					}
+					that.copyProperty(impl, property, null);
 				}
 			}
 		}
@@ -401,15 +396,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.copyFrom(impl);
 
 		LOG.info("The active record now has these values after populateFromRequestMap: " + toString());
+		
+		return errorMap;
 	}
 			
 	activeRecord.populate = function(_attributeMap, _restContext, _method)
 	{
-		var errorMap = new java.util.HashMap();
+		var errorMap = this.populateFromRequestMap(_attributeMap);
 
-		this.populateFromRequestMap(_attributeMap);
-
-		if ((new java.lang.String("POST")).equalsIgnoreCase(_method) == false)
+		if ((new java.lang.String("POST")).equalsIgnoreCase(_method) === false)
 		{
 			this.populateFromRestContext(_restContext);
 		}

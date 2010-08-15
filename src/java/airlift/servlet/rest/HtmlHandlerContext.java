@@ -143,14 +143,15 @@ public class HtmlHandlerContext
 
 			log.info("Executing handler: " + _handlerName);
 
-			String[] scriptResources = new String[6];
+			String[] scriptResources = new String[7];
 
 			scriptResources[0] = "/airlift/util/douglasCrockford.js";
 			scriptResources[1] = "/airlift/util/xhtml.js";
 			scriptResources[2] = "/airlift/util/error.js";
 			scriptResources[3] = "/airlift/util/handler.js";
 			scriptResources[4] = "/airlift/util/HtmlUtil.js";
-			scriptResources[5] = _handlerName;
+			scriptResources[5] = "/airlift/util/validate.js";
+			scriptResources[6] = _handlerName;
 
 			scriptingUtil.executeScript(scriptResources);
 

@@ -8,18 +8,18 @@
  ** The team at Hannibal is grateful for these contributions.
  **/
 
-var h;
+var airlift;
 
-if (!h)
+if (!airlift)
 {
-	h = {};
+	airlift = {};
 }
-else if (typeof h != "object")
+else if (typeof airlift != "object")
 {
-	throw new Error("h already exists and it is not an object");
+	throw new Error("airlift already exists and it is not an object");
 }
 
-h.trim = function (_trim)
+airlift.trim = function (_trim)
 {
 	var trimmed = null;
 
@@ -45,9 +45,9 @@ h.trim = function (_trim)
  *	failureMessage {String} - the message to show when the field fails validation 
  *  (DEFAULT: "Can't be empty!")
  */
-h.isRequired = function(value, paramsObj)
+airlift.isRequired = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;    
 	var paramsObj = paramsObj || {};
@@ -87,9 +87,9 @@ h.isRequired = function(value, paramsObj)
  *  NB. can be checked if it is within a range by specifying both a minimum and a maximum
  *  NB. will evaluate numbers represented in scientific form (ie 2e10) correctly as numbers				
  */
-h.isNumeric = function(value, paramsObj)
+airlift.isNumeric = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var suppliedValue = value;
@@ -141,9 +141,9 @@ h.isNumeric = function(value, paramsObj)
  *		If you do not want this to be the case then you must either add a LiveValidation.PRESENCE validation
  *		or build it into the regular expression pattern
  */
-h.hasFormat = function(value, paramsObj)
+airlift.hasFormat = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var value = String(value);
@@ -166,14 +166,14 @@ h.hasFormat = function(value, paramsObj)
  *							failureMessage {String} - the message to show when the field fails validation
  *													  (DEFAULT: "Must be a number!" or "Must be an integer!")
  */
-h.isEmail = function(value, paramsObj)
+airlift.isEmail = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
 	var message = paramsObj.failureMessage || "Must be a valid email address!";
-	error = h.hasFormat(value, { failureMessage: message, pattern: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i } );
+	error = airlift.hasFormat(value, { failureMessage: message, pattern: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i } );
 	return error;
 };
 
@@ -188,14 +188,14 @@ h.isEmail = function(value, paramsObj)
  *	failureMessage {String} - the message to show when the field fails validation
  * (DEFAULT: "Must be a number!" or "Must be an integer!")
  */
-h.isZipCode = function(value, paramsObj)
+airlift.isZipCode = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
 	var message = paramsObj.failureMessage || "Must be a valid zip code!";
-	error = h.hasFormat(value,
+	error = airlift.hasFormat(value,
 	{ failureMessage: message, pattern: /^(\d{5}-\d{4})|(\d{5})$/i } );
 	return error;
 };
@@ -210,14 +210,14 @@ h.isZipCode = function(value, paramsObj)
  *	failureMessage {String} - the message to show when the field fails validation
  * (DEFAULT: "Must be a number!" or "Must be an integer!")
  */
-h.isDate = function(value, paramsObj)
+airlift.isDate = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
 
-	var result = h.setDate(paramsObj.mask, value);
+	var result = airlift.setDate(paramsObj.mask, value);
 
 	if (result.substring(0, 5) === "Error")
 	{
@@ -246,9 +246,9 @@ h.isDate = function(value, paramsObj)
  *
  *  NB. can be checked if it is within a range by specifying both a minimum and a maximum				
  */
-h.hasLength = function(value, paramsObj)
+airlift.hasLength = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;    
 	var value = String(value);
@@ -301,9 +301,9 @@ h.hasLength = function(value, paramsObj)
  *	(DEFAULT: false)			
  */
 
-h.isIncluded = function(value, paramsObj)
+airlift.isIncluded = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
@@ -338,9 +338,9 @@ h.isIncluded = function(value, paramsObj)
  *                         partialMatch {Bool} 	- if true, will not only validate against the whole value to check but also if it is a substring of the value 
  *													  (DEFAULT: false)			
  */
-h.isExcluded = function(value, paramsObj)
+airlift.isExcluded = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
@@ -361,9 +361,9 @@ h.isExcluded = function(value, paramsObj)
  *													  (DEFAULT: "Does not match!")
  *							match {String} 			- id of the field that this one should match						
  */
-h.isEqual = function(value, paramsObj)
+airlift.isEqual = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	if(!paramsObj.match) throw new Error("Validate::Confirmation - Error validating confirmation: Id of element to match must be provided!");
@@ -388,9 +388,9 @@ h.isEqual = function(value, paramsObj)
  *	failureMessage {String} - the message to show when the field fails validation 
  *	(DEFAULT: "Must be assigned!")
  */
-h.isAssigned = function(value, paramsObj)
+airlift.isAssigned = function(value, paramsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
@@ -409,9 +409,9 @@ h.isAssigned = function(value, paramsObj)
  *	@var value {mixed} - value to be checked if true or not (usually a boolean from the checked value of a checkbox)
  *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
  */
-h.validate = function(validationFunction, value, validationParamsObj)
+airlift.validate = function(validationFunction, value, validationParamsObj)
 {
-	value = h.trim(value);
+	value = airlift.trim(value);
 	
 	if(!validationFunction) throw new Error("Validate::validate - Validation function must be provided!");
 	var isValid = true;
@@ -442,18 +442,18 @@ h.validate = function(validationFunction, value, validationParamsObj)
  *
  *	@var errorMessage {String} - message to display
  */
-h.fail = function(errorMessage)
+airlift.fail = function(errorMessage)
 {
 		throw new this.Error(errorMessage);
 };
 
-h.Error = function(errorMessage)
+airlift.Error = function(errorMessage)
 {
 	this.message = errorMessage;
 	this.name = 'ValidationError';
 };
 
-h.setString = function (_m, _v, _d)
+airlift.setString = function (_m, _v, _d)
 {
 	var allowPartial = false;
 	var strippedValue = "";
@@ -511,7 +511,7 @@ h.setString = function (_m, _v, _d)
 	return nv;
 };
 
-h.setNumber = function(_m, _v, _d)
+airlift.setNumber = function(_m, _v, _d)
 {
 	var allowPartial = false;
 	var strippedValue = "";
@@ -637,7 +637,7 @@ h.setNumber = function(_m, _v, _d)
 	return v;
 };
 
-h.setDate = function (_m, _v)
+airlift.setDate = function (_m, _v)
 {
 	var v = _v, m = _m;
 	var a, e, mm, dd, yy, x, s;
@@ -713,19 +713,19 @@ h.setDate = function (_m, _v)
  * propertyName -> {name, validationMessage[], isValid}
  */
 
-h.validate = function(_domainObject, _bindingSet)
+airlift.validate = function(_domainObject, _bindingSet)
 {
 	var errors = {};
 	var domainEntry = DOMAIN.getDomainEntry(_domainObject.name);
 
-	if (h.isDefined(domainEntry) == false)
+	if (airlift.isDefined(domainEntry) == false)
 	{
 		throw new Error("No domain defined for object named: " + _domainObject.name);
 	}
 
 	for each (li in _domainObject.xmlObject.li)
 	{
-		var tempErrors = h.validateP(li.@property, li, domainEntry, _domainObject);
+		var tempErrors = airlift.validateP(li.@property, li, domainEntry, _domainObject);
 
 		if (tempErrors.length > 0)
 		{
@@ -736,12 +736,12 @@ h.validate = function(_domainObject, _bindingSet)
 	return errors;
 };
 
-h.validateP = function(_name, _value, _domainEntry, _domainObject)
+airlift.validateP = function(_name, _value, _domainEntry, _domainObject)
 {
 	var errors = [];
 	var fieldEntry = _domainEntry.getFieldEntry(_name);
 	
-	if (h.isDefined(fieldEntry) == true)
+	if (airlift.isDefined(fieldEntry) == true)
 	{
 		var ruleMap = fieldEntry.getVRuleMap();
 		var rules = ruleMap.keySet().iterator();
@@ -754,7 +754,7 @@ h.validateP = function(_name, _value, _domainEntry, _domainObject)
 			
 			var error = validationRule(_value, parameters);
 
-			if (h.isDefined(error) == true)
+			if (airlift.isDefined(error) == true)
 			{
 				errors.push(error);
 			}
@@ -768,7 +768,7 @@ h.validateP = function(_name, _value, _domainEntry, _domainObject)
 	return errors;
 };
 
-h.noop = function(_value, _parameters)
+airlift.noop = function(_value, _parameters)
 {
 	var error;
 	

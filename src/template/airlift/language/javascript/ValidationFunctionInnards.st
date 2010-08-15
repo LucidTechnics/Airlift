@@ -2,7 +2,7 @@ parameters = {};
 
 $validationParameters; separator="\n"$
 
-message  = h.$validationFunctionName$(_value, parameters); //converting _value to a JavaScript String
+message  = airlift.$validationFunctionName$(_value, parameters); //converting _value to a JavaScript String
 
 if (!(message === null || message === undefined) === true)
 {
