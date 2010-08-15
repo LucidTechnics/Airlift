@@ -1,1 +1,1 @@
-SELECT FROM $tableName$ WHERE $attribute$ = :attribute
+SELECT FROM $tableName$ WHERE $attribute$ == :attribute

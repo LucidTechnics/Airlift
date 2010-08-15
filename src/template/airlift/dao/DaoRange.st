@@ -14,6 +14,7 @@ dao.collectBy$uppercaseAttribute$Range = function(_begin, _end, _config)
 	var query = PERSISTENCE_MANAGER.newQuery(sql);
 	query.setOrdering(orderBy);
 	query.setRange(offset, limit);
+	query.declareParameters("$rangeParameters$");
 
 	return query.execute(_begin, _end);
 }

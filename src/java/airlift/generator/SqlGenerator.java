@@ -70,8 +70,7 @@ public class SqlGenerator
 	    Iterator attributes = _domainObjectModel.getAttributes();
 	    String tableName = _domainObjectModel.getTableName();
 
-		stringTemplate.setAttribute("lowerBound", _rangeField);
-		stringTemplate.setAttribute("upperBound", _rangeField);
+		stringTemplate.setAttribute("rangeField", _rangeField);
 	    stringTemplate.setAttribute("tableName", tableName);
 
 	    return stringTemplate.toString();

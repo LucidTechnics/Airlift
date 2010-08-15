@@ -112,11 +112,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.del();
 	};
 
-	activeRecord.collect = function(_offset, _limit, _orderBy)
+	activeRecord.collect = function(_config)
 	{
 		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET", true);
 
-		return this.convertToActiveRecordArray(this.dao.collect(_offset, _limit, _orderBy));
+		return this.convertToActiveRecordArray(this.dao.collect(_config));
 	};
 
 	activeRecord.retrieveDomainInterface = function()
