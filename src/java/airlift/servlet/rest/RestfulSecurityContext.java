@@ -14,6 +14,8 @@
 
 package airlift.servlet.rest; 
 
+import com.google.appengine.api.users.User;
+
 import java.util.logging.Logger;
 
 public class RestfulSecurityContext
@@ -23,13 +25,12 @@ public class RestfulSecurityContext
 
 	public RestfulSecurityContext() {}
 	
-	public boolean allowed(airlift.AppProfile _appProfile, javax.servlet.http.HttpServletRequest _request)
+	public boolean allowed(airlift.AppProfile _appProfile, User _user, javax.servlet.http.HttpServletRequest _request)
 	{
 		String rootPackageName = _appProfile.getRootPackageName();
 		String appName = _appProfile.getAppName();
 		
 		String method = _request.getMethod();
-		String user = _request.getRemoteUser();
 
 		log.info("Security context has this servlet path: " + _request.getServletPath());
 		log.info("Security context has this path info: " + _request.getPathInfo());
@@ -61,12 +62,13 @@ public class RestfulSecurityContext
 
 		String domainClassName = _appProfile.getFullyQualifiedClassName(domainName);
 		
-		return allowed(domainClassName, domainName, method, _request, airlift.util.AirliftUtil.isUriACollection(uri, rootPackageName));
+		return allowed(domainClassName, domainName, method, _user, _request, airlift.util.AirliftUtil.isUriACollection(uri, rootPackageName));
 	}
 
 	public boolean allowed(String _domainClassName,
 						   String _domainName,
 						   String _method,
+						   User _user,
 						   javax.servlet.http.HttpServletRequest _request,
 						   boolean _isCollection)
 	{
@@ -122,15 +124,18 @@ public class RestfulSecurityContext
 				}
 			}
 
+			String email = (_user != null) ? _user.getEmail() : "null";
+			
 			if (allowed == false)
 			{
-				log.warning("User: " + _request.getRemoteUser() + " is not allowed method: " + _method +
+				log.warning("User: " + email + " is not allowed method: " + _method +
 						 " access to this domain: " + _domainName +
 						 " for this uri: " + _request.getRequestURI());
 			}
 			else
 			{
-				log.info("User: " + _request.getRemoteUser() + " is allowed method: " + _method +
+				
+				log.info("User: " + email + " is allowed method: " + _method +
 						 " access to this domain: " + _domainName +
 						 " for this uri: " + _request.getRequestURI());
 			}

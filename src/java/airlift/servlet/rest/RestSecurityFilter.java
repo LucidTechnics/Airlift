@@ -14,13 +14,17 @@
 
 package airlift.servlet.rest;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import java.io.IOException;
 
 public final class RestSecurityFilter
    implements javax.servlet.Filter
@@ -46,9 +50,23 @@ public final class RestSecurityFilter
 			throws IOException, ServletException
 	{
 		log.info("Applying airlift security checks");
-				
-		boolean success = allowed(_request, _response);
+
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+
+		boolean success = allowed(user, _request, _response);
 		
+		if (!success && user == null)
+		{
+			if (_request instanceof javax.servlet.http.HttpServletRequest && _response instanceof javax.servlet.http.HttpServletResponse)
+			{
+				((javax.servlet.http.HttpServletResponse)_response).sendRedirect(userService.createLoginURL(((javax.servlet.http.HttpServletRequest)_request).getRequestURI()));
+			}
+			else
+			{
+				throw new RuntimeException("Access Forbidden");
+			}
+		}
 		if (!success)
 		{
 			throw new RuntimeException("Access Forbidden");
@@ -59,7 +77,7 @@ public final class RestSecurityFilter
 		}
 	}
 
-	public boolean allowed(ServletRequest _request, ServletResponse _response)
+	public boolean allowed(User _user, ServletRequest _request, ServletResponse _response)
 	{
 		boolean allowed = true;
 
@@ -72,7 +90,7 @@ public final class RestSecurityFilter
 				String rootPackageName = this.filterConfig.getInitParameter("a.root.package.name");
 				airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName(rootPackageName + ".AppProfile").newInstance();
 				airlift.SecurityContext securityContext = appProfile.getSecurityContext();
-				allowed = securityContext.allowed(appProfile, request);
+				allowed = securityContext.allowed(appProfile, _user, request);
 			}
 			catch(Throwable t)
 			{

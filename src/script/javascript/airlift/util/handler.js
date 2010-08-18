@@ -30,7 +30,7 @@ airlift.checkAllowed = function(_domainClassName, _domainName, _method, _isColle
 {
 	var isCollection = (airlift.isDefined(_isCollection) === true) ? _isCollection : false;
 	var securityContext = new Packages.airlift.servlet.rest.RestfulSecurityContext();
-	securityContext.allowed(_domainClassName, _domainName,  _method, REQUEST, isCollection); 
+	securityContext.allowed(_domainClassName, _domainName,  _method, USER, REQUEST, isCollection); 
 };
 
 //ar - Create an active record for the provided domain name.  If not

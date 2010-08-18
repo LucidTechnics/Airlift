@@ -26,7 +26,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.Map;
+
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 public class HtmlHandlerContext
    extends HandlerContext
@@ -93,8 +98,12 @@ public class HtmlHandlerContext
 		log.info("handlerName: " + _handlerName);
 		log.info("queryString: " + queryString);
 		log.info("domainObjectPaths: " + domainPathMap);
-		
-		String userName = (_httpServletRequest.getUserPrincipal() != null) ? _httpServletRequest.getUserPrincipal().getName() : null;
+
+
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		String userName = (user != null) ? user.getNickname() : null;
+		String userEmail = (user != null) ? user.getEmail() : null;
 
 		airlift.AppProfile appProfile = null;
 		
@@ -138,7 +147,9 @@ public class HtmlHandlerContext
 			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
 			scriptingUtil.bind("OUT", System.out);
 			scriptingUtil.bind("LOG", log);
+			scriptingUtil.bind("USER", user);
 			scriptingUtil.bind("USER_NAME", userName);
+			scriptingUtil.bind("USER_EMAIL", userEmail);
 			scriptingUtil.bind("APP_PROFILE", appProfile);
 
 			log.info("Executing handler: " + _handlerName);
