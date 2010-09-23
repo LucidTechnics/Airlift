@@ -19,7 +19,7 @@ public class IdGenerator
 
 	public static String generate(int _length)
 	{
-		com.eaio.uuid.UUID uuid = new com.eaio.uuid.UUID();
+		java.util.UUID uuid = java.util.UUID.randomUUID();
 		String message = uuid.toString();
 		String hash = hash("SHA1", message);
 

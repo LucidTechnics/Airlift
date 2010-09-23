@@ -32,7 +32,7 @@ public @interface Securable
 	//airlift.noone - if this role is present no one can access this
 	//domain via the associated method
 	//If set to airlift.none Airlift will NOT create a security constraint.
-	public String postRoles() default "airlift.all"; 
+	public String postRoles() default "airlift.all";
 	public String getRoles() default "airlift.all";
 	public String putRoles() default "airlift.all";
 
@@ -41,7 +41,6 @@ public @interface Securable
 	//method. The DELETE method is not allowed by default as well as
 	//GETs to collection URIs.
 	public String collectRoles() default ""; 
-
 	public String deleteRoles() default "";
 
 	public String headRoles() default "airlift.noone";

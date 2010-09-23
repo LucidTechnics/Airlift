@@ -37,5 +37,6 @@ public @interface Persistable
 	public boolean rangeable() default false;
 	public String minimumValue() default "";
 	public String maximumValue() default "";
+	public boolean encrypted() default false;
 	public Semantic semanticType() default Semantic.NONE;
 }
