@@ -45,7 +45,10 @@ public class RestfulCachingContext
 	public RestfulCachingContext() {}
 
 	public static void put(javax.servlet.http.HttpServletRequest _request, String _content)
-	{
+	{//TODO Check isCacheable to see how long it should be cached!!!
+	 //Also you can create multiple Caches per domain and have those
+	 //caches set up with different instantiated timeouts.
+	 
 		getCache().put(constructCacheKey(_request), _content);
 	}
 

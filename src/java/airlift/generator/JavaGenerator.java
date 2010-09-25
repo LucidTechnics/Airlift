@@ -137,7 +137,6 @@ public class JavaGenerator
 		while (attributes.hasNext() == true)
 		{
 			StringTemplate getterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotatedInterfaceAttributeGetterDeclaration");
-			StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotatedInterfaceAttributeSetterDeclaration");
 
 			Attribute attribute = (Attribute) attributes.next();
 
@@ -152,41 +151,56 @@ public class JavaGenerator
 			getterStringTemplate.setAttribute("getterName", getterName);
 			getterStringTemplate.setAttribute("name", name);
 
+			StringTemplate annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
+
 			Annotation annotation = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Searchable");
 
-			StringTemplate annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
-			annotationInstanceTemplate.setAttribute("annotationName", "airlift.generator.Searchable");
-
-			for (String parameterName: annotation.getParameterMap().keySet())
+			if (annotation != null)
 			{
-				annotationInstanceTemplate.setAttribute("name"	, parameterName);
-				String value = prepareParameterValue(annotation, parameterName);
-				annotationInstanceTemplate.setAttribute("value", value);
+				annotationInstanceTemplate.setAttribute("annotationName", "airlift.generator.Searchable");
+
+				for (String parameterName: annotation.getParameterMap().keySet())
+				{
+					annotationInstanceTemplate.setAttribute("name"	, parameterName);
+					annotationInstanceTemplate.setAttribute("value", annotation.getParameterValue(parameterName));
+				}
+
+				getterStringTemplate.setAttribute("annotation", annotationInstanceTemplate.toString());
 			}
-
-			getterStringTemplate.setAttribute("annotation", annotationInstanceTemplate);
-
+			
 			annotation = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 
-			annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
-			annotationInstanceTemplate.setAttribute("annotationName", "airlift.generator.Persistable");
-
-			for (String parameterName: annotation.getParameterMap().keySet())
+			if (annotation != null)
 			{
-				annotationInstanceTemplate.setAttribute("name", parameterName);
-				String value = prepareParameterValue(annotation, parameterName);
-				annotationInstanceTemplate.setAttribute("value", value);
+				annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
+				annotationInstanceTemplate.setAttribute("annotationName", "airlift.generator.Persistable");
+
+				for (String parameterName: annotation.getParameterMap().keySet())
+				{
+					annotationInstanceTemplate.setAttribute("name", parameterName);
+					annotationInstanceTemplate.setAttribute("value", annotation.getParameterValue(parameterName));
+				}
+
+				getterStringTemplate.setAttribute("annotation", annotationInstanceTemplate.toString());
 			}
 
-			getterStringTemplate.setAttribute("annotation", annotationInstanceTemplate);
+			annotation = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Presentable");
 
-			setterStringTemplate.setAttribute("scope", scope);
-			setterStringTemplate.setAttribute("type", type);
-			setterStringTemplate.setAttribute("setterName", setterName);
-			setterStringTemplate.setAttribute("name", name);
+			if (annotation != null)
+			{
+				annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
+				annotationInstanceTemplate.setAttribute("annotationName", "airlift.generator.Presentable");
+
+				for (String parameterName: annotation.getParameterMap().keySet())
+				{
+					annotationInstanceTemplate.setAttribute("name", parameterName);
+					annotationInstanceTemplate.setAttribute("value", annotation.getParameterValue(parameterName));
+				}
+
+				getterStringTemplate.setAttribute("annotation", annotationInstanceTemplate.toString());
+			}
 
 			domainInterfaceStringTemplate.setAttribute("annotatedInterfaceAttributeGetters", getterStringTemplate);
-			domainInterfaceStringTemplate.setAttribute("annotatedInterfaceAttributeSetters", setterStringTemplate);
 		}
 
 		domainInterfaceStringTemplate.setAttribute("generatorComment", comment);

@@ -37,7 +37,7 @@ public class Annotation
 	{
 		getParameterMap().put(_parameter, _value);
 	}
-
+	
 	public Object getParameterValue(String _parameter)
 	{
 		return getParameterMap().get(_parameter);
