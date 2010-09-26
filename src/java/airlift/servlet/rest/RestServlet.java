@@ -14,6 +14,10 @@
 
 package airlift.servlet.rest;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 import airlift.rest.Method;
 import airlift.rest.Route;
 import java.util.logging.Logger;
@@ -68,7 +72,7 @@ public class RestServlet
 			       HttpServletResponse _httpServletResponse)
 	    throws ServletException, IOException
 	{
-		processRequest(_httpServletRequest, _httpServletResponse, Method.GET);
+		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.GET);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class RestServlet
 				HttpServletResponse _httpServletResponse)
 	    throws ServletException, IOException
 	{
-		processRequest(_httpServletRequest, _httpServletResponse, Method.POST);
+		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.POST);
     }
 
     @Override
@@ -84,7 +88,7 @@ public class RestServlet
 			       HttpServletResponse _httpServletResponse)
 	    throws ServletException, IOException
 	{
-		processRequest(_httpServletRequest, _httpServletResponse, Method.PUT);
+		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.PUT);
     }
 
     @Override
@@ -92,44 +96,78 @@ public class RestServlet
 				  HttpServletResponse _httpServletResponse)
 	    throws ServletException, IOException
 	{
-		processRequest(_httpServletRequest, _httpServletResponse, Method.DELETE);
-    }
+		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.DELETE);
 
-    protected final void processRequest(HttpServletRequest _httpServletRequest,
+	}
+
+	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
+	{
+		String method = determineMethod(_method, _request);
+		Map uriParameterMap = new java.util.HashMap();
+		RestContext restContext = prepareRestContext(method, _request, uriParameterMap, getServletName());
+		log.info("Applying airlift security checks");
+
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+
+		boolean success = allowed(user, _request, _response);
+
+		if (!success && user == null)
+		{
+			try
+			{
+				_response.sendRedirect(userService.createLoginURL(_request.getRequestURI()));
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}
+		}
+		else if (!success)
+		{
+			sendCodedPage("403", "Access Forbidden", uriParameterMap, _request, _response, method);
+		}
+		else if (success)
+		{
+			try
+			{
+				processRequest(_request, _response, method, restContext, uriParameterMap);
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}
+		}
+
+		return restContext;
+	}
+
+	protected final void processRequest(HttpServletRequest _httpServletRequest,
 					HttpServletResponse _httpServletResponse,
-					Method _method)
+					String _method, RestContext _restContext, Map _uriParameterMap)
 	    throws ServletException, IOException
 	{
-		ContentContext contentContext = new SimpleContentContext();
-		Map uriParameterMap = new HashMap();
-		String appName = getServletName();
-
-		String method = _method.name();
-
-		String override = _httpServletRequest.getParameter("a.method.override");
-
-		if (isValidMethod(override) == true)
-		{
-			method = prepareMethod(override);
-		}
 		
+		String appName = getServletName();
+		String domainName = _restContext.getThisDomain();
+		String handlerName = _restContext.getHandlerPath();
+
 		try
 		{
-			RestContext restContext = prepareRestContext(method, _httpServletRequest, uriParameterMap, appName);
-			String domainName = restContext.getThisDomain();
-			String handlerName = restContext.getHandlerPath();
+			ContentContext contentContext = new SimpleContentContext();
 
 			if (handlerName != null)
 			{
 				log.info("Looking for handler: " + handlerName);
 				
 				boolean handlerNotFound = false;
-				
+
 				try
 				{
+
 				    contentContext = getHandlerContext().execute(appName,
-									handlerName, method, this, _httpServletRequest,
-									_httpServletResponse, uriParameterMap,
+									handlerName, _method, this, _httpServletRequest,
+									_httpServletResponse, _uriParameterMap,
 									null);
 				}
 				catch(airlift.servlet.rest.HandlerException _handlerException)
@@ -149,12 +187,12 @@ public class RestServlet
 				if (handlerNotFound == true )
 				{
 					handlerName = getErrorHandlerName("405");
-					uriParameterMap.put("a.error.code", "405");
-					uriParameterMap.put("a.error.message", "Method Not Allowed");
+					_uriParameterMap.put("a.error.code", "405");
+					_uriParameterMap.put("a.error.message", "Method Not Allowed");
 
 					contentContext = getErrorHandlerContext().execute(appName,
-						handlerName, method, this, _httpServletRequest,
-						_httpServletResponse, uriParameterMap,
+						handlerName, _method, this, _httpServletRequest,
+						_httpServletResponse, _uriParameterMap,
 						null);
 				}
 
@@ -178,17 +216,7 @@ public class RestServlet
 			}
 			else
 			{
-				handlerName = getErrorHandlerName("404");
-				uriParameterMap.put("a.error.code", "404");
-				uriParameterMap.put("a.error.message", "Resource Not Found");
-
-				contentContext = getErrorHandlerContext().execute(appName,
-					handlerName, method, this, _httpServletRequest,
-					_httpServletResponse, uriParameterMap,
-					null);
-				
-				_httpServletResponse.getWriter().print(contentContext.getContent());
-
+				contentContext = sendCodedPage("404", "Resource Not Found", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 				populateCache("airlift.404.cache", _method, _httpServletRequest, contentContext.getContent());
 			}
 		}
@@ -205,31 +233,66 @@ public class RestServlet
 			propertyUtil.loadProperties("/airlift/airlift.properties", "airlift.cfg");
 			String reportJavaException = propertyUtil.getProperty("airlift.cfg", "airlift.report.java.exception");
 
+			ContentContext contentContext = new SimpleContentContext();
+			
 			if ("yes".equalsIgnoreCase(reportJavaException) == true)
 			{
+
 				contentContext.setType("text/html");
 				contentContext.setContent(t.toString());
+				_httpServletResponse.getWriter().print(contentContext.getContent());
 			}
 			else
 			{
-				String handlerName = getErrorHandlerName("500");
-				uriParameterMap.put("a.error.code", "500");
-				uriParameterMap.put("a.error.message", "Internal Server Error");
-
-				contentContext = getErrorHandlerContext().execute(appName,
-					handlerName, method, this, _httpServletRequest,
-					_httpServletResponse, uriParameterMap,
-					null);
+				contentContext = sendCodedPage("500", "Internal Server Error", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 			}
 			
-			_httpServletResponse.getWriter().print(contentContext.getContent());
-
 			//TODO: This should have its own region and it should be timed
 			//out.
 			populateCache(appName, _method, _httpServletRequest, contentContext.getContent());
 		}
     }
 
+	private String determineMethod(Method _method, HttpServletRequest _request)
+	{
+		String method = _method.name();
+
+		String override = _request.getParameter("a.method.override");
+
+		if (isValidMethod(override) == true)
+		{
+			method = prepareMethod(override);
+		}
+
+		return method;
+	}
+
+	public ContentContext sendCodedPage(String _code, String _message, Map _uriParameterMap, HttpServletRequest _request, HttpServletResponse _response, String _method)
+	{
+		ContentContext contentContext = null;
+
+		try
+		{
+			String handlerName = getErrorHandlerName(_code);
+
+			_uriParameterMap.put("a.error.code", _code);
+			_uriParameterMap.put("a.error.message", _message);
+
+			contentContext = getErrorHandlerContext().execute(getServletName(),
+				handlerName, _method, this, _request,
+				_response, _uriParameterMap,
+				null);
+
+			_response.getWriter().print(contentContext.getContent());
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return contentContext;
+	}
+	
 	public airlift.CachingContext isCacheable(javax.servlet.http.HttpServletRequest _request, String _domainName)
 	{
 		airlift.CachingContext cachingContext = null;
@@ -272,9 +335,10 @@ public class RestServlet
 		return content;
 	}
 
-	private void populateCache(String _cacheName, Method _method, HttpServletRequest _request, String _content)
+	private void populateCache(String _cacheName, String _method, HttpServletRequest _request, String _content)
 	{
-		if ("GET".equalsIgnoreCase(_method.name()) == true)
+		if ("GET".equalsIgnoreCase(_method) == true ||
+		   "COLLECT".equalsIgnoreCase(_method) == true)
 		{
 			try
 			{
@@ -289,15 +353,15 @@ public class RestServlet
 		}
 	}
 
-	private void invalidateCache(String _cacheName, Method _method, HttpServletRequest _request)
+	private void invalidateCache(String _cacheName, String _method, HttpServletRequest _request)
 	{
 		airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
 
 		
 		if (cachingContext != null &&
-			  ("POST".equalsIgnoreCase(_method.name()) == true ||
-			  "PUT".equalsIgnoreCase(_method.name()) == true ||
-			  "DELETE".equalsIgnoreCase(_method.name()) == true))
+			  ("POST".equalsIgnoreCase(_method) == true ||
+			  "PUT".equalsIgnoreCase(_method) == true ||
+			  "DELETE".equalsIgnoreCase(_method) == true))
 		{
 			try
 			{
@@ -405,6 +469,24 @@ public class RestServlet
 		restContext.setHandlerPath(handlerPath);
 
 		return restContext;
+	}
+
+	public boolean allowed(User _user, HttpServletRequest _request, HttpServletResponse _response)
+	{
+		boolean allowed = true;
+
+		try
+		{
+			String rootPackageName = this.getServletConfig().getInitParameter("a.root.package.name");
+			airlift.SecurityContext securityContext = getAppProfile().getSecurityContext();
+			allowed = securityContext.allowed(appProfile, _user, _request);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return allowed;
 	}
 
 	public String prepareGenericHandler(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
