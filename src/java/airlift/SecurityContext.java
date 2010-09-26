@@ -18,12 +18,5 @@ import com.google.appengine.api.users.User;
 
 public interface SecurityContext
 {
-	public boolean allowed(airlift.AppProfile _appProfile, User _user, javax.servlet.http.HttpServletRequest _request);
-
-	public boolean allowed(String _activeRecordClassName,
-						   String _domainName,
-						   String _method,
-						   User _user,
-						   javax.servlet.http.HttpServletRequest _request,
-						   boolean _isCollection);
+	public boolean allowed(User _user, airlift.servlet.rest.RestContext _restContext, airlift.AppProfile _appProfile);
 }

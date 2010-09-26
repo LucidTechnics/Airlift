@@ -25,102 +25,51 @@ public class RestfulSecurityContext
 
 	public RestfulSecurityContext() {}
 	
-	public boolean allowed(airlift.AppProfile _appProfile, User _user, javax.servlet.http.HttpServletRequest _request)
-	{
-		String rootPackageName = _appProfile.getRootPackageName();
-		String appName = _appProfile.getAppName();
-		
-		String method = _request.getMethod();
-
-		log.info("Security context has this servlet path: " + _request.getServletPath());
-		log.info("Security context has this path info: " + _request.getPathInfo());
-
-		String pathInfo = ((_request.getPathInfo() == null) &&
-						   ("".equals(_request.getPathInfo()) == false)) ? "" : _request.getPathInfo();
-		
-		String path = _request.getServletPath() + pathInfo;
-
-		log.info("Security context has this path: " + path);
-		
-		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
-
-		log.info("Security context path is now: " + path);
-		
-		String uri = appName + "/" + path;
-
-		log.info("Security context uri is now: " + uri);
-
-		java.util.Map uriParameterMap = new java.util.HashMap();
-		
-		airlift.util.AirliftUtil.populateDomainInformation(uri, uriParameterMap, rootPackageName);
-
-		RestContext restContext = new RestContext(uriParameterMap);
-
-		log.info("Here is this domain name: " + restContext.getThisDomain());
-
-		String domainName = restContext.getThisDomain();
-
-		String domainClassName = _appProfile.getFullyQualifiedClassName(domainName);
-		
-		return allowed(domainClassName, domainName, method, _user, _request, airlift.util.AirliftUtil.isUriACollection(uri, rootPackageName));
-	}
-
-	public boolean allowed(String _domainClassName,
-						   String _domainName,
-						   String _method,
-						   User _user,
-						   javax.servlet.http.HttpServletRequest _request,
-						   boolean _isCollection)
+	public boolean allowed(User _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
 		boolean allowed = true;
+		String method = _restContext.getMethod();
 
 		try
 		{
-			log.info("Loading this class: " + _domainClassName);
+			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_restContext.getThisDomain(), airlift.generator.Securable.class);
 
-			Class domainInterfaceClass = Class.forName(_domainClassName);
-
-			if (domainInterfaceClass.isAnnotationPresent(airlift.generator.Securable.class) == true)
+			if (securable.isSecurable() == true)
 			{
-				airlift.generator.Securable securable = (airlift.generator.Securable) domainInterfaceClass.getAnnotation(airlift.generator.Securable.class);
-
-				if (securable.isSecurable() == true)
+				if ("GET".equalsIgnoreCase(method) == true)
 				{
-					if ("GET".equalsIgnoreCase(_method) == true)
+					if (_restContext.uriIsACollection() == true)
 					{
-						if (_isCollection == true)
-						{
-							allowed = checkAllowed(createRoleSet(securable.collectRoles()), _request);
-						}
-						else
-						{
-							allowed = checkAllowed(createRoleSet(securable.getRoles()), _request);
-						}
+						allowed = checkAllowed(createRoleSet(securable.collectRoles()), _user);
 					}
-					else if ("POST".equalsIgnoreCase(_method) == true)
+					else
 					{
-						allowed = checkAllowed(createRoleSet(securable.postRoles()), _request);
+						allowed = checkAllowed(createRoleSet(securable.getRoles()), _user);
 					}
-					else if ("PUT".equalsIgnoreCase(_method) == true)
-					{
-						allowed = checkAllowed(createRoleSet(securable.putRoles()), _request);
-					}
-					else if ("DELETE".equalsIgnoreCase(_method) == true)
-					{
-						allowed = checkAllowed(createRoleSet(securable.deleteRoles()), _request);
-					}
-					else if ("TRACE".equalsIgnoreCase(_method) == true)
-					{
-						allowed = checkAllowed(createRoleSet(securable.traceRoles()), _request);
-					}
-					else if ("HEAD".equalsIgnoreCase(_method) == true)
-					{
-						allowed = checkAllowed(createRoleSet(securable.headRoles()), _request);
-					}
-					else if ("OPTIONS".equalsIgnoreCase(_method) == true)
-					{
-						allowed = checkAllowed(createRoleSet(securable.optionsRoles()), _request);
-					}
+				}
+				else if ("POST".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.postRoles()), _user);
+				}
+				else if ("PUT".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.putRoles()), _user);
+				}
+				else if ("DELETE".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.deleteRoles()), _user);
+				}
+				else if ("TRACE".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.traceRoles()), _user);
+				}
+				else if ("HEAD".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.headRoles()), _user);
+				}
+				else if ("OPTIONS".equalsIgnoreCase(method) == true)
+				{
+					allowed = checkAllowed(createRoleSet(securable.optionsRoles()), _user);
 				}
 			}
 
@@ -128,16 +77,14 @@ public class RestfulSecurityContext
 			
 			if (allowed == false)
 			{
-				log.warning("User: " + email + " is not allowed method: " + _method +
-						 " access to this domain: " + _domainName +
-						 " for this uri: " + _request.getRequestURI());
+				log.warning("User: " + email + " is not allowed method: " + method +
+						 " access to this domain: " + _restContext.getThisDomain());
 			}
 			else
 			{
 				
-				log.info("User: " + email + " is allowed method: " + _method +
-						 " access to this domain: " + _domainName +
-						 " for this uri: " + _request.getRequestURI());
+				log.info("User: " + email + " is allowed method: " + method +
+						 " access to this domain: " + _restContext.getThisDomain());
 			}
 		}
 		catch(Throwable t)
@@ -162,7 +109,7 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
-	private boolean checkAllowed(java.util.Set<String> _roleSet, javax.servlet.http.HttpServletRequest _request)
+	private boolean checkAllowed(java.util.Set<String> _roleSet, User _user)
 	{
 		boolean allowed = false;
 		
@@ -174,16 +121,133 @@ public class RestfulSecurityContext
 			}
 			else
 			{
-				for (String role: _roleSet)
+				java.util.Set<String> userRoleSet = fetchUserRoleSet(_user);
+
+				if (userRoleSet.isEmpty() != false)
 				{
-					if (_request.isUserInRole(role) == true)
-					{
-						allowed = true;
-					}
+					userRoleSet.retainAll(_roleSet);
+					allowed = (userRoleSet.isEmpty() == false);
 				}
 			}
 		}
 
 		return allowed;
+	}
+
+	public java.util.Set<String> fetchUserRoleSet(com.google.appengine.api.users.User _user)
+	{
+		java.util.Set<String> roleList = new java.util.HashSet<String>();
+		java.util.List<AirliftUser> userList = collectByEmail(_user.getEmail(), 0, 10, "email", true);
+
+		if (userList.size() > 1) { throw new RuntimeException("Multiple users for email address: " + _user.getEmail() + " found."); }
+
+		if (userList.isEmpty() != true)
+		{
+			AirliftUser user = userList.get(0);
+
+			String[] tokenArray = user.getRoleList().split(",");
+
+			for (int i = 0; i > tokenArray.length; i++)
+			{
+				roleList.add(tokenArray[i]);
+			}
+		}
+
+		return roleList;
+	}
+
+	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser";
+
+		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+
+		return (java.util.List<AirliftUser>) query.execute();
+	}
+
+	public String insert(AirliftUser _airliftUser)
+	{
+		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
+		
+		airlift.dao.PMF.get().getPersistenceManager().makePersistent(_airliftUser);
+
+		return _airliftUser.getId();
+	}
+
+	public boolean exists(String _id)
+	{
+		return (this.get(_id) != null);
+	}
+
+	public AirliftUser get(String _id)
+	{
+		return airlift.dao.PMF.get().getPersistenceManager().getObjectById(AirliftUser.class, _id);
+	}
+
+	public void update(AirliftUser _airliftUser)
+	{
+		if (_airliftUser.getId() == null)
+		{
+			throw new RuntimeException("Cannot update. Null id found for object: " + _airliftUser);
+		}
+
+		airlift.dao.PMF.get().getPersistenceManager().makePersistent(_airliftUser);
+	}
+
+	public void delete(AirliftUser _airliftUser)
+	{
+		airlift.dao.PMF.get().getPersistenceManager().deletePersistent(_airliftUser);
+	}
+
+	public java.util.List<AirliftUser> collectByGoogleId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE googleUserId == :attribute";
+
+		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+
+		return (java.util.List<AirliftUser>) query.execute(_value);
+	}
+
+	public java.util.List<AirliftUser> collectByEmail(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE email == :attribute";
+
+		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+
+		return (java.util.List<AirliftUser>) query.execute(_value);
+	}
+
+	public java.util.List<AirliftUser> collectByActive(boolean _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE active == :attribute";
+
+		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+
+		return (java.util.List<AirliftUser>) query.execute(_value);
+	}
+
+	public java.util.List<AirliftUser> collectByCreateDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE createDate >= lowerBound && createDate <= upperBound";
+
+		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+		query.declareParameters("java.util.Date lowerBound, java.util.Date upperBound");
+
+		return (java.util.List<AirliftUser>) query.execute(_begin, _end);
 	}
 }

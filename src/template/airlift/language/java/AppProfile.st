@@ -17,7 +17,6 @@ public class AppProfile
 	private static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
-	private static final airlift.servlet.rest.RestfulSecurityContext securityContext = new airlift.servlet.rest.RestfulSecurityContext();
 	
 	static
 	{
@@ -101,11 +100,6 @@ public class AppProfile
 	public boolean hasAttribute(String _domainName, String _attributeName)
 	{
 		return map.containsKey(_domainName.toLowerCase() + "." + _attributeName);
-	}
-
-	public airlift.SecurityContext getSecurityContext()
-	{
-		return this.securityContext;
 	}
 
 	public String getConcept(String _conceptHandle)

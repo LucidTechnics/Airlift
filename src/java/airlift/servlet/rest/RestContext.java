@@ -24,12 +24,24 @@ public class RestContext
 
 	private Map<String, Object> uriParameterMap;
 	private String handlerPath;
-
+	private String method;
+	private boolean isUriACollection;
+	private String uri;
+	private String appName;
+	
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
-
+	public String getMethod() { return method; }
+	public boolean getIsUriACollection() { return isUriACollection; }
+	public String getUri() { return uri; }
+	public String getAppName() { return appName; }
+	
 	public String getHandlerPath() { return handlerPath; }
 	protected void setHandlerPath(String _handlerPath) { handlerPath = _handlerPath; }
+	protected void setMethod(String _method) { method = _method; }
+	protected void setIsUriACollection(boolean _isUriACollection) { isUriACollection = _isUriACollection; }
+	protected void setUri(String _uri) { uri = _uri; }
+	protected void setAppName(String _appName) { appName = _appName; }
 	
 	public RestContext()
 	{
@@ -39,6 +51,11 @@ public class RestContext
 	public RestContext(Map _uriParameterMap)
 	{
 		setUriParameterMap(_uriParameterMap);
+	}
+
+	public boolean uriIsACollection()
+	{
+		return getIsUriACollection();
 	}
 
 	public String getThisDomain()

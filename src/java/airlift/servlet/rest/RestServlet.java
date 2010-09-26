@@ -110,7 +110,7 @@ public class RestServlet
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 
-		boolean success = allowed(user, _request, _response);
+		boolean success = allowed(user, restContext);
 
 		if (!success && user == null)
 		{
@@ -458,6 +458,12 @@ public class RestServlet
 		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
 				
 		RestContext restContext = new RestContext(_uriParameterMap);
+		String uri = reconstructUri(getServletName(), _httpServletRequest);
+		restContext.setIsUriACollection(isUriACollection(uri));
+		restContext.setMethod(_method);
+		restContext.setUri(uri);
+		restContext.setAppName(_appName);
+		
 		String domainName = restContext.getThisDomain();
 		String className = getAppProfile().getDomainShortClassName(domainName);
 
@@ -471,15 +477,14 @@ public class RestServlet
 		return restContext;
 	}
 
-	public boolean allowed(User _user, HttpServletRequest _request, HttpServletResponse _response)
+	public boolean allowed(User _user, RestContext _restContext)
 	{
 		boolean allowed = true;
+		RestfulSecurityContext securityContext = new RestfulSecurityContext();
 
 		try
 		{
-			String rootPackageName = this.getServletConfig().getInitParameter("a.root.package.name");
-			airlift.SecurityContext securityContext = getAppProfile().getSecurityContext();
-			allowed = securityContext.allowed(appProfile, _user, _request);
+			allowed = securityContext.allowed(_user, _restContext, getAppProfile());
 		}
 		catch(Throwable t)
 		{

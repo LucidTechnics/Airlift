@@ -25,6 +25,4 @@ public interface AppProfile
 	public boolean isValidDomain(String _domainName);
 	public String getAttributeType(String _domainName, String _attributeName);
 	public String getConcept(String _domainName);
-	
-	public airlift.SecurityContext getSecurityContext();
 }
