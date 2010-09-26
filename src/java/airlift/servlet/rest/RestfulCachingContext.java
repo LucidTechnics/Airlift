@@ -16,135 +16,87 @@ package airlift.servlet.rest;
 
 import java.util.logging.Logger;
 
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheManager;
+import com.google.appengine.api.memcache.Expiration;
 
 public class RestfulCachingContext
    implements airlift.CachingContext
 {
 	private static final Logger log = Logger.getLogger(RestfulCachingContext.class.getName());
 
-	private static Cache cache;
+	private String domainName;
+	private boolean isCacheable;
+	private boolean cacheCollections;
+	private int life;
 
-	static
+	public String getDomainName() { return domainName; }
+	public boolean getIsCacheable() { return isCacheable; }
+	public boolean getCacheCollections() { return cacheCollections; }
+	public int getLife() { return life; }
+
+	public void setDomainName(String _domainName) { domainName = _domainName; }
+	public void setIsCacheable(boolean _isCacheable) { isCacheable = _isCacheable; }
+	public void setCacheCollections(boolean _cacheCollections) { cacheCollections = _cacheCollections; }
+	public void setLife(int _life) { life = _life; }
+
+	public RestfulCachingContext(String _domainName, boolean _isCacheable, int _life, boolean _cacheCollections)
 	{
 		try
 		{
-			cache = CacheManager.getInstance().getCacheFactory().createCache(java.util.Collections.emptyMap());
+			setDomainName(domainName);
+			setIsCacheable(_isCacheable);
+			setLife(_life);
+			setCacheCollections(_cacheCollections);
 		}
 		catch (Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
-	};
-
-	private static Cache getCache() { return cache; }
-	private static void setCache(Cache _cache) { cache = _cache; }
-
-	public RestfulCachingContext() {}
-
-	public static void put(javax.servlet.http.HttpServletRequest _request, String _content)
-	{//TODO Check isCacheable to see how long it should be cached!!!
-	 //Also you can create multiple Caches per domain and have those
-	 //caches set up with different instantiated timeouts.
-	 
-		getCache().put(constructCacheKey(_request), _content);
 	}
 
-	public static void remove(javax.servlet.http.HttpServletRequest _request)
+	private com.google.appengine.api.memcache.MemcacheService getCache()
 	{
-		getCache().remove(constructCacheKey(_request));
+		return com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+	}
+	
+	public int life()
+	{
+		return getLife();
+	}
+	
+	public boolean cacheCollections()
+	{
+		return getCacheCollections();
 	}
 
-	public String get(airlift.AppProfile _appProfile, javax.servlet.http.HttpServletRequest _request)
+	public boolean isCacheable()
 	{
-		String content = null;
-		String method = _request.getMethod();
-
-		if ("GET".equalsIgnoreCase(method) == true)
-		{
-			String rootPackageName = _appProfile.getRootPackageName();
-			String appName = _appProfile.getAppName();
-
-			String user = _request.getRemoteUser();
-
-			log.info("Caching context has this servlet path: " + _request.getServletPath());
-			log.info("Caching context has this path info: " + _request.getPathInfo());
-
-			String pathInfo = ((_request.getPathInfo() == null) &&
-							   ("".equals(_request.getPathInfo()) == false)) ? "" : _request.getPathInfo();
-
-			String path = _request.getServletPath() + pathInfo;
-
-			log.info("Caching context has this path: " + path);
-
-			path = path.replaceFirst("/$", "").replaceFirst("^/", "");
-
-			log.info("Caching context path is now: " + path);
-
-			String uri = appName + "/" + path;
-
-			log.info("Caching context uri is now: " + path);
-
-			java.util.Map uriParameterMap = new java.util.HashMap();
-
-			airlift.util.AirliftUtil.extractDomainInformation(uri, uriParameterMap, rootPackageName);
-
-			RestContext restContext = new RestContext(uriParameterMap);
-
-			log.info("Here is this domain name: " + restContext.getThisDomain());
-
-			String domainName = restContext.getThisDomain();
-
-			String domainClassName = _appProfile.getFullyQualifiedClassName(domainName);
-
-			content = get(appName, domainClassName, _request);
-		}
-
-		return content;
+		return getIsCacheable();
 	}
 
-	public String get(String _appName, String _domainClassName, javax.servlet.http.HttpServletRequest _request)
+	public void put(javax.servlet.http.HttpServletRequest _request, String _content)
 	{
-		String content = null;
-		boolean isCacheable = true;
-		String cacheKey = "";
+		getCache().put(constructCacheKey(_request), _content, Expiration.byDeltaSeconds(life()));
+	}
 
-		try
-		{
-			Class domainInterfaceClass = Class.forName(_domainClassName);
-
-			if (domainInterfaceClass.isAnnotationPresent(airlift.generator.Cacheable.class) == true)
-			{
-				airlift.generator.Cacheable cacheable = (airlift.generator.Cacheable) domainInterfaceClass.getAnnotation(airlift.generator.Cacheable.class);
-				isCacheable = cacheable.isCacheable();	
-			}
-
-			if (isCacheable == true)
-			{
-				cacheKey = constructCacheKey(_request);
-				content = (String) getCache().get(cacheKey);
-			}
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
+	public void remove(javax.servlet.http.HttpServletRequest _request)
+	{
+		getCache().delete(constructCacheKey(_request));
+	}
+	
+	public String get(javax.servlet.http.HttpServletRequest _request)
+	{
+		String cacheKey = constructCacheKey(_request);
+		String content = (String) getCache().get(cacheKey);
 
 		if (log.isLoggable(java.util.logging.Level.INFO) == true && content != null)
 		{
 			log.info("Cache hit for this entry: " + cacheKey);
 		}
-		else if (log.isLoggable(java.util.logging.Level.INFO) == true)
-		{
-			log.info("Cache miss for this entry: " + cacheKey);
-		}			
 		
 		return content;
 	}
 
-	public static String constructCacheKey(javax.servlet.http.HttpServletRequest _request)
+	public String constructCacheKey(javax.servlet.http.HttpServletRequest _request)
 	{
 		String queryString = (_request.getQueryString() != null) ? "?" + _request.getQueryString() : ""; 
 		return _request.getRequestURL() + queryString;

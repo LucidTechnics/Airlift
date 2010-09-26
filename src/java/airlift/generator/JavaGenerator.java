@@ -132,6 +132,22 @@ public class JavaGenerator
 	{
 		StringTemplate domainInterfaceStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DomainInterface");
 
+		for (Annotation domainAnnotation: _domainObjectModel.getDomainAnnotationSet())
+		{
+			StringTemplate annotationInstanceTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AnnotationInstance");
+
+			annotationInstanceTemplate.setAttribute("annotationName", domainAnnotation.getName());
+
+			for (String parameterName: domainAnnotation.getParameterMap().keySet())
+			{
+				annotationInstanceTemplate.setAttribute("name"	, parameterName);
+				annotationInstanceTemplate.setAttribute("value", domainAnnotation.getParameterValue(parameterName));
+			}
+
+			domainInterfaceStringTemplate.setAttribute("annotation", annotationInstanceTemplate.toString());
+		}
+
+		
 		Iterator attributes = _domainObjectModel.getAttributes();
 
 		while (attributes.hasNext() == true)

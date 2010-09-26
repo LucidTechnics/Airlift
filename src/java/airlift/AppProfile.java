@@ -20,11 +20,11 @@ public interface AppProfile
 	public String getRootPackageName();
 	public String getDomainShortClassName(String _domainName);
 	public String getFullyQualifiedClassName(String _domainName);
-	public java.util.Collection getValidDomains();
+	public java.lang.annotation.Annotation getAnnotation(String _domainName, Class _annotationClass);
+	public java.util.Collection<String> getValidDomains();
 	public boolean isValidDomain(String _domainName);
 	public String getAttributeType(String _domainName, String _attributeName);
 	public String getConcept(String _domainName);
 	
 	public airlift.SecurityContext getSecurityContext();
-	public airlift.CachingContext getCachingContext();
 }

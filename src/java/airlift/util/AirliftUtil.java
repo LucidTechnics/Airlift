@@ -192,7 +192,7 @@ public class AirliftUtil
 		return "id";
 	}
 
-	public static void extractDomainInformation(String _uri, java.util.Map _uriParameterMap, String _rootPackageName)
+	public static void populateDomainInformation(String _uri, java.util.Map _uriParameterMap, String _rootPackageName)
 	{
 		String[] tokenArray = _uri.split("\\/");
 

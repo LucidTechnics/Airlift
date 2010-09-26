@@ -31,6 +31,7 @@ public class DomainObjectModel
 	private String buildPackageName;
 	private String className;
 	private String appName;
+	private Set<Annotation> domainAnnotationSet;
 	private Map<Attribute, Set<Annotation>> attributeAnnotationSetMap;
 	private Map<String, Attribute> attributeNameMap;
 	private Set<String> annotationNameSet;
@@ -47,6 +48,7 @@ public class DomainObjectModel
 	public String getBuildPackageName() { return buildPackageName; }
 	public String getClassName() { return upperTheFirstCharacter(className); }
 	public String getAppName() { return appName; }
+	public Set<Annotation> getDomainAnnotationSet() { return domainAnnotationSet; }
 	public Map<Attribute, Set<Annotation>> getAttributeAnnotationSetMap() { return attributeAnnotationSetMap; }
 	public Map<String, Attribute> getAttributeNameMap() { return attributeNameMap;  }
 	public Set<String> getAnnotationNameSet() { return annotationNameSet; }
@@ -61,6 +63,7 @@ public class DomainObjectModel
 	public void setBuildPackageName(String _buildPackageName) { buildPackageName = _buildPackageName; }
 	public void setClassName(String _className) { className = upperTheFirstCharacter(_className); }
 	public void setAppName(String _appName) { appName = _appName; }
+	public void setDomainAnnotationSet(Set<Annotation> _domainAnnotationSet) { domainAnnotationSet = _domainAnnotationSet; }
 	public void setAttributeAnnotationSetMap(Map<Attribute, Set<Annotation>> _attributeAnnotationSetMap) { attributeAnnotationSetMap = _attributeAnnotationSetMap; }
 	public void setAttributeNameMap(Map<String, Attribute> _attributeNameMap) { attributeNameMap = _attributeNameMap; }
 	public void setAnnotationNameSet(Set<String> _annotationNameSet) { annotationNameSet = _annotationNameSet; }
@@ -86,6 +89,7 @@ public class DomainObjectModel
 
 		setAttributeNameMap(new HashMap<String, Attribute>());
 		setAnnotationNameSet(new HashSet<String>());
+		setDomainAnnotationSet(new HashSet<Annotation>());
 		setAttributeAnnotationSetMap(new HashMap<Attribute, Set<Annotation>>());
 		setAttributeList(new ArrayList<Attribute>());
 		setDirectSuperClassSet(new HashSet<String>());

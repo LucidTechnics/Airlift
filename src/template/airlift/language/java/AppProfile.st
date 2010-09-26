@@ -12,13 +12,12 @@ import airlift.servlet.rest.RestfulSecurityContext;
 public class AppProfile
    implements airlift.AppProfile
 {
-	private static final java.util.Collection <String> collection = new java.util.ArrayList<String>();
+	private static final java.util.Collection<String> collection = new java.util.ArrayList<String>();
 	private static final java.util.Map<String, String> map = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
 	private static final airlift.servlet.rest.RestfulSecurityContext securityContext = new airlift.servlet.rest.RestfulSecurityContext();
-	private static final airlift.servlet.rest.RestfulCachingContext cachingContext = new airlift.servlet.rest.RestfulCachingContext();
 	
 	static
 	{
@@ -63,7 +62,28 @@ public class AppProfile
 		return domainToClassMap.get(_domainName.toLowerCase());
 	}
 
-	public java.util.Collection getValidDomains()
+	public java.lang.annotation.Annotation getAnnotation(String _domainName, Class _annotationClass)
+	{
+		java.lang.annotation.Annotation annotation = null;
+
+		try
+		{
+			Class domainInterfaceClass = Class.forName(getFullyQualifiedClassName(_domainName));
+
+			if (domainInterfaceClass.isAnnotationPresent(_annotationClass) == true)
+			{
+				annotation = domainInterfaceClass.getAnnotation(_annotationClass);
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return annotation;
+	}
+
+	public java.util.Collection<String> getValidDomains()
 	{
 		return new java.util.ArrayList<String>(collection);
 	}
@@ -86,11 +106,6 @@ public class AppProfile
 	public airlift.SecurityContext getSecurityContext()
 	{
 		return this.securityContext;
-	}
-
-	public airlift.CachingContext getCachingContext()
-	{
-		return this.cachingContext;
 	}
 
 	public String getConcept(String _conceptHandle)

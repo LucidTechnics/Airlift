@@ -52,7 +52,7 @@ public class RestfulSecurityContext
 
 		java.util.Map uriParameterMap = new java.util.HashMap();
 		
-		airlift.util.AirliftUtil.extractDomainInformation(uri, uriParameterMap, rootPackageName);
+		airlift.util.AirliftUtil.populateDomainInformation(uri, uriParameterMap, rootPackageName);
 
 		RestContext restContext = new RestContext(uriParameterMap);
 

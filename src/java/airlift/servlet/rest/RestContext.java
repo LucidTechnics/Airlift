@@ -23,9 +23,13 @@ public class RestContext
 	private static Logger log = Logger.getLogger(RestContext.class.getName());
 
 	private Map<String, Object> uriParameterMap;
+	private String handlerPath;
 
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
+
+	public String getHandlerPath() { return handlerPath; }
+	protected void setHandlerPath(String _handlerPath) { handlerPath = _handlerPath; }
 	
 	public RestContext()
 	{

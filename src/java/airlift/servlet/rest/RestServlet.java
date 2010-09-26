@@ -30,8 +30,10 @@ public class RestServlet
    extends HttpServlet
 {
 	private static Logger log = Logger.getLogger(RestServlet.class.getName());
+	private java.util.Map<String, RestfulCachingContext> cachingContextMap = new java.util.HashMap<String, RestfulCachingContext>();
 
 	protected Map<String, Object> redirectContextMap;
+	protected static airlift.AppProfile appProfile;
 
 	public Map<String, Object> getRedirectContextMap() { return redirectContextMap; }
 	public void setRedirectContextMap(Map<String, Object> _redirectContextMap) { redirectContextMap = _redirectContextMap; }
@@ -41,8 +43,26 @@ public class RestServlet
 	    throws ServletException
 	{		
 		setRedirectContextMap(new HashMap<String, Object>());
+		initCache();
     }
-    
+
+	public void initCache() 
+	{
+		//On init create cached response for 404s
+		cachingContextMap.put("airlift.404.cache", new RestfulCachingContext("airlift.404.cache", true, 3600000, true));
+
+		//For each domain that is cacheable create the relevant caching
+		//context.
+		for (String domainName: getAppProfile().getValidDomains())
+		{
+			if (cachingContextMap.containsKey(domainName) != true)
+			{
+				airlift.generator.Cacheable cacheableAnnotation = (airlift.generator.Cacheable) getAppProfile().getAnnotation(domainName, airlift.generator.Cacheable.class);
+				cachingContextMap.put(domainName, new RestfulCachingContext(domainName, cacheableAnnotation.isCacheable(), cacheableAnnotation.life(), cacheableAnnotation.cacheCollections()));
+			}
+		}
+	}
+	
     @Override
     protected final void doGet(HttpServletRequest _httpServletRequest,
 			       HttpServletResponse _httpServletResponse)
@@ -95,7 +115,9 @@ public class RestServlet
 		
 		try
 		{
-			String handlerName = prepareImplicitHandler(method, _httpServletRequest, uriParameterMap, appName);
+			RestContext restContext = prepareRestContext(method, _httpServletRequest, uriParameterMap, appName);
+			String domainName = restContext.getThisDomain();
+			String handlerName = restContext.getHandlerPath();
 
 			if (handlerName != null)
 			{
@@ -136,9 +158,14 @@ public class RestServlet
 						null);
 				}
 
+				//Invalidate the cache if necessary
+				invalidateCache(domainName, _method, _httpServletRequest);
+
 				if (contentContext.isRedirect() == true)
+					//TODO this should be checking to see if the method
+					//call is a POST PUT or DELETE.  At this point the
+					//cache is then invalidated.
 				{
-					invalidateCache(appName, _method, _httpServletRequest);
 					_httpServletResponse.sendRedirect(contentContext.getRedirectUri());
 				}
 				else
@@ -146,7 +173,7 @@ public class RestServlet
 					_httpServletResponse.setContentType(contentContext.getType());
 					String content = contentContext.getContent();
 					_httpServletResponse.getWriter().print(content);
-					populateCache(appName, _method, _httpServletRequest, contentContext.getContent());
+					populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
 				}
 			}
 			else
@@ -162,7 +189,7 @@ public class RestServlet
 				
 				_httpServletResponse.getWriter().print(contentContext.getContent());
 
-				populateCache(appName, _method, _httpServletRequest, contentContext.getContent());
+				populateCache("airlift.404.cache", _method, _httpServletRequest, contentContext.getContent());
 			}
 		}
 		catch(Throwable t)
@@ -203,6 +230,47 @@ public class RestServlet
 		}
     }
 
+	public airlift.CachingContext isCacheable(javax.servlet.http.HttpServletRequest _request, String _domainName)
+	{
+		airlift.CachingContext cachingContext = null;
+		String rootPackageName = this.getServletConfig().getInitParameter("a.root.package.name");
+		String uri = reconstructUri(getServletName(), _request);
+
+		airlift.CachingContext tempCachingContext = this.cachingContextMap.get(_domainName);
+		
+		if (tempCachingContext != null &&
+			"yes".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.production.mode")) == true &&
+			  tempCachingContext.isCacheable() == true)
+		{
+			boolean isUriACollection = isUriACollection(uri);
+			
+			if (isUriACollection == false)
+			{
+				cachingContext = tempCachingContext;
+			}
+			else if (tempCachingContext.cacheCollections() == true)
+			{
+				cachingContext = tempCachingContext;
+			}
+		}
+		else if ("airlift.404.cache".equalsIgnoreCase(_domainName) == true)
+		{
+			cachingContext = tempCachingContext;
+		}
+			
+		return cachingContext;
+	}
+	
+	public String getFromCache(String _cacheName, javax.servlet.http.HttpServletRequest _request)
+	{
+		String content = null;
+		
+		airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
+
+		if (cachingContext != null) { content = cachingContext.get(_request); }
+
+		return content;
+	}
 
 	private void populateCache(String _cacheName, Method _method, HttpServletRequest _request, String _content)
 	{
@@ -210,7 +278,9 @@ public class RestServlet
 		{
 			try
 			{
-				RestfulCachingContext.put(_request, _content);
+				airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
+				
+				if (cachingContext != null) { cachingContext.put(_request, _content); }
 			}
 			catch(Throwable t)
 			{
@@ -221,13 +291,17 @@ public class RestServlet
 
 	private void invalidateCache(String _cacheName, Method _method, HttpServletRequest _request)
 	{
-		if ("POST".equalsIgnoreCase(_method.name()) == true ||
+		airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
+
+		
+		if (cachingContext != null &&
+			  ("POST".equalsIgnoreCase(_method.name()) == true ||
 			  "PUT".equalsIgnoreCase(_method.name()) == true ||
-			  "DELETE".equalsIgnoreCase(_method.name()) == true)
+			  "DELETE".equalsIgnoreCase(_method.name()) == true))
 		{
 			try
 			{
-				RestfulCachingContext.remove(_request);
+				cachingContext.remove(_request);
 			}
 			catch(Throwable t)
 			{
@@ -314,7 +388,7 @@ public class RestServlet
 		return airlift.util.AirliftUtil.isUriACollection(_uri, rootPackageName);
 	}
 
-	public String prepareImplicitHandler(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
+	public RestContext prepareRestContext(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
 		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
@@ -328,7 +402,9 @@ public class RestServlet
 			handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + "_" + className + ".js";
 		}
 		
-		return handlerPath;  
+		restContext.setHandlerPath(handlerPath);
+
+		return restContext;
 	}
 
 	public String prepareGenericHandler(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
@@ -358,25 +434,28 @@ public class RestServlet
 		return new airlift.servlet.rest.ErrorHandlerContext(productionMode);
 	}
 
-	public void extractDomainInformation(String _uri, java.util.Map _uriParameterMap)
+	public void populateDomainInformation(String _uri, java.util.Map _uriParameterMap)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
 		
-		airlift.util.AirliftUtil.extractDomainInformation(_uri, _uriParameterMap, rootPackageName);
+		airlift.util.AirliftUtil.populateDomainInformation(_uri, _uriParameterMap, rootPackageName);
 	}
 
+	public String reconstructUri(String _appName, HttpServletRequest _request)
+	{
+		String pathInfo = (_request.getPathInfo() == null) ? "" : _request.getPathInfo();
+		String path = _request.getServletPath() + pathInfo;
+		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
+		
+		return _appName + "/" + path;
+	}
+	
 	public String determinePrefix(String _appName, String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap)
 	{
 		_uriParameterMap.clear();
 
 		String prefix = _method.toUpperCase();
-
-		String pathInfo = ((_httpServletRequest.getPathInfo() == null) &&
-						   ("".equals(_httpServletRequest.getPathInfo()) == false)) ? "" : _httpServletRequest.getPathInfo();
-		
-		String path = _httpServletRequest.getServletPath() + pathInfo;
-		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
-		String uri = _appName + "/" + path;
+		String uri = reconstructUri(_appName, _httpServletRequest);
 
 		log.info("URI is now: " + uri);
 
@@ -390,22 +469,21 @@ public class RestServlet
 			}
 		}
 
-		extractDomainInformation(uri, _uriParameterMap);
+		populateDomainInformation(uri, _uriParameterMap);
 
 		return prefix;
 	}
 
 	public airlift.AppProfile getAppProfile()
 	{
-		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
-
-		airlift.AppProfile appProfile = null;
-
 		try
 		{
-			appProfile = (airlift.AppProfile) Class.forName(rootPackageName + ".AppProfile").newInstance();
+			if (appProfile == null)
+			{
+				this.appProfile = (airlift.AppProfile) Class.forName(getServletConfig().getInitParameter("a.root.package.name") + ".AppProfile").newInstance();
+			}
 		}
-		catch(Throwable t)
+		catch (Throwable t)
 		{
 			throw new RuntimeException(t);
 		}

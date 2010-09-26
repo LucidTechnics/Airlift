@@ -1,4 +1,4 @@
-package $package$.airlift.domaininterface;
+package $package$.domaininterface;
 
 import airlift.generator.Persistable;
 import airlift.generator.Persistable.Semantic;
@@ -8,10 +8,12 @@ import airlift.generator.Searchable;
 
 @javax.annotation.Generated
 (
-  value="hannibal.generator.Generator",
+  value="airlift.generator.Generator",
   comments="$generatorComment$",
   date = "$dateTimestamp$"
 )
+
+$annotation; separator="\n"$
 
 public interface $className$
 {
