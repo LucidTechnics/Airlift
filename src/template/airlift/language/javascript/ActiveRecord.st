@@ -71,14 +71,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.exists = function(_id)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET");
+		airlift.checkAllowed(this.retrieveDomainName(), "GET");
 
 		return this.dao.exists(_id);
 	};
 
 	activeRecord.get = function(_id)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET");
+		airlift.checkAllowed(this.retrieveDomainName(), "GET");
 
 		var jdo = this.dao.get(_id);
 		this.copyFrom(jdo);
@@ -88,21 +88,21 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.update = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "PUT");
+		airlift.checkAllowed(this.retrieveDomainName(), "PUT");
 
 		return this.dao.update(this.createDO());
 	};
 
 	activeRecord.insert = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "POST");
+		airlift.checkAllowed(this.retrieveDomainName(), "POST");
 
 		this.setId(this.dao.insert(this.createDO()));
 	};
 
 	activeRecord.del = function()
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "DELETE");
+		airlift.checkAllowed(this.retrieveDomainName(), "DELETE");
 
 		return this.dao.del(id);
 	};
@@ -114,7 +114,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.collect = function(_config)
 	{
-		airlift.checkAllowed("$fullyQualifiedDomainClassName$", this.retrieveDomainName(), "GET", true);
+		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
 
 		return this.convertToActiveRecordArray(this.dao.collect(_config));
 	};
@@ -297,7 +297,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		catch(t) 
 		{
 			throwable = t;
-			LOG.warning("Unable to copy property: " + _propertyName + " to domain: " + retrieveDomainName());
+			LOG.warning("Unable to copy property: " + _propertyName + " to domain: " + this.retrieveDomainName());
 			LOG.warning(t.toString());
 		}
 

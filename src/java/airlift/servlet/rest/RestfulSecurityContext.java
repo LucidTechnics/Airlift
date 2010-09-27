@@ -24,21 +24,25 @@ public class RestfulSecurityContext
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 
 	public RestfulSecurityContext() {}
-	
+
 	public boolean allowed(User _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
-		boolean allowed = true;
-		String method = _restContext.getMethod();
+		return allowed(_user, _restContext.getMethod(), _appProfile, _restContext.getThisDomain(), _restContext.uriIsACollection());
+	}
 
+	public boolean allowed(User _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
+	{
+		boolean allowed = true;
+		
 		try
 		{
-			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_restContext.getThisDomain(), airlift.generator.Securable.class);
+			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_domainName, airlift.generator.Securable.class);
 
 			if (securable.isSecurable() == true)
 			{
-				if ("GET".equalsIgnoreCase(method) == true)
+				if ("GET".equalsIgnoreCase(_method) == true)
 				{
-					if (_restContext.uriIsACollection() == true)
+					if (_uriIsACollection == true)
 					{
 						allowed = checkAllowed(createRoleSet(securable.collectRoles()), _user);
 					}
@@ -47,27 +51,27 @@ public class RestfulSecurityContext
 						allowed = checkAllowed(createRoleSet(securable.getRoles()), _user);
 					}
 				}
-				else if ("POST".equalsIgnoreCase(method) == true)
+				else if ("POST".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.postRoles()), _user);
 				}
-				else if ("PUT".equalsIgnoreCase(method) == true)
+				else if ("PUT".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.putRoles()), _user);
 				}
-				else if ("DELETE".equalsIgnoreCase(method) == true)
+				else if ("DELETE".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.deleteRoles()), _user);
 				}
-				else if ("TRACE".equalsIgnoreCase(method) == true)
+				else if ("TRACE".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.traceRoles()), _user);
 				}
-				else if ("HEAD".equalsIgnoreCase(method) == true)
+				else if ("HEAD".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.headRoles()), _user);
 				}
-				else if ("OPTIONS".equalsIgnoreCase(method) == true)
+				else if ("OPTIONS".equalsIgnoreCase(_method) == true)
 				{
 					allowed = checkAllowed(createRoleSet(securable.optionsRoles()), _user);
 				}
@@ -77,14 +81,14 @@ public class RestfulSecurityContext
 			
 			if (allowed == false)
 			{
-				log.warning("User: " + email + " is not allowed method: " + method +
-						 " access to this domain: " + _restContext.getThisDomain());
+				log.warning("User: " + email + " is not allowed method: " + _method +
+						 " access to this domain: " + _domainName);
 			}
 			else
 			{
 				
-				log.info("User: " + email + " is allowed method: " + method +
-						 " access to this domain: " + _restContext.getThisDomain());
+				log.info("User: " + email + " is allowed method: " + _method +
+						 " access to this domain: " + _domainName);
 			}
 		}
 		catch(Throwable t)
@@ -113,9 +117,9 @@ public class RestfulSecurityContext
 	{
 		boolean allowed = false;
 		
-		if (_roleSet.contains("airlift.noone") == false)
+		if (_roleSet.contains("noone") == false)
 		{
-			if (_roleSet.contains("airlift.all") == true)
+			if (_roleSet.contains("all") == true)
 			{
 				allowed = true;
 			}
@@ -137,19 +141,23 @@ public class RestfulSecurityContext
 	public java.util.Set<String> fetchUserRoleSet(com.google.appengine.api.users.User _user)
 	{
 		java.util.Set<String> roleList = new java.util.HashSet<String>();
-		java.util.List<AirliftUser> userList = collectByEmail(_user.getEmail(), 0, 10, "email", true);
 
-		if (userList.size() > 1) { throw new RuntimeException("Multiple users for email address: " + _user.getEmail() + " found."); }
-
-		if (userList.isEmpty() != true)
+		if (_user != null)
 		{
-			AirliftUser user = userList.get(0);
+			java.util.List<AirliftUser> userList = collectByEmail(_user.getEmail(), 0, 10, "email", true);
 
-			String[] tokenArray = user.getRoleList().split(",");
+			if (userList.size() > 1) { throw new RuntimeException("Multiple users for email address: " + _user.getEmail() + " found."); }
 
-			for (int i = 0; i > tokenArray.length; i++)
+			if (userList.isEmpty() != true)
 			{
-				roleList.add(tokenArray[i]);
+				AirliftUser user = userList.get(0);
+
+				String[] tokenArray = user.getRoleList().split(",");
+
+				for (int i = 0; i > tokenArray.length; i++)
+				{
+					roleList.add(tokenArray[i]);
+				}
 			}
 		}
 

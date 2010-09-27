@@ -27,14 +27,14 @@ public @interface Securable
 	//To define roles simply pass in comma separated string. For
 	//example "user, admin".
 	//special airlift.roles
-	//airlift.all - if this role is present, then anyone can access
+	//all - if this role is present, then anyone can access
 	//this domain via the associated method.
-	//airlift.noone - if this role is present no one can access this
+	//noone - if this role is present no one can access this
 	//domain via the associated method
 	//If set to airlift.none Airlift will NOT create a security constraint.
-	public String postRoles() default "airlift.all";
-	public String getRoles() default "airlift.all";
-	public String putRoles() default "airlift.all";
+	public String postRoles() default "all";
+	public String getRoles() default "all";
+	public String putRoles() default "all";
 
 	//Empty string means this method is NOT allowed by default.
 	//Airlift will disallow all access to the resource via this
@@ -43,7 +43,7 @@ public @interface Securable
 	public String collectRoles() default ""; 
 	public String deleteRoles() default "";
 
-	public String headRoles() default "airlift.noone";
-	public String optionsRoles() default "airlift.all";
-	public String traceRoles() default "airlift.noone";
+	public String headRoles() default "noone";
+	public String optionsRoles() default "all";
+	public String traceRoles() default "noone";
 }

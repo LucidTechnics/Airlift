@@ -382,7 +382,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						default:
 							throw new RuntimeException("Cannot create form. Unknown airlift.generator.Presentable.inputType() value:" + inputType +
-								" for field: " + _property + " on domain interface : " + domainInterfaceClass.getName() + " used to generate class: " + _activeRecord.getClass().getName());
+								" for field: " + _property + " on domain interface : " + domainInterfaceClass.getName() + " used to generate class: " + _activeRecord.createDO().getClass().getName());
 					}
 				}
 			}
@@ -392,7 +392,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	}
 	else
 	{
-		throw {name: "Form creation error", message: "Cannot generate form for class: " + _activeRecord.getClass() + ". Class does not have airlift.generator.Presentable annotation." };
+		throw {name: "Form creation error", message: "Cannot generate form for class: " + _activeRecord.createDO().getClass() + ". Class does not have airlift.generator.Presentable annotation." };
 	}
 
 	return fieldSetTemplate.toString();

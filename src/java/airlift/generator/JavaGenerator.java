@@ -146,7 +146,6 @@ public class JavaGenerator
 
 			domainInterfaceStringTemplate.setAttribute("annotation", annotationInstanceTemplate.toString());
 		}
-
 		
 		Iterator attributes = _domainObjectModel.getAttributes();
 

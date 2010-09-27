@@ -26,39 +26,39 @@ airlift.ls = function(_scriptName)
 };
 
 //Security checks via the Security context.
-airlift.checkAllowed = function(_domainClassName, _domainName, _method, _isCollection)
+airlift.checkAllowed = function(_domainName, _method, _isCollection)
 {
 	var isCollection = (airlift.isDefined(_isCollection) === true) ? _isCollection : false;
 	var securityContext = new Packages.airlift.servlet.rest.RestfulSecurityContext();
-	securityContext.allowed(_domainClassName, _domainName,  _method, USER, REQUEST, isCollection); 
+	securityContext.allowed(USER, _method, APP_PROFILE, _domainName, isCollection); 
 };
 
 //ar - Create an active record for the provided domain name.  If not
 //domain name is provided the default DOMAIN_NAME is used instead.
 airlift.ar = function(_domainName)
 {
-	var domainName = (airlift.isDefined(_domainName) === true) ? Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_domainName) : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(DOMAIN_NAME);
+	var domainName = (!_domainName) ? DOMAIN_NAME : (new Packages.java.lang.String(_domainName).toLowerCase());
 	
-	if (airlift.isDefined(airlift["create" + domainName]) !== true)
+	if (airlift.isDefined(airlift["create" + APP_PROFILE.getDomainShortClassName(domainName)]) !== true)
 	{
-		airlift.ls("javascript/airlift/activerecord/" + domainName + ".js");
+		airlift.ls("javascript/airlift/activerecord/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
 	}
 
-	return airlift["create" + domainName]();
+	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName)]();
 };
 
 //ar - Create the DAO for the provided domain name.  If not
 //domain name is provided the default DOMAIN_NAME is used instead.
 airlift.dao = function(_domainName)
 {
-	var domainName = (airlift.isDefined(_domainName) === true) ? Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_domainName) : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(DOMAIN_NAME);
+	var domainName = (!_domainName) ? DOMAIN_NAME : (new Packages.java.lang.String(_domainName).toLowerCase());
 
-	if (airlift.isDefined(airlift["create" + domainName + "Dao"]) !== true)
+	if (airlift.isDefined(airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Dao"]) !== true)
 	{
-		airlift.ls("javascript/airlift/dao/" + domainName + ".js");
+		airlift.ls("javascript/airlift/dao/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
 	}
 
-	return airlift["create" + domainName + "Dao"]();
+	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Dao"]();
 };
 
 //Convenience method for creating a blank StringTemplate object
