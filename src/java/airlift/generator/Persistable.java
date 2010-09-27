@@ -32,7 +32,7 @@ public @interface Persistable
 	public boolean isAutoIncrementedPrimaryKey() default false;
 	public String mapTo() default "false";
 	public String concept() default "";
-	public boolean nullable() default true;
+	public boolean nullable() default false;
 	public boolean immutable() default false;
 	public boolean rangeable() default false;
 	public String minimumValue() default "";
