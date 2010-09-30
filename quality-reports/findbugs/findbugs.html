@@ -1,0 +1,750 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>FindBugs Report</title>
+<style type="text/css">
+		.tablerow0 {
+			background: #EEEEEE;
+		}
+
+		.tablerow1 {
+			background: white;
+		}
+
+		.detailrow0 {
+			background: #EEEEEE;
+		}
+
+		.detailrow1 {
+			background: white;
+		}
+
+		.tableheader {
+			background: #b9b9fe;
+			font-size: larger;
+		}
+
+		.tablerow0:hover, .tablerow1:hover {
+			background: #aaffaa;
+		}
+
+		.priority-1 {
+		    color: red;
+		    font-weight: bold;
+		}
+		.priority-2 {
+		    color: orange;
+		    font-weight: bold;
+		}
+		.priority-3 {
+		    color: green;
+		    font-weight: bold;
+		}
+		.priority-4 {
+		    color: blue;
+		    font-weight: bold;
+		}
+		</style>
+<script type="text/javascript">
+			function toggleRow(elid) {
+				if (document.getElementById) {
+					element = document.getElementById(elid);
+					if (element) {
+						if (element.style.display == 'none') {
+							element.style.display = 'block';
+							//window.status = 'Toggle on!';
+						} else {
+							element.style.display = 'none';
+							//window.status = 'Toggle off!';
+						}
+					}
+				}
+			}
+		</script>
+</head>
+<body>
+<h1>
+<a href="http://findbugs.sourceforge.net">FindBugs</a> Report</h1>
+<h2>Project Information</h2>
+<p>Project: 
+		</p>
+<p>FindBugs version: 1.3.9</p>
+<p>Code analyzed:</p>
+<ul>
+<li>/Users/dyhodge/projects/airlift/dist/lib</li>
+</ul>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Metrics</h2>
+<p>3519 lines of code analyzed,
+	in 63 classes, 
+	in 8 packages.</p>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Metric</th>
+<th align="right">Total</th>
+<th align="right">Density*</th>
+</tr>
+<tr class="tablerow0">
+<td>High Priority Warnings</td>
+<td align="right">3</td>
+<td align="right">0.85</td>
+</tr>
+<tr class="tablerow1">
+<td>Medium Priority Warnings</td>
+<td align="right">21</td>
+<td align="right">5.97</td>
+</tr>
+<tr class="$totalClass">
+<td>
+<b>Total Warnings</b>
+</td>
+<td align="right">
+<b>24</b>
+</td>
+<td align="right">
+<b>6.82</b>
+</td>
+</tr>
+</table>
+<p>
+<i>(* Defects per Thousand lines of non-commenting source statements)</i>
+</p>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Contents</h2>
+<ul>
+<li>
+<a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</li>
+<li>
+<a href="#Warnings_CORRECTNESS">Correctness Warnings</a>
+</li>
+<li>
+<a href="#Warnings_EXPERIMENTAL">Experimental Warnings</a>
+</li>
+<li>
+<a href="#Warnings_PERFORMANCE">Performance Warnings</a>
+</li>
+<li>
+<a href="#Warnings_SECURITY">Security Warnings</a>
+</li>
+<li>
+<a href="#Warnings_STYLE">Dodgy Warnings</a>
+</li>
+<li>
+<a href="#Details">Details</a>
+</li>
+</ul>
+<h1>Summary</h1>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Warning Type</th>
+<th align="right">Number</th>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</td>
+<td align="right">3</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_CORRECTNESS">Correctness Warnings</a>
+</td>
+<td align="right">1</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_EXPERIMENTAL">Experimental Warnings</a>
+</td>
+<td align="right">2</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_PERFORMANCE">Performance Warnings</a>
+</td>
+<td align="right">6</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_SECURITY">Security Warnings</a>
+</td>
+<td align="right">1</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_STYLE">Dodgy Warnings</a>
+</td>
+<td align="right">11</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<b>Total</b>
+</td>
+<td align="right">
+<b>24</b>
+</td>
+</tr>
+</table>
+<h1>Warnings</h1>
+<p>Click on a warning row to see full context information.</p>
+<h2>
+<a name="Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65683');">
+<td>
+<span class="priority-1">DE</span>
+</td>
+<td>airlift.generator.Compiler.spawnInterfaceClasses(String, String, String, String, String) might ignore java.lang.Exception</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65683" style="display: none;">
+<a href="#DE_MIGHT_IGNORE">Bug type DE_MIGHT_IGNORE (click for details)</a>
+<br/>In class airlift.generator.Compiler<br/>In method airlift.generator.Compiler.spawnInterfaceClasses(String, String, String, String, String)<br/>Exception class java.lang.Exception<br/>At Compiler.java:[line 607]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66672');">
+<td>
+<span class="priority-2">NP</span>
+</td>
+<td>airlift.util.DatabaseUtil.getBoolean(ResultSet, int) has Boolean return type and returns explicit null</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66672" style="display: none;">
+<a href="#NP_BOOLEAN_RETURN_NULL">Bug type NP_BOOLEAN_RETURN_NULL (click for details)</a>
+<br/>In class airlift.util.DatabaseUtil<br/>In method airlift.util.DatabaseUtil.getBoolean(ResultSet, int)<br/>At DatabaseUtil.java:[line 125]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66727');">
+<td>
+<span class="priority-2">NP</span>
+</td>
+<td>airlift.util.DatabaseUtil.getBoolean(ResultSet, String) has Boolean return type and returns explicit null</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66727" style="display: none;">
+<a href="#NP_BOOLEAN_RETURN_NULL">Bug type NP_BOOLEAN_RETURN_NULL (click for details)</a>
+<br/>In class airlift.util.DatabaseUtil<br/>In method airlift.util.DatabaseUtil.getBoolean(ResultSet, String)<br/>At DatabaseUtil.java:[line 320]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_CORRECTNESS">Correctness Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66304');">
+<td>
+<span class="priority-1">GC</span>
+</td>
+<td>java.util.List is incompatible with expected argument type String in airlift.servlet.rest.RestContext.getOtherDomainIds()</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66304" style="display: none;">
+<a href="#GC_UNRELATED_TYPES">Bug type GC_UNRELATED_TYPES (click for details)</a>
+<br/>In class airlift.servlet.rest.RestContext<br/>In method airlift.servlet.rest.RestContext.getOtherDomainIds()<br/>Actual type java.util.List<br/>Expected String<br/>Called method java.util.List.remove(Object)<br/>Invoked on otherIds<br/>java.util.List.equals(Object) used to determine equality<br/>At RestContext.java:[line 103]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_EXPERIMENTAL">Experimental Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66845');">
+<td>
+<span class="priority-2">OBL</span>
+</td>
+<td>Method airlift.util.PropertyUtil.loadProperties(String, String) may fail to clean up java.io.InputStream</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66845" style="display: none;">
+<a href="#OBL_UNSATISFIED_OBLIGATION">Bug type OBL_UNSATISFIED_OBLIGATION (click for details)</a>
+<br/>In class airlift.util.PropertyUtil<br/>In method airlift.util.PropertyUtil.loadProperties(String, String)<br/>Reference type java.io.InputStream<br/>1 instances of obligation remaining<br/>Obligation to clean up resource created at PropertyUtil.java:[line 66] is not discharged<br/>Path continues at PropertyUtil.java:[line 67]<br/>Path continues at PropertyUtil.java:[line 68]<br/>Path continues at PropertyUtil.java:[line 70]<br/>Path continues at PropertyUtil.java:[line 81]<br/>Path continues at PropertyUtil.java:[line 82]<br/>Remaining obligations: {InputStream x 1}</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66984');">
+<td>
+<span class="priority-2">OBL</span>
+</td>
+<td>Method airlift.util.PropertyUtil.reloadProperties(String) may fail to clean up java.io.InputStream</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66984" style="display: none;">
+<a href="#OBL_UNSATISFIED_OBLIGATION">Bug type OBL_UNSATISFIED_OBLIGATION (click for details)</a>
+<br/>In class airlift.util.PropertyUtil<br/>In method airlift.util.PropertyUtil.reloadProperties(String)<br/>Reference type java.io.InputStream<br/>1 instances of obligation remaining<br/>Obligation to clean up resource created at PropertyUtil.java:[line 114] is not discharged<br/>Path continues at PropertyUtil.java:[line 119]<br/>Path continues at PropertyUtil.java:[line 120]<br/>Remaining obligations: {InputStream x 1}</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_PERFORMANCE">Performance Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65647');">
+<td>
+<span class="priority-2">SIC</span>
+</td>
+<td>Should airlift.domain.DomainConfiguration$FieldEntry be a _static_ inner class?</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65647" style="display: none;">
+<a href="#SIC_INNER_SHOULD_BE_STATIC">Bug type SIC_INNER_SHOULD_BE_STATIC (click for details)</a>
+<br/>In class airlift.domain.DomainConfiguration$FieldEntry<br/>At DomainConfiguration.java:[lines 144-183]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65948');">
+<td>
+<span class="priority-2">SIC</span>
+</td>
+<td>Should airlift.generator.JavaGenerator$PropertyOrder be a _static_ inner class?</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65948" style="display: none;">
+<a href="#SIC_INNER_SHOULD_BE_STATIC">Bug type SIC_INNER_SHOULD_BE_STATIC (click for details)</a>
+<br/>In class airlift.generator.JavaGenerator$PropertyOrder<br/>At JavaGenerator.java:[lines 458-504]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66268');">
+<td>
+<span class="priority-2">SIC</span>
+</td>
+<td>Should airlift.servlet.rest.ContentContext$Redirect be a _static_ inner class?</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66268" style="display: none;">
+<a href="#SIC_INNER_SHOULD_BE_STATIC">Bug type SIC_INNER_SHOULD_BE_STATIC (click for details)</a>
+<br/>In class airlift.servlet.rest.ContentContext$Redirect<br/>At ContentContext.java:[lines 59-62]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65592');">
+<td>
+<span class="priority-2">WMI</span>
+</td>
+<td>Method airlift.MessageManager.add(Map) makes inefficient use of keySet iterator instead of entrySet iterator</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65592" style="display: none;">
+<a href="#WMI_WRONG_MAP_ITERATOR">Bug type WMI_WRONG_MAP_ITERATOR (click for details)</a>
+<br/>In class airlift.MessageManager<br/>In method airlift.MessageManager.add(Map)<br/>At MessageManager.java:[line 92]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66562');">
+<td>
+<span class="priority-2">WMI</span>
+</td>
+<td>Method airlift.util.Browser.addHeaders(HTTPRequest, Map) makes inefficient use of keySet iterator instead of entrySet iterator</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66562" style="display: none;">
+<a href="#WMI_WRONG_MAP_ITERATOR">Bug type WMI_WRONG_MAP_ITERATOR (click for details)</a>
+<br/>In class airlift.util.Browser<br/>In method airlift.util.Browser.addHeaders(HTTPRequest, Map)<br/>At Browser.java:[line 115]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66617');">
+<td>
+<span class="priority-2">WMI</span>
+</td>
+<td>Method airlift.util.Browser.createQueryString(Map) makes inefficient use of keySet iterator instead of entrySet iterator</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66617" style="display: none;">
+<a href="#WMI_WRONG_MAP_ITERATOR">Bug type WMI_WRONG_MAP_ITERATOR (click for details)</a>
+<br/>In class airlift.util.Browser<br/>In method airlift.util.Browser.createQueryString(Map)<br/>At Browser.java:[line 97]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_SECURITY">Security Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65822');">
+<td>
+<span class="priority-1">SQL</span>
+</td>
+<td>Method airlift.generator.Compiler.spawnInterfaceClasses(String, String, String, String, String) passes a nonconstant String to an execute method on an SQL statement</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65822" style="display: none;">
+<a href="#SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE">Bug type SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE (click for details)</a>
+<br/>In class airlift.generator.Compiler<br/>In method airlift.generator.Compiler.spawnInterfaceClasses(String, String, String, String, String)<br/>At Compiler.java:[line 552]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_STYLE">Dodgy Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65751');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to types in airlift.generator.Compiler.createNewDomainObjectModel(Element, Elements)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65751" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.Compiler<br/>In method airlift.generator.Compiler.createNewDomainObjectModel(Element, Elements)<br/>Local variable named types<br/>At Compiler.java:[line 386]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65877');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to updateMethodNotSupportedStringTemplate in airlift.generator.JavaGenerator.generateDao(DomainObjectModel)</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65877" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.JavaGenerator<br/>In method airlift.generator.JavaGenerator.generateDao(DomainObjectModel)<br/>Local variable named updateMethodNotSupportedStringTemplate<br/>At JavaGenerator.java:[line 356]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65984');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to attributes in airlift.generator.SqlGenerator.generateFindByThisAttributeSql(DomainObjectModel, String)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65984" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.SqlGenerator<br/>In method airlift.generator.SqlGenerator.generateFindByThisAttributeSql(DomainObjectModel, String)<br/>Local variable named attributes<br/>At SqlGenerator.java:[line 84]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66055');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to attributes in airlift.generator.SqlGenerator.generateFindSql(DomainObjectModel)</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66055" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.SqlGenerator<br/>In method airlift.generator.SqlGenerator.generateFindSql(DomainObjectModel)<br/>Local variable named attributes<br/>At SqlGenerator.java:[line 97]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66126');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to attributes in airlift.generator.SqlGenerator.generateFindThisRangeSql(DomainObjectModel, String)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66126" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.SqlGenerator<br/>In method airlift.generator.SqlGenerator.generateFindThisRangeSql(DomainObjectModel, String)<br/>Local variable named attributes<br/>At SqlGenerator.java:[line 70]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66197');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to attributes in airlift.generator.SqlGenerator.generateSelectSql(DomainObjectModel)</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66197" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.generator.SqlGenerator<br/>In method airlift.generator.SqlGenerator.generateSelectSql(DomainObjectModel)<br/>Local variable named attributes<br/>At SqlGenerator.java:[line 59]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66414');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to user in airlift.servlet.rest.RestfulCachingContext.get(AppProfile, HttpServletRequest)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66414" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.servlet.rest.RestfulCachingContext<br/>In method airlift.servlet.rest.RestfulCachingContext.get(AppProfile, HttpServletRequest)<br/>Local variable named user<br/>At RestfulCachingContext.java:[line 67]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66488');">
+<td>
+<span class="priority-2">DLS</span>
+</td>
+<td>Dead store to user in airlift.servlet.rest.RestfulSecurityContext.allowed(AppProfile, HttpServletRequest)</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66488" style="display: none;">
+<a href="#DLS_DEAD_LOCAL_STORE">Bug type DLS_DEAD_LOCAL_STORE (click for details)</a>
+<br/>In class airlift.servlet.rest.RestfulSecurityContext<br/>In method airlift.servlet.rest.RestfulSecurityContext.allowed(AppProfile, HttpServletRequest)<br/>Local variable named user<br/>At RestfulSecurityContext.java:[line 32]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66782');">
+<td>
+<span class="priority-2">RCN</span>
+</td>
+<td>Redundant nullcheck of inputStream which is known to be null in airlift.util.JavascriptingUtil.findScript(String)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66782" style="display: none;">
+<a href="#RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE">Bug type RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE (click for details)</a>
+<br/>In class airlift.util.JavascriptingUtil<br/>In method airlift.util.JavascriptingUtil.findScript(String)<br/>Value loaded from inputStream<br/>Redundant null check at JavascriptingUtil.java:[line 92]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67087');">
+<td>
+<span class="priority-2">ST</span>
+</td>
+<td>Write to static field airlift.util.PropertyUtil.propertiesMap from instance method new airlift.util.PropertyUtil()</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67087" style="display: none;">
+<a href="#ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">Bug type ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD (click for details)</a>
+<br/>In class airlift.util.PropertyUtil<br/>In method new airlift.util.PropertyUtil()<br/>Field airlift.util.PropertyUtil.propertiesMap<br/>At PropertyUtil.java:[line 29]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67157');">
+<td>
+<span class="priority-2">ST</span>
+</td>
+<td>Write to static field airlift.util.PropertyUtil.resourceMap from instance method new airlift.util.PropertyUtil()</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67157" style="display: none;">
+<a href="#ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">Bug type ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD (click for details)</a>
+<br/>In class airlift.util.PropertyUtil<br/>In method new airlift.util.PropertyUtil()<br/>Field airlift.util.PropertyUtil.resourceMap<br/>At PropertyUtil.java:[line 30]</p>
+</td>
+</tr>
+</table>
+<h1>
+<a name="Details">Details</a>
+</h1>
+<h2>
+<a name="DE_MIGHT_IGNORE">DE_MIGHT_IGNORE: Method might ignore exception</a>
+</h2>
+
+  <p> This method might ignore an exception.&nbsp; In general, exceptions
+  should be handled or reported in some way, or they should be thrown
+  out of the method.</p>
+
+    
+<h2>
+<a name="DLS_DEAD_LOCAL_STORE">DLS_DEAD_LOCAL_STORE: Dead store to local variable</a>
+</h2>
+
+<p>
+This instruction assigns a value to a local variable,
+but the value is not read or used in any subsequent instruction.
+Often, this indicates an error, because the value computed is never
+used.
+</p>
+<p>
+Note that Sun's javac compiler often generates dead stores for
+final local variables.  Because FindBugs is a bytecode-based tool,
+there is no easy way to eliminate these false positives.
+</p>
+
+    
+<h2>
+<a name="GC_UNRELATED_TYPES">GC_UNRELATED_TYPES: No relationship between generic parameter and method argument</a>
+</h2>
+     
+     <p> This call to a generic collection method contains an argument
+     with an incompatible class from that of the collection's parameter
+	(i.e., the type of the argument is neither a supertype nor a subtype 
+		of the corresponding generic type argument).
+     Therefore, it is unlikely that the collection contains any objects 
+	that are equal to the method argument used here.
+	Most likely, the wrong value is being passed to the method.</p>
+	<p>In general, instances of two unrelated classes are not equal. 
+	For example, if the <code>Foo</code> and <code>Bar</code> classes
+	are not related by subtyping, then an instance of <code>Foo</code>
+		should not be equal to an instance of <code>Bar</code>.
+	Among other issues, doing so will likely result in an equals method
+	that is not symmetrical. For example, if you define the <code>Foo</code> class
+	so that a <code>Foo</code> can be equal to a <code>String</code>,
+	your equals method isn't symmetrical since a <code>String</code> can only be equal
+	to a <code>String</code>.
+	</p>
+	<p>In rare cases, people do define nonsymmetrical equals methods and still manage to make 
+	their code work. Although none of the APIs document or guarantee it, it is typically
+	the case that if you check if a <code>Collection&lt;String&gt;</code> contains
+	a <code>Foo</code>, the equals method of argument (e.g., the equals method of the 
+	<code>Foo</code> class) used to perform the equality checks.
+	</p>
+     
+    
+<h2>
+<a name="NP_BOOLEAN_RETURN_NULL">NP_BOOLEAN_RETURN_NULL: Method with Boolean return type returns explicit null</a>
+</h2>
+  	 
+  	 <p>
+	A method that returns either Boolean.TRUE, Boolean.FALSE or null is an accident waiting to happen.
+	This method can be invoked as though it returned a value of type boolean, and
+	the compiler will insert automatic unboxing of the Boolean value. If a null value is returned,
+	this will result in a NullPointerException.
+  	 </p>
+  	 
+  	 
+<h2>
+<a name="OBL_UNSATISFIED_OBLIGATION">OBL_UNSATISFIED_OBLIGATION: Method may fail to clean up stream or resource</a>
+</h2>
+		  
+		  <p>
+		  This method may fail to clean up (close, dispose of) a stream,
+		  database object, or other
+		  resource requiring an explicit cleanup operation.
+		  </p>
+		  
+		  <p>
+		  In general, if a method opens a stream or other resource,
+		  the method should use a try/finally block to ensure that
+		  the stream or resource is cleaned up before the method
+		  returns.
+		  </p>
+		  
+		  <p>
+		  This bug pattern is essentially the same as the
+		  OS_OPEN_STREAM and ODR_OPEN_DATABASE_RESOURCE
+		  bug patterns, but is based on a different
+		  (and hopefully better) static analysis technique.
+		  We are interested is getting feedback about the
+		  usefulness of this bug pattern.
+		  To send feedback, either:
+		  </p>
+		  <ul>
+			<li>send email to findbugs@cs.umd.edu</li>
+			<li>file a bug report: <a href="http://findbugs.sourceforge.net/reportingBugs.html">http://findbugs.sourceforge.net/reportingBugs.html</a></li>
+		  </ul>
+		  
+		  <p>
+		  In particular,
+		  the false-positive suppression heuristics for this
+		  bug pattern have not been extensively tuned, so
+		  reports about false positives are helpful to us.
+		  </p>
+		  
+		  <p>
+		  See Weimer and Necula, <i>Finding and Preventing Run-Time Error Handling Mistakes</i>, for
+		  a description of the analysis technique.
+		  </p>
+		  
+	  
+<h2>
+<a name="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE">RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE: Redundant nullcheck of value known to be null</a>
+</h2>
+
+<p> This method contains a redundant check of a known null value against
+the constant null.</p>
+
+    
+<h2>
+<a name="SIC_INNER_SHOULD_BE_STATIC">SIC_INNER_SHOULD_BE_STATIC: Should be a static inner class</a>
+</h2>
+
+  <p> This class is an inner class, but does not use its embedded reference
+  to the object which created it.&nbsp; This reference makes the instances
+  of the class larger, and may keep the reference to the creator object
+  alive longer than necessary.&nbsp; If possible, the class should be
+   made static.
+</p>
+
+    
+<h2>
+<a name="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE">SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE: Nonconstant string passed to execute method on an SQL statement</a>
+</h2>
+
+  <p>The method invokes the execute method on an SQL statement with a String that seems
+to be dynamically generated. Consider using
+a prepared statement instead. It is more efficient and less vulnerable to
+SQL injection attacks.
+</p>
+
+    
+<h2>
+<a name="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD: Write to static field from instance method</a>
+</h2>
+
+  <p> This instance method writes to a static field. This is tricky to get
+correct if multiple instances are being manipulated,
+and generally bad practice.
+</p>
+
+    
+<h2>
+<a name="WMI_WRONG_MAP_ITERATOR">WMI_WRONG_MAP_ITERATOR: Inefficient use of keySet iterator instead of entrySet iterator</a>
+</h2>
+
+<p> This method accesses the value of a Map entry, using a key that was retrieved from
+a keySet iterator. It is more efficient to use an iterator on the entrySet of the map, to avoid the
+Map.get(key) lookup.</p>
+
+        </body>
+</html>

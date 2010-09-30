@@ -1,0 +1,44 @@
+<project name="quality-build" default="findbugs" basedir=".">
+
+	<description>Quality Build File</description>
+  
+	<import file="build.xml"/>
+	
+	<property file="quality.properties" />
+	
+  	<property name="quality.lib" location="quality-lib"/>
+  
+	
+	
+    <!-- =================================================================== -->
+    <!-- Find Bugs - Static Code Analysis                                    -->
+    <!-- =================================================================== -->
+
+    <path id="findbugs.class.path">
+        <fileset dir="${quality.lib}/findbugs"/>
+    </path>
+
+    <property name="findbugs.class.path" refId="findbugs.class.path"/>
+    <target name="findbugs" depends="jar" description="Findbugs Static Code Analysis">
+        <taskdef name="findbugs" classpathref="findbugs.class.path" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+        <findbugs classpath="${findbugs.class.path}" output="xml" outputFile="${findbugs.results.file}"
+                pluginList="${findbugs.plugin}">
+            <auxClasspath path="${build.class.path}" />
+            <sourcePath path="${src.java}" />
+            <sourcePath path="${src.test}" />
+            <class location="${dist}/lib"/>
+        </findbugs>
+    </target>  
+    
+    <target name="findbugs-html" depends="jar" description="Findbugs Static Code Analysis">
+        <taskdef name="findbugs" classpathref="findbugs.class.path" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+        <findbugs classpath="${findbugs.class.path}" output="html" outputFile="${findbugs.results.htmlfile}"
+                pluginList="${findbugs.plugin}">
+            <auxClasspath path="${build.class.path}" />
+            <sourcePath path="${src.java}" />
+            <sourcePath path="${src.test}" />
+            <class location="${dist}/lib"/>
+        </findbugs>
+    </target>  
+    
+</project>
