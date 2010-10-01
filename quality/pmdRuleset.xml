@@ -24,6 +24,7 @@
         <rule ref="rulesets/clone.xml" />
         <rule ref="rulesets/junit.xml" />
         <rule ref="rulesets/braces.xml" />
+		<rule ref="rulesets/j2ee.xml"/>
 
         <!-- Customized Rulesets -->
         <rule ref="rulesets/controversial.xml">
