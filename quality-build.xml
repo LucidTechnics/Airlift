@@ -11,7 +11,7 @@
  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  specific language governing permissions and limitations under the License.
 -->
-<project name="quality-build" default="findbugs" basedir=".">
+<project name="quality-build" default="quality-control" basedir=".">
 
 	<description>Quality Build File</description>
   
@@ -21,7 +21,10 @@
 	
   	<property name="quality.lib" location="quality-lib"/>
   
-	
+    <!-- =================================================================== -->
+    <!-- Quality Control All Target for Continuous Integration Sever         -->
+    <!-- =================================================================== -->
+    <target name="quality-control" depends="findbugs, pmd, cpd, checkstyle"/>
 	
     <!-- =================================================================== -->
     <!-- Find Bugs - Static Code Analysis                                    -->
@@ -90,6 +93,27 @@
         </cpd>
         <xslt in="${cpd.report.xml}" style="${cpd.xslt}" out="${cpd.report.html}"/>
     </target>
+    
+    <!-- =================================================================== -->
+    <!-- Checkstyle - Checks Coding Standards                                -->
+    <!-- =================================================================== -->
+    
+    <path id="checkstyle.class.path">
+	  <fileset dir="${quality.lib}/checkstyle"/>
+    </path>
+    <target name="checkstyle" depends="compile"
+            description="Generates a report of code convention violations.">
+        <taskdef resource="checkstyletask.properties" classpathref="checkstyle.class.path"/>
+        <checkstyle config="${checkstyle.checks.file}" failureProperty="checkstyle.failure" failOnViolation="false">
+            <formatter type="xml" tofile="${checkstyle.report.xml}"/>
+            <fileset dir="${src.java}" includes="**/*.java"/>
+            <fileset dir="${src.test}" includes="**/*.java"/>
+        </checkstyle>
+
+        <xslt in="${checkstyle.report.xml}" out="${checkstyle.report.html}" style="${checkstyle.xsl.file}"/>
+
+    </target>
+    
     
     
 </project>

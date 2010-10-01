@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pmd version="4.2.5" timestamp="2010-10-01T00:26:24.120">
+<pmd version="4.2.5" timestamp="2010-10-01T17:00:56.058">
 <file name="airlift/ErrorImpl.java">
 <violation beginline="23" endline="27" begincolumn="16" endcolumn="9" rule="CallSuperInConstructor" ruleset="Controversial Rules" package="airlift" class="ErrorImpl" externalInfoUrl="http://pmd.sourceforge.net/rules/controversial.html#CallSuperInConstructor" priority="3">
 It is a good practice to call super() in a constructor
