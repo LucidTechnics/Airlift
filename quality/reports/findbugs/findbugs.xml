@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BugCollection version="1.3.9" sequence="0" timestamp="1285907039865" analysisTimestamp="1285907041391" release="">
+  <Project projectName="">
+    <Jar>/Users/dyhodge/projects/airlift/dist/lib</Jar>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/antlr/antlr-2.7.7.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/antlr/antlr-3.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/antlr/antlr-runtime-3.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/antlr/stringtemplate-3.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/appengine/appengine-api-1.0-sdk-1.3.4.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/appengine/jdo2-api-2.3-eb.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-beanutils-1.8.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-codec-1.3.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-dbcp-1.2.2.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-dbutils-1.1.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-lang-2.4.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/commons/commons-pool-1.4.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/gson/gson-1.3.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/jcache/jsr107cache-1.1.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/jdom/jdom.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/rhino/rhino1_7R1/js.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/rome/rome-1.0RC1.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/runtime-lib/uuid/uuid-3.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/build-only-lib/junit3.8.1/junit.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/dyhodge/projects/airlift/build-only-lib/servlet-api/servlet-api.jar</AuxClasspathEntry>
+    <SrcDir>/Users/dyhodge/projects/airlift/src/java</SrcDir>
+    <SrcDir>/Users/dyhodge/projects/airlift/src/test</SrcDir>
+  </Project>
+  <BugInstance type="WMI_WRONG_MAP_ITERATOR" priority="2" abbrev="WMI" category="PERFORMANCE">
+    <Class classname="airlift.MessageManager">
+      <SourceLine classname="airlift.MessageManager" start="22" end="150" sourcefile="MessageManager.java" sourcepath="airlift/MessageManager.java"/>
+    </Class>
+    <Method classname="airlift.MessageManager" name="add" signature="(Ljava/util/Map;)V" isStatic="false">
+      <SourceLine classname="airlift.MessageManager" start="81" end="95" startBytecode="0" endBytecode="286" sourcefile="MessageManager.java" sourcepath="airlift/MessageManager.java"/>
+    </Method>
+    <SourceLine classname="airlift.MessageManager" start="92" end="92" startBytecode="93" endBytecode="93" sourcefile="MessageManager.java" sourcepath="airlift/MessageManager.java"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="airlift.domain.DomainConfiguration$FieldEntry">
+      <SourceLine classname="airlift.domain.DomainConfiguration$FieldEntry" start="143" end="182" sourcefile="DomainConfiguration.java" sourcepath="airlift/domain/DomainConfiguration.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="DE_MIGHT_IGNORE" priority="1" abbrev="DE" category="BAD_PRACTICE">
+    <Class classname="airlift.generator.Compiler">
+      <SourceLine classname="airlift.generator.Compiler" start="54" end="791" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Class>
+    <Method classname="airlift.generator.Compiler" name="spawnInterfaceClasses" signature="(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="airlift.generator.Compiler" start="509" end="627" startBytecode="0" endBytecode="1678" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Method>
+    <Class classname="java.lang.Exception" role="CLASS_EXCEPTION">
+      <SourceLine classname="java.lang.Exception" start="29" end="78" sourcefile="Exception.java" sourcepath="java/lang/Exception.java"/>
+    </Class>
+    <SourceLine classname="airlift.generator.Compiler" start="622" end="622" startBytecode="832" endBytecode="832" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.Compiler">
+      <SourceLine classname="airlift.generator.Compiler" start="54" end="791" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Class>
+    <Method classname="airlift.generator.Compiler" name="createNewDomainObjectModel" signature="(Ljavax/lang/model/element/Element;Ljavax/lang/model/util/Elements;)Lairlift/generator/DomainObjectModel;" isStatic="false">
+      <SourceLine classname="airlift.generator.Compiler" start="393" end="410" startBytecode="0" endBytecode="66" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Method>
+    <LocalVariable name="types" register="4" pc="106" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.Compiler" start="401" end="401" startBytecode="104" endBytecode="104" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="types"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" priority="1" abbrev="SQL" category="SECURITY">
+    <Class classname="airlift.generator.Compiler">
+      <SourceLine classname="airlift.generator.Compiler" start="54" end="791" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Class>
+    <Method classname="airlift.generator.Compiler" name="spawnInterfaceClasses" signature="(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="airlift.generator.Compiler" start="509" end="627" startBytecode="0" endBytecode="375" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+    </Method>
+    <SourceLine classname="airlift.generator.Compiler" start="567" end="567" startBytecode="285" endBytecode="285" sourcefile="Compiler.java" sourcepath="airlift/generator/Compiler.java"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.JavaGenerator">
+      <SourceLine classname="airlift.generator.JavaGenerator" start="24" end="627" sourcefile="JavaGenerator.java" sourcepath="airlift/generator/JavaGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.JavaGenerator" name="generateDao" signature="(Lairlift/generator/DomainObjectModel;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.JavaGenerator" start="531" end="624" startBytecode="0" endBytecode="313" sourcefile="JavaGenerator.java" sourcepath="airlift/generator/JavaGenerator.java"/>
+    </Method>
+    <LocalVariable name="updateMethodNotSupportedStringTemplate" register="6" pc="51" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.JavaGenerator" start="536" end="536" startBytecode="49" endBytecode="49" sourcefile="JavaGenerator.java" sourcepath="airlift/generator/JavaGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="updateMethodNotSupportedStringTemplate"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="airlift.generator.JavaGenerator$PropertyOrder">
+      <SourceLine classname="airlift.generator.JavaGenerator$PropertyOrder" start="627" end="673" sourcefile="JavaGenerator.java" sourcepath="airlift/generator/JavaGenerator.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.JavaScriptGenerator">
+      <SourceLine classname="airlift.generator.JavaScriptGenerator" start="24" end="372" sourcefile="JavaScriptGenerator.java" sourcepath="airlift/generator/JavaScriptGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.JavaScriptGenerator" name="generateDao" signature="(Lairlift/generator/DomainObjectModel;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.JavaScriptGenerator" start="50" end="147" startBytecode="0" endBytecode="342" sourcefile="JavaScriptGenerator.java" sourcepath="airlift/generator/JavaScriptGenerator.java"/>
+    </Method>
+    <LocalVariable name="updateMethodNotSupportedStringTemplate" register="7" pc="57" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.JavaScriptGenerator" start="56" end="56" startBytecode="55" endBytecode="55" sourcefile="JavaScriptGenerator.java" sourcepath="airlift/generator/JavaScriptGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="updateMethodNotSupportedStringTemplate"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.SqlGenerator">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="27" end="107" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.SqlGenerator" name="generateFindByThisAttributeSql" signature="(Lairlift/generator/DomainObjectModel;Ljava/lang/String;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="82" end="90" startBytecode="0" endBytecode="21" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Method>
+    <LocalVariable name="attributes" register="4" pc="16" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.SqlGenerator" start="84" end="84" startBytecode="14" endBytecode="14" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="attributes"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.SqlGenerator">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="27" end="107" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.SqlGenerator" name="generateFindSql" signature="(Lairlift/generator/DomainObjectModel;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="95" end="102" startBytecode="0" endBytecode="17" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Method>
+    <LocalVariable name="attributes" register="3" pc="15" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.SqlGenerator" start="97" end="97" startBytecode="14" endBytecode="14" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="attributes"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.SqlGenerator">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="27" end="107" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.SqlGenerator" name="generateFindThisRangeSql" signature="(Lairlift/generator/DomainObjectModel;Ljava/lang/String;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="70" end="77" startBytecode="0" endBytecode="21" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Method>
+    <LocalVariable name="attributes" register="4" pc="16" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.SqlGenerator" start="71" end="71" startBytecode="14" endBytecode="14" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="attributes"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.generator.SqlGenerator">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="27" end="107" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Class>
+    <Method classname="airlift.generator.SqlGenerator" name="generateSelectSql" signature="(Lairlift/generator/DomainObjectModel;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.generator.SqlGenerator" start="58" end="65" startBytecode="0" endBytecode="17" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    </Method>
+    <LocalVariable name="attributes" register="3" pc="15" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.generator.SqlGenerator" start="60" end="60" startBytecode="14" endBytecode="14" sourcefile="SqlGenerator.java" sourcepath="airlift/generator/SqlGenerator.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="attributes"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="airlift.servlet.rest.AirliftUser">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" start="24" end="45" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Class>
+    <Method classname="airlift.servlet.rest.AirliftUser" name="getCreateDate" signature="()Ljava/util/Date;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" start="38" end="38" startBytecode="0" endBytecode="46" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Method>
+    <Field classname="airlift.servlet.rest.AirliftUser" name="createDate" signature="Ljava/util/Date;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Field>
+    <SourceLine classname="airlift.servlet.rest.AirliftUser" start="38" end="38" startBytecode="4" endBytecode="4" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP2" priority="2" abbrev="EI2" category="MALICIOUS_CODE">
+    <Class classname="airlift.servlet.rest.AirliftUser">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" start="24" end="45" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Class>
+    <Method classname="airlift.servlet.rest.AirliftUser" name="setCreateDate" signature="(Ljava/util/Date;)V" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" start="45" end="45" startBytecode="0" endBytecode="57" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Method>
+    <Field classname="airlift.servlet.rest.AirliftUser" name="createDate" signature="Ljava/util/Date;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.AirliftUser" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+    </Field>
+    <LocalVariable name="_createDate" register="1" pc="2" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.servlet.rest.AirliftUser" start="45" end="45" startBytecode="2" endBytecode="2" sourcefile="AirliftUser.java" sourcepath="airlift/servlet/rest/AirliftUser.java"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="airlift.servlet.rest.ContentContext$Redirect">
+      <SourceLine classname="airlift.servlet.rest.ContentContext$Redirect" start="59" end="62" sourcefile="ContentContext.java" sourcepath="airlift/servlet/rest/ContentContext.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="GC_UNRELATED_TYPES" priority="1" abbrev="GC" category="CORRECTNESS">
+    <Class classname="airlift.servlet.rest.RestContext">
+      <SourceLine classname="airlift.servlet.rest.RestContext" start="28" end="199" sourcefile="RestContext.java" sourcepath="airlift/servlet/rest/RestContext.java"/>
+    </Class>
+    <Method classname="airlift.servlet.rest.RestContext" name="getOtherDomainIds" signature="()Ljava/util/List;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.RestContext" start="126" end="131" startBytecode="0" endBytecode="17" sourcefile="RestContext.java" sourcepath="airlift/servlet/rest/RestContext.java"/>
+    </Method>
+    <Type descriptor="Ljava/util/List;" role="TYPE_FOUND">
+      <SourceLine classname="java.util.List" sourcefile="List.java" sourcepath="java/util/List.java"/>
+    </Type>
+    <Type descriptor="Ljava/lang/String;" role="TYPE_EXPECTED">
+      <SourceLine classname="java.lang.String" start="92" end="2973" sourcefile="String.java" sourcepath="java/lang/String.java"/>
+    </Type>
+    <Method classname="java.util.List" name="remove" signature="(Ljava/lang/Object;)Z" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.util.List" sourcefile="List.java" sourcepath="java/util/List.java"/>
+    </Method>
+    <LocalVariable name="otherIds" register="1" pc="28" role="LOCAL_VARIABLE_INVOKED_ON"/>
+    <Method classname="java.util.List" name="equals" signature="(Ljava/lang/Object;)Z" isStatic="false" role="METHOD_EQUALS_USED">
+      <SourceLine classname="java.util.List" sourcefile="List.java" sourcepath="java/util/List.java"/>
+    </Method>
+    <SourceLine classname="airlift.servlet.rest.RestContext" start="129" end="129" startBytecode="31" endBytecode="31" sourcefile="RestContext.java" sourcepath="airlift/servlet/rest/RestContext.java"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="airlift.servlet.rest.RestServlet">
+      <SourceLine classname="airlift.servlet.rest.RestServlet" start="33" end="578" sourcefile="RestServlet.java" sourcepath="airlift/servlet/rest/RestServlet.java"/>
+    </Class>
+    <Method classname="airlift.servlet.rest.RestServlet" name="isCacheable" signature="(Ljavax/servlet/http/HttpServletRequest;Ljava/lang/String;)Lairlift/CachingContext;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.RestServlet" start="298" end="324" startBytecode="0" endBytecode="57" sourcefile="RestServlet.java" sourcepath="airlift/servlet/rest/RestServlet.java"/>
+    </Method>
+    <LocalVariable name="rootPackageName" register="4" pc="15" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="airlift.servlet.rest.RestServlet" start="299" end="299" startBytecode="13" endBytecode="13" sourcefile="RestServlet.java" sourcepath="airlift/servlet/rest/RestServlet.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.BASE_VALUE" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="rootPackageName"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+  </BugInstance>
+  <BugInstance type="MS_PKGPROTECT" priority="2" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="airlift.servlet.rest.RestServlet">
+      <SourceLine classname="airlift.servlet.rest.RestServlet" start="33" end="578" sourcefile="RestServlet.java" sourcepath="airlift/servlet/rest/RestServlet.java"/>
+    </Class>
+    <Field classname="airlift.servlet.rest.RestServlet" name="appProfile" signature="Lairlift/AppProfile;" isStatic="true">
+      <SourceLine classname="airlift.servlet.rest.RestServlet" sourcefile="RestServlet.java" sourcepath="airlift/servlet/rest/RestServlet.java"/>
+    </Field>
+  </BugInstance>
+  <BugInstance type="UR_UNINIT_READ" priority="1" abbrev="UR" category="CORRECTNESS">
+    <Class classname="airlift.servlet.rest.RestfulCachingContext">
+      <SourceLine classname="airlift.servlet.rest.RestfulCachingContext" start="24" end="102" sourcefile="RestfulCachingContext.java" sourcepath="airlift/servlet/rest/RestfulCachingContext.java"/>
+    </Class>
+    <Method classname="airlift.servlet.rest.RestfulCachingContext" name="&lt;init&gt;" signature="(Ljava/lang/String;ZIZ)V" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.RestfulCachingContext" start="42" end="54" startBytecode="0" endBytecode="203" sourcefile="RestfulCachingContext.java" sourcepath="airlift/servlet/rest/RestfulCachingContext.java"/>
+    </Method>
+    <Field classname="airlift.servlet.rest.RestfulCachingContext" name="domainName" signature="Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.servlet.rest.RestfulCachingContext" sourcefile="RestfulCachingContext.java" sourcepath="airlift/servlet/rest/RestfulCachingContext.java"/>
+    </Field>
+    <LocalVariable name="_domainName" register="1" pc="0" role="LOCAL_VARIABLE_DID_YOU_MEAN"/>
+    <SourceLine classname="airlift.servlet.rest.RestfulCachingContext" start="45" end="45" startBytecode="6" endBytecode="6" sourcefile="RestfulCachingContext.java" sourcepath="airlift/servlet/rest/RestfulCachingContext.java"/>
+  </BugInstance>
+  <BugInstance type="WMI_WRONG_MAP_ITERATOR" priority="2" abbrev="WMI" category="PERFORMANCE">
+    <Class classname="airlift.util.Browser">
+      <SourceLine classname="airlift.util.Browser" start="14" end="238" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+    </Class>
+    <Method classname="airlift.util.Browser" name="addHeaders" signature="(Lcom/google/appengine/api/urlfetch/HTTPRequest;Ljava/util/Map;)V" isStatic="false">
+      <SourceLine classname="airlift.util.Browser" start="110" end="117" startBytecode="0" endBytecode="192" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+    </Method>
+    <SourceLine classname="airlift.util.Browser" start="114" end="114" startBytecode="46" endBytecode="46" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+  </BugInstance>
+  <BugInstance type="WMI_WRONG_MAP_ITERATOR" priority="2" abbrev="WMI" category="PERFORMANCE">
+    <Class classname="airlift.util.Browser">
+      <SourceLine classname="airlift.util.Browser" start="14" end="238" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+    </Class>
+    <Method classname="airlift.util.Browser" name="createQueryString" signature="(Ljava/util/Map;)Ljava/lang/String;" isStatic="false">
+      <SourceLine classname="airlift.util.Browser" start="85" end="105" startBytecode="0" endBytecode="370" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+    </Method>
+    <SourceLine classname="airlift.util.Browser" start="96" end="96" startBytecode="91" endBytecode="91" sourcefile="Browser.java" sourcepath="airlift/util/Browser.java"/>
+  </BugInstance>
+  <BugInstance type="NP_BOOLEAN_RETURN_NULL" priority="2" abbrev="NP" category="BAD_PRACTICE">
+    <Class classname="airlift.util.DatabaseUtil">
+      <SourceLine classname="airlift.util.DatabaseUtil" start="9" end="529" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.DatabaseUtil" name="getBoolean" signature="(Ljava/sql/ResultSet;I)Ljava/lang/Boolean;" isStatic="true">
+      <SourceLine classname="airlift.util.DatabaseUtil" start="121" end="129" startBytecode="0" endBytecode="109" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+    </Method>
+    <SourceLine classname="airlift.util.DatabaseUtil" start="125" end="125" startBytecode="18" endBytecode="18" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+  </BugInstance>
+  <BugInstance type="NP_BOOLEAN_RETURN_NULL" priority="2" abbrev="NP" category="BAD_PRACTICE">
+    <Class classname="airlift.util.DatabaseUtil">
+      <SourceLine classname="airlift.util.DatabaseUtil" start="9" end="529" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.DatabaseUtil" name="getBoolean" signature="(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Boolean;" isStatic="true">
+      <SourceLine classname="airlift.util.DatabaseUtil" start="316" end="324" startBytecode="0" endBytecode="109" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+    </Method>
+    <SourceLine classname="airlift.util.DatabaseUtil" start="320" end="320" startBytecode="18" endBytecode="18" sourcefile="DatabaseUtil.java" sourcepath="airlift/util/DatabaseUtil.java"/>
+  </BugInstance>
+  <BugInstance type="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" priority="2" abbrev="RCN" category="STYLE">
+    <Class classname="airlift.util.JavascriptingUtil">
+      <SourceLine classname="airlift.util.JavascriptingUtil" start="32" end="258" sourcefile="JavascriptingUtil.java" sourcepath="airlift/util/JavascriptingUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.JavascriptingUtil" name="findScript" signature="(Ljava/lang/String;)Ljava/io/InputStream;" isStatic="false">
+      <SourceLine classname="airlift.util.JavascriptingUtil" start="83" end="113" startBytecode="0" endBytecode="302" sourcefile="JavascriptingUtil.java" sourcepath="airlift/util/JavascriptingUtil.java"/>
+    </Method>
+    <LocalVariable name="inputStream" register="2" pc="36" role="LOCAL_VARIABLE_VALUE_OF"/>
+    <SourceLine classname="airlift.util.JavascriptingUtil" start="90" end="90" startBytecode="37" endBytecode="37" sourcefile="JavascriptingUtil.java" sourcepath="airlift/util/JavascriptingUtil.java" role="SOURCE_REDUNDANT_NULL_CHECK"/>
+  </BugInstance>
+  <BugInstance type="OBL_UNSATISFIED_OBLIGATION" priority="2" abbrev="OBL" category="EXPERIMENTAL">
+    <Class classname="airlift.util.PropertyUtil">
+      <SourceLine classname="airlift.util.PropertyUtil" start="22" end="130" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.PropertyUtil" name="loadProperties" signature="(Ljava/lang/String;Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="airlift.util.PropertyUtil" start="62" end="81" startBytecode="0" endBytecode="283" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Method>
+    <Class classname="java.io.InputStream" role="CLASS_REFTYPE">
+      <SourceLine classname="java.io.InputStream" start="28" end="350" sourcefile="InputStream.java" sourcepath="java/io/InputStream.java"/>
+    </Class>
+    <Int value="1" role="INT_OBLIGATIONS_REMAINING"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="65" end="65" startBytecode="32" endBytecode="32" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_OBLIGATION_CREATED"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="66" end="66" startBytecode="38" endBytecode="38" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="67" end="67" startBytecode="51" endBytecode="51" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="69" end="69" startBytecode="64" endBytecode="64" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="80" end="80" startBytecode="101" endBytecode="101" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="81" end="81" startBytecode="133" endBytecode="133" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <String value="{InputStream x 1}" role="STRING_REMAINING_OBLIGATIONS"/>
+  </BugInstance>
+  <BugInstance type="OBL_UNSATISFIED_OBLIGATION" priority="2" abbrev="OBL" category="EXPERIMENTAL">
+    <Class classname="airlift.util.PropertyUtil">
+      <SourceLine classname="airlift.util.PropertyUtil" start="22" end="130" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.PropertyUtil" name="reloadProperties" signature="(Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="airlift.util.PropertyUtil" start="107" end="119" startBytecode="0" endBytecode="230" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Method>
+    <Class classname="java.io.InputStream" role="CLASS_REFTYPE">
+      <SourceLine classname="java.io.InputStream" start="28" end="350" sourcefile="InputStream.java" sourcepath="java/io/InputStream.java"/>
+    </Class>
+    <Int value="1" role="INT_OBLIGATIONS_REMAINING"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="113" end="113" startBytecode="54" endBytecode="54" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_OBLIGATION_CREATED"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="118" end="118" startBytecode="60" endBytecode="60" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <SourceLine classname="airlift.util.PropertyUtil" start="119" end="119" startBytecode="73" endBytecode="73" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java" role="SOURCE_LINE_PATH_CONTINUES"/>
+    <String value="{InputStream x 1}" role="STRING_REMAINING_OBLIGATIONS"/>
+  </BugInstance>
+  <BugInstance type="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" priority="2" abbrev="ST" category="STYLE">
+    <Class classname="airlift.util.PropertyUtil">
+      <SourceLine classname="airlift.util.PropertyUtil" start="22" end="130" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.PropertyUtil" name="&lt;init&gt;" signature="()V" isStatic="false">
+      <SourceLine classname="airlift.util.PropertyUtil" start="27" end="30" startBytecode="0" endBytecode="82" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Method>
+    <Field classname="airlift.util.PropertyUtil" name="propertiesMap" signature="Ljava/util/Map;" isStatic="true">
+      <SourceLine classname="airlift.util.PropertyUtil" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Field>
+    <SourceLine classname="airlift.util.PropertyUtil" start="28" end="28" startBytecode="13" endBytecode="13" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+  </BugInstance>
+  <BugInstance type="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" priority="2" abbrev="ST" category="STYLE">
+    <Class classname="airlift.util.PropertyUtil">
+      <SourceLine classname="airlift.util.PropertyUtil" start="22" end="130" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Class>
+    <Method classname="airlift.util.PropertyUtil" name="&lt;init&gt;" signature="()V" isStatic="false">
+      <SourceLine classname="airlift.util.PropertyUtil" start="27" end="30" startBytecode="0" endBytecode="82" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Method>
+    <Field classname="airlift.util.PropertyUtil" name="resourceMap" signature="Ljava/util/Map;" isStatic="true">
+      <SourceLine classname="airlift.util.PropertyUtil" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+    </Field>
+    <SourceLine classname="airlift.util.PropertyUtil" start="29" end="29" startBytecode="25" endBytecode="25" sourcefile="PropertyUtil.java" sourcepath="airlift/util/PropertyUtil.java"/>
+  </BugInstance>
+  <Errors errors="0" missingClasses="2">
+    <MissingClass>org.apache.commons.logging.Log</MissingClass>
+    <MissingClass>org.apache.commons.logging.LogFactory</MissingClass>
+  </Errors>
+  <FindBugsSummary timestamp="Fri, 1 Oct 2010 00:23:59 -0400" total_classes="64" referenced_classes="248" total_bugs="28" total_size="3931" num_packages="8" vm_version="16.3-b01-279" cpu_seconds="39.35" clock_seconds="24.60" peak_mbytes="148.31" alloc_mbytes="123.94" gc_seconds="3.37" priority_2="24" priority_1="4">
+    <PackageStats package="airlift" total_bugs="1" total_types="11" total_size="166" priority_2="1">
+      <ClassStats class="airlift.AbstractDomain" sourceFile="AbstractDomain.java" interface="true" size="1" bugs="0"/>
+      <ClassStats class="airlift.AppProfile" sourceFile="AppProfile.java" interface="true" size="10" bugs="0"/>
+      <ClassStats class="airlift.CachingContext" sourceFile="CachingContext.java" interface="true" size="7" bugs="0"/>
+      <ClassStats class="airlift.Clockable" sourceFile="Clockable.java" interface="true" size="17" bugs="0"/>
+      <ClassStats class="airlift.Clockable$HASH_ALGORITHM" sourceFile="Clockable.java" interface="false" size="10" bugs="0"/>
+      <ClassStats class="airlift.Error" sourceFile="Error.java" interface="true" size="1" bugs="0"/>
+      <ClassStats class="airlift.ErrorImpl" sourceFile="ErrorImpl.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="airlift.Message" sourceFile="Message.java" interface="true" size="7" bugs="0"/>
+      <ClassStats class="airlift.MessageImpl" sourceFile="MessageImpl.java" interface="false" size="32" bugs="0"/>
+      <ClassStats class="airlift.MessageManager" sourceFile="MessageManager.java" interface="false" size="67" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.SecurityContext" sourceFile="SecurityContext.java" interface="true" size="2" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.dao" total_bugs="0" total_types="1" total_size="8">
+      <ClassStats class="airlift.dao.PMF" sourceFile="PMF.java" interface="false" size="8" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.domain" total_bugs="1" total_types="3" total_size="163" priority_2="1">
+      <ClassStats class="airlift.domain.DomainConfiguration" sourceFile="DomainConfiguration.java" interface="false" size="61" bugs="0"/>
+      <ClassStats class="airlift.domain.DomainConfiguration$DomainEntry" sourceFile="DomainConfiguration.java" interface="false" size="61" bugs="0"/>
+      <ClassStats class="airlift.domain.DomainConfiguration$FieldEntry" sourceFile="DomainConfiguration.java" interface="false" size="41" bugs="1" priority_2="1"/>
+    </PackageStats>
+    <PackageStats package="airlift.generator" total_bugs="10" total_types="19" total_size="1647" priority_2="8" priority_1="2">
+      <ClassStats class="airlift.generator.Annotation" sourceFile="Annotation.java" interface="false" size="35" bugs="0"/>
+      <ClassStats class="airlift.generator.Attribute" sourceFile="Attribute.java" interface="false" size="28" bugs="0"/>
+      <ClassStats class="airlift.generator.Cacheable" sourceFile="Cacheable.java" interface="true" size="4" bugs="0"/>
+      <ClassStats class="airlift.generator.Compiler" sourceFile="Compiler.java" interface="false" size="389" bugs="3" priority_2="1" priority_1="2"/>
+      <ClassStats class="airlift.generator.Datable" sourceFile="Datable.java" interface="true" size="3" bugs="0"/>
+      <ClassStats class="airlift.generator.DomainObjectModel" sourceFile="DomainObjectModel.java" interface="false" size="177" bugs="0"/>
+      <ClassStats class="airlift.generator.Generator" sourceFile="Generator.java" interface="false" size="204" bugs="0"/>
+      <ClassStats class="airlift.generator.JavaGenerator" sourceFile="JavaGenerator.java" interface="false" size="389" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.generator.JavaGenerator$PropertyOrder" sourceFile="JavaGenerator.java" interface="false" size="25" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.generator.JavaScriptGenerator" sourceFile="JavaScriptGenerator.java" interface="false" size="208" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.generator.LuceneGenerator" sourceFile="LuceneGenerator.java" interface="false" size="58" bugs="0"/>
+      <ClassStats class="airlift.generator.Persistable" sourceFile="Persistable.java" interface="true" size="20" bugs="0"/>
+      <ClassStats class="airlift.generator.Persistable$Semantic" sourceFile="Persistable.java" interface="false" size="13" bugs="0"/>
+      <ClassStats class="airlift.generator.Presentable" sourceFile="Presentable.java" interface="true" size="14" bugs="0"/>
+      <ClassStats class="airlift.generator.Presentable$Type" sourceFile="Presentable.java" interface="false" size="14" bugs="0"/>
+      <ClassStats class="airlift.generator.Searchable" sourceFile="Searchable.java" interface="true" size="5" bugs="0"/>
+      <ClassStats class="airlift.generator.Securable" sourceFile="Securable.java" interface="true" size="10" bugs="0"/>
+      <ClassStats class="airlift.generator.SqlGenerator" sourceFile="SqlGenerator.java" interface="false" size="49" bugs="4" priority_2="4"/>
+      <ClassStats class="airlift.generator.Undoable" sourceFile="Undoable.java" interface="true" size="2" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.rest" total_bugs="0" total_types="2" total_size="161">
+      <ClassStats class="airlift.rest.Method" sourceFile="Method.java" interface="false" size="19" bugs="0"/>
+      <ClassStats class="airlift.rest.Route" sourceFile="Route.java" interface="false" size="142" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.search.lucene" total_bugs="0" total_types="1" total_size="3">
+      <ClassStats class="airlift.search.lucene.Searcher" sourceFile="Searcher.java" interface="false" size="3" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.servlet.rest" total_bugs="7" total_types="15" total_size="878" priority_2="5" priority_1="2">
+      <ClassStats class="airlift.servlet.rest.AirliftUser" sourceFile="AirliftUser.java" interface="false" size="33" bugs="2" priority_2="2"/>
+      <ClassStats class="airlift.servlet.rest.ContentContext" sourceFile="ContentContext.java" interface="false" size="26" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.ContentContext$Redirect" sourceFile="ContentContext.java" interface="false" size="9" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.servlet.rest.ErrorHandlerContext" sourceFile="ErrorHandlerContext.java" interface="false" size="47" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.HandlerContext" sourceFile="HandlerContext.java" interface="false" size="6" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.HandlerException" sourceFile="HandlerException.java" interface="false" size="26" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.HandlerException$ErrorCode" sourceFile="HandlerException.java" interface="false" size="9" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.HtmlHandlerContext" sourceFile="HtmlHandlerContext.java" interface="false" size="90" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.RestCachingFilter" sourceFile="RestCachingFilter.java" interface="false" size="36" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.RestContext" sourceFile="RestContext.java" interface="false" size="102" bugs="1" priority_1="1"/>
+      <ClassStats class="airlift.servlet.rest.RestSecurityFilter" sourceFile="RestSecurityFilter.java" interface="false" size="33" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.RestServlet" sourceFile="RestServlet.java" interface="false" size="255" bugs="2" priority_2="2"/>
+      <ClassStats class="airlift.servlet.rest.RestfulCachingContext" sourceFile="RestfulCachingContext.java" interface="false" size="57" bugs="1" priority_1="1"/>
+      <ClassStats class="airlift.servlet.rest.RestfulSecurityContext" sourceFile="RestfulSecurityContext.java" interface="false" size="115" bugs="0"/>
+      <ClassStats class="airlift.servlet.rest.SimpleContentContext" sourceFile="SimpleContentContext.java" interface="false" size="34" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="airlift.util" total_bugs="9" total_types="12" total_size="905" priority_2="9">
+      <ClassStats class="airlift.util.AirliftUtil" sourceFile="AirliftUtil.java" interface="false" size="153" bugs="0"/>
+      <ClassStats class="airlift.util.AirliftUtil$SqlDateInstanceCreator" sourceFile="AirliftUtil.java" interface="false" size="6" bugs="0"/>
+      <ClassStats class="airlift.util.AirliftUtil$SqlTimestampInstanceCreator" sourceFile="AirliftUtil.java" interface="false" size="6" bugs="0"/>
+      <ClassStats class="airlift.util.Browser" sourceFile="Browser.java" interface="false" size="100" bugs="2" priority_2="2"/>
+      <ClassStats class="airlift.util.DatabaseUtil" sourceFile="DatabaseUtil.java" interface="false" size="185" bugs="2" priority_2="2"/>
+      <ClassStats class="airlift.util.FormatUtil" sourceFile="FormatUtil.java" interface="false" size="35" bugs="0"/>
+      <ClassStats class="airlift.util.IdGenerator" sourceFile="IdGenerator.java" interface="false" size="33" bugs="0"/>
+      <ClassStats class="airlift.util.JavascriptingUtil" sourceFile="JavascriptingUtil.java" interface="false" size="121" bugs="1" priority_2="1"/>
+      <ClassStats class="airlift.util.PropertyUtil" sourceFile="PropertyUtil.java" interface="false" size="61" bugs="4" priority_2="4"/>
+      <ClassStats class="airlift.util.ScriptingUtil" sourceFile="ScriptingUtil.java" interface="false" size="57" bugs="0"/>
+      <ClassStats class="airlift.util.XMPPUtil" sourceFile="XMPPUtil.java" interface="false" size="14" bugs="0"/>
+      <ClassStats class="airlift.util.XhtmlTemplateUtil" sourceFile="XhtmlTemplateUtil.java" interface="false" size="134" bugs="0"/>
+    </PackageStats>
+    <FindBugsProfile>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.Methods" totalMilliseconds="11" invocations="248" avgMicrosecondsPerInvocation="44" maxMicrosecondsPerInvocation="1176" standardDeviationMircosecondsPerInvocation="123"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindSpinLoop" totalMilliseconds="11" invocations="64" avgMicrosecondsPerInvocation="174" maxMicrosecondsPerInvocation="6047" standardDeviationMircosecondsPerInvocation="746"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.InheritanceUnsafeGetResource" totalMilliseconds="11" invocations="64" avgMicrosecondsPerInvocation="176" maxMicrosecondsPerInvocation="4001" standardDeviationMircosecondsPerInvocation="517"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindLocalSelfAssignment2" totalMilliseconds="11" invocations="64" avgMicrosecondsPerInvocation="177" maxMicrosecondsPerInvocation="4866" standardDeviationMircosecondsPerInvocation="606"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.ReadReturnShouldBeChecked" totalMilliseconds="11" invocations="64" avgMicrosecondsPerInvocation="180" maxMicrosecondsPerInvocation="2890" standardDeviationMircosecondsPerInvocation="395"/>
+      <ClassProfile name="edu.umd.cs.findbugs.util.TopologicalSort" totalMilliseconds="11" invocations="65" avgMicrosecondsPerInvocation="178" maxMicrosecondsPerInvocation="2116" standardDeviationMircosecondsPerInvocation="281"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.AssertionMethodsFactory" totalMilliseconds="11" invocations="50" avgMicrosecondsPerInvocation="239" maxMicrosecondsPerInvocation="7996" standardDeviationMircosecondsPerInvocation="1111"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.Naming" totalMilliseconds="12" invocations="64" avgMicrosecondsPerInvocation="200" maxMicrosecondsPerInvocation="1680" standardDeviationMircosecondsPerInvocation="264"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteCheckReturnValue" totalMilliseconds="13" invocations="248" avgMicrosecondsPerInvocation="52" maxMicrosecondsPerInvocation="1874" standardDeviationMircosecondsPerInvocation="183"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteJCIPAnnotation" totalMilliseconds="13" invocations="248" avgMicrosecondsPerInvocation="54" maxMicrosecondsPerInvocation="2785" standardDeviationMircosecondsPerInvocation="191"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ConstantPoolGenFactory" totalMilliseconds="14" invocations="64" avgMicrosecondsPerInvocation="224" maxMicrosecondsPerInvocation="3619" standardDeviationMircosecondsPerInvocation="531"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindSelfComparison2" totalMilliseconds="16" invocations="64" avgMicrosecondsPerInvocation="258" maxMicrosecondsPerInvocation="3060" standardDeviationMircosecondsPerInvocation="490"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.EmptyZipFileEntry" totalMilliseconds="17" invocations="64" avgMicrosecondsPerInvocation="265" maxMicrosecondsPerInvocation="7545" standardDeviationMircosecondsPerInvocation="1019"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.SerializableIdiom" totalMilliseconds="19" invocations="64" avgMicrosecondsPerInvocation="298" maxMicrosecondsPerInvocation="5286" standardDeviationMircosecondsPerInvocation="893"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NumberConstructor" totalMilliseconds="19" invocations="64" avgMicrosecondsPerInvocation="306" maxMicrosecondsPerInvocation="2178" standardDeviationMircosecondsPerInvocation="441"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.MethodFactory" totalMilliseconds="19" invocations="229" avgMicrosecondsPerInvocation="86" maxMicrosecondsPerInvocation="7176" standardDeviationMircosecondsPerInvocation="484"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteNonNullAnnotations" totalMilliseconds="20" invocations="248" avgMicrosecondsPerInvocation="81" maxMicrosecondsPerInvocation="8277" standardDeviationMircosecondsPerInvocation="547"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FormatStringChecker" totalMilliseconds="20" invocations="64" avgMicrosecondsPerInvocation="316" maxMicrosecondsPerInvocation="1895" standardDeviationMircosecondsPerInvocation="435"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.StreamResourceTracker" totalMilliseconds="20" invocations="8" avgMicrosecondsPerInvocation="2590" maxMicrosecondsPerInvocation="7989" standardDeviationMircosecondsPerInvocation="2922"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindUnsatisfiedObligation" totalMilliseconds="20" invocations="64" avgMicrosecondsPerInvocation="326" maxMicrosecondsPerInvocation="6795" standardDeviationMircosecondsPerInvocation="977"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteSuppressedWarnings" totalMilliseconds="21" invocations="248" avgMicrosecondsPerInvocation="88" maxMicrosecondsPerInvocation="4833" standardDeviationMircosecondsPerInvocation="369"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindRunInvocations" totalMilliseconds="23" invocations="64" avgMicrosecondsPerInvocation="359" maxMicrosecondsPerInvocation="9870" standardDeviationMircosecondsPerInvocation="1553"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNullDerefsInvolvingNonShortCircuitEvaluation" totalMilliseconds="23" invocations="64" avgMicrosecondsPerInvocation="363" maxMicrosecondsPerInvocation="5267" standardDeviationMircosecondsPerInvocation="806"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ClassContextClassAnalysisEngine" totalMilliseconds="23" invocations="429" avgMicrosecondsPerInvocation="54" maxMicrosecondsPerInvocation="16671" standardDeviationMircosecondsPerInvocation="809"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.SynchronizeOnClassLiteralNotGetClass" totalMilliseconds="23" invocations="64" avgMicrosecondsPerInvocation="368" maxMicrosecondsPerInvocation="8547" standardDeviationMircosecondsPerInvocation="1134"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ObligationDataflowFactory" totalMilliseconds="23" invocations="159" avgMicrosecondsPerInvocation="150" maxMicrosecondsPerInvocation="10464" standardDeviationMircosecondsPerInvocation="827"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindReturnRef" totalMilliseconds="23" invocations="64" avgMicrosecondsPerInvocation="374" maxMicrosecondsPerInvocation="7419" standardDeviationMircosecondsPerInvocation="944"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.LostLoggerDueToWeakReference" totalMilliseconds="24" invocations="64" avgMicrosecondsPerInvocation="382" maxMicrosecondsPerInvocation="2270" standardDeviationMircosecondsPerInvocation="529"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteAnnotationRetention" totalMilliseconds="25" invocations="248" avgMicrosecondsPerInvocation="101" maxMicrosecondsPerInvocation="11108" standardDeviationMircosecondsPerInvocation="729"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteCheckReturnValueAnnotations" totalMilliseconds="25" invocations="248" avgMicrosecondsPerInvocation="101" maxMicrosecondsPerInvocation="10063" standardDeviationMircosecondsPerInvocation="692"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BadSyntaxForRegularExpression" totalMilliseconds="27" invocations="64" avgMicrosecondsPerInvocation="424" maxMicrosecondsPerInvocation="6526" standardDeviationMircosecondsPerInvocation="903"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.InfiniteLoop" totalMilliseconds="29" invocations="64" avgMicrosecondsPerInvocation="454" maxMicrosecondsPerInvocation="2841" standardDeviationMircosecondsPerInvocation="672"/>
+      <ClassProfile name="edu.umd.cs.findbugs.DetectorToDetector2Adapter" totalMilliseconds="30" invocations="7218" avgMicrosecondsPerInvocation="4" maxMicrosecondsPerInvocation="792" standardDeviationMircosecondsPerInvocation="14"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.RepeatedConditionals" totalMilliseconds="30" invocations="64" avgMicrosecondsPerInvocation="480" maxMicrosecondsPerInvocation="4182" standardDeviationMircosecondsPerInvocation="738"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.VolatileUsage" totalMilliseconds="32" invocations="64" avgMicrosecondsPerInvocation="503" maxMicrosecondsPerInvocation="27685" standardDeviationMircosecondsPerInvocation="3425"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.SynchronizingOnContentsOfFieldToProtectField" totalMilliseconds="32" invocations="64" avgMicrosecondsPerInvocation="505" maxMicrosecondsPerInvocation="8749" standardDeviationMircosecondsPerInvocation="1337"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.DumbMethodInvocations" totalMilliseconds="33" invocations="64" avgMicrosecondsPerInvocation="518" maxMicrosecondsPerInvocation="6108" standardDeviationMircosecondsPerInvocation="1097"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindBadCast2" totalMilliseconds="33" invocations="64" avgMicrosecondsPerInvocation="519" maxMicrosecondsPerInvocation="14515" standardDeviationMircosecondsPerInvocation="1850"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteUnconditionalParamDerefs" totalMilliseconds="35" invocations="64" avgMicrosecondsPerInvocation="557" maxMicrosecondsPerInvocation="15869" standardDeviationMircosecondsPerInvocation="2027"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindUnrelatedTypesInGenericContainer" totalMilliseconds="38" invocations="63" avgMicrosecondsPerInvocation="614" maxMicrosecondsPerInvocation="12294" standardDeviationMircosecondsPerInvocation="1748"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ReverseDepthFirstSearchFactory" totalMilliseconds="39" invocations="600" avgMicrosecondsPerInvocation="65" maxMicrosecondsPerInvocation="9580" standardDeviationMircosecondsPerInvocation="455"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BadResultSetAccess" totalMilliseconds="39" invocations="64" avgMicrosecondsPerInvocation="620" maxMicrosecondsPerInvocation="11158" standardDeviationMircosecondsPerInvocation="1532"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.DepthFirstSearchFactory" totalMilliseconds="39" invocations="697" avgMicrosecondsPerInvocation="57" maxMicrosecondsPerInvocation="9073" standardDeviationMircosecondsPerInvocation="428"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.ReadOfInstanceFieldInMethodInvokedByConstructorInSuperclass" totalMilliseconds="41" invocations="64" avgMicrosecondsPerInvocation="645" maxMicrosecondsPerInvocation="24176" standardDeviationMircosecondsPerInvocation="3006"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.SynchronizationOnSharedBuiltinConstant" totalMilliseconds="43" invocations="64" avgMicrosecondsPerInvocation="676" maxMicrosecondsPerInvocation="10700" standardDeviationMircosecondsPerInvocation="1621"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindFieldSelfAssignment" totalMilliseconds="44" invocations="64" avgMicrosecondsPerInvocation="693" maxMicrosecondsPerInvocation="19876" standardDeviationMircosecondsPerInvocation="2722"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindPuzzlers" totalMilliseconds="45" invocations="64" avgMicrosecondsPerInvocation="711" maxMicrosecondsPerInvocation="4947" standardDeviationMircosecondsPerInvocation="1092"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.AppendingToAnObjectOutputStream" totalMilliseconds="47" invocations="64" avgMicrosecondsPerInvocation="735" maxMicrosecondsPerInvocation="23015" standardDeviationMircosecondsPerInvocation="2927"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindEmptySynchronizedBlock" totalMilliseconds="54" invocations="64" avgMicrosecondsPerInvocation="855" maxMicrosecondsPerInvocation="40941" standardDeviationMircosecondsPerInvocation="5143"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteNonnullReturnValues" totalMilliseconds="57" invocations="64" avgMicrosecondsPerInvocation="894" maxMicrosecondsPerInvocation="9513" standardDeviationMircosecondsPerInvocation="1499"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindFloatEquality" totalMilliseconds="57" invocations="64" avgMicrosecondsPerInvocation="894" maxMicrosecondsPerInvocation="24062" standardDeviationMircosecondsPerInvocation="3404"/>
+      <ClassProfile name="edu.umd.cs.findbugs.NonReportingDetectorToDetector2Adapter" totalMilliseconds="58" invocations="3352" avgMicrosecondsPerInvocation="17" maxMicrosecondsPerInvocation="9799" standardDeviationMircosecondsPerInvocation="222"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.DuplicateBranches" totalMilliseconds="60" invocations="64" avgMicrosecondsPerInvocation="945" maxMicrosecondsPerInvocation="21929" standardDeviationMircosecondsPerInvocation="3136"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNullDeref" totalMilliseconds="61" invocations="64" avgMicrosecondsPerInvocation="957" maxMicrosecondsPerInvocation="16306" standardDeviationMircosecondsPerInvocation="2335"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNonShortCircuit" totalMilliseconds="61" invocations="64" avgMicrosecondsPerInvocation="963" maxMicrosecondsPerInvocation="27325" standardDeviationMircosecondsPerInvocation="3557"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.CrossSiteScripting" totalMilliseconds="62" invocations="64" avgMicrosecondsPerInvocation="972" maxMicrosecondsPerInvocation="14996" standardDeviationMircosecondsPerInvocation="2787"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.InfiniteRecursiveLoop" totalMilliseconds="64" invocations="64" avgMicrosecondsPerInvocation="1003" maxMicrosecondsPerInvocation="24055" standardDeviationMircosecondsPerInvocation="3781"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindInconsistentSync2" totalMilliseconds="75" invocations="64" avgMicrosecondsPerInvocation="1176" maxMicrosecondsPerInvocation="16169" standardDeviationMircosecondsPerInvocation="2421"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindSelfComparison" totalMilliseconds="76" invocations="64" avgMicrosecondsPerInvocation="1191" maxMicrosecondsPerInvocation="47773" standardDeviationMircosecondsPerInvocation="5907"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.MethodReturnCheck" totalMilliseconds="77" invocations="64" avgMicrosecondsPerInvocation="1204" maxMicrosecondsPerInvocation="40167" standardDeviationMircosecondsPerInvocation="5139"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.asm.ClassReaderAnalysisEngine" totalMilliseconds="86" invocations="896" avgMicrosecondsPerInvocation="96" maxMicrosecondsPerInvocation="53914" standardDeviationMircosecondsPerInvocation="1881"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindSqlInjection" totalMilliseconds="87" invocations="64" avgMicrosecondsPerInvocation="1366" maxMicrosecondsPerInvocation="29153" standardDeviationMircosecondsPerInvocation="4405"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindUncalledPrivateMethods" totalMilliseconds="87" invocations="64" avgMicrosecondsPerInvocation="1366" maxMicrosecondsPerInvocation="74977" standardDeviationMircosecondsPerInvocation="9279"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindHEmismatch" totalMilliseconds="89" invocations="64" avgMicrosecondsPerInvocation="1396" maxMicrosecondsPerInvocation="31928" standardDeviationMircosecondsPerInvocation="4366"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindDeadLocalStores" totalMilliseconds="118" invocations="64" avgMicrosecondsPerInvocation="1854" maxMicrosecondsPerInvocation="41564" standardDeviationMircosecondsPerInvocation="5586"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.SwitchFallthrough" totalMilliseconds="121" invocations="64" avgMicrosecondsPerInvocation="1899" maxMicrosecondsPerInvocation="29129" standardDeviationMircosecondsPerInvocation="5074"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.RuntimeExceptionCapture" totalMilliseconds="124" invocations="64" avgMicrosecondsPerInvocation="1941" maxMicrosecondsPerInvocation="73159" standardDeviationMircosecondsPerInvocation="9250"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindOpenStream" totalMilliseconds="124" invocations="64" avgMicrosecondsPerInvocation="1947" maxMicrosecondsPerInvocation="57671" standardDeviationMircosecondsPerInvocation="7894"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.URLProblems" totalMilliseconds="132" invocations="64" avgMicrosecondsPerInvocation="2066" maxMicrosecondsPerInvocation="20279" standardDeviationMircosecondsPerInvocation="4339"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNullDeref$CheckCallSitesAndReturnInstructions" totalMilliseconds="142" invocations="597" avgMicrosecondsPerInvocation="239" maxMicrosecondsPerInvocation="28943" standardDeviationMircosecondsPerInvocation="1505"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindBadForLoop" totalMilliseconds="153" invocations="64" avgMicrosecondsPerInvocation="2401" maxMicrosecondsPerInvocation="125853" standardDeviationMircosecondsPerInvocation="15575"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.UnreadFields" totalMilliseconds="160" invocations="64" avgMicrosecondsPerInvocation="2511" maxMicrosecondsPerInvocation="73627" standardDeviationMircosecondsPerInvocation="9403"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.ReflectiveClasses" totalMilliseconds="167" invocations="248" avgMicrosecondsPerInvocation="674" maxMicrosecondsPerInvocation="54986" standardDeviationMircosecondsPerInvocation="4057"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.EqualsOperandShouldHaveClassCompatibleWithThis" totalMilliseconds="181" invocations="248" avgMicrosecondsPerInvocation="732" maxMicrosecondsPerInvocation="21839" standardDeviationMircosecondsPerInvocation="2117"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.DumbMethods" totalMilliseconds="182" invocations="64" avgMicrosecondsPerInvocation="2851" maxMicrosecondsPerInvocation="78414" standardDeviationMircosecondsPerInvocation="10527"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.CalledMethods" totalMilliseconds="202" invocations="248" avgMicrosecondsPerInvocation="817" maxMicrosecondsPerInvocation="44430" standardDeviationMircosecondsPerInvocation="3637"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindRefComparison" totalMilliseconds="228" invocations="64" avgMicrosecondsPerInvocation="3573" maxMicrosecondsPerInvocation="103285" standardDeviationMircosecondsPerInvocation="13357"/>
+      <ClassProfile name="edu.umd.cs.findbugs.ba.npe.TypeQualifierNullnessAnnotationDatabase" totalMilliseconds="247" invocations="11516" avgMicrosecondsPerInvocation="21" maxMicrosecondsPerInvocation="56327" standardDeviationMircosecondsPerInvocation="655"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.LiveLocalStoreDataflowFactory" totalMilliseconds="259" invocations="597" avgMicrosecondsPerInvocation="434" maxMicrosecondsPerInvocation="95779" standardDeviationMircosecondsPerInvocation="4185"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.OverridingEqualsNotSymmetrical" totalMilliseconds="260" invocations="248" avgMicrosecondsPerInvocation="1050" maxMicrosecondsPerInvocation="13410" standardDeviationMircosecondsPerInvocation="2077"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.LoadOfKnownNullValue" totalMilliseconds="268" invocations="64" avgMicrosecondsPerInvocation="4200" maxMicrosecondsPerInvocation="77907" standardDeviationMircosecondsPerInvocation="11973"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BuildObligationPolicyDatabase" totalMilliseconds="334" invocations="248" avgMicrosecondsPerInvocation="1349" maxMicrosecondsPerInvocation="49521" standardDeviationMircosecondsPerInvocation="4580"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.MethodGenFactory" totalMilliseconds="380" invocations="697" avgMicrosecondsPerInvocation="546" maxMicrosecondsPerInvocation="54044" standardDeviationMircosecondsPerInvocation="2819"/>
+      <ClassProfile name="edu.umd.cs.findbugs.ba.obl.ObligationAnalysis" totalMilliseconds="444" invocations="159" avgMicrosecondsPerInvocation="2795" maxMicrosecondsPerInvocation="99642" standardDeviationMircosecondsPerInvocation="9628"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.JavaClassAnalysisEngine" totalMilliseconds="473" invocations="304" avgMicrosecondsPerInvocation="1559" maxMicrosecondsPerInvocation="220767" standardDeviationMircosecondsPerInvocation="12803"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ConstantDataflowFactory" totalMilliseconds="511" invocations="600" avgMicrosecondsPerInvocation="852" maxMicrosecondsPerInvocation="37264" standardDeviationMircosecondsPerInvocation="3588"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteDirectlyRelevantTypeQualifiers" totalMilliseconds="541" invocations="248" avgMicrosecondsPerInvocation="2184" maxMicrosecondsPerInvocation="71752" standardDeviationMircosecondsPerInvocation="6373"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.XMLFactoryBypass" totalMilliseconds="550" invocations="64" avgMicrosecondsPerInvocation="8602" maxMicrosecondsPerInvocation="543851" standardDeviationMircosecondsPerInvocation="67435"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassDataAnalysisEngine" totalMilliseconds="563" invocations="983" avgMicrosecondsPerInvocation="573" maxMicrosecondsPerInvocation="99212" standardDeviationMircosecondsPerInvocation="4345"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNonSerializableStoreIntoSession" totalMilliseconds="564" invocations="63" avgMicrosecondsPerInvocation="8967" maxMicrosecondsPerInvocation="546757" standardDeviationMircosecondsPerInvocation="68314"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassInfoAnalysisEngine" totalMilliseconds="726" invocations="981" avgMicrosecondsPerInvocation="740" maxMicrosecondsPerInvocation="59750" standardDeviationMircosecondsPerInvocation="3065"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.CFGFactory" totalMilliseconds="914" invocations="600" avgMicrosecondsPerInvocation="1524" maxMicrosecondsPerInvocation="172409" standardDeviationMircosecondsPerInvocation="9125"/>
+      <ClassProfile name="edu.umd.cs.findbugs.OpcodeStack$JumpInfoFactory" totalMilliseconds="929" invocations="4072" avgMicrosecondsPerInvocation="228" maxMicrosecondsPerInvocation="44621" standardDeviationMircosecondsPerInvocation="1329"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.TypeDataflowFactory" totalMilliseconds="945" invocations="602" avgMicrosecondsPerInvocation="1571" maxMicrosecondsPerInvocation="86966" standardDeviationMircosecondsPerInvocation="6116"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FieldItemSummary" totalMilliseconds="962" invocations="248" avgMicrosecondsPerInvocation="3882" maxMicrosecondsPerInvocation="81560" standardDeviationMircosecondsPerInvocation="10003"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindRefComparison$SpecialTypeAnalysis" totalMilliseconds="1115" invocations="430" avgMicrosecondsPerInvocation="2593" maxMicrosecondsPerInvocation="405990" standardDeviationMircosecondsPerInvocation="20098"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ValueNumberDataflowFactory" totalMilliseconds="1213" invocations="699" avgMicrosecondsPerInvocation="1735" maxMicrosecondsPerInvocation="109471" standardDeviationMircosecondsPerInvocation="7812"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.UnconditionalValueDerefDataflowFactory" totalMilliseconds="2065" invocations="600" avgMicrosecondsPerInvocation="3442" maxMicrosecondsPerInvocation="169647" standardDeviationMircosecondsPerInvocation="12671"/>
+      <ClassProfile name="edu.umd.cs.findbugs.ba.npe.NullDerefAndRedundantComparisonFinder" totalMilliseconds="2120" invocations="597" avgMicrosecondsPerInvocation="3551" maxMicrosecondsPerInvocation="437559" standardDeviationMircosecondsPerInvocation="20871"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.IsNullValueDataflowFactory" totalMilliseconds="2129" invocations="600" avgMicrosecondsPerInvocation="3548" maxMicrosecondsPerInvocation="405537" standardDeviationMircosecondsPerInvocation="19245"/>
+    </FindBugsProfile>
+  </FindBugsSummary>
+  <ClassFeatures></ClassFeatures>
+  <History></History>
+</BugCollection>
