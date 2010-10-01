@@ -14,17 +14,17 @@
 
 package airlift.util;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
 import javax.script.Bindings;
-import javax.script.SimpleBindings;
 import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
 public class ScriptingUtil

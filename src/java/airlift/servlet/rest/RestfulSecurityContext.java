@@ -14,9 +14,9 @@
 
 package airlift.servlet.rest; 
 
-import com.google.appengine.api.users.User;
-
 import java.util.logging.Logger;
+
+import com.google.appengine.api.users.User;
 
 public class RestfulSecurityContext
    implements airlift.SecurityContext

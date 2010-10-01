@@ -14,9 +14,9 @@
 
 package airlift.servlet.rest; 
 
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
 public class AirliftUser

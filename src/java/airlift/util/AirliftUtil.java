@@ -1,12 +1,14 @@
 package airlift.util;
 
-import com.google.gson.GsonBuilder;
-import airlift.rest.Route;
-import org.apache.commons.lang.StringUtils;
-import java.util.logging.Logger;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang.StringUtils;
+
+import airlift.rest.Route;
+
+import com.google.gson.GsonBuilder;
 
 public class AirliftUtil
 {

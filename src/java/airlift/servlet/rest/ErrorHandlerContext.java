@@ -14,16 +14,17 @@
 
 package airlift.servlet.rest;
 
-import airlift.domain.DomainConfiguration;
-import airlift.rest.Method;
-import airlift.util.JavascriptingUtil;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+
+import org.antlr.stringtemplate.StringTemplateGroup;
+
+import airlift.domain.DomainConfiguration;
+import airlift.util.JavascriptingUtil;
 
 public class ErrorHandlerContext
    extends HandlerContext

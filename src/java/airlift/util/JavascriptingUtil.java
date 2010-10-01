@@ -14,20 +14,18 @@
 
 package airlift.util;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.Map;
+import java.io.Reader;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import java.util.logging.Logger;
 
 public class JavascriptingUtil
 {

@@ -14,11 +14,12 @@
 
 package airlift.generator;
 
-import org.antlr.stringtemplate.StringTemplate;
-
-import javax.lang.model.element.Element;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.lang.model.element.Element;
+
+import org.antlr.stringtemplate.StringTemplate;
 
 public class SqlGenerator
    extends Generator

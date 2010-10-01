@@ -14,10 +14,9 @@
 
 package airlift.util;
 
-import org.apache.commons.lang.StringUtils;
-
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.commons.lang.StringUtils;
 
 public class XhtmlTemplateUtil
 {

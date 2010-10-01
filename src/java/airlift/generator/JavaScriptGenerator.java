@@ -14,13 +14,12 @@
 
 package airlift.generator;
 
-import org.apache.commons.lang.StringUtils;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-
 import java.util.Map;
 
 import javax.lang.model.element.Element;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.apache.commons.lang.StringUtils;
 
 public class JavaScriptGenerator
    extends Generator

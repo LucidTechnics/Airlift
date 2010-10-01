@@ -14,18 +14,12 @@
 
 package airlift.generator;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-
-import java.util.Collection;
-import java.util.Map;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.Map;
 
 import javax.lang.model.element.Element;
+
+import org.antlr.stringtemplate.StringTemplate;
 
 public class JavaGenerator
    extends Generator
