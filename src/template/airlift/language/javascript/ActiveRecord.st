@@ -143,7 +143,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	$collectByRange; separator="\n\n"$
 
-	activeRecord.addMessage = function(_name, _category, _message)
+	activeRecord.addMessage = function(_name, _message, _category)
 	{
 		var message = (airlift.isDefined(_message) === true) ? _message: "";
 		var category = (airlift.isDefined(_category) === true) ? _category: "$appName$";

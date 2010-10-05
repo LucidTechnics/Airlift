@@ -184,7 +184,7 @@ public class JavaScriptGenerator
 
 			if ("false".equals(isForeignKey) == false)
 			{
-				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "this.foreignKeySet.add(\"" + name + "\");");
+				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "activeRecord.foreignKeySet.add(\"" + name + "\");");
 				activeRecordStringTemplate.setAttribute("addForeignKeyName", "foreignKeyList.push(airlift.string(\"" + name + "\"));");
 			}
 

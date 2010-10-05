@@ -163,13 +163,32 @@ airlift.toForm = function(_config)
 
 	var processFieldSet = function(_activeRecord, _index, _array)
 	{
-		var fieldSet = airlift.toFieldSet(config, _activeRecord);
-		formTemplate.setAttribute("fieldSet", fieldSet);
+		var fieldSetArray = airlift.toFieldSet(config, _activeRecord);
+
+		for (var i = 0; i < fieldSetArray.length; i++)
+		{
+			formTemplate.setAttribute("fieldSet", fieldSetArray[i].toString());
+		}
 	}
 
 	argumentArray.forEach(processFieldSet);
 
 	return formTemplate.toString();
+}
+
+
+airlift.convertToClassName = function(_element, _index, _array)
+{
+	_array[_index] = (!_element) ? "" : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_element.toLowerCase());
+}
+
+airlift.join = function(_name, _function, _separator)
+{
+	var tokenArray = ("" + _name).split(" ");
+	var separator = (!_separator) ? "" : _separator;
+	tokenArray.forEach(_function);
+	var joinedArray = tokenArray.join(separator);
+	return (!joinedArray || "undefined".equalsIgnoreCase(joinedArray)) ? null : joinedArray;
 }
 
 airlift.toFieldSet = function(_config, _activeRecord)
@@ -196,14 +215,10 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 	if (airlift.isDefined(fieldSetName) === false) { fieldSetName = _activeRecord.retrieveDomainName(); }
 
-	var fieldSetTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFieldSetTemplate(fieldSetName, _activeRecord.retrieveDomainName());
-	fieldSetTemplate.setAttribute("fieldSetId", groupName + "_fieldSet");
+	var fieldSetArray = [];
 
 	if (domainInterfaceClass.isAnnotationPresent(Packages.java.lang.Class.forName("airlift.generator.Presentable")) === true)
 	{
-		formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.method.override", method);
-		fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
-
 		var propertyMap = _activeRecord.describe();
 		var orderedPropertyList = _activeRecord.retrieveOrderedPropertyList();
 
@@ -211,9 +226,24 @@ airlift.toFieldSet = function(_config, _activeRecord)
 		{
 			orderedPropertyList.add("clock");
 		}
+		
+		var determineCurrentGroupName = function(_activeRecord, _property)
+		{
+			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+			var method = domainInterfaceClass.getMethod(getter);
+			var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
+
+			var groupName = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.fieldSetName() : null;
+			groupName = (airlift.isDefined(groupName) === true && "".equalsIgnoreCase(groupName) === false) ? groupName : _activeRecord.retrieveDomainName();
+
+			return groupName;
+		}
 
 		var count = 0;
+		var currentGroupName, previousGroupName;
 
+		var fieldSetTemplate;
+		
 		var processProperties = function(_property, _index, _array)
 		{
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
@@ -254,6 +284,25 @@ airlift.toFieldSet = function(_config, _activeRecord)
 				{
 					LOG.info("Processing property: " + _property);
 
+					currentGroupName = determineCurrentGroupName(_activeRecord, _property);
+
+					if (currentGroupName.equalsIgnoreCase(previousGroupName) === false)
+					{
+						var fieldSetId = airlift.join(currentGroupName, airlift.convertToClassName); 
+						fieldSetTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFieldSetTemplate(currentGroupName, currentGroupName);
+						fieldSetTemplate.setAttribute("fieldSetId", fieldSetId + "_fieldSet");
+
+						if (fieldSetArray.length === 0)
+						{
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.method.override", method);
+							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
+						}
+
+						fieldSetArray.push(fieldSetTemplate);
+					}
+
+					previousGroupName = currentGroupName;
+
 					var value = (airlift.isDefined(propertyMap.get(_property)) === true) ? Packages.airlift.util.FormatUtil.format(propertyMap.get(_property)) : "";
 					var propertyDescriptor = org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
 					var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
@@ -274,7 +323,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					switch(inputType)
 					{
 						case Packages.airlift.generator.Presentable.Type.HIDDEN:
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, value);
 							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 
 							break;
@@ -282,7 +331,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						case Packages.airlift.generator.Presentable.Type.TEXT:
 
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("text", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -291,8 +340,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 							break;
 
 						case Packages.airlift.generator.Presentable.Type.PASSWORD:
-							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
-							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", groupName, value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
+							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -302,7 +351,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						case Packages.airlift.generator.Presentable.Type.TEXTAREA:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTextAreaTemplate(value, textAreaRows, textAreaColumns, _property, groupName, readOnly);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -346,7 +395,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								}
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -372,7 +421,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -395,7 +444,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 		throw {name: "Form creation error", message: "Cannot generate form for class: " + _activeRecord.createDO().getClass() + ". Class does not have airlift.generator.Presentable annotation." };
 	}
 
-	return fieldSetTemplate.toString();
+	return fieldSetArray;
 }
 
 airlift.toTable = function(_config, _collection)

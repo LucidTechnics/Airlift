@@ -152,7 +152,7 @@ public class XhtmlTemplateUtil
 		return textAreaTemplate;
 	}
 
-	public static StringTemplate createFormEntryTemplate(String _name, String _label, String _message, StringTemplate _inputTemplate, boolean _error)
+	public static StringTemplate createFormEntryTemplate(String _name, String _groupName, String _label, String _message, StringTemplate _inputTemplate, boolean _error)
 	{
 		StringTemplate formEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/FormEntryTemplate");
 
@@ -163,7 +163,8 @@ public class XhtmlTemplateUtil
 		{
 			formEntryTemplate.setAttribute("emClass", "error");
 		}
-		
+
+		formEntryTemplate.setAttribute("emId", "em_" + _groupName + "_" + _name);
 		formEntryTemplate.setAttribute("message", _message);
 		formEntryTemplate.setAttribute("input", _inputTemplate.toString());
 
