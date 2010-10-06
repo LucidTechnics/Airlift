@@ -298,6 +298,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			throwable = t;
 			LOG.warning("Unable to copy property: " + _propertyName + " to domain: " + this.retrieveDomainName());
+			LOG.warning("with value: " + _value);
 			LOG.warning(t.toString());
 		}
 

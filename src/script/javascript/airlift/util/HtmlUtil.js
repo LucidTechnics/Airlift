@@ -20,7 +20,7 @@ airlift.findValue = function(_annotation, _attributeName)
 	
 	if (airlift.isDefined(_annotation) === true)
 	{
-		var rawValue = _annotation.getParameterValue(_attributeName);
+		var rawValue = _annotation[_attributeName]();
 		if (airlift.isDefined(rawValue) === true) { value = rawValue.toString(); }
 	}
 
@@ -34,13 +34,16 @@ airlift.findValue = function(_annotation, _attributeName)
 	return value;
 }
 
-airlift.determineForeignDomainName = function(_do, _propertyName)
+airlift.determineForeignDomainName = function(_interfaceClass, _propertyName)
 {
 	var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_propertyName);
-	var method = _do.getClass().getMethod(getter);
-	var methodPersistable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
 
-	var mapTo = findValue(methodPersistable, "mapTo");
+	LOG.info("Halloween looking at method: " + getter);
+	LOG.info("on class: " + _interfaceClass.getName());
+	var getterMethod = _interfaceClass.getMethod(getter);
+	var methodPersistable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
+
+	var mapTo = airlift.findValue(methodPersistable, "mapTo");
 
 	var tokenArray = mapTo.split("\\.");
 
@@ -89,6 +92,7 @@ airlift.toRdfa = function(_config)
 
 		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
 		var dataObject = activeRecord.createImpl();
+		var interfaceObject = activeRecord.retrieveDomainInterface();
 		var propertyMap = Packages.airlift.util.AirliftUtil.describe(dataObject);
 		
 		if (dataObject instanceof Packages.airlift.Clockable)
@@ -132,9 +136,10 @@ airlift.toRdfa = function(_config)
 					}
 					else if (activeRecord.isForeignKey(_property) === true)
 					{
-						var foreignDomainName = airlift.determineForeignDomainName(dataObject, _property);
+						var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
 						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(propertyMap.get(_property)).append("</a></li>\n");
+						var foreignKeyValue = (airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "";
+						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 					}
 				}
 			}
@@ -230,8 +235,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 		var determineCurrentGroupName = function(_activeRecord, _property)
 		{
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-			var method = domainInterfaceClass.getMethod(getter);
-			var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
+			var getterMethod = domainInterfaceClass.getMethod(getter);
+			var methodPresentable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 
 			var groupName = (airlift.isDefined(methodPresentable) === true) ? methodPresentable.fieldSetName() : null;
 			groupName = (airlift.isDefined(groupName) === true && "".equalsIgnoreCase(groupName) === false) ? groupName : _activeRecord.retrieveDomainName();
@@ -259,9 +264,9 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 			messageString = messageString.toString();
 
-			var method = domainInterfaceClass.getMethod(getter);
-			var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
-			var methodPersistable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
+			var getterMethod = domainInterfaceClass.getMethod(getter);
+			var methodPresentable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
+			var methodPersistable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
 
 			var formStringBufferStringTemplate = stringTemplateGroup.getInstanceOf("airlift/language/java/FormAttributeStringBufferAppends");
 
@@ -493,9 +498,9 @@ airlift.toTable = function(_config, _collection)
 				   Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) == contains))
 			{
 				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-				var method = domainInterfaceClass.getMethod(getter);
-				var methodPresentable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
-				var methodPersistable = method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
+				var getterMethod = domainInterfaceClass.getMethod(getter);
+				var methodPresentable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
+				var methodPersistable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Persistable"));
 
 				if (setHeader === true)
 				{
