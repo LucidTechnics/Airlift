@@ -51,7 +51,7 @@ airlift.isRequired = function(value, paramsObj)
 	
 	var error;    
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Can't be empty!";
+	var message = paramsObj.failureMessage || "This is a required field - ";
 
 	if (value === '' || value === null || value === undefined || value === "")
 	{
@@ -95,14 +95,14 @@ airlift.isNumeric = function(value, paramsObj)
 	var suppliedValue = value;
 	var value = Number(value);
 	var paramsObj = paramsObj || {};
-	var minimum = ((paramsObj.minimum) || (paramsObj.minimum == 0)) ? paramsObj.minimum : null;;
-	var maximum = ((paramsObj.maximum) || (paramsObj.maximum == 0)) ? paramsObj.maximum : null;
-	var is = ((paramsObj.is) || (paramsObj.is == 0)) ? paramsObj.is : null;
-	var notANumberMessage = paramsObj.notANumberMessage || "Must be a number!";
-	var notAnIntegerMessage = paramsObj.notAnIntegerMessage || "Must be an integer!";
-	var wrongNumberMessage = paramsObj.wrongNumberMessage || "Must be " + is + "!";
-	var tooLowMessage = paramsObj.tooLowMessage || "Must not be less than " + minimum + "!";
-	var tooHighMessage = paramsObj.tooHighMessage || "Must not be more than " + maximum + "!";
+	var minimum = ((paramsObj.minimum) || (paramsObj.minimum === 0)) ? paramsObj.minimum : null;;
+	var maximum = ((paramsObj.maximum) || (paramsObj.maximum === 0)) ? paramsObj.maximum : null;
+	var is = ((paramsObj.is) || (paramsObj.is === 0)) ? paramsObj.is : null;
+	var notANumberMessage = paramsObj.notANumberMessage || "Must be a number -  ";
+	var notAnIntegerMessage = paramsObj.notAnIntegerMessage || "Must be an integer - ";
+	var wrongNumberMessage = paramsObj.wrongNumberMessage || "Must be " + is + "-  ";
+	var tooLowMessage = paramsObj.tooLowMessage || "Must not be less than " + minimum + "-  ";
+	var tooHighMessage = paramsObj.tooHighMessage || "Must not be more than " + maximum + "- ";
 	if (!isFinite(value)) error = notANumberMessage;
 	if (paramsObj.onlyInteger && (/\.0+$|\.$/.test(String(suppliedValue))  || value != parseInt(value)) ) error = notAnIntegerMessage;
 	switch(true){
@@ -148,7 +148,7 @@ airlift.hasFormat = function(value, paramsObj)
 	var error;
 	var value = String(value);
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Not valid!";
+	var message = paramsObj.failureMessage || "Format is invalid - ";
 	var pattern = paramsObj.pattern || /./;
 	if(!pattern.test(value) /* && value != ''*/ ){ 
 		error = message;
@@ -172,7 +172,7 @@ airlift.isEmail = function(value, paramsObj)
 	
 	var error;
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Must be a valid email address!";
+	var message = paramsObj.failureMessage || "Must be a valid email address - ";
 	error = airlift.hasFormat(value, { failureMessage: message, pattern: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i } );
 	return error;
 };
@@ -194,7 +194,7 @@ airlift.isZipCode = function(value, paramsObj)
 	
 	var error;
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Must be a valid zip code!";
+	var message = paramsObj.failureMessage || "Must be a valid zip code -  ";
 	error = airlift.hasFormat(value,
 	{ failureMessage: message, pattern: /^(\d{5}-\d{4})|(\d{5})$/i } );
 	return error;
@@ -221,7 +221,7 @@ airlift.isDate = function(value, paramsObj)
 
 	if (result.substring(0, 5) === "Error")
 	{
-		var error = paramsObj.failureMessage || result + " with value: " + value + " for mask: " + paramsObj.mask;
+		var error = paramsObj.failureMessage || result + " with value: " + value + " for mask: " + paramsObj.mask + "-  ";
 	}
 	
 	return error;
@@ -253,12 +253,12 @@ airlift.hasLength = function(value, paramsObj)
 	var error;    
 	var value = String(value);
 	var paramsObj = paramsObj || {};
-	var minimum = ((paramsObj.minimum) || (paramsObj.minimum == 0)) ? paramsObj.minimum : null;
-	var maximum = ((paramsObj.maximum) || (paramsObj.maximum == 0)) ? paramsObj.maximum : null;
-	var is = ((paramsObj.is) || (paramsObj.is == 0)) ? paramsObj.is : null;
-	var wrongLengthMessage = paramsObj.wrongLengthMessage || "Must be " + is + " characters long!";
-	var tooShortMessage = paramsObj.tooShortMessage || "Must not be less than " + minimum + " characters long!";
-	var tooLongMessage = paramsObj.tooLongMessage || "Must not be more than " + maximum + " characters long!";
+	var minimum = ((paramsObj.minimum) || (paramsObj.minimum === 0)) ? paramsObj.minimum : null;
+	var maximum = ((paramsObj.maximum) || (paramsObj.maximum === 0)) ? paramsObj.maximum : null;
+	var is = ((paramsObj.is) || (paramsObj.is === 0)) ? paramsObj.is : null;
+	var wrongLengthMessage = paramsObj.wrongLengthMessage || "Must be " + is + " characters long - ";
+	var tooShortMessage = paramsObj.tooShortMessage || "Must not be less than " + minimum + " characters long - ";
+	var tooLongMessage = paramsObj.tooLongMessage || "Must not be more than " + maximum + " characters long - ";
 	switch(true){
 		case (is !== null):
 			if( value.length != Number(is) ) error = wrongLengthMessage;
@@ -276,7 +276,7 @@ airlift.hasLength = function(value, paramsObj)
 			if( value.length > Number(maximum) ) error = tooLongMessage;
 			break;
 		default:
-			throw new Error("Validate::hasLength - Length(s) to validate against must be provided!");
+			throw new Error("Validate::hasLength - Length(s) to validate against must be provided - ");
 	}
 	return error;
 };
@@ -307,13 +307,13 @@ airlift.isIncluded = function(value, paramsObj)
 	
 	var error;
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Must be included in the list!";
-	if(paramsObj.allowNull && value == null) return true;
-	if(!paramsObj.allowNull && value == null) error = message;
+	var message = paramsObj.failureMessage || "Must be included in the list - ";
+	if(paramsObj.allowNull && value === null) return true;
+	if(!paramsObj.allowNull && value === null) error = message;
 	var list = paramsObj.within || [];
 	var found = false;
 	for(var i = 0, length = list.length; i < length; ++i){
-		if(list[i] == value) found = true;
+		if(list[i] === value) found = true;
 		if(paramsObj.partialMatch){ 
 			if(value.indexOf(list[i]) != -1) found = true;
 		}
@@ -344,7 +344,7 @@ airlift.isExcluded = function(value, paramsObj)
 	
 	var error;
 	var paramsObj = paramsObj || {};
-	paramsObj.failureMessage = paramsObj.failureMessage || "Must not be included in the list!";
+	paramsObj.failureMessage = paramsObj.failureMessage || "Must not be included in the list - ";
 	paramsObj.exclusion = true;
 	error = isIncluded(value, paramsObj);
 	return error;
@@ -368,7 +368,7 @@ airlift.isEqual = function(value, paramsObj)
 	var error;
 	if(!paramsObj.match) throw new Error("Validate::Confirmation - Error validating confirmation: Id of element to match must be provided!");
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Does not match!";
+	var message = paramsObj.failureMessage || "Does not match each other -  ";
 	var match = paramsObj.match.nodeName ? paramsObj.match : document.getElementById(paramsObj.match);
 	if(!match) throw new Error("Validate::Confirmation - There is no reference with name of, or element with id of '" + paramsObj.match + "'!");
 	if(value != match.value)
@@ -394,7 +394,7 @@ airlift.isAssigned = function(value, paramsObj)
 	
 	var error;
 	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Must be assigned!";
+	var message = paramsObj.failureMessage || "Must have a value -   ";
 	if(!value)
 	{ 
 		error = message;
@@ -409,6 +409,9 @@ airlift.isAssigned = function(value, paramsObj)
  *	@var value {mixed} - value to be checked if true or not (usually a boolean from the checked value of a checkbox)
  *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
  */
+
+//TODO this function seems to be clobbered by a later declaration!!! Do
+//not use this until I figure out what is going on - Bediako
 airlift.validate = function(validationFunction, value, validationParamsObj)
 {
 	value = airlift.trim(value);
@@ -462,7 +465,7 @@ airlift.setString = function (_m, _v, _d)
 
 	// strip out invalid characters
 	v = v.replace(new RegExp("[^" + rx["*"] + "]", "gi"), "");
-	if( (_d == true) && (v.length == strippedValue.length) ) v = v.substring(0, v.length-1);
+	if( (_d === true) && (v.length === strippedValue.length) ) v = v.substring(0, v.length-1);
 	strippedValue = v;
 	var b=[];
 	for( var i=0; i < m.length; i++ )
@@ -472,7 +475,7 @@ airlift.setString = function (_m, _v, _d)
 		// check to see if current character is a mask, escape commands are not a mask character
 		t = (r.indexOf(x) > -1);
 		// if the current character is an escape command, then grab the next character
-		if( x == "!" ) x = m.charAt(i++);
+		if( x === "!" ) x = m.charAt(i++);
 		// build a regex to test against
 		if( (t && !allowPartial) || (t && allowPartial && (rt.length < v.length)) ) rt[rt.length] = "[" + rx[x] + "]";
 		// build mask definition table
@@ -481,7 +484,7 @@ airlift.setString = function (_m, _v, _d)
 
 	var hasOneValidChar = false;
 	// if the regex fails, return an error
-	if( !allowPartial && !(new RegExp(rt.join(""))).test(v) ) return "The value \"" + _v + "\" must be in the format " + m + ".";
+	if( !allowPartial && !(new RegExp(rt.join(""))).test(v) ) return "The value \"" + _v + "\" must be in the format " + m + "-  ";
 	// loop through the mask definition, and build the formatted string
 	else if( (allowPartial && (v.length > 0)) || !allowPartial )
 	{
@@ -489,7 +492,7 @@ airlift.setString = function (_m, _v, _d)
 		{
 			if( a[i].mask )
 			{
-				while( v.length > 0 && !(new RegExp(rt[j])).test(v.charAt(j)) ) v = (v.length == 1) ? "" : v.substring(1);
+				while( v.length > 0 && !(new RegExp(rt[j])).test(v.charAt(j)) ) v = (v.length === 1) ? "" : v.substring(1);
 				if( v.length > 0 )
 				{
 					nv += v.charAt(j);
@@ -525,17 +528,17 @@ airlift.setNumber = function(_m, _v, _d)
 		return "An invalid mask was specified for the \nMask constructor.";
 	}
 
-	if( (_d == true) && (v.length == strippedValue.length) ) { v = v.substring(0, v.length-1); }
+	if( (_d === true) && (v.length === strippedValue.length) ) { v = v.substring(0, v.length-1); }
 
-	if( allowPartial && (v.replace(/[^0-9]/, "").length == 0) ) return v;
+	if( allowPartial && (v.replace(/[^0-9]/, "").length === 0) ) return v;
 	strippedValue = v;
 
-	if( v.length == 0 ) v = NaN;
+	if( v.length === 0 ) v = NaN;
 	var vn = Number(v);
-	if( isNaN(vn) ) return "The value entered was not a number.";
+	if( isNaN(vn) ) return "The value entered was not a number -  ";
 
 	// if no mask, stop processing
-	if( m.length == 0 ) return v;
+	if( m.length === 0 ) return v;
 
 	// get the value before the decimal point
 	var vi = String(Math.abs((v.indexOf(".") > -1 ) ? v.split(".")[0] : v));
@@ -543,7 +546,7 @@ airlift.setNumber = function(_m, _v, _d)
 	var vd = (v.indexOf(".") > -1) ? v.split(".")[1] : "";
 	var _vd = vd;
 
-	var isNegative = (vn != 0 && Math.abs(vn)*-1 == vn);
+	var isNegative = (vn != 0 && Math.abs(vn)*-1 === vn);
 
 	// check for masking operations
 	var show = {
@@ -562,7 +565,7 @@ airlift.setNumber = function(_m, _v, _d)
 	*/
 	// get number of digits after decimal point in mask
 	var dm = (m.indexOf(".") > -1 ) ? m.split(".")[1] : "";
-	if( dm.length == 0 )
+	if( dm.length === 0 )
 	{
 		vi = String(Math.round(Number(vi)));
 		vd = "";
@@ -649,14 +652,14 @@ airlift.setDate = function (_m, _v)
 	// convert the string into an array in which digits are together
 	e = v.split(/[^0-9]/);
 
-	if( s[0].length == 0 ) s.splice(0, 1);
+	if( s[0].length === 0 ) s.splice(0, 1);
 
 	for( var i=0; i < a.length; i++ )
 	{
 		x = a[i].charAt(0);
-		if( x == "M" ) mm = parseInt(e[i], 10)-1;
-		else if( x == "d" ) dd = parseInt(e[i], 10);
-		else if( x == "y" ) yy = parseInt(e[i], 10);
+		if( x === "M" ) mm = parseInt(e[i], 10)-1;
+		else if( x === "d" ) dd = parseInt(e[i], 10);
+		else if( x === "y" ) yy = parseInt(e[i], 10);
 	}
 
 	// if year is abbreviated, guess at the year
@@ -669,35 +672,35 @@ airlift.setDate = function (_m, _v)
 	// create date object	
 	var d = new Date(yy, mm, dd);
 
-	if( d.getDate() != dd ) return "Error: An invalid day was entered.";
-	else if( d.getMonth() != mm ) return "Error: An invalid month was entered.";
+	if( d.getDate() != dd ) return "Error: An invalid day was entered - ";
+	else if( d.getMonth() != mm ) return "Error: An invalid month was entered - ";
 
 	var nv = "";
 
 	for( i=0; i < a.length; i++ )
 	{
 		x = a[i].charAt(0);
-		if( x == "M" )
+		if( x === "M" )
 		{
 			mm++;
-			if( a[i].length == 2 ){
+			if( a[i].length === 2 ){
 				mm = "0" + mm;
 				mm = mm.substring(mm.length-2);
 			}
 			nv += mm;
 		}
-		else if( x == "d" )
+		else if( x === "d" )
 		{
-			if( a[i].length == 2 )
+			if( a[i].length === 2 )
 			{
 				dd = "0" + dd;
 				dd = dd.substring(dd.length-2);
 			}
 			nv += dd;
 		}
-		else if( x == "y" )
+		else if( x === "y" )
 		{
-			if( a[i].length == 2 ) nv += d.getYear();
+			if( a[i].length === 2 ) nv += d.getYear();
 			else nv += d.getFullYear();
 		}
 
@@ -718,7 +721,7 @@ airlift.validate = function(_domainObject, _bindingSet)
 	var errors = {};
 	var domainEntry = DOMAIN.getDomainEntry(_domainObject.name);
 
-	if (airlift.isDefined(domainEntry) == false)
+	if (domainEntry === undefined || domainEntry === null)
 	{
 		throw new Error("No domain defined for object named: " + _domainObject.name);
 	}
@@ -741,12 +744,12 @@ airlift.validateP = function(_name, _value, _domainEntry, _domainObject)
 	var errors = [];
 	var fieldEntry = _domainEntry.getFieldEntry(_name);
 	
-	if (airlift.isDefined(fieldEntry) == true)
+	if (fieldEntry !== undefined && fieldEntry !== null)
 	{
 		var ruleMap = fieldEntry.getVRuleMap();
 		var rules = ruleMap.keySet().iterator();
 
-		while (rules.hasNext() == true)
+		while (rules.hasNext() === true)
 		{
 			var rule = rules.next();
 			var parameters = ruleMap.get(rule);
@@ -754,13 +757,13 @@ airlift.validateP = function(_name, _value, _domainEntry, _domainObject)
 			
 			var error = validationRule(_value, parameters);
 
-			if (airlift.isDefined(error) == true)
+			if (error !== undefined && error != null)
 			{
 				errors.push(error);
 			}
 		}
 	}
-	else if (_domainEntry.getValidateAllFields() == true)
+	else if (_domainEntry.getValidateAllFields() === true)
 	{
 		throw new Error("Field identified by name: " + _name + " is not defined on domain object: " + _domainEntry.getName()); 
 	}

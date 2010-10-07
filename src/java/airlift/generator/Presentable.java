@@ -32,5 +32,6 @@ public @interface Presentable
 	public String hasFormat() default ".*";
 	public boolean readOnly() default false;
 	public String[] allowedValues() default {};
+	public String dateTimePattern() default "MM-dd-yyyy";
 	public String delimiter() default ","; //to be used for attributes that are presented as checkboxes, radio buttons, and selects.
 }

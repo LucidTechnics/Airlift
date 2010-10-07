@@ -324,7 +324,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					var nullable = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.nullable() : true;
 
 					var inputClass = ""; if (nullable === false) { inputClass = "required";	}
-
+					var propertyError = (_activeRecord.getMessageList(_property).size() > 1);
+					
 					switch(inputType)
 					{
 						case Packages.airlift.generator.Presentable.Type.HIDDEN:
@@ -336,7 +337,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						case Packages.airlift.generator.Presentable.Type.TEXT:
 
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("text", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -346,7 +347,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						case Packages.airlift.generator.Presentable.Type.PASSWORD:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", groupName, value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
-							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
+							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -356,7 +357,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						case Packages.airlift.generator.Presentable.Type.TEXTAREA:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTextAreaTemplate(value, textAreaRows, textAreaColumns, _property, groupName, readOnly);
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -400,7 +401,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								}
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 
@@ -426,7 +427,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
 
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, error);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
 							count++;
 

@@ -240,7 +240,7 @@ public class AirliftUtil
 		return stringBuffer.toString().replaceAll(",$", "") + "]";
 	}
 
-	public static java.util.Map<String, String> describe(Object _do)
+	public static java.util.Map<String, String> describe(Object _do, Class _interfaceClass)
 	{
 		java.util.Map<String, String> descriptionMap = new java.util.HashMap<String, String>();
 
@@ -261,7 +261,7 @@ public class AirliftUtil
 
 					if (java.sql.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Datable.class);
 
 						String mask = "MM-dd-yyyy";
 
@@ -279,17 +279,17 @@ public class AirliftUtil
 					}
 					else if (java.util.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Presentable presentable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Presentable.class);
 
-						String mask = "MM-dd-yyyy HH:mm:ss";
+						String mask = "MM-dd-yyyy";
 
-						if (datable != null)
+						if (presentable != null)
 						{
-							String[] patternArray = datable.dateTimePatterns();
+							String pattern = presentable.dateTimePattern();
 
-							if (patternArray != null && patternArray.length > 0)
+							if (pattern != null)
 							{
-								mask = patternArray[0];
+								mask = pattern;
 							}
 						}
 
@@ -298,7 +298,7 @@ public class AirliftUtil
 					}
 					else if (java.sql.Timestamp.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_do.getClass(), propertyDescriptor.getName(), airlift.generator.Datable.class);
+						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Datable.class);
 
 						String mask = "MM-dd-yyyy HH:mm:ss";
 

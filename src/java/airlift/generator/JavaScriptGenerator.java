@@ -176,7 +176,7 @@ public class JavaScriptGenerator
 			
 			if (processedDatable == false)
 			{
-				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"yyyy-MM-dd\", \"MM/dd/yyyy\", \"yyyy/MM/dd\", \"yyyy-MM-dd HH:mm:ss\", \"MM-dd-yyyy HH:mm:ss\", \"MM/dd/yyyy HH:mm:ss\", \"yyyy/MM/dd HH:mm:ss\", \"MM-dd-yyyy\", \"yyyy-MM-dd\", \"MM/dd/yyyy\", \"yyyy/MM/dd\"}";
+				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\"}";
 				activeRecordStringTemplate.setAttribute("dateTimePatterns", dateTimePatterns.replaceAll("^\\s*\\{", "[").replaceAll("\\}$\\s*", "]"));
 			}
 

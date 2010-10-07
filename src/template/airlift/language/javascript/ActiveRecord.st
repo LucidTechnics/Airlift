@@ -307,7 +307,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.describe = function()
 	{
-		return Packages.airlift.util.AirliftUtil.describe(this.createDO());
+		return Packages.airlift.util.AirliftUtil.describe(this.createDO(), this.retrieveDomainInterface());
 	}
 
 	activeRecord.getPresentableAnnotation = function(_propertyName)
