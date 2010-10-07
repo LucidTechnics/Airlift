@@ -86,7 +86,6 @@ public class RestfulSecurityContext
 			}
 			else
 			{
-				
 				log.info("User: " + email + " is allowed method: " + _method +
 						 " access to this domain: " + _domainName);
 			}
@@ -110,6 +109,8 @@ public class RestfulSecurityContext
 			roleSet.add(token.toLowerCase().trim());
 		}
 
+		log.info("Role set: " + roleSet);
+
 		return roleSet;
 	}
 
@@ -121,6 +122,7 @@ public class RestfulSecurityContext
 		{
 			if (_roleSet.contains("all") == true)
 			{
+				log.info("Role set contains all");
 				allowed = true;
 			}
 			else
@@ -129,10 +131,18 @@ public class RestfulSecurityContext
 
 				if (userRoleSet.isEmpty() != false)
 				{
-					userRoleSet.retainAll(_roleSet);
+					boolean changeSet = userRoleSet.retainAll(_roleSet);
+
+					log.info("User role set after retainAll: " + userRoleSet);
+					log.info("User role set change indicator: " + changeSet);
+					
 					allowed = (userRoleSet.isEmpty() == false);
 				}
 			}
+		}
+		else
+		{
+			log.info("Role set contains no one");
 		}
 
 		return allowed;

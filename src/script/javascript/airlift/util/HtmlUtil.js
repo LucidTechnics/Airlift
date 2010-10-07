@@ -93,7 +93,7 @@ airlift.toRdfa = function(_config)
 		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
 		var dataObject = activeRecord.createImpl();
 		var interfaceObject = activeRecord.retrieveDomainInterface();
-		var propertyMap = Packages.airlift.util.AirliftUtil.describe(dataObject);
+		var propertyMap = Packages.airlift.util.AirliftUtil.describe(dataObject, interfaceObject);
 		
 		if (dataObject instanceof Packages.airlift.Clockable)
 		{
