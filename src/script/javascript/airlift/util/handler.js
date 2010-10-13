@@ -62,9 +62,11 @@ airlift.dao = function(_domainName)
 };
 
 //Convenience method for creating a blank StringTemplate object
-airlift.stringTemplate = function()
+airlift.stringTemplate = function(_templateString)
 {
-	return new Packages.org.antlr.stringtemplate.StringTemplate();
+	var stringTemplate  = (airlift.isDefined(_templateString) === true) ? new Packages.org.antlr.stringtemplate.StringTemplate(_templateString) : new Packages.org.antlr.stringtemplate.StringTemplate();
+	
+	return stringTemplate;
 }
 
 //t - create StringTemplate object for a given locale.
@@ -553,19 +555,20 @@ airlift.toJavaString = function(_string)
 airlift.appender = function(_initialText, _delimiter)
 {
 	var delimiter = (airlift.isDefined(_delimiter) === true) ? _delimiter : ",";
+	var initialText = (airlift.isDefined(_initialText) === true) ? _initialText : "";
 	
-	var template = airlift.t();
-	template.setTemplate(_initialText + "$append; separator=\"" + delimiter +"\"$");
-
 	var appender = {
+		text: initialText,
+		delimiter: delimiter,	  
+
 		append: function(_appendee)
-				 {
-					 template.setAttribute("append", _appendee);
-				 },
+		{
+			this.text += this.delimiter + _appendee; 
+		},
 		toString: function()
-				 {
-					 return template.toString();
-				 }
+		{
+			return this.text;
+		}
 	};
 
 	return appender;

@@ -196,6 +196,11 @@ airlift.join = function(_name, _function, _separator)
 	return (!joinedArray || "undefined".equalsIgnoreCase(joinedArray)) ? null : joinedArray;
 }
 
+airlift.createTemplateTarget = function(_groupName, _propertyName, _targetType)
+{
+	return "$" + _groupName + "_" + _propertyName + "_" + _targetType + "$";
+}
+
 airlift.toFieldSet = function(_config, _activeRecord)
 {
 	var method = (airlift.isDefined(_config.method) === true) ? airlift.string(_config.method) : airlift.string("POST");
@@ -253,7 +258,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 		{
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			var messageList = _activeRecord.getMessageList(_property);
+			/*var messageList = _activeRecord.getMessageList(_property);
 
 			var messageString = airlift.appender("", " ");
 
@@ -262,7 +267,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 				messageString.append(message.getMessage());
 			}
 
-			messageString = messageString.toString();
+			messageString = messageString.toString();*/
+			messageString = airlift.createTemplateTarget(groupName, _property, "message");
 
 			var getterMethod = domainInterfaceClass.getMethod(getter);
 			var methodPresentable = getterMethod.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
@@ -308,7 +314,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 					previousGroupName = currentGroupName;
 
-					var value = (airlift.isDefined(propertyMap.get(_property)) === true) ? Packages.airlift.util.FormatUtil.format(propertyMap.get(_property)) : "";
+					var value = airlift.createTemplateTarget(groupName, _property, "value");
 					var propertyDescriptor = org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
 					var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
 
@@ -645,4 +651,42 @@ airlift.toAtom = function(_config)
 	var output = new Packages.com.sun.syndication.io.SyndFeedOutput();
 
 	return output.outputString(feed);
+}
+
+airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
+{
+	var valueString = (airlift.isDefined(_activeRecord[_propertyName]) === true) ? Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]) : "";
+
+	var messageList = _activeRecord.getMessageList(_propertyName);
+
+	var messageString = airlift.appender("", " ");
+
+	for (var message in Iterator(messageList))
+	{
+		messageString.append(message.getMessage());
+	}
+
+	messageString = messageString.toString();
+
+	if (messageList.size() > 1)
+	{
+		var emClassString = "error";
+	}
+	else
+	{
+		var emClassString = "";
+	}
+
+	var messageTarget = airlift.createTemplateTarget(_groupName, _propertyName, "message").replace(/\$/g,"");
+	var emClassTarget = airlift.createTemplateTarget(_groupName, _propertyName, "emClass").replace(/\$/g,"");
+	var valueTarget = airlift.createTemplateTarget(_groupName, _propertyName, "value").replace(/\$/g,"");
+
+	_formTemplate.setAttribute(messageTarget, messageString);
+	_formTemplate.setAttribute(emClassTarget, emClassString);
+	_formTemplate.setAttribute(valueTarget, valueString);
+}
+
+airlift.getCacheFormKey = function(_activeRecord, _method)
+{
+	return _method + "." + _activeRecord.retrieveDomainInterfaceClassName();
 }

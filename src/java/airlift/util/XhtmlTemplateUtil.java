@@ -159,11 +159,13 @@ public class XhtmlTemplateUtil
 		formEntryTemplate.setAttribute("name", _name);
 		formEntryTemplate.setAttribute("label", _label);
 
-		if (_error && _message != null && !StringUtils.isWhitespace(_message))
+		
+		//if (_error && _message != null && !StringUtils.isWhitespace(_message))
 		{
-			formEntryTemplate.setAttribute("emClass", "error");
+			formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");
 		}
 
+		
 		formEntryTemplate.setAttribute("emId", "em_" + _groupName + "_" + _name);
 		formEntryTemplate.setAttribute("message", _message);
 		formEntryTemplate.setAttribute("input", _inputTemplate.toString());

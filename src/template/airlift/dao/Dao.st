@@ -45,8 +45,22 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	{
 		var id = Packages.airlift.util.IdGenerator.generate(12);
 		_$lowerCaseClassName$.setId(id);
-		
-		PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
+
+		for (var i = 0; i < 5; i++)
+		{
+			try
+			{
+				PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
+				break;
+			}
+			catch(e)
+			{
+				if (i >= 5)
+				{
+					throw e;
+				}
+			}
+		}
 
 		return id;
 	}

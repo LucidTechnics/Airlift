@@ -12,7 +12,22 @@ $updateMethod$
 
 dao.del = function(_$lowerCaseClassName$)
 {
-	PERSISTENCE_MANAGER.deletePersistent(_$lowerCaseClassName$);
+	//Need to retry automatically ...
+	for (var i = 0; i < 5; i++)
+	{
+		try
+		{
+			PERSISTENCE_MANAGER.deletePersistent(_$lowerCaseClassName$);
+			break;
+		}
+		catch(e)
+		{
+			if (i >= 5)
+			{
+				throw e;
+			}
+		}
+	}
 }
 
 dao["delete"] = function(_$lowerCaseClassName$)

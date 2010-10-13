@@ -83,14 +83,24 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var jdo = this.dao.get(_id);
 		this.copyFrom(jdo);
 
-		return activeRecord;
+		return this;
+	};
+
+	activeRecord.copy = function(_id)
+	{
+		this.get(_id);
+		this.id = null;
+
+		return this;
 	};
 
 	activeRecord.update = function()
 	{
 		airlift.checkAllowed(this.retrieveDomainName(), "PUT");
 
-		return this.dao.update(this.createDO());
+		this.dao.update(this.createDO());
+
+		return this;
 	};
 
 	activeRecord.insert = function()
@@ -98,6 +108,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		airlift.checkAllowed(this.retrieveDomainName(), "POST");
 
 		this.setId(this.dao.insert(this.createDO()));
+
+		return this;
 	};
 
 	activeRecord.del = function()
@@ -118,6 +130,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return this.convertToActiveRecordArray(this.dao.collect(_config));
 	};
+
+	activeRecord.retrieveDomainInterfaceClassName = function()
+	{
+		return "$fullyQualifiedDomainClassName$";
+	}
 
 	activeRecord.retrieveDomainInterface = function()
 	{

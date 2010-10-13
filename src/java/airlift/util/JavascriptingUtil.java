@@ -85,18 +85,7 @@ public class JavascriptingUtil
 
 		try
 		{
-			log.info("Attempting to load script: " + _scriptResource);
-
-			if (inputStream == null)
-			{
-				log.info("Looking for script as a resource");
-
-				inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
-			}
-			else
-			{
-				log.info("Found script from development");
-			}
+			inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
 		}
 		catch(Throwable t)
 		{
@@ -224,8 +213,12 @@ public class JavascriptingUtil
 		
 		try
 		{
+			log.info("Attempting to load script: " + _scriptResource);			
+
 			if (getScriptResourceMap().containsKey(_scriptResource) == false)
 			{
+				
+				log.info("Compiled script not cached: " + System.currentTimeMillis());
 				reader = new InputStreamReader(findScript(_scriptResource));
 
 				try
@@ -247,6 +240,7 @@ public class JavascriptingUtil
 			}
 			else
 			{
+				log.info("Compiled script cached: " + System.currentTimeMillis());
 				script = getScriptResourceMap().get(_scriptResource);
 			}
 		}
@@ -254,6 +248,8 @@ public class JavascriptingUtil
 		{
 			if (reader != null) { try { reader.close(); } catch(Throwable t) {} }
 		}
+
+		log.info("Returning script: " + System.currentTimeMillis());
 
 		return script;
 	}
