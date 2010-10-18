@@ -73,8 +73,6 @@ public abstract class Generator
 		getPersistableSet().add("java.sql.Timestamp");
 		getPersistableSet().add("java.math.BigDecimal");
 		getPersistableSet().add("java.math.BigInteger");
-		getPersistableSet().add("airlift.domain.Link");
-		getPersistableSet().add("airlift.domain.Link[]");
 
 		getNumericSet().add("long");
 		getNumericSet().add("int");
@@ -88,6 +86,29 @@ public abstract class Generator
 		getNumericSet().add("java.lang.Float");
 		getNumericSet().add("java.math.BigDecimal");
 		getNumericSet().add("java.math.BigInteger");
+
+		getPersistableSet().add("java.lang.String[]");
+		getPersistableSet().add("long[]");
+		getPersistableSet().add("int[]");
+		getPersistableSet().add("char[]");
+		getPersistableSet().add("short[]");
+		getPersistableSet().add("double[]");
+		getPersistableSet().add("boolean[]");
+		getPersistableSet().add("byte[]");
+		getPersistableSet().add("float[]");
+		getPersistableSet().add("java.lang.Long[]");
+		getPersistableSet().add("java.lang.Integer[]");
+		getPersistableSet().add("java.lang.Character[]");
+		getPersistableSet().add("java.lang.Short[]");
+		getPersistableSet().add("java.lang.Double[]");
+		getPersistableSet().add("java.lang.Boolean[]");
+		getPersistableSet().add("java.lang.Byte[]");
+		getPersistableSet().add("java.lang.Float[]");
+		getPersistableSet().add("java.util.Date[]");
+		getPersistableSet().add("java.sql.Date[]");
+		getPersistableSet().add("java.sql.Timestamp[]");
+		getPersistableSet().add("java.math.BigDecimal[]");
+		getPersistableSet().add("java.math.BigInteger[]");
     }
 
     protected String getNullableConstraint(String _nullable)

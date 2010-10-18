@@ -36,6 +36,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray);
 
+    activeRecord.getConverter = function() 
+	{ 
+		return activeRecord.beanUtilsBean.getConvertUtils(); 
+	}
+
 	activeRecord.isForeignKey = function(_propertyName)
 	{
 		return this.foreignKeySet.contains(_propertyName);
@@ -345,8 +350,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var processProperty = function(_property, _index, _array)
 		{
 			var property = new Packages.java.lang.String(_property);
-			
 			var methodPresentable = that.getPresentableAnnotation(property);
+			var attributeType = that.getAttributeType(property);
 
 			if ((airlift.isDefined(methodPresentable) === true) &&
 				(methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
@@ -355,23 +360,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			{
 				var result = null, valueArray = _attributeMap.get(property), stringBuffer = new Packages.java.lang.StringBuffer();
 
-				if (airlift.isDefined(valueArray) === true && valueArray.length > 0)
+				if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
 				{
-					valueArrayWasNull = false;
-					stringBuffer.append(valueArray[0]);							
-
-					if (valueArray.length > 1)
-					{
-						for (var i = 1; i < valueArray.length; i++)
-						{
-							stringBuffer.append(methodPresentable.delimiter()).append(valueArray[i]);
-						}
-					}
-
-					result = stringBuffer.toString();
+					result = valueArray;
 				}
-
-				var attributeType = that.getAttributeType(property);
+				else (airlift.isDefined(valueArray) === true && valueArray.length > 0)
+				{
+					result = valueArray[0];
+				}
 
 				if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
 					  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
@@ -398,20 +394,36 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 				if (airlift.isDefined(result) === true)
 				{
-					if (airlift.isDefined(that.copyProperty(impl, property, result)) === true
-						  && airlift.isDefined(result) === true && Packages.airlift.util.Airlift.isWhitespace(result) !== true)
+					if (airlift.isDefined(that.copyProperty(impl, property, result)) === true && airlift.isDefined(result) === true)
 					{
+						if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
+						{
+							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
+						}
+						else if (airlift.isDefined(valueArray) === true && Packages.airlift.util.Airlift.isWhitespace(result) !== true)
+						{
+							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
+						}
+
 						that.copyProperty(impl, property, null);
-						that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
 					}
 				}
 			}
 			else
 			{
 				var valueArray = _attributeMap.get(property);
-				var value = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
-				errorMap = that.validateProperty(property, value + "");
-
+				
+				if (attributeType.endsWith("[]") === true)
+				{
+					var value = valueArray;
+					errorMap = that.validateProperty(property, value);
+				}
+				else
+				{
+					var value = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
+					errorMap = that.validateProperty(property, value + "");
+				}
+				
 				if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
 				{
 					that.copyProperty(impl, property, null);

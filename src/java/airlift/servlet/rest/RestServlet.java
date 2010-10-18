@@ -186,14 +186,7 @@ public class RestServlet
 
 				if (handlerNotFound == true )
 				{
-					handlerName = getErrorHandlerName("405");
-					_uriParameterMap.put("a.error.code", "405");
-					_uriParameterMap.put("a.error.message", "Method Not Allowed");
-
-					contentContext = getErrorHandlerContext().execute(appName,
-						handlerName, _method, this, _httpServletRequest,
-						_httpServletResponse, _uriParameterMap,
-						null);
+					sendCodedPage("405", "Method Not Allowed", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 				}
 
 				//Invalidate the cache if necessary
@@ -231,7 +224,7 @@ public class RestServlet
 			
 			airlift.util.PropertyUtil propertyUtil = airlift.util.PropertyUtil.getInstance();
 			propertyUtil.loadProperties("/airlift/airlift.properties", "airlift.cfg");
-			String reportJavaException = propertyUtil.getProperty("airlift.cfg", "airlift.report.java.exception");
+			String reportJavaException = this.getServletConfig().getInitParameter("a.report.java.exception");
 
 			ContentContext contentContext = new SimpleContentContext();
 			
@@ -247,8 +240,8 @@ public class RestServlet
 				contentContext = sendCodedPage("500", "Internal Server Error", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 			}
 			
-			//TODO: This should have its own region and it should be timed
-			//out.
+			//TODO: This should have its own region and it should be
+			//timed out.
 			populateCache(appName, _method, _httpServletRequest, contentContext.getContent());
 		}
     }
@@ -283,6 +276,7 @@ public class RestServlet
 				_response, _uriParameterMap,
 				null);
 
+			_response.sendError(Integer.parseInt(_code), _message);
 			_response.getWriter().print(contentContext.getContent());
 		}
 		catch(Throwable t)

@@ -192,8 +192,8 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; }");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");
 
-			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_name, _config) { airlift.checkAllowed(\"" + _domainObjectModel.getFullyQualifiedClassName() + "\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_name, _config)); }");
-			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { airlift.checkAllowed(\"" + _domainObjectModel.getFullyQualifiedClassName() + "\", this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config)); }");
+			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config)); }");
+			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config)); }");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 		}

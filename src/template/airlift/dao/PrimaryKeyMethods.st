@@ -5,7 +5,8 @@ dao.exists = function(_id)
 
 dao.get = function(_id)
 {
-	return PERSISTENCE_MANAGER.getObjectById(Packages.java.lang.Class.forName("$package$.airlift.domain.$className$Jdo"), _id);
+	var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey(airlift.cc("$package$.airlift.domain.$className$Jdo").getSimpleName(), _id);
+	return PERSISTENCE_MANAGER.getObjectById(airlift.cc("$package$.airlift.domain.$className$Jdo"), key);
 }
 
 $updateMethod$

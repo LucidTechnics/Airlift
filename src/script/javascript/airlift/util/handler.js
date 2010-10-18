@@ -9,6 +9,12 @@ else if (typeof airlift != "object")
 	throw new Error("airlift already exists and it is not an object");
 }
 
+//Convenience method to create a Java class
+airlift.cc = function(_className)
+{
+	return Packages.java.lang.Class.forName(_className);
+}
+
 //Debugging to the web page.  Text sent to this method preppends text
 //to the CONTENT_CONTEXT so that it shows up at the top of the web
 //page. Very convenient. 

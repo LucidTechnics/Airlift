@@ -390,7 +390,7 @@ public class JavaGenerator
 
 			if ("id".equals(name) == true)
 			{
-				attributeStringTemplate.setAttribute("annotation", "@Persistent @PrimaryKey");
+				attributeStringTemplate.setAttribute("annotation", " @Persistent @Extension(vendorName=\"datanucleus\", key=\"gae.pk-name\", value=\"true\")");
 			}
 			else
 			{
