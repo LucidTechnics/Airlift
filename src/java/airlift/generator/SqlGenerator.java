@@ -65,7 +65,7 @@ public class SqlGenerator
 		return stringTemplate.toString();
 	}
 
-	public String generateFindThisRangeSql(DomainObjectModel _domainObjectModel, String _rangeField)
+	public String generateFindByThisRangeSql(DomainObjectModel _domainObjectModel, String _rangeField)
 	{
 	    StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf(AIRLIFT_SQL_FIND_BY_RANGE_SQLTEMPLATE);
 	    Iterator attributes = _domainObjectModel.getAttributes();
@@ -88,6 +88,18 @@ public class SqlGenerator
 	    stringTemplate.setAttribute("tableName", tableName);
 
 	    return stringTemplate.toString();
+	}
+
+	public String generateFindByThisMembershipSql(DomainObjectModel _domainObjectModel, String _attribute)
+	{
+		StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf("airlift/sql/FindByMembershipSQLTemplate");
+
+		Iterator attributes = _domainObjectModel.getAttributes();
+		String tableName = _domainObjectModel.getTableName();
+
+		stringTemplate.setAttribute("tableName", tableName);
+
+		return stringTemplate.toString();
 	}
 
 	public String generateFindSql(DomainObjectModel _domainObjectModel)

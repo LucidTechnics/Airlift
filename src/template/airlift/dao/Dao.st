@@ -71,6 +71,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	$collectByAttribute; separator="\n\n"$
 
+	$collectByMembership; separator="\n\n"$
+
 	$collectByRange; separator="\n\n"$
 
 	return dao;

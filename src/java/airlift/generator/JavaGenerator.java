@@ -588,7 +588,7 @@ public class JavaGenerator
 
 				StringTemplate daoRangeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoRange");
 
-				daoRangeStringTemplate.setAttribute("findByRangeSql", databaseGenerator.generateFindThisRangeSql(_domainObjectModel, fieldName));
+				daoRangeStringTemplate.setAttribute("findByRangeSql", databaseGenerator.generateFindByThisRangeSql(_domainObjectModel, fieldName));
 				daoRangeStringTemplate.setAttribute("rangeType", type);
 				daoRangeStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
 				daoRangeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
