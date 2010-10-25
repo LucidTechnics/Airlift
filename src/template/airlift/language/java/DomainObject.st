@@ -6,7 +6,7 @@ import javax.jdo.annotations.PersistenceCapable;
 
 @javax.annotation.Generated
 (
-	value="hannibal.generator.Generator",
+	value="airlift.generator.Generator",
 	comments="$generatorComment$",
 	date = "$dateTimestamp$"
 )

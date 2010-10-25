@@ -2,7 +2,7 @@ package $package$.airlift.domain;
 
 @javax.annotation.Generated
 (
-  value="hannibal.generator.Generator",
+  value="airlift.generator.Generator",
   comments="$generatorComment$",
   date = "$dateTimestamp$"
 )

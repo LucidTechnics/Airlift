@@ -33,6 +33,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -364,13 +365,31 @@ public class Compiler
 	private String determineReturnType(Element _element, Types _types)
 	{
 		String type = "";
+		String typeParameters = "";
 
 		ExecutableElement executableElement = (ExecutableElement) _element;
-		Element returnType = _types.asElement(executableElement.getReturnType());
+		javax.lang.model.type.TypeMirror returnTypeMirror = executableElement.getReturnType();
+		javax.lang.model.type.DeclaredType declaredReturnType = (javax.lang.model.type.DeclaredType) returnTypeMirror;
+		TypeElement returnType = (TypeElement) _types.asElement(returnTypeMirror);
 
+		List<? extends javax.lang.model.type.TypeMirror> declaredTypeArgumentsList = declaredReturnType.getTypeArguments();
+
+		if (declaredTypeArgumentsList.isEmpty() == false)
+		{
+			typeParameters = "<";
+			
+			for (javax.lang.model.type.TypeMirror typeMirror: declaredTypeArgumentsList)
+			{
+				typeParameters += typeMirror.toString() + ",";
+			}
+
+			typeParameters = typeParameters.replaceAll(",$", ">");
+		}
+		
 		if (returnType == null)
 		{
 			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Comparing this type kind: " + executableElement.getReturnType().getKind());
+
 			if (javax.lang.model.type.TypeKind.ARRAY == executableElement.getReturnType().getKind())
 			{
 				type = executableElement.getReturnType().toString();
@@ -385,7 +404,10 @@ public class Compiler
 			type = returnType.toString();
 		}
 
-		return type;
+		System.out.println("type is: " + type + " and type parameters are: " + typeParameters);
+
+		
+		return type + typeParameters;
 	}
 	
 	private DomainObjectModel createNewDomainObjectModel(Element _element, Elements _elementUtil)

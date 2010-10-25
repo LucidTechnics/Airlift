@@ -40,6 +40,10 @@ public class JavaGenerator
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Jdo";
 		writeJavaFile(fileName, generatedString, _element);
 
+		generatedString = generateJdoDomainIndexObject(_domainObjectModel);
+		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "IndexJdo";
+		writeJavaFile(fileName, generatedString, _element);
+
 		generatedString = generateDomainSubInterface(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName();
 		writeJavaFile(fileName, generatedString, _element);
@@ -376,6 +380,26 @@ public class JavaGenerator
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
 
+		//index property
+		attributeStringTemplate.setAttribute("annotation", "@Persistent");
+		
+		attributeStringTemplate.setAttribute("scope", "private");
+		attributeStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
+		attributeStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+
+		getterStringTemplate.setAttribute("scope", "public");
+		getterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
+		getterStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo"));
+		getterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+
+		setterStringTemplate.setAttribute("scope", "public");
+		setterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
+		setterStringTemplate.setAttribute("setterName", getSetterName(_domainObjectModel.getClassName() + "IndexJdo"));
+		setterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+
+		stringBufferStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo()"));
+		stringBufferStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+
 		Iterator attributes = _domainObjectModel.getAttributes();
 
 		while (attributes.hasNext() == true)
@@ -390,7 +414,7 @@ public class JavaGenerator
 
 			if ("id".equals(name) == true)
 			{
-				attributeStringTemplate.setAttribute("annotation", " @Persistent @Extension(vendorName=\"datanucleus\", key=\"gae.pk-name\", value=\"true\")");
+				attributeStringTemplate.setAttribute("annotation", "@Persistent @Extension(vendorName=\"datanucleus\", key=\"gae.pk-name\", value=\"true\")");
 			}
 			else
 			{
@@ -523,6 +547,19 @@ public class JavaGenerator
 		domainObjectStringTemplate.setAttribute("fullClassName", _domainObjectModel.getFullyQualifiedClassName());
 		domainObjectStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 
+		return domainObjectStringTemplate.toString();
+	}
+
+	public String generateJdoDomainIndexObject(DomainObjectModel _domainObjectModel)
+	{
+		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainIndexObject");
+
+		domainObjectStringTemplate.setAttribute("generatorComment", comment	);
+		domainObjectStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
+		domainObjectStringTemplate.setAttribute("fullClassName", _domainObjectModel.getFullyQualifiedClassName());
+		domainObjectStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+		domainObjectStringTemplate.setAttribute("dateTimeStamp", (new java.util.Date()).getTime());
+		
 		return domainObjectStringTemplate.toString();
 	}
 

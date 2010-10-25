@@ -14,30 +14,33 @@ import javax.jdo.annotations.PersistenceCapable;
 )
 
 @PersistenceCapable
-public class $className$Jdo
-	implements $package$.airlift.domain.$className$
+public class $className$IndexJdo
 {
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
     private String encodedKey;
 
-	$attributes$
+	@Persistent @Extension(vendorName="datanucleus", key="gae.pk-name", value="true") private java.lang.String id;
+	@Persistent private java.util.List<String> index; 
 
 	public String getEncodedKey() { return encodedKey; }
-	$attributeGetters$
+	public String getId() { return id; }
+	public java.util.List<String> getIndex() { return index; }
 
 	public void setEncodedKey(String _encodedKey) { encodedKey = _encodedKey; }
-	$attributeSetters$
+	public void setId(String _id) { id = _id; }
+	public void setIndex(java.util.List<String> _index) { index = _index; }
 
-	public $className$Jdo() {}
+	public $className$IndexJdo() {}
 
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();
 
-		stringBuffer.append("[** $className$Jdo ... $className$").append("\n");
-		$attributeStringBufferAppends$
+		stringBuffer.append("[** AssignmentJdoIndex ... Assignment").append("\n");
+		stringBuffer.append("id:").append(getId()).append("\n"); 
+		stringBuffer.append("index:").append(getIndex()).append("\n"); 
 		stringBuffer.append("**]\n");
 		
 		return stringBuffer.toString();

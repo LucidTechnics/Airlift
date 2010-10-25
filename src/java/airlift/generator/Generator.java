@@ -51,29 +51,6 @@ public abstract class Generator
 		setPersistableSet(new HashSet());
 		setNumericSet(new HashSet());
 
-		getPersistableSet().add("java.lang.String");
-		getPersistableSet().add("long");
-		getPersistableSet().add("int");
-		getPersistableSet().add("char");
-		getPersistableSet().add("short");
-		getPersistableSet().add("double");
-		getPersistableSet().add("boolean");
-		getPersistableSet().add("byte");
-		getPersistableSet().add("float");
-		getPersistableSet().add("java.lang.Long");
-		getPersistableSet().add("java.lang.Integer");
-		getPersistableSet().add("java.lang.Character");
-		getPersistableSet().add("java.lang.Short");
-		getPersistableSet().add("java.lang.Double");
-		getPersistableSet().add("java.lang.Boolean");
-		getPersistableSet().add("java.lang.Byte");
-		getPersistableSet().add("java.lang.Float");
-		getPersistableSet().add("java.util.Date");
-		getPersistableSet().add("java.sql.Date");
-		getPersistableSet().add("java.sql.Timestamp");
-		getPersistableSet().add("java.math.BigDecimal");
-		getPersistableSet().add("java.math.BigInteger");
-
 		getNumericSet().add("long");
 		getNumericSet().add("int");
 		getNumericSet().add("short");
@@ -86,30 +63,7 @@ public abstract class Generator
 		getNumericSet().add("java.lang.Float");
 		getNumericSet().add("java.math.BigDecimal");
 		getNumericSet().add("java.math.BigInteger");
-
-		getPersistableSet().add("java.lang.String[]");
-		getPersistableSet().add("long[]");
-		getPersistableSet().add("int[]");
-		getPersistableSet().add("char[]");
-		getPersistableSet().add("short[]");
-		getPersistableSet().add("double[]");
-		getPersistableSet().add("boolean[]");
-		getPersistableSet().add("byte[]");
-		getPersistableSet().add("float[]");
-		getPersistableSet().add("java.lang.Long[]");
-		getPersistableSet().add("java.lang.Integer[]");
-		getPersistableSet().add("java.lang.Character[]");
-		getPersistableSet().add("java.lang.Short[]");
-		getPersistableSet().add("java.lang.Double[]");
-		getPersistableSet().add("java.lang.Boolean[]");
-		getPersistableSet().add("java.lang.Byte[]");
-		getPersistableSet().add("java.lang.Float[]");
-		getPersistableSet().add("java.util.Date[]");
-		getPersistableSet().add("java.sql.Date[]");
-		getPersistableSet().add("java.sql.Timestamp[]");
-		getPersistableSet().add("java.math.BigDecimal[]");
-		getPersistableSet().add("java.math.BigInteger[]");
-    }
+	}
 
     protected String getNullableConstraint(String _nullable)
     {
@@ -292,13 +246,11 @@ public abstract class Generator
 
     protected boolean isPersistable(String _type)
 	{
+		//Use to be that only primitives were persistable.  Now all
+		//objects are persistable.  Note that not all objects are
+		//presentable however.
 	    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Checking this type: " + _type);
-		boolean isPersistable = false;
-
-		if (getPersistableSet().contains(_type) == true)
-		{
-			isPersistable = true;
-		}
+		boolean isPersistable = true;
 
 		return isPersistable;
     }

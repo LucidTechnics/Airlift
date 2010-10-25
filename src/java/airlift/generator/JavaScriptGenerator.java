@@ -114,7 +114,7 @@ public class JavaScriptGenerator
 				daoRangeStringTemplate.setAttribute("attribute", name);
 				daoStringTemplate.setAttribute("collectByRange", daoRangeStringTemplate.toString());
 
-				if (type.endsWith("[]") == true)
+				if (type.endsWith("[]") == true || type.startsWith("java.util.List") == true)
 				{
 					StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
 

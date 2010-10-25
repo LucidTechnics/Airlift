@@ -1,3 +1,0 @@
-stringBuffer.append("<tr type=\"$appName$:$className$\">").append("\n");
-$tdStringAppend; separator="\n"$
-stringBuffer.append("</tr>");
