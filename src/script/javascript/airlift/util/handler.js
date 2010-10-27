@@ -693,7 +693,6 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 	{
 		//works for java.util.Date and for Date
 		var date = new Date(_date.getTime());
-
 		indexList.add(airlift.prepareForDateSearch(date, _name, "year"));
 		indexList.add(airlift.prepareForDateSearch(date, _name, "month"));
 		indexList.add(airlift.prepareForDateSearch(date, _name, "date"));
