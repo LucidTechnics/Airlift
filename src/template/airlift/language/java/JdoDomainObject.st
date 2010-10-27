@@ -1,6 +1,8 @@
 package $package$.airlift.domain;
 
 import javax.jdo.annotations.Extension;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Persistent;
@@ -13,9 +15,10 @@ import javax.jdo.annotations.PersistenceCapable;
 	date = "$dateTimestamp$"
 )
 
-@PersistenceCapable
+@FetchGroup(name = "$lowerCaseClassName$Index", members = {@Persistent(name = "$lowerCaseClassName$Index") })
+@PersistenceCapable(identityType = IdentityType.APPLICATION, detachable="true")
 public class $className$Jdo
-	implements $package$.airlift.domain.$className$
+   implements $package$.airlift.domain.$className$, java.io.Serializable
 {
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)

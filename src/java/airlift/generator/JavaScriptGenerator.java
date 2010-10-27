@@ -104,6 +104,7 @@ public class JavaScriptGenerator
 				daoAttributeStringTemplate.setAttribute("attributeName", name);
 				daoAttributeStringTemplate.setAttribute("attributeType", type);
 				daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+				
 				daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());
 
 				StringTemplate daoRangeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoRange");
@@ -123,6 +124,20 @@ public class JavaScriptGenerator
 					daoMembershipStringTemplate.setAttribute("attribute", name);
 					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
 				}
+
+				String indexAddAll = "";
+				
+				if ("java.util.Date".equals(type) == true)
+				{
+					indexAddAll = "indexList.addAll(airlift.tokenizeIntoDateParts(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "(), \"" + name + "\"));"; 
+				}
+				else
+				//For all other types change to a string and index it!
+				{
+					indexAddAll = "indexList.addAll(airlift.tokenizeIntoNGrams(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "()));"; 
+				}
+
+				daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
 			}
 		}
 
@@ -151,7 +166,8 @@ public class JavaScriptGenerator
 		daoStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 		daoStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		daoStringTemplate.setAttribute("selectAllSql", databaseGenerator.generateSelectSql(_domainObjectModel));
-
+		daoStringTemplate.setAttribute("findKeysSql", databaseGenerator.generateFindKeysSql(_domainObjectModel));
+		
 		return daoStringTemplate.toString();
 	}
 

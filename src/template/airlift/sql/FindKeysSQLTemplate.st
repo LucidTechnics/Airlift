@@ -1,0 +1,1 @@
+SELECT encodedKey FROM $package$.airlift.domain.$className$IndexJdo

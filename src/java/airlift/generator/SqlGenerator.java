@@ -79,7 +79,7 @@ public class SqlGenerator
 
 	public String generateFindByThisAttributeSql(DomainObjectModel _domainObjectModel, String _attribute)
 	{
-	    StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf(AIRLIFT_SQL_FIND_BY_ATTRIBUTE_SQLTEMPLATE);
+	    StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf("airlift/sql/FindByAttributeSQLTemplate");
 
 	    Iterator attributes = _domainObjectModel.getAttributes();
 	    String tableName = _domainObjectModel.getTableName();
@@ -88,6 +88,19 @@ public class SqlGenerator
 	    stringTemplate.setAttribute("tableName", tableName);
 
 	    return stringTemplate.toString();
+	}
+
+	public String generateFindKeysSql(DomainObjectModel _domainObjectModel)
+	{
+		StringTemplate stringTemplate = getStringTemplateGroup().getInstanceOf("airlift/sql/FindKeysSQLTemplate");
+
+		Iterator attributes = _domainObjectModel.getAttributes();
+		String tableName = _domainObjectModel.getTableName();
+
+		stringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
+		stringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+
+		return stringTemplate.toString();
 	}
 
 	public String generateFindByThisMembershipSql(DomainObjectModel _domainObjectModel, String _attribute)

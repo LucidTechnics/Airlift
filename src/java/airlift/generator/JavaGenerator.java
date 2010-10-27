@@ -381,7 +381,7 @@ public class JavaGenerator
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
 
 		//index property
-		attributeStringTemplate.setAttribute("annotation", "@Persistent");
+		attributeStringTemplate.setAttribute("annotation", "@Persistent(dependent=\"true\")");
 		
 		attributeStringTemplate.setAttribute("scope", "private");
 		attributeStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
@@ -538,6 +538,7 @@ public class JavaGenerator
 			stringBufferStringTemplate.setAttribute("name", "updateDate");
 		}
 
+		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeSetters", setterStringTemplate);
@@ -554,6 +555,7 @@ public class JavaGenerator
 	{
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainIndexObject");
 
+		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		domainObjectStringTemplate.setAttribute("generatorComment", comment	);
 		domainObjectStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		domainObjectStringTemplate.setAttribute("fullClassName", _domainObjectModel.getFullyQualifiedClassName());

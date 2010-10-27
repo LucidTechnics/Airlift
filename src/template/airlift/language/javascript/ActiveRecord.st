@@ -129,6 +129,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.del();
 	};
 
+	activeRecord.search = function(_tokenList, _config)
+	{
+		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
+
+		return this.convertToActiveRecordArray(this.dao.search(_tokenList, _config));
+	};
+
 	activeRecord.collect = function(_config)
 	{
 		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
@@ -257,7 +264,16 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			that[setter](_$allLowerCaseClassName$[getter]());
+			if (airlift.isDefined(_request[getter]) === true && airlift.isDefined(_request.getEncodedKey) === true)
+			{
+				//this is a JDO object
+				that[setter](_request[getter]());
+			}
+			else
+			{
+				//this is a Datastore entity and not a JDO object.
+				that[setter](_request.getProperty(_property));
+			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);

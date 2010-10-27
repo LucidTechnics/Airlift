@@ -558,22 +558,40 @@ airlift.toJavaString = function(_string)
 	return new Packages.java.lang.String(_string);
 };
 
-airlift.appender = function(_initialText, _delimiter)
+airlift.appender = function(_initialText, _delimiter, _postAppendDelimiter)
 {
+	var postAppendDelimiter = (airlift.isDefined(_postAppendDelimiter) === true) ? _postAppendDelimiter : false;
 	var delimiter = (airlift.isDefined(_delimiter) === true) ? _delimiter : ",";
 	var initialText = (airlift.isDefined(_initialText) === true) ? _initialText : "";
 	
 	var appender = {
+		firstAppend: true,
 		text: initialText,
 		delimiter: delimiter,	  
 
 		append: function(_appendee)
 		{
-			this.text += this.delimiter + _appendee; 
+			 if (this.firstAppend === true && postAppendDelimiter === true)
+			 {
+				 this.text += _appendee;
+				 this.firstAppend = false;
+			 }
+			 else
+			 {
+				 this.text += this.delimiter + _appendee;
+			 }
 		},
+		
 		toString: function()
 		{
 			return this.text;
+		},
+
+		reset: function()
+		{
+			this.text = "";
+			this.delimiter = "";
+			this.firstAppend = true;
 		}
 	};
 
@@ -614,3 +632,103 @@ airlift.copy = function(_source, _destination, _propertyArray)
 {
 	_propertyArray.forEach(function (_e, _i, _a) { _destination[_e] = _source[_e]; });
 };
+
+airlift.tokenizeIntoNGrams = function(_string)
+{
+	//Make sure string is a string and make sure it is in all lowercase
+	//...
+	var string = (airlift.isDefined(_string) === true) ? _string.toString().toLowerCase() : "";
+	
+	var indexList = new Packages.java.util.ArrayList();
+	var standardTokenizer = new Packages.org.apache.lucene.analysis.standard.StandardTokenizer(org.apache.lucene.util.Version.LUCENE_30, new Packages.java.io.StringReader(string));
+	var standardTermAttribute = standardTokenizer.addAttribute(Packages.java.lang.Class.forName("org.apache.lucene.analysis.tokenattributes.TermAttribute"));
+
+	while (standardTokenizer.incrementToken() === true)
+	{
+		var term = standardTermAttribute.term();
+		indexList.add(term);
+
+		var tokenizer = new Packages.org.apache.lucene.analysis.ngram.EdgeNGramTokenizer(new Packages.java.io.StringReader(term), "front", 3, 15);
+		var termAttribute = tokenizer.addAttribute(Packages.java.lang.Class.forName("org.apache.lucene.analysis.tokenattributes.TermAttribute"));
+
+		tokenizer.reset();
+
+		while (tokenizer.incrementToken() === true)
+		{
+			indexList.add(termAttribute.term());
+		}
+	}
+
+	return indexList;
+}
+
+airlift.prepareForDateSearch = function(_date, _attributeName, _datePart)
+{
+	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName + "-") : "";
+
+	if ("month".equalsIgnoreCase(_datePart) === true )
+	{
+		var datePart = "month-";
+		var getter = "getMonth";
+	}
+	else if ("year".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "year-";
+		var getter = "getFullYear";
+	}
+	else if ("date".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "date-";
+		var getter = "getDate";
+	}
+	
+	return name + datePart + _date[getter]();
+}
+
+airlift.tokenizeIntoDateParts = function(_date, _name)
+{
+	var indexList = new Packages.java.util.ArrayList();
+	
+	if (_date)
+	{
+		//works for java.util.Date and for Date
+		var date = new Date(_date.getTime());
+
+		indexList.add(airlift.prepareForDateSearch(date, _name, "year"));
+		indexList.add(airlift.prepareForDateSearch(date, _name, "month"));
+		indexList.add(airlift.prepareForDateSearch(date, _name, "date"));
+	}
+
+	return indexList;
+}
+
+airlift.getMonthIntervals = function(_date1, _date2)
+{
+	var monthList = new Packages.java.util.ArrayList();
+
+	if (_date1 && _date2)
+	{
+		//works for java.util.Date and for Date
+		var date1 = new Date(_date1.getTime());
+		var date2 = new Date(_date2.getTime());
+
+		var startDate = (date1 < date2) ? date1 : date2;
+		var endDate = (date1 >= date2) ? date1 : date2;
+
+		var interval = startDate;
+		interval.setDate(1);
+
+		while (interval < endDate)
+		{
+			var month = interval.getMonth();
+			var fullYear = interval.getFullYear();
+			monthList.add(interval);
+
+			interval = new Date(interval.getTime());
+			interval.setMonth(((month + 1) > 11) ? 0 : month + 1);
+			interval.setFullYear((interval.getMonth() === 0) ? fullYear + 1 : fullYear);
+		}
+	}
+
+	return monthList;
+}

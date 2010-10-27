@@ -13,6 +13,7 @@ else if (typeof airlift != "object")
 
 importClass(Packages.$package$.airlift.domain.$className$);
 importClass(Packages.$package$.airlift.domain.$className$Jdo);
+importClass(Packages.$package$.airlift.domain.$className$IndexJdo);
 
 importClass(Packages.javax.jdo.Query);
 importClass(Packages.javax.jdo.PersistenceManager);
@@ -46,6 +47,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var id = Packages.airlift.util.IdGenerator.generate(12);
 		_$lowerCaseClassName$.setId(id);
 
+		var indexList = this.index(_$lowerCaseClassName$);
+
+		var index = new $className$IndexJdo();
+		var indexId = Packages.airlift.util.IdGenerator.generate(12);
+
+		index.setId(indexId);
+		index.setIndex(indexList);
+		index.set$className$Jdo(_$lowerCaseClassName$);
+
+		_$lowerCaseClassName$.set$className$IndexJdo(index);
+
 		for (var i = 0; i < 5; i++)
 		{
 			try
@@ -65,6 +77,61 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		return id;
 	}
 
+	dao.index = function(_$lowerCaseClassName$)
+	{
+		var indexList = new Packages.java.util.ArrayList();
+
+		$indexAddAll; separator="\n"$
+
+		return indexList;
+	}
+
+	dao.search = function(_tokenList, _config)
+	{
+		var config = (airlift.isDefined(_config) === true) ? _config : {};
+
+		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
+		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
+
+		var sql = airlift.appender("$findKeysSql$ WHERE ", "AND", true);
+
+		for (var token in Iterator(_tokenList))
+		{
+			sql.append("index == \"" + token + "\"");
+		}
+
+		LOG.info("SQL is: " + sql.toString());
+
+		var query = PERSISTENCE_MANAGER.newQuery(sql.toString());
+
+		query.setRange(offset, limit);
+
+		var indexKeyList = query.execute();
+		var keyList = new Packages.java.util.ArrayList();
+		
+		for (var indexKey in Iterator(indexKeyList))
+		{
+			var key = Packages.com.google.appengine.api.datastore.KeyFactory.stringToKey(indexKey);
+			if (airlift.isDefined(key.getParent() === true))
+			{
+				LOG.info("looking for parent key: " + key.getParent());
+				keyList.add(key.getParent());
+			}
+		}
+
+		
+		if (keyList.isEmpty() === false)
+		{
+			var objectList = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory.getDatastoreService().get(keyList);
+		}
+		else
+		{
+			var objectList = new Packages.java.util.ArrayList();
+		}
+
+		return new Packages.java.util.ArrayList(objectList);
+	}
+	
 	$insertChangeEvent$
 
 	$primaryKeyMethods$
