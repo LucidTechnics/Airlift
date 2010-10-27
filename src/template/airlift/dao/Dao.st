@@ -118,18 +118,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 				keyList.add(key.getParent());
 			}
 		}
-
 		
 		if (keyList.isEmpty() === false)
 		{
-			var objectList = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory.getDatastoreService().get(keyList);
+			var objectMap = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory.getDatastoreService().get(keyList);
 		}
 		else
 		{
-			var objectList = new Packages.java.util.ArrayList();
+			var objectMap = new Packages.java.util.HashMap();
 		}
 
-		return new Packages.java.util.ArrayList(objectList);
+		return new Packages.java.util.ArrayList(objectMap.values());
 	}
 	
 	$insertChangeEvent$
