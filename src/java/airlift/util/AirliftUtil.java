@@ -240,9 +240,9 @@ public class AirliftUtil
 		return stringBuffer.toString().replaceAll(",$", "") + "]";
 	}
 
-	public static java.util.Map<String, String> describe(Object _do, Class _interfaceClass)
+	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
 	{
-		java.util.Map<String, String> descriptionMap = new java.util.HashMap<String, String>();
+		java.util.Map<String, Object> descriptionMap = new java.util.HashMap<String, Object>();
 
 		try
 		{
@@ -257,7 +257,7 @@ public class AirliftUtil
 					java.lang.reflect.Method getter = propertyDescriptor.getReadMethod();
 
 					Object rawValue = getter.invoke(_do, new Object[0]);
-					String value = null;
+					Object value = null;
 
 					if (java.sql.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
 					{
@@ -313,6 +313,11 @@ public class AirliftUtil
 						}
 
 						value = airlift.util.FormatUtil.format((java.sql.Timestamp) rawValue, mask);
+					}
+					else if (java.util.ArrayList.class.equals(propertyDescriptor.getPropertyType()) == true ||
+							java.util.HashSet.class.equals(propertyDescriptor.getPropertyType()) == true)
+					{
+						value = (rawValue == null) ? null : rawValue;
 					}
 					else
 					{

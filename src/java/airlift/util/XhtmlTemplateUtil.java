@@ -259,6 +259,6 @@ public class XhtmlTemplateUtil
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/MultiInputTemplate");
 
-		return template;		
+		return template;
 	}
 }

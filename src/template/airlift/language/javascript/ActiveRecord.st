@@ -382,47 +382,83 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.populateFromRequestMap = function(_attributeMap, _errorMap)
 	{
+		LOG.info("populating from request map: ");
 		var errorMap = (airlift.isDefined(_errorMap) === true) ? _errorMap : new java.util.HashMap();
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 		var impl = this.createImpl();
-		
+
 		var processProperty = function(_property, _index, _array)
 		{
 			var property = new Packages.java.lang.String(_property);
 			var methodPresentable = that.getPresentableAnnotation(property);
 			var attributeType = that.getAttributeType(property);
 
+			LOG.info("Attribute type is: " + attributeType + " for property: " + property);
+
+			function copyValueArrayToCollection(_valueArray, _collection)
+			{
+				if (airlift.isDefined(_valueArray) === true)
+				{
+					for (var i = 0; i < _valueArray.length; i++)
+					{
+						_collection.add(_valueArray[i]);
+					}
+				}
+			}
+
 			if ((airlift.isDefined(methodPresentable) === true) &&
-				(methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
-				 methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.SELECT)
+				  (methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
+				   methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.SELECT)
 			   )
 			{
+				LOG.info("property name is: " + property);
+				LOG.info("attribute map has: " + _attributeMap);
 				var result = null, valueArray = _attributeMap.get(property), stringBuffer = new Packages.java.lang.StringBuffer();
 
 				if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
 				{
+					LOG.info("This is an array");
+					//This only works for arrays of strings!!!
 					result = valueArray;
 				}
-				else (airlift.isDefined(valueArray) === true && valueArray.length > 0)
+				else if (attributeType.startsWith("java.util.List") === true)
+				//attribute is of type collection.
 				{
-					result = valueArray[0];
+					LOG.info("This is a ArrayList");
+					var valueCollection = new Packages.java.util.ArrayList();
+					copyValueArrayToCollection(valueArray, valueCollection);
+					airlift.d("This is the values: " + valueCollection);
+					result = valueCollection;
+				}
+				else if (attributeType.startsWith("java.util.Set") === true)
+				{
+					LOG.info("This is a HashSet");
+					var valueCollection = new Packages.java.util.HashSet();
+					copyValueArrayToCollection(valueArray, valueCollection);
+					result = valueCollection;
+				}
+				else if (airlift.isDefined(valueArray) === true && valueArray.length > 0)
+				{
+					LOG.info("This is a something else");
+					LOG.info("assigning this to result: ");
+					result = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
 				}
 
 				if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
 					  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
 				{
 					if (result != null && ((new Packages.java.lang.String("yes")).equalsIgnoreCase(result) === true ||
-						(new Packages.java.lang.String("y")).equalsIgnoreCase(result) === true ||
-						(new Packages.java.lang.String("true")).equalsIgnoreCase(result) === true ||
-						(new Packages.java.lang.String("on")).equalsIgnoreCase(result) === true ||
-						(new Packages.java.lang.String("1")).equalsIgnoreCase(result) === true ||
+										   (new Packages.java.lang.String("y")).equalsIgnoreCase(result) === true ||
+										   (new Packages.java.lang.String("true")).equalsIgnoreCase(result) === true ||
+										   (new Packages.java.lang.String("on")).equalsIgnoreCase(result) === true ||
+										   (new Packages.java.lang.String("1")).equalsIgnoreCase(result) === true ||
 						//registering "" (empty string) as a true value to support checkboxes with
 						//the value attribute not being set.  Setting the value
 						//atrribute wil make the value visible on the form.  This may
 						//not be desired for a simple yes-no option hence the need to
 						//register "" as true.
-						(new Packages.java.lang.String("")).equals(result) === true))
+										   (new Packages.java.lang.String("")).equals(result) === true))
 					{
 						result = "true";
 					}
@@ -440,7 +476,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 						{
 							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
 						}
-						else if (airlift.isDefined(valueArray) === true && Packages.airlift.util.Airlift.isWhitespace(result) !== true)
+						else if (airlift.isDefined(valueArray) === true)
 						{
 							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
 						}
@@ -452,10 +488,24 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			else
 			{
 				var valueArray = _attributeMap.get(property);
-				
+
 				if (attributeType.endsWith("[]") === true)
 				{
 					var value = valueArray;
+					errorMap = that.validateProperty(property, value);
+				}
+				else if ((new Packages.java.lang.String("java.util.ArrayList")).equalsIgnoreCase(attributeType) === true)
+				{
+					var valueCollection = new Packages.java.util.ArrayList();
+					copyValueArrayToCollection(valueArray, valueCollection);
+					var value = valueCollection;
+					errorMap = that.validateProperty(property, value);
+				}
+				else if ((new Packages.java.lang.String("java.util.HashSet")).equalsIgnoreCase(attributeType) === true)
+				{
+					var valueCollection = new Packages.java.util.HashSet();
+					copyValueArrayToCollection(valueArray, valueCollection);
+					var value = valueCollection;
 					errorMap = that.validateProperty(property, value);
 				}
 				else
@@ -463,7 +513,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 					var value = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
 					errorMap = that.validateProperty(property, value + "");
 				}
-				
+
 				if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
 				{
 					that.copyProperty(impl, property, null);
@@ -475,7 +525,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.copyFrom(impl);
 
 		LOG.info("The active record now has these values after populateFromRequestMap: " + toString());
-		
+
 		return errorMap;
 	}
 

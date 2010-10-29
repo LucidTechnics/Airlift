@@ -391,10 +391,13 @@ airlift.toFieldSet = function(_config, _activeRecord)
 							}
 							else
 							{
-								for (var i in allowedValues)
+								for (var i = 0; i < allowedValues.length; i++)
 								{
 									var allowedValue = allowedValues[i];
-									var checked = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(_property), allowedValue) === true) ? "checked" : "";
+
+									LOG.info("Here are the values: " + propertyMap.get(_property));
+									
+									var checked = "$" + allowedValue + "_checked$";
 
 									inputTemplate.setAttribute("type", multiType);
 									inputTemplate.setAttribute("name", _property);
