@@ -133,7 +133,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
 
-		return this.convertToActiveRecordArray(this.dao.search(_tokenList, _config));
+		return this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
 	};
 
 	activeRecord.collect = function(_config)
@@ -161,6 +161,22 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
 			activeRecord.copyFrom(dataObject);
+			collection.push(activeRecord);
+		}
+
+		return collection;
+	}
+
+	activeRecord.convertIndexToActiveRecordArray = function(_map)
+	{
+		var collection = [];
+
+		for (var entry in Iterator(_map.entrySet()))
+		{
+			var key = entry.getKey();
+			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
+			activeRecord.copyFromEntity(entry.getValue());
+			activeRecord.setId(key.name);
 			collection.push(activeRecord);
 		}
 
@@ -264,16 +280,24 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			if (airlift.isDefined(_request[getter]) === true && airlift.isDefined(_request.getEncodedKey) === true)
-			{
-				//this is a JDO object
-				that[setter](_request[getter]());
-			}
-			else
-			{
-				//this is a Datastore entity and not a JDO object.
-				that[setter](_request.getProperty(_property));
-			}
+			//this is a JDO object
+			that[setter](_$allLowerCaseClassName$[getter]());
+		}
+
+		orderedPropertyList.forEach(copyProperty);
+	}
+
+	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$)
+	{
+		var orderedPropertyList = this.retrieveOrderedPropertyList();
+		var that = this;
+		
+		var copyProperty = function(_property, _index, _array)
+		{
+			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+			//this is a Datastore entity and not a JDO object.
+			that[setter](_$allLowerCaseClassName$.getProperty(_property));
 		}
 
 		orderedPropertyList.forEach(copyProperty);
