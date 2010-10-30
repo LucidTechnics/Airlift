@@ -77,7 +77,6 @@ public class JavaGenerator
 				//TODO Need to refactor annotations into class level
 				//and attribute level annotations.
 				template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \""  + "\");");
-
 				
 				for (Attribute attribute: domainObjectModel.getAttributeNameMap().values())
 				{
@@ -86,6 +85,10 @@ public class JavaGenerator
 					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 					String concept = findValue(persist, "concept()");
 					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + concept + "\");");
+
+					Annotation present = domainObjectModel.getAnnotation(attribute, "airlift.generator.Presentable");
+					String inputType = findValue(present, "inputType()");
+					template.setAttribute("addToDomainAttributeWidgetMap", "widgetMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + inputType + "\");");
 				}
 			}
 		}

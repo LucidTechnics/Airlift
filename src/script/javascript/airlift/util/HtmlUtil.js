@@ -658,8 +658,6 @@ airlift.toAtom = function(_config)
 
 airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
 {
-	var valueString = (airlift.isDefined(_activeRecord[_propertyName]) === true) ? Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]) : "";
-
 	var messageList = _activeRecord.getMessageList(_propertyName);
 
 	var messageString = airlift.appender("", " ");
@@ -686,7 +684,34 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 
 	_formTemplate.setAttribute(messageTarget, messageString);
 	_formTemplate.setAttribute(emClassTarget, emClassString);
-	_formTemplate.setAttribute(valueTarget, valueString);
+
+	var widget = APP_PROFILE.getAttributeWidget(DOMAIN_NAME, _propertyName);
+	var type = APP_PROFILE.getAttributeType(DOMAIN_NAME, _propertyName);
+
+	LOG.info("Here is the widget: " + widget);
+	LOG.info("Here is the type: " + type);
+	
+	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
+	{
+		if (("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
+			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true) &&
+		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") == true))
+		{
+			for (var value in Iterator(_activeRecord[_propertyName]))
+			{
+				_formTemplate.setAttribute(value + "_checked", "checked");
+			}
+		}
+		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
+			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true)
+		{
+			_formTemplate.setAttribute(_activeRecord[_propertyName] + "_checked", "checked");
+		}
+		else
+		{
+			_formTemplate.setAttribute(valueTarget, Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
+		}
+	}
 }
 
 airlift.getCacheFormKey = function(_activeRecord, _method)

@@ -14,6 +14,7 @@ public class AppProfile
 {
 	private static final java.util.Collection<String> collection = new java.util.ArrayList<String>();
 	private static final java.util.Map<String, String> map = new java.util.HashMap<String, String>();
+	private static final java.util.Map<String, String> widgetMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
 	private static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
@@ -32,6 +33,9 @@ public class AppProfile
 		//Domain attribute types
 		$addToDomainAttributeTypeMap; separator="\n"$
 
+		//Domain attribute display widgets
+		$addToDomainAttributeWidgetMap; separator="\n"$
+			
 		//Concept Map
 		$addToConceptMap; separator="\n"$
 
@@ -95,6 +99,11 @@ public class AppProfile
 	public String getAttributeType(String _domainName, String _attributeName)
 	{
 		return map.get(_domainName.toLowerCase() + "." + _attributeName);
+	}
+
+	public String getAttributeWidget(String _domainName, String _attributeName)
+	{
+		return widgetMap.get(_domainName.toLowerCase() + "." + _attributeName);
 	}
 
 	public boolean hasAttribute(String _domainName, String _attributeName)
