@@ -93,12 +93,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
 		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
 
-		var sql = airlift.appender("$findKeysSql$ WHERE ", "AND", true);
+		var sql = airlift.appender("$findKeysSql$ WHERE index == [", ", ", true);
 
 		for (var token in Iterator(_tokenList))
 		{
-			sql.append("index == \"" + token + "\"");
+			sql.append("\"" + token + "\"");
 		}
+
+		sql.append("]");
 
 		LOG.info("SQL is: " + sql.toString());
 

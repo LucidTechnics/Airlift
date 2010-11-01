@@ -258,16 +258,6 @@ airlift.toFieldSet = function(_config, _activeRecord)
 		{
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			/*var messageList = _activeRecord.getMessageList(_property);
-
-			var messageString = airlift.appender("", " ");
-
-			for (var message in Iterator(messageList))
-			{
-				messageString.append(message.getMessage());
-			}
-
-			messageString = messageString.toString();*/
 			messageString = airlift.createTemplateTarget(groupName, _property, "message");
 
 			var getterMethod = domainInterfaceClass.getMethod(getter);
@@ -397,7 +387,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 									LOG.info("Here are the values: " + propertyMap.get(_property));
 									
-									var checked = "$" + allowedValue + "_checked$";
+									var checked = "$" + airlift.createCheckedTarget(allowedValue) + "$";
 
 									inputTemplate.setAttribute("type", multiType);
 									inputTemplate.setAttribute("name", _property);
@@ -421,11 +411,11 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						case Packages.airlift.generator.Presentable.Type.SELECT:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectTemplate(_property, groupName, 1, false, false);
 
-							for (var i in allowedValues)
+							for (var i = 0; i < allowedValues.length; i++)
 							{
 								var allowedValue = allowedValues[i];
-								
-								var selected = (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(propertyMap.get(_property), allowedValue) === true) ? "selected" : "";
+
+								var selected = "$" + airlift.createSelectedTarget(allowedValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
 								selectOptionTemplate.setAttribute("value", allowedValue);
@@ -433,8 +423,9 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
-								inputTemplate.setAttribute("inputClass", inputClass);
 							}
+
+							inputTemplate.setAttribute("inputClass", inputClass);
 
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
 							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
@@ -687,14 +678,10 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 
 	var widget = APP_PROFILE.getAttributeWidget(DOMAIN_NAME, _propertyName);
 	var type = APP_PROFILE.getAttributeType(DOMAIN_NAME, _propertyName);
-
-	LOG.info("Here is the widget: " + widget);
-	LOG.info("Here is the type: " + type);
 	
 	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
 	{
-		if (("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
-			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true) &&
+		if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true &&
 		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") == true))
 		{
 			for (var value in Iterator(_activeRecord[_propertyName]))
@@ -705,13 +692,32 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
 			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true)
 		{
-			_formTemplate.setAttribute(_activeRecord[_propertyName] + "_checked", "checked");
+			_formTemplate.setAttribute(airlift.createCheckedTarget(_activeRecord[_propertyName]), "checked");
+		}
+		else if ("airlift.generator.Presentable.Type.SELECT".equalsIgnoreCase(widget) === true)
+		{
+			_formTemplate.setAttribute(airlift.createSelectedTarget(_activeRecord[_propertyName]), "selected");
 		}
 		else
 		{
 			_formTemplate.setAttribute(valueTarget, Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
 		}
 	}
+}
+
+airlift.escapeForStringTemplate = function(_name)
+{
+	return (new Packages.java.lang.String("" + _name)).replaceAll("[^a-zA-Z0-9]", "_");
+}
+
+airlift.createCheckedTarget = function(_name)
+{
+	 return airlift.escapeForStringTemplate(_name) + "_checked";
+}
+
+airlift.createSelectedTarget = function(_name)
+{
+	return airlift.escapeForStringTemplate(_name) + "_selected";
 }
 
 airlift.getCacheFormKey = function(_activeRecord, _method)

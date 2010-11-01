@@ -558,28 +558,18 @@ airlift.toJavaString = function(_string)
 	return new Packages.java.lang.String(_string);
 };
 
-airlift.appender = function(_initialText, _delimiter, _postAppendDelimiter)
+airlift.appender = function(_initialText, _delimiter)
 {
-	var postAppendDelimiter = (airlift.isDefined(_postAppendDelimiter) === true) ? _postAppendDelimiter : false;
 	var delimiter = (airlift.isDefined(_delimiter) === true) ? _delimiter : ",";
 	var initialText = (airlift.isDefined(_initialText) === true) ? _initialText : "";
 	
 	var appender = {
-		firstAppend: true,
 		text: initialText,
 		delimiter: delimiter,	  
 
 		append: function(_appendee)
 		{
-			 if (this.firstAppend === true && postAppendDelimiter === true)
-			 {
-				 this.text += _appendee;
-				 this.firstAppend = false;
-			 }
-			 else
-			 {
-				 this.text += this.delimiter + _appendee;
-			 }
+			this.text += this.delimiter + _appendee;
 		},
 		
 		toString: function()

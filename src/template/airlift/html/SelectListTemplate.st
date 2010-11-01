@@ -1,3 +1,3 @@
-<select id="$id$" class="$inputClass$" $selectAttribute; separator=" "$>
+<select class="$inputClass$" $selectAttribute; separator=" "$ size="$size$">
   $optionList$
 </select>
