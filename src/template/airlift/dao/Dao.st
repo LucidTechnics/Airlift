@@ -79,11 +79,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.index = function(_$lowerCaseClassName$)
 	{
-		var indexList = new Packages.java.util.ArrayList();
+		var indexSet = new Packages.java.util.HashSet();
 
 		$indexAddAll; separator="\n"$
 
-		return indexList;
+		return new Packages.java.util.ArrayList(indexSet);
 	}
 
 	dao.search = function(_tokenList, _config)
@@ -93,18 +93,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
 		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
 
-		var sql = airlift.appender("$findKeysSql$ WHERE index == [", ", ", true);
-
+		var sql = new Packages.java.lang.StringBuffer("$findKeysSql$ WHERE ");
+		
 		for (var token in Iterator(_tokenList))
 		{
-			sql.append("\"" + token + "\"");
+			sql.append("index == \"" + token + "\" || ");
 		}
 
-		sql.append("]");
+		sql = sql.toString().replaceAll(" \\\|\\\| \$", "");
 
-		LOG.info("SQL is: " + sql.toString());
+		LOG.info("SQL is: " + sql);
 
-		var query = PERSISTENCE_MANAGER.newQuery(sql.toString());
+		var query = PERSISTENCE_MANAGER.newQuery(sql);
 
 		query.setRange(offset, limit);
 
@@ -116,7 +116,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			var key = Packages.com.google.appengine.api.datastore.KeyFactory.stringToKey(indexKey);
 			if (airlift.isDefined(key.getParent() === true))
 			{
-				LOG.info("looking for parent key: " + key.getParent());
 				keyList.add(key.getParent());
 			}
 		}

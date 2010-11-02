@@ -129,12 +129,12 @@ public class JavaScriptGenerator
 				
 				if ("java.util.Date".equals(type) == true)
 				{
-					indexAddAll = "indexList.addAll(airlift.tokenizeIntoDateParts(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "(), \"" + name + "\"));"; 
+					indexAddAll = "indexSet.addAll(airlift.tokenizeIntoDateParts(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "(), \"" + name + "\"));"; 
 				}
 				else
 				//For all other types change to a string and index it!
 				{
-					indexAddAll = "indexList.addAll(airlift.tokenizeIntoNGrams(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "()));"; 
+					indexAddAll = "indexSet.addAll(airlift.tokenizeIntoNGrams(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "()));"; 
 				}
 
 				daoStringTemplate.setAttribute("indexAddAll", indexAddAll);

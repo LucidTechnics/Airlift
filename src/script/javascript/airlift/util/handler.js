@@ -721,3 +721,44 @@ airlift.getMonthIntervals = function(_date1, _date2)
 
 	return monthList;
 }
+
+airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFieldName, _startDate, _endDate)
+{
+	var hasFilterTokens = true;
+	var inInterval = true;
+	var filteredArray = [];
+	var filterTokens = airlift.tokenizeIntoNGrams(_filterString);
+
+	_resultArray.forEach(function(_item) {
+		
+		if (airlift.isDefined(_startDate) === true &&
+			  airlift.isDefined(_endDate) === true &&
+			  airlift.isDefined(_dateFieldName) === true &&
+			  (
+			   _item[_dateFieldName].getTime() <= _startDate.getTime() ||
+			   _item[_dateFieldName].getTime() >= _endDate.getTime()
+			  )
+			)
+		{
+			inInterval = false;
+		}
+
+		if (filterTokens.isEmpty() === false)
+		{
+			var indexSet = new Packages.java.util.HashSet();
+
+			_propertyArray.forEach(function(_property)
+			{
+				indexSet.addAll(airlift.tokenizeIntoNGrams(_item[_property]));
+			});
+
+			indexSet.retainAll(filterTokens);
+
+			hasFilterTokens = !(indexSet.isEmpty());
+		}
+
+		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }
+	});
+
+	return filteredArray;
+}
