@@ -206,7 +206,7 @@ public class XhtmlTemplateUtil
 		return hiddenFormEntryTemplate;
 	}
 
-	public static StringTemplate createAnchorTemplate(String _href, String _rel, String _rev, String _target, String _label)
+	public static StringTemplate createAnchorTemplate(String _href, String _rel, String _rev, String _target, String _label, String _id, String _class)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/AnchorTemplate");
 
@@ -215,6 +215,8 @@ public class XhtmlTemplateUtil
 		template.setAttribute("rev", _rev);
 		template.setAttribute("target", _target);
 		template.setAttribute("label", _label);
+		template.setAttribute("containerId", _id);
+		template.setAttribute("containerClass", _class);
 
 		return template;
 	}

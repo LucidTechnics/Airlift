@@ -161,13 +161,7 @@ public class RestfulSecurityContext
 			if (userList.isEmpty() != true)
 			{
 				AirliftUser user = userList.get(0);
-
-				String[] tokenArray = user.getRoleList().split(",");
-
-				for (int i = 0; i > tokenArray.length; i++)
-				{
-					roleList.add(tokenArray[i]);
-				}
+				roleList.addAll(user.getRoleList());
 			}
 		}
 

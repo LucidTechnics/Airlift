@@ -24,24 +24,29 @@ public class AirliftUser
 	public AirliftUser() {}
 
 	@Persistent @PrimaryKey private String id;
+	@Persistent private String familyName;
+	@Persistent private String givenName;
 	@Persistent private String googleUserId;
 	@Persistent private String email;
-	@Persistent private String roleList;
+	@Persistent private java.util.List<String> roleList;
 	@Persistent private boolean active;
 	@Persistent private java.util.Date createDate;
 	
 	public String getId() { return id; }
+	public String getFamilyName() { return familyName; }
+	public String getGivenName() { return givenName; }
 	public String getGoogleUserId() { return googleUserId; }
 	public String getEmail() { return email; }
-	public String getRoleList() { return roleList; }
+	public java.util.List<String> getRoleList() { return roleList; }
 	public boolean getActive() { return active; }
 	public java.util.Date getCreateDate() { return createDate; }
 
 	public void setId(String _id) { id = _id; }
 	public void setGoogleUserId(String _googleUserId) { googleUserId = _googleUserId; }
+	public void setFamilyName(String _familyName) { familyName = _familyName; }
+	public void setGivenName(String _givenName) { givenName = _givenName; }
 	public void setEmail(String _email) { email = _email; }
-	public void setRoleList(String _roleList) { roleList = _roleList; }
+	public void setRoleList(java.util.List<String> _roleList) { roleList = _roleList; }
 	public void setActive(boolean _active) { active = _active; }
 	public void setCreateDate(java.util.Date _createDate) { createDate = _createDate; }
-
 }
