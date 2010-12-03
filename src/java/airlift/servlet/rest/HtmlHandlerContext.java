@@ -149,6 +149,7 @@ public class HtmlHandlerContext
 			scriptingUtil.bind("USER_NAME", userName);
 			scriptingUtil.bind("USER_EMAIL", userEmail);
 			scriptingUtil.bind("APP_PROFILE", appProfile);
+			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext());
 
 			log.info("Executing handler: " + _handlerName);
 

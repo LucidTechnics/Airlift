@@ -35,8 +35,7 @@ airlift.ls = function(_scriptName)
 airlift.checkAllowed = function(_domainName, _method, _isCollection)
 {
 	var isCollection = (airlift.isDefined(_isCollection) === true) ? _isCollection : false;
-	var securityContext = new Packages.airlift.servlet.rest.RestfulSecurityContext();
-	securityContext.allowed(USER, _method, APP_PROFILE, _domainName, isCollection); 
+	SECURITY_CONTEXT.allowed(USER, _method, APP_PROFILE, _domainName, isCollection); 
 };
 
 //ar - Create an active record for the provided domain name.  If not
