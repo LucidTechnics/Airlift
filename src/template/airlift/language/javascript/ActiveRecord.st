@@ -281,7 +281,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
 			//this is a JDO object
-			that[setter](_$allLowerCaseClassName$[getter]());
+
+			if (airlift.isDefined(_$allLowerCaseClassName$[getter]) === true)
+			{
+				that[setter](_$allLowerCaseClassName$[getter]());
+			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);
@@ -314,7 +318,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-			_$allLowerCaseClassName$[setter](that[getter]());
+			if (airlift.isDefined(_$allLowerCaseClassName$[setter]) === true)
+			{
+				_$allLowerCaseClassName$[setter](that[getter]());
+			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);

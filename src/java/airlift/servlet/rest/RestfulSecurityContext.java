@@ -16,6 +16,7 @@ package airlift.servlet.rest;
 
 import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
 import com.google.appengine.api.users.User;
 
 public class RestfulSecurityContext
@@ -23,7 +24,20 @@ public class RestfulSecurityContext
 {
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 
-	public RestfulSecurityContext() {}
+	private PersistenceManager persistenceManager;
+
+	private PersistenceManager getPersistenceManager() { return persistenceManager; }
+	private void setPersistenceManager(PersistenceManager _persistenceManager) { persistenceManager = _persistenceManager; }
+	
+	public RestfulSecurityContext()
+	{
+		setPersistenceManager(airlift.dao.PMF.get().getPersistenceManager());
+	}
+
+	public RestfulSecurityContext(PersistenceManager _persistenceManager)
+	{
+		setPersistenceManager(_persistenceManager);
+	}
 
 	public boolean allowed(User _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
@@ -173,7 +187,7 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser";
 
-		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 
@@ -184,7 +198,7 @@ public class RestfulSecurityContext
 	{
 		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
 		
-		airlift.dao.PMF.get().getPersistenceManager().makePersistent(_airliftUser);
+		getPersistenceManager().makePersistent(_airliftUser);
 
 		return _airliftUser.getId();
 	}
@@ -196,7 +210,7 @@ public class RestfulSecurityContext
 
 	public AirliftUser get(String _id)
 	{
-		return airlift.dao.PMF.get().getPersistenceManager().getObjectById(AirliftUser.class, _id);
+		return getPersistenceManager().getObjectById(AirliftUser.class, _id);
 	}
 
 	public void update(AirliftUser _airliftUser)
@@ -206,12 +220,12 @@ public class RestfulSecurityContext
 			throw new RuntimeException("Cannot update. Null id found for object: " + _airliftUser);
 		}
 
-		airlift.dao.PMF.get().getPersistenceManager().makePersistent(_airliftUser);
+		getPersistenceManager().makePersistent(_airliftUser);
 	}
 
 	public void delete(AirliftUser _airliftUser)
 	{
-		airlift.dao.PMF.get().getPersistenceManager().deletePersistent(_airliftUser);
+		getPersistenceManager().deletePersistent(_airliftUser);
 	}
 
 	public java.util.List<AirliftUser> collectByGoogleId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
@@ -219,7 +233,7 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE googleUserId == :attribute";
 
-		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 
@@ -231,7 +245,7 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE email == :attribute";
 
-		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 
@@ -243,7 +257,7 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE active == :attribute";
 
-		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 
@@ -255,7 +269,7 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE createDate >= lowerBound && createDate <= upperBound";
 
-		javax.jdo.Query query = airlift.dao.PMF.get().getPersistenceManager().newQuery(sql);
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 		query.declareParameters("java.util.Date lowerBound, java.util.Date upperBound");

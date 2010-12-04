@@ -28,7 +28,7 @@ public class AirliftUser
 	@Persistent private String givenName;
 	@Persistent private String googleUserId;
 	@Persistent private String email;
-	@Persistent private java.util.List<String> roleList;
+	@Persistent private java.util.List<String> roleList = new java.util.ArrayList<String>();
 	@Persistent private boolean active;
 	@Persistent private java.util.Date createDate;
 	
