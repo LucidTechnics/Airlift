@@ -143,7 +143,7 @@ public class RestfulSecurityContext
 			{
 				java.util.Set<String> userRoleSet = fetchUserRoleSet(_user);
 
-				if (userRoleSet.isEmpty() != false)
+				if (userRoleSet.isEmpty() == false)
 				{
 					boolean changeSet = userRoleSet.retainAll(_roleSet);
 
