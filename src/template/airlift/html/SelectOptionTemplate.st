@@ -1,1 +1,1 @@
-$value, selected, id:{ v, s, id | <option id="$id$" value="$v$" $s$>$v$</option> }; separator="\n"$
+$displayValue, value, selected, id:{ dv, v, s, id | <option id="$id$" value="$v$" $s$>$dv$</option> }; separator="\n"$

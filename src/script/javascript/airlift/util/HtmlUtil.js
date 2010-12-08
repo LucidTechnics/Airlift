@@ -399,14 +399,32 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						case Packages.airlift.generator.Presentable.Type.SELECT:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectTemplate(_property, groupName, 1, false, false);
 
-							for (var i = 0; i < allowedValues.length; i++)
+							var selectAllowedValues = (airlift.isDefined(_config[_property]) === true) ? _config[_property].allowedValues : allowedValues;
+							
+							for (var i = 0; i < selectAllowedValues.length; i++)
 							{
-								var allowedValue = allowedValues[i];
+								var selectAllowedValue = selectAllowedValues[i];
 
-								var selected = "$" + airlift.createSelectedTarget(allowedValue) + "$";
+								//This is a property whose allowed
+								//values are determined at runtime.
+								if (airlift.isDefined(selectAllowedValue.selectId) === true)
+								{
+									var displayValue = selectAllowedValue.displayValue;
+									var selectValue = selectAllowedValue.selectId;
+								}
+								else
+								{
+									//Use the configurable allowed
+									//values.
+									var displayValue = selectAllowedValue;
+									var selectValue = selectAllowedValue;
+								}
+								
+								var selected = "$" + airlift.createSelectedTarget(selectAllowedValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
-								selectOptionTemplate.setAttribute("value", allowedValue);
+								selectOptionTemplate.setAttribute("displayValue", displayValue);
+								selectOptionTemplate.setAttribute("value", selectValue);
 								selectOptionTemplate.setAttribute("selected", selected);
 								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
 
