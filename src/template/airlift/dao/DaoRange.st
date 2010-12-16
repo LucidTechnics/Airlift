@@ -1,11 +1,9 @@
 dao.collectBy$uppercaseAttribute$Range = function(_begin, _end, _config)
 {
-	var config = (airlift.isDefined(_config) === true) ? _config : {};
-
-	var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
-	var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
-	var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
-	var orderBy = (airlift.isDefined(_config.orderBy) === true && _config.orderBy.length > 0) ? "$attribute$," + _config.orderBy : "$attribute$";
+	var offset = (_config && _config.offset) ? _config.offset : 0;
+	var limit = (_config && _config.limit) ? _config.limit : 20;
+	var asc = (_config && _config.asc) ? _config.asc : true;
+	var orderBy = (_config && _config.orderBy && (_config.orderBy.length > 0)) ? "$attribute$," + _config.orderBy : "$attribute$";
 
 	orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
 	

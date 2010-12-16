@@ -62,7 +62,7 @@ h.createDO = function(_root, _domainObject)
 	var jetsetUtil = new Packages.hannibal.util.JetsetUtil(aws.access, aws.secret);
 	var id = h.generateUUID();
 	var persistPath = _domainObject.name + "/" + id;
-	var timestamp = new Date().getTime();
+	var timestamp = airlift.createDate().getTime();
 	
 	_domainObject.setPointer(id);
 	_domainObject.setCreationDate(timestamp);
@@ -76,7 +76,7 @@ h.createDO = function(_root, _domainObject)
 h.updateDO = function (_root, _domainObject)
 {
 	_domainObject.incrementClock();
-	_domainObject.setLastUpdateDate(new Date().getTime());
+	_domainObject.setLastUpdateDate(airlift.createDate().getTime());
 
 	var jetsetUtil = new Packages.hannibal.util.JetsetUtil(aws.access, aws.secret);
 	jetsetUtil.putObject(_root, _domainObject.name + "/" + _domainObject.xmlObject.@pointer, _domainObject, "text/xml");

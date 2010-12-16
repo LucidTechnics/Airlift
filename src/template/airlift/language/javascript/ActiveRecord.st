@@ -34,7 +34,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	allowedDateTimePatterns.every(addDateTimeString);
 	
-	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray);
+	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray, TIMEZONE);
 
     activeRecord.getConverter = function() 
 	{ 
@@ -197,6 +197,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.messageManager.add(_name, _category, _message);
 	}
 
+	activeRecord.addError = function(_name, _message, _category)
+	{
+		this.error = true;
+		this.addMessage(_name, _message, _category);
+	}
+
+	activeRecord.addErrorMap = function(_errorMap)
+	{
+		this.error = true;
+		this.messageManager.add(_errorMap);
+	}
+
 	activeRecord.getMessageMap = function()
 	{
 		return this.messageManager.getMessageMap();
@@ -253,16 +265,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		errorArray = errorArray.concat($upperCaseFirstLetterDomainClassName$Validator["validate" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property)](_value));
 
-		var messageManager = this.messageManager;
+		var that = this;
 		
-		var addErrorToMessageManager = function(_error, _index, _array)
+		var addError = function(_error, _index, _array)
 		{
-			messageManager.add(_error.name, _error.category, _error.message);
+			that.addError(_error.name, _error.message, _error.category);
 		}
 
-		errorArray.forEach(addErrorToMessageManager);
-
-		return this.messageManager.getMessageMap();
+		errorArray.forEach(addError);
 	}
 
 	/**
@@ -299,9 +309,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var copyProperty = function(_property, _index, _array)
 		{
 			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+			
 
 			//this is a Datastore entity and not a JDO object.
 			that[setter](_$allLowerCaseClassName$.getProperty(_property));
+
+			if ("java.util.Date".equals(that.getAttributeType(_property)) === true)
+			{
+				//Need to convert date to value that has the handler's
+				//timezone.
+				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+				that[setter](airlift.createDate({date: that[getter]()}));
+			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);
@@ -387,143 +406,142 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 	}
 	
-	activeRecord.populateFromRequestMap = function(_attributeMap, _errorMap)
+	activeRecord.populateFromRequestMap = function(_attributeMap)
 	{
-		LOG.info("populating from request map: ");
-		var errorMap = (airlift.isDefined(_errorMap) === true) ? _errorMap : new java.util.HashMap();
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 		var impl = this.createImpl();
 
 		var processProperty = function(_property, _index, _array)
 		{
-			var property = new Packages.java.lang.String(_property);
-			var methodPresentable = that.getPresentableAnnotation(property);
-			var attributeType = that.getAttributeType(property);
-
-			LOG.info("Attribute type is: " + attributeType + " for property: " + property);
-
-			function copyValueArrayToCollection(_valueArray, _collection)
+			if ("id".equalsIgnoreCase(_property) === false && that.isForeignKey(_property) === false)
 			{
-				if (airlift.isDefined(_valueArray) === true)
-				{
-					for (var i = 0; i < _valueArray.length; i++)
-					{
-						_collection.add(_valueArray[i]);
-					}
-				}
-			}
+				var property = new Packages.java.lang.String(_property);
+				var methodPresentable = that.getPresentableAnnotation(property);
+				var attributeType = that.getAttributeType(property);
 
-			if ((airlift.isDefined(methodPresentable) === true) &&
-				  (methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
-				   methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.SELECT)
-			   )
-			{
-				LOG.info("property name is: " + property);
-				LOG.info("attribute map has: " + _attributeMap);
-				var result = null, valueArray = _attributeMap.get(property), stringBuffer = new Packages.java.lang.StringBuffer();
-
-				if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
+				function copyValueArrayToCollection(_valueArray, _collection)
 				{
-					LOG.info("This is an array");
-					//This only works for arrays of strings!!!
-					result = valueArray;
-				}
-				else if (attributeType.startsWith("java.util.List") === true)
-				//attribute is of type collection.
-				{
-					LOG.info("This is a ArrayList");
-					var valueCollection = new Packages.java.util.ArrayList();
-					copyValueArrayToCollection(valueArray, valueCollection);
-					airlift.d("This is the values: " + valueCollection);
-					result = valueCollection;
-				}
-				else if (attributeType.startsWith("java.util.Set") === true)
-				{
-					LOG.info("This is a HashSet");
-					var valueCollection = new Packages.java.util.HashSet();
-					copyValueArrayToCollection(valueArray, valueCollection);
-					result = valueCollection;
-				}
-				else if (airlift.isDefined(valueArray) === true && valueArray.length > 0)
-				{
-					LOG.info("This is a something else");
-					LOG.info("assigning this to result: ");
-					result = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
-				}
-
-				if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
-					  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
-				{
-					if (result != null && ((new Packages.java.lang.String("yes")).equalsIgnoreCase(result) === true ||
-										   (new Packages.java.lang.String("y")).equalsIgnoreCase(result) === true ||
-										   (new Packages.java.lang.String("true")).equalsIgnoreCase(result) === true ||
-										   (new Packages.java.lang.String("on")).equalsIgnoreCase(result) === true ||
-										   (new Packages.java.lang.String("1")).equalsIgnoreCase(result) === true ||
-						//registering "" (empty string) as a true value to support checkboxes with
-						//the value attribute not being set.  Setting the value
-						//atrribute wil make the value visible on the form.  This may
-						//not be desired for a simple yes-no option hence the need to
-						//register "" as true.
-										   (new Packages.java.lang.String("")).equals(result) === true))
+					if (airlift.isDefined(_valueArray) === true)
 					{
-						result = "true";
-					}
-					else
-					{
-						result = "false";
-					}
-				}
-
-				if (airlift.isDefined(result) === true)
-				{
-					if (airlift.isDefined(that.copyProperty(impl, property, result)) === true && airlift.isDefined(result) === true)
-					{
-						if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
+						for (var i = 0; i < _valueArray.length; i++)
 						{
-							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
+							_collection.add(_valueArray[i]);
 						}
-						else if (airlift.isDefined(valueArray) === true)
-						{
-							that.addMessage(property, "conversion", result + " is an invalid entry for " + property + ".");
-						}
-
-						that.copyProperty(impl, property, null);
 					}
 				}
-			}
-			else
-			{
-				var valueArray = _attributeMap.get(property);
 
-				if (attributeType.endsWith("[]") === true)
+				if ((airlift.isDefined(methodPresentable) === true) &&
+					  (methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
+					   methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.SELECT)
+				   )
 				{
-					var value = valueArray;
-					errorMap = that.validateProperty(property, value);
-				}
-				else if ((new Packages.java.lang.String("java.util.ArrayList")).equalsIgnoreCase(attributeType) === true)
-				{
-					var valueCollection = new Packages.java.util.ArrayList();
-					copyValueArrayToCollection(valueArray, valueCollection);
-					var value = valueCollection;
-					errorMap = that.validateProperty(property, value);
-				}
-				else if ((new Packages.java.lang.String("java.util.HashSet")).equalsIgnoreCase(attributeType) === true)
-				{
-					var valueCollection = new Packages.java.util.HashSet();
-					copyValueArrayToCollection(valueArray, valueCollection);
-					var value = valueCollection;
-					errorMap = that.validateProperty(property, value);
+					LOG.info("property name is: " + property);
+					LOG.info("attribute map has: " + _attributeMap);
+					var result = null, valueArray = _attributeMap.get(property), stringBuffer = new Packages.java.lang.StringBuffer();
+
+					if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
+					{
+						LOG.info("This is an array");
+						//This only works for arrays of strings!!!
+						result = valueArray;
+					}
+					else if (attributeType.startsWith("java.util.List") === true)
+					//attribute is of type collection.
+					{
+						LOG.info("This is a ArrayList");
+						var valueCollection = new Packages.java.util.ArrayList();
+						copyValueArrayToCollection(valueArray, valueCollection);
+						airlift.d("This is the values: " + valueCollection);
+						result = valueCollection;
+					}
+					else if (attributeType.startsWith("java.util.Set") === true)
+					{
+						LOG.info("This is a HashSet");
+						var valueCollection = new Packages.java.util.HashSet();
+						copyValueArrayToCollection(valueArray, valueCollection);
+						result = valueCollection;
+					}
+					else if (airlift.isDefined(valueArray) === true && valueArray.length > 0)
+					{
+						LOG.info("This is a something else");
+						LOG.info("assigning this to result: ");
+						result = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
+					}
+
+					if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
+						  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
+					{
+						if (result != null && ((new Packages.java.lang.String("yes")).equalsIgnoreCase(result) === true ||
+											   (new Packages.java.lang.String("y")).equalsIgnoreCase(result) === true ||
+											   (new Packages.java.lang.String("true")).equalsIgnoreCase(result) === true ||
+											   (new Packages.java.lang.String("on")).equalsIgnoreCase(result) === true ||
+											   (new Packages.java.lang.String("1")).equalsIgnoreCase(result) === true ||
+							//registering "" (empty string) as a true value to support checkboxes with
+							//the value attribute not being set.  Setting the value
+							//atrribute wil make the value visible on the form.  This may
+							//not be desired for a simple yes-no option hence the need to
+							//register "" as true.
+											   (new Packages.java.lang.String("")).equals(result) === true))
+						{
+							result = "true";
+						}
+						else
+						{
+							result = "false";
+						}
+					}
+
+					if (airlift.isDefined(result) === true)
+					{
+						if (airlift.isDefined(that.copyProperty(impl, property, result)) === true && airlift.isDefined(result) === true)
+						{
+							if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
+							{
+								that.addError(property, "conversion", result + " is an invalid entry for " + property + ".");
+							}
+							else if (airlift.isDefined(valueArray) === true)
+							{
+								that.addError(property, "conversion", result + " is an invalid entry for " + property + ".");
+							}
+
+							that.copyProperty(impl, property, null);
+						}
+					}
 				}
 				else
 				{
-					var value = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
-					errorMap = that.validateProperty(property, value + "");
-				}
+					var valueArray = _attributeMap.get(property);
 
-				if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
-				{
-					that.copyProperty(impl, property, null);
+					if (attributeType.endsWith("[]") === true)
+					{
+						var value = valueArray;
+						that.validateProperty(property, value);
+					}
+					else if ((new Packages.java.lang.String("java.util.ArrayList")).equalsIgnoreCase(attributeType) === true)
+					{
+						var valueCollection = new Packages.java.util.ArrayList();
+						copyValueArrayToCollection(valueArray, valueCollection);
+						var value = valueCollection;
+						that.validateProperty(property, value);
+					}
+					else if ((new Packages.java.lang.String("java.util.HashSet")).equalsIgnoreCase(attributeType) === true)
+					{
+						var valueCollection = new Packages.java.util.HashSet();
+						copyValueArrayToCollection(valueArray, valueCollection);
+						var value = valueCollection;
+						that.validateProperty(property, value);
+					}
+					else
+					{
+						var value = (valueArray && (valueArray.length > 0) && valueArray[0]) ? valueArray[0] : "";
+						that.validateProperty(property, value + "");
+					}
+
+					if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
+					{
+						that.copyProperty(impl, property, null);
+					}
 				}
 			}
 		}
@@ -533,7 +551,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		LOG.info("The active record now has these values after populateFromRequestMap: " + toString());
 
-		return errorMap;
+		return this.messageManager.getMessageMap();;
 	}
 
 	activeRecord.populateFromRestContext = function(_restContext)

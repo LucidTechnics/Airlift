@@ -377,13 +377,7 @@ airlift.populate = function(_domainName, _appName)
 {
 	var activeRecord = airlift.ar(_domainName, _appName);
 	var errorMap = activeRecord.populate(REQUEST.getParameterMap(), REST_CONTEXT, METHOD);
-
-	if (errorMap.isEmpty() === false)
-	{
-		activeRecord.error = true;
-		activeRecord.addMessage(errorMap);
-	}
-
+	
 	return [activeRecord, errorMap];
 };
 
@@ -435,7 +429,7 @@ airlift.post = function(_domainName, _appName)
 {
 	var [activeRecord, errorMap] = airlift.populate(_domainName, _appName);
 
-	if (errorMap.isEmpty() === true)
+	if (activeRecord.error === true)
 	{
 		activeRecord["id"] =  airlift.g();
 	}
@@ -444,11 +438,9 @@ airlift.post = function(_domainName, _appName)
 	{
 		for (var i = 2; i < arguments.length; i++)
 		{
-			arguments[i](activeRecord);
+			arguments[i](activeRecord, errorMap);
 		}
 	}
-
-	activeRecord.error = (errorMap.isEmpty() === false) || (activeRecord.hasMessages() === true);
 
 	if (activeRecord.error === false)
 	{
@@ -466,11 +458,9 @@ airlift.put = function(_domainName, _appName)
 	{
 		for (var i = 2; i < arguments.length; i++)
 		{
-			arguments[i](activeRecord);
+			arguments[i](activeRecord, errorMap);
 		}
 	}
-
-	activeRecord.error = (errorMap.isEmpty() === false) || (activeRecord.hasMessages() === true);
 	
 	if (activeRecord.error === false)
 	{
@@ -651,27 +641,27 @@ airlift.tokenizeIntoNGrams = function(_string)
 	return indexList;
 }
 
-airlift.prepareForDateSearch = function(_date, _attributeName, _datePart)
+airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 {
 	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName + "-") : "";
 
 	if ("month".equalsIgnoreCase(_datePart) === true )
 	{
 		var datePart = "month-";
-		var getter = "getMonth";
+		var getter = "MONTH";
 	}
 	else if ("year".equalsIgnoreCase(_datePart) === true)
 	{
 		var datePart = "year-";
-		var getter = "getFullYear";
+		var getter = "YEAR";
 	}
 	else if ("date".equalsIgnoreCase(_datePart) === true)
 	{
 		var datePart = "date-";
-		var getter = "getDate";
+		var getter = "DAY_OF_MONTH";
 	}
 	
-	return name + datePart + _date[getter]();
+	return name + datePart + _calendar.get(_calendar[getter]);
 }
 
 airlift.tokenizeIntoDateParts = function(_date, _name)
@@ -681,10 +671,10 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 	if (_date)
 	{
 		//works for java.util.Date and for Date
-		var date = new Date(_date.getTime());
-		indexList.add(airlift.prepareForDateSearch(date, _name, "year"));
-		indexList.add(airlift.prepareForDateSearch(date, _name, "month"));
-		indexList.add(airlift.prepareForDateSearch(date, _name, "date"));
+		var calendar = airlift.createCalendar({date: _date});
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "year"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "month"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "date"));
 	}
 
 	return indexList;
@@ -697,25 +687,47 @@ airlift.getMonthIntervals = function(_date1, _date2)
 	if (_date1 && _date2)
 	{
 		//works for java.util.Date and for Date
-		var date1 = new Date(_date1.getTime());
-		var date2 = new Date(_date2.getTime());
+		var date1 = airlift.createCalendar({date: _date1});
+		var date2 = airlift.createCalendar({date: _date2});
 
-		var startDate = (date1 < date2) ? date1 : date2;
-		var endDate = (date1 >= date2) ? date1 : date2;
+		var startDate = (date1.getTimeInMillis() < date2.getTimeInMillis()) ? date1 : date2;
+		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
 
-		var interval = startDate;
-		interval.setDate(1);
+		var interval = airlift.createCalendar({date: startDate.getTime()});
+		interval.set(interval.DAY_OF_MONTH, 1);
 
-		while (interval < endDate)
+		LOG.info("firstIntervalTime: " + interval.getTimeInMillis());
+		LOG.info("firstEndDateTime: " + endDate.getTimeInMillis());
+
+		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
 		{
-			var month = interval.getMonth();
-			var fullYear = interval.getFullYear();
+			var month = interval.get(interval.MONTH);
+			LOG.info("interval month: " + month);
+
+			var fullYear = interval.get(interval.YEAR);
+			LOG.info("interval year: " + fullYear);
+
 			monthList.add(interval);
 
-			interval = new Date(interval.getTime());
-			interval.setMonth(((month + 1) > 11) ? 0 : month + 1);
-			interval.setFullYear((interval.getMonth() === 0) ? fullYear + 1 : fullYear);
+			interval = airlift.createCalendar({date: interval.getTime()});
+
+			var nextMonth = month + 1;
+			LOG.info("next month: " + nextMonth);
+
+			var nextYear = fullYear + 1;
+			LOG.info("next year: " + nextYear);
+			
+			interval.set(interval.MONTH, (((nextMonth) > 11) ? 0 : nextMonth));
+			interval.set(interval.YEAR, (interval.get(interval.MONTH) === 0) ? nextYear : fullYear);
+
+			LOG.info("intervalTime: " + interval.getTimeInMillis());
+			LOG.info("endDateTime: " + endDate.getTimeInMillis());
 		}
+
+
+		LOG.info("lastIntervalTime: " + interval.getTimeInMillis());
+		LOG.info("lastEndDateTime: " + endDate.getTimeInMillis());
+
 	}
 
 	return monthList;
@@ -760,4 +772,48 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	});
 
 	return filteredArray;
+}
+
+airlift.getCacheService = function()
+{
+	return Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+}
+
+airlift.production = function(_productionValue, _devValue)
+{
+	return (PRODUCTION_MODE === true) ? _productionValue : _devValue;
+}
+
+airlift.createCalendar = function(_config)
+{
+	var date = (airlift.isDefined(_config) === true && airlift.isDefined(_config.date) === true) ? _config.date : null;
+	var dateOffset = (airlift.isDefined(_config) === true && airlift.isDefined(_config.dateOffset) === true) ? _config.dateOffset : 0;
+	var dateOffsetType = (airlift.isDefined(_config) === true && airlift.isDefined(_config.dateOffsetType) === true) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
+	var timeZone = (airlift.isDefined(_config) === true && airlift.isDefined(_config.timeZone) === true) ? _config.timeZone : TIMEZONE;
+	var locale = (airlift.isDefined(_config) === true && airlift.isDefined(_config.locale) === true) ? _config.locale : LOCALE;
+
+	if (airlift.isDefined(date) === true)
+	{
+		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
+		calendar.setTime(date);
+	}
+	else
+	{
+		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
+	}
+
+	calendar.add(dateOffsetType, dateOffset);
+
+	return calendar;
+}
+
+airlift.createDate = function(_config)
+{
+	var calendar = airlift.createCalendar(_config);
+	return calendar.getTime();
+}
+
+airlift.cloneDate = function(_date)
+{
+	return new Packages.java.util.Date(_date.getTime());
 }

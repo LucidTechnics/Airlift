@@ -8,7 +8,7 @@ $className$Validator.validate$propertyName$ = function(_value)
 
 	$requiredValidationFunction$
 
-	if (_value !== null && _value !== undefined && "" !== _value)
+	if (_value && "" !== _value)
 	{
 		LOG.info("property value is not null, not undefined, && not empty string");
 		$validationFunctionInnards; separator="\n\n"$

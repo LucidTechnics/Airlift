@@ -16,7 +16,7 @@ package airlift.util;
 
 public class FormatUtil
 {
-	public static final String DEFAULT_DATE_FORMAT = "MM-dd-yyyy";
+	public static final String DEFAULT_DATE_FORMAT = "MM-dd-yyyy Z";
 	public static final String DEFAULT_TIMESTAMP_FORMAT = "EEE d, MMM yyyy HH:mm:ss Z";
 	
 	public static String format(String _string)

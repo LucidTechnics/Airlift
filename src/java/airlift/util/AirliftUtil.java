@@ -14,19 +14,19 @@ public class AirliftUtil
 {
 	private static Logger log = Logger.getLogger(AirliftUtil.class.getName());
 
-	public static org.apache.commons.beanutils.BeanUtilsBean createBeanUtilsBean(String[] _allowedDateTimePatterns)
+	public static org.apache.commons.beanutils.BeanUtilsBean createBeanUtilsBean(String[] _allowedDateTimePatterns, java.util.TimeZone _timeZone)
 	{
 		org.apache.commons.beanutils.converters.SqlDateConverter sqlDateConverter = new org.apache.commons.beanutils.converters.SqlDateConverter();
 		sqlDateConverter.setPatterns(_allowedDateTimePatterns);
-		sqlDateConverter.setTimeZone(java.util.TimeZone.getDefault());
+		sqlDateConverter.setTimeZone(_timeZone);
 
 		org.apache.commons.beanutils.converters.DateConverter dateConverter = new org.apache.commons.beanutils.converters.DateConverter();
 		dateConverter.setPatterns(_allowedDateTimePatterns);
-		dateConverter.setTimeZone(java.util.TimeZone.getDefault());
+		dateConverter.setTimeZone(_timeZone);
 
 		org.apache.commons.beanutils.converters.SqlTimestampConverter sqlTimestampConverter = new org.apache.commons.beanutils.converters.SqlTimestampConverter();
 		sqlTimestampConverter.setPatterns(_allowedDateTimePatterns);
-		sqlTimestampConverter.setTimeZone(java.util.TimeZone.getDefault());
+		sqlTimestampConverter.setTimeZone(_timeZone);
 
 		//registering "" (empty string) as a true value to support checkboxes with
 		//the value attribute not being set.  Setting the value

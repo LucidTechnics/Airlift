@@ -150,6 +150,10 @@ public class HtmlHandlerContext
 			scriptingUtil.bind("USER_EMAIL", userEmail);
 			scriptingUtil.bind("APP_PROFILE", appProfile);
 			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(persistenceManager));
+			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
+
+			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : "UTC";
+			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 
 			log.info("Executing handler: " + _handlerName);
 

@@ -24,7 +24,7 @@ h.domainObject = function(_name)
 	domainObject.xmlObject.@clock = 0;
 	domainObject.xmlObject.@oldClock = -1;
 
-	var creationDate = new Date().getTime();
+	var creationDate = airlift.createDate().getTime();
 
 	domainObject.xmlObject.@creationDate = creationDate;
 	domainObject.xmlObject.@lastUpdateDate = creationDate;

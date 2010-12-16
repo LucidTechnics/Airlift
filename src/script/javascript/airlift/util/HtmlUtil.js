@@ -195,6 +195,7 @@ airlift.createTemplateTarget = function(_groupName, _propertyName, _targetType)
 
 airlift.toFieldSet = function(_config, _activeRecord)
 {
+	var timezone = (airlift.isDefined(_config.timezone) === true) ? airlift.string(_config.timezone) : airlift.string("UTC");
 	var method = (airlift.isDefined(_config.method) === true) ? airlift.string(_config.method) : airlift.string("POST");
 	var groupName = (airlift.isDefined(_config.groupName) === true) ? airlift.string(_config.groupName) : _activeRecord.retrieveDomainName();
 	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : airlift.string("");
@@ -286,6 +287,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						if (fieldSetArray.length === 0)
 						{
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.method.override", method);
+							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate("a.timezone", timezone);
 							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 						}
 
@@ -623,7 +626,7 @@ airlift.toAtom = function(_config)
 		}
 
 		entry.setLink((airlift.sb(airlift.preparePath(baseUri))).append("/").append(primaryKeyValue).toString());
-		entry.setPublishedDate(new Packages.java.util.Date());
+		entry.setPublishedDate(airlift.createDate());
 		entry.setDescription(description);
 
 		entries.add(entry);
@@ -714,4 +717,22 @@ airlift.createSelectedTarget = function(_name)
 airlift.getCacheFormKey = function(_activeRecord, _method)
 {
 	return _method + "." + _activeRecord.retrieveDomainInterfaceClassName();
+}
+
+//requires user to provide a function that can make a form template to
+//be cached if the cache does not have a form template already stored
+//for the provided form key.
+airlift.getCachedFormTemplate = function(_formKey, _formTemplateCreateFunction, _expirationInSeconds)
+{
+	var cache = airlift.getCacheService();
+	var formTemplateString = cache.get(_formKey);
+
+	if (airlift.isDefined(formTemplateString) === false)
+	{
+		formTemplateString = _formTemplateCreateFunction();
+		var expirationInSeconds = (airlift.isDefined(_expirationInSeconds) === true) ? _expirationInSeconds : 60;
+		cache.put(_formKey, formTemplateString, Packages.com.google.appengine.api.memcache.Expiration.byDeltaSeconds(expirationInSeconds));
+	}
+
+	return formTemplateString;
 }

@@ -4,7 +4,7 @@ $validationParameters; separator="\n"$
 
 message  = airlift.$validationFunctionName$(_value, parameters); //converting _value to a JavaScript String
 
-if (!(message === null || message === undefined) === true)
+if (message)
 {
 	var error = {};
 
