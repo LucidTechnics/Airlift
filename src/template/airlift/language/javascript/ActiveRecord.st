@@ -414,7 +414,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var processProperty = function(_property, _index, _array)
 		{
-			if ("id".equalsIgnoreCase(_property) === false && that.isForeignKey(_property) === false)
+			if ("id".equalsIgnoreCase(_property) === false)
 			{
 				var property = new Packages.java.lang.String(_property);
 				var methodPresentable = that.getPresentableAnnotation(property);
@@ -549,7 +549,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		orderedPropertyList.forEach(processProperty);
 		this.copyFrom(impl);
 
-		LOG.info("The active record now has these values after populateFromRequestMap: " + toString());
+		LOG.info("The active record now has these values after populateFromRequestMap: " + impl);
 
 		return this.messageManager.getMessageMap();;
 	}
@@ -557,11 +557,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.populateFromRestContext = function(_restContext)
 	{
 		var impl = this.createImpl();
+		that = this;
 		var orderedForeignKeyList = this.retrieveOrderedForeignKeyList();
 
 		var processForeignKeys = function(_foreignKeyName, _index, _array)
 		{
-			var persistable = Packages.airlift.util.AirliftUtil.getMethodAnnotation(this.retrieveDomainInterface(),
+			var persistable = Packages.airlift.util.AirliftUtil.getMethodAnnotation(that.retrieveDomainInterface(),
 				_foreignKeyName, Packages.java.lang.Class.forName("airlift.generator.Persistable"));
 
 			var mapTo = persistable.mapTo();
@@ -583,12 +584,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 			if (airlift.isDefined(value) === true)
 			{
-				var throwable = this.copyProperty(impl, foreignKeyName, value);
+				var throwable = that.copyProperty(impl, foreignKeyName, value);
 
 				if (throwable && value && Packages.airlift.util.AirliftUtil.isWhitespace(value) !== true)
 				{
-					this.copyProperty(foreignKeyName, null);
-					this.addMessage(foreignKeyName, "conversion", value + " is an invalid entry for " + foreignKeyName + ".");
+					that.copyProperty(foreignKeyName, null);
+					that.addMessage(foreignKeyName, "conversion", value + " is an invalid entry for " + foreignKeyName + ".");
 				}
 			}
 		}
@@ -610,14 +611,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		this.copyFrom(impl);
 		
-		LOG.info("The active record now has these values after populateFromRestContext: " + this.createImpl());
+		LOG.info("The active record now has these values after populateFromRestContext: " + impl);
 	}
 	
 	activeRecord.populate = function(_attributeMap, _restContext, _method)
 	{
 		var errorMap = this.populateFromRequestMap(_attributeMap);
 
-		if ((new java.lang.String("POST")).equalsIgnoreCase(_method) === false)
+		if ("POST".equalsIgnoreCase(_method) === false)
 		{
 			this.populateFromRestContext(_restContext);
 		}

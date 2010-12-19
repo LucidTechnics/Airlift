@@ -423,7 +423,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 									var selectValue = selectAllowedValue;
 								}
 								
-								var selected = "$" + airlift.createSelectedTarget(selectAllowedValue) + "$";
+								var selected = "$" + airlift.createSelectedTarget(displayValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
 								selectOptionTemplate.setAttribute("displayValue", displayValue);
