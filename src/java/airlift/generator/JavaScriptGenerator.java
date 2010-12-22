@@ -289,7 +289,7 @@ public class JavaScriptGenerator
 			validationFunctionStringTemplate.setAttribute("className", _domainObjectModel.getClassName());
 			validationFunctionStringTemplate.setAttribute("propertyName", upperTheFirstCharacter(name));
 			
-			if (nullable == false || "true".equalsIgnoreCase(isPrimaryKey) == true || "false".equalsIgnoreCase(isForeignKey) == false)
+			if (nullable == false || "true".equalsIgnoreCase(isPrimaryKey) == true)
 			{
 				StringTemplate validationFunctionInnardsStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ValidationFunctionInnards");
 

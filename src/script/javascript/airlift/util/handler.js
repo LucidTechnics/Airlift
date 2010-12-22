@@ -18,11 +18,11 @@ airlift.cc = function(_className)
 //Debugging to the web page.  Text sent to this method preppends text
 //to the CONTENT_CONTEXT so that it shows up at the top of the web
 //page. Very convenient. 
-airlift.d = function(_id)
+airlift.d = function(_debugString)
 {
-	var string = ">>>>" + HANDLER_NAME + ":" + _id;
-	airlift.p(string);
-	CONTENT_CONTEXT.debug(string);
+	var string = HANDLER_NAME + ":" + _debugString;
+	airlift.p(">>>>>>>>>> " + string);
+	CONTENT_CONTEXT.debug("<div>" + string + "</div>");
 };
 
 //ls - load JavaScript scripts 
