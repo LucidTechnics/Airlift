@@ -685,7 +685,7 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 		{
 			for (var value in Iterator(_activeRecord[_propertyName]))
 			{
-				_formTemplate.setAttribute(value + "_checked", "checked");
+				_formTemplate.setAttribute(airlift.createCheckedTarget(value), "checked");
 			}
 		}
 		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||

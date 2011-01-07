@@ -452,7 +452,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 						LOG.info("This is a ArrayList");
 						var valueCollection = new Packages.java.util.ArrayList();
 						copyValueArrayToCollection(valueArray, valueCollection);
-						airlift.d("This is the values: " + valueCollection);
 						result = valueCollection;
 					}
 					else if (attributeType.startsWith("java.util.Set") === true)
