@@ -79,9 +79,9 @@ airlift.toRdfa = function(_config)
 	var anchorClass = (airlift.isDefined(_config.anchorClass) === true) ? _config.anchorClass : "";
 	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : null;
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
-	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;
-	var anchorTarget = (airlift.isDefined(_config.anchorTarget) === true) ? _config.anchorTarget : "";
 	var activeRecord = _config.activeRecord;
+	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : activeRecord.retrieveDomainName();
+	var anchorTarget = (airlift.isDefined(_config.anchorTarget) === true) ? _config.anchorTarget : "";
 
 	if (airlift.isDefined(activeRecord) === true)
 	{
@@ -191,6 +191,11 @@ airlift.join = function(_name, _function, _separator)
 airlift.createTemplateTarget = function(_groupName, _propertyName, _targetType)
 {
 	return "$" + _groupName + "_" + _propertyName + "_" + _targetType + "$";
+}
+
+airlift.createTemplateTargetName = function(_groupName, _propertyName, _targetType)
+{
+	return airlift.createTemplateTarget(_groupName, _propertyName, _targetType).replace(/\$/g, "");
 }
 
 airlift.toFieldSet = function(_config, _activeRecord)
@@ -473,7 +478,7 @@ airlift.toTable = function(_config)
 	var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
 	var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
 	var collection = (airlift.isDefined(config.collection) === true) ? config.collection : [];
-	var domainName = (airlift.isDefined(config.domainName) === true) ? config.domainName : DOMAIN_NAME;
+	var domainName = (airlift.isDefined(config.domainName) === true) ? config.domainName : (collection.length > 0) ? collection[0].retrieveDomainName() : DOMAIN_NAME;
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 	var tableId = (airlift.isDefined(config.tableId) === true) ? config.tableId : domainName + "Table";
 	var anchorTarget = (airlift.isDefined(config.anchorTarget) === true) ? config.anchorTarget : "";
@@ -663,9 +668,9 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 		var emClassString = "";
 	}
 
-	var messageTarget = airlift.createTemplateTarget(_groupName, _propertyName, "message").replace(/\$/g,"");
-	var emClassTarget = airlift.createTemplateTarget(_groupName, _propertyName, "emClass").replace(/\$/g,"");
-	var valueTarget = airlift.createTemplateTarget(_groupName, _propertyName, "value").replace(/\$/g,"");
+	var messageTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "message");
+	var emClassTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "emClass");
+	var valueTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "value");
 
 	_formTemplate.setAttribute(messageTarget, messageString);
 	_formTemplate.setAttribute(emClassTarget, emClassString);
@@ -706,12 +711,12 @@ airlift.escapeForStringTemplate = function(_name)
 
 airlift.createCheckedTarget = function(_name)
 {
-	 return airlift.escapeForStringTemplate(_name) + "_checked";
+	 return "airlift_" + airlift.escapeForStringTemplate(_name) + "_checked";
 }
 
 airlift.createSelectedTarget = function(_name)
 {
-	return airlift.escapeForStringTemplate(_name) + "_selected";
+	return "airlift_" + airlift.escapeForStringTemplate(_name) + "_selected";
 }
 
 airlift.getCacheFormKey = function(_activeRecord, _method)
