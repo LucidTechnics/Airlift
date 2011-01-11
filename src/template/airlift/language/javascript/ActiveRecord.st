@@ -121,12 +121,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		airlift.checkAllowed(this.retrieveDomainName(), "DELETE");
 
-		return this.dao.del(id);
+		this.dao.del(this.id);
+
+		return this;
 	};
 
 	activeRecord["delete"] = function()
 	{
-		this.del();
+		return this.del();
 	};
 
 	activeRecord.search = function(_tokenList, _config)

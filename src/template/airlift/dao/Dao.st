@@ -67,8 +67,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			}
 			catch(e)
 			{
+				LOG.warning("Encountered this error while accessing the datastore for insert: " + e.toString());
+
 				if (i >= 5)
 				{
+					LOG.severe("After fifth try at insert: " + e.toString());
 					throw e;
 				}
 			}

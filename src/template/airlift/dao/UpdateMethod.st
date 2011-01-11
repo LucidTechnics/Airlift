@@ -12,8 +12,11 @@ dao.update = function(_$lowerCaseClassName$)
 		}
 		catch(e)
 		{
+			LOG.warning("Encountered this error while accessing the datastore for update: " + e.toString());
+
 			if (i >= 5)
 			{
+				LOG.severe("After fifth try at update: " + e.toString());
 				throw e;
 			}
 		}
