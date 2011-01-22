@@ -300,66 +300,95 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	 *
 	 */
 
-	activeRecord.copyFrom = function(_$allLowerCaseClassName$)
+	activeRecord.copyFrom = function(_$allLowerCaseClassName$, _config)
 	{
+		var config = (airlift.isDefined(_config) === true) ? _config : {};
+		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 
 		var copyProperty = function(_property, _index, _array)
 		{
-			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-
-			//this is a JDO object
-
-			if (airlift.isDefined(_$allLowerCaseClassName$[getter]) === true)
+			if (airlift.isDefined(filter) === false ||
+			 (airlift.string("")).equalsIgnoreCase(filter) === true ||
+			 Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
+				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
 			{
-				that[setter](_$allLowerCaseClassName$[getter]());
+				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+				//this is a JDO object
+
+				if (airlift.isDefined(_$allLowerCaseClassName$[getter]) === true)
+				{
+					that[setter](_$allLowerCaseClassName$[getter]());
+				}
 			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);
 	}
 
-	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$)
+	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$, _config)
 	{
+		var config = (airlift.isDefined(_config) === true) ? _config : {};
+		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 		
 		var copyProperty = function(_property, _index, _array)
 		{
-			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-			
-
-			//this is a Datastore entity and not a JDO object.
-			that[setter](_$allLowerCaseClassName$.getProperty(_property));
-
-			if ("java.util.Date".equals(that.getAttributeType(_property)) === true)
+			if (airlift.isDefined(filter) === false ||
+				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
+				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
+				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
 			{
-				//Need to convert date to value that has the handler's
-				//timezone.
-				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-				that[setter](airlift.createDate({date: that[getter]()}));
+				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+				//this is a Datastore entity and not a JDO object.
+				that[setter](_$allLowerCaseClassName$.getProperty(_property));
+
+				if ("java.util.Date".equals(that.getAttributeType(_property)) === true)
+				{
+					//Need to convert date to value that has the handler's
+					//timezone.
+					var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+					that[setter](airlift.createDate({date: that[getter]()}));
+				}
 			}
 		}
 
 		orderedPropertyList.forEach(copyProperty);
 	}
 
-	activeRecord.copyTo = function(_$allLowerCaseClassName$)
+	activeRecord.copyTo = function(_$allLowerCaseClassName$, _config)
 	{
+		var config = (airlift.isDefined(_config) === true) ? _config : {};
+		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 
 		var that = this;
 
 		var copyProperty = function(_property, _index, _array)
 		{
-			var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-			var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-
-			if (airlift.isDefined(_$allLowerCaseClassName$[setter]) === true)
+			if (airlift.isDefined(filter) === false ||
+				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
+				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
+				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
 			{
-				_$allLowerCaseClassName$[setter](that[getter]());
+				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
+
+				if (airlift.isDefined(_$allLowerCaseClassName$[setter]) === true)
+				{
+					_$allLowerCaseClassName$[setter](that[getter]());
+				}
 			}
 		}
 
