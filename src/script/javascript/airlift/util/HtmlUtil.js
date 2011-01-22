@@ -383,7 +383,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								{
 									var allowedValue = allowedValues[i];
 
-									var checked = "$" + airlift.createCheckedTarget(allowedValue) + "$";
+									var checked = "$" + airlift.createCheckedTarget(_property, allowedValue) + "$";
 
 									inputTemplate.setAttribute("type", multiType);
 									inputTemplate.setAttribute("name", _property);
@@ -428,13 +428,13 @@ airlift.toFieldSet = function(_config, _activeRecord)
 									var selectValue = selectAllowedValue;
 								}
 								
-								var selected = "$" + airlift.createSelectedTarget(displayValue) + "$";
+								var selected = "$" + airlift.createSelectedTarget(_property, displayValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
 								selectOptionTemplate.setAttribute("displayValue", displayValue);
 								selectOptionTemplate.setAttribute("value", selectValue);
 								selectOptionTemplate.setAttribute("selected", selected);
-								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
+								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(selectValue));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
 							}
@@ -646,7 +646,7 @@ airlift.toAtom = function(_config)
 	return output.outputString(feed);
 }
 
-airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
+airlift.populateFormMessages = function(_formTemplate, _groupName, _propertyName, _activeRecord)
 {
 	var messageList = _activeRecord.getMessageList(_propertyName);
 
@@ -670,35 +670,47 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 
 	var messageTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "message");
 	var emClassTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "emClass");
-	var valueTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "value");
 
 	_formTemplate.setAttribute(messageTarget, messageString);
 	_formTemplate.setAttribute(emClassTarget, emClassString);
+}
 
-	var widget = APP_PROFILE.getAttributeWidget(DOMAIN_NAME, _propertyName);
-	var type = APP_PROFILE.getAttributeType(DOMAIN_NAME, _propertyName);
+airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
+{
+	airlift.populateFormMessages(_formTemplate, _groupName, _propertyName, _activeRecord);
+
+	var valueTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "value");
+	
+	var widget = APP_PROFILE.getAttributeWidget(_activeRecord.retrieveDomainName(), _propertyName);
+	var type = APP_PROFILE.getAttributeType(_activeRecord.retrieveDomainName(), _propertyName);
+
+	LOG.info("Widget is: " + widget);
 	
 	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
 	{
 		if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true &&
 		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") == true))
-		{
+		{			
 			for (var value in Iterator(_activeRecord[_propertyName]))
 			{
-				_formTemplate.setAttribute(airlift.createCheckedTarget(value), "checked");
+				LOG.info(_propertyName + " checked value: " + airlift.createCheckedTarget(_propertyName, value));
+				_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, value), "checked");
 			}
 		}
 		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
 			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true)
 		{
-			_formTemplate.setAttribute(airlift.createCheckedTarget(_activeRecord[_propertyName]), "checked");
+			LOG.info(_propertyName + " checked value: " + airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]));
+			_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]), "checked");
 		}
 		else if ("airlift.generator.Presentable.Type.SELECT".equalsIgnoreCase(widget) === true)
 		{
-			_formTemplate.setAttribute(airlift.createSelectedTarget(_activeRecord[_propertyName]), "selected");
+			LOG.info(_propertyName + " selected value: " + airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]));
+			_formTemplate.setAttribute(airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]), "selected");
 		}
 		else
 		{
+			LOG.info(_propertyName + " text value: " + Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
 			_formTemplate.setAttribute(valueTarget, Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
 		}
 	}
@@ -709,14 +721,14 @@ airlift.escapeForStringTemplate = function(_name)
 	return (new Packages.java.lang.String("" + _name)).replaceAll("[^a-zA-Z0-9]", "_");
 }
 
-airlift.createCheckedTarget = function(_name)
+airlift.createCheckedTarget = function(_propertyName, _name)
 {
-	 return "airlift_" + airlift.escapeForStringTemplate(_name) + "_checked";
+	return "airlift_" + _propertyName + "_" + airlift.escapeForStringTemplate(_name) + "_checked";
 }
 
-airlift.createSelectedTarget = function(_name)
+airlift.createSelectedTarget = function(_propertyName, _name)
 {
-	return "airlift_" + airlift.escapeForStringTemplate(_name) + "_selected";
+	return "airlift_" + _propertyName + "_" + airlift.escapeForStringTemplate(_name) + "_selected";
 }
 
 airlift.getCacheFormKey = function(_activeRecord, _method)

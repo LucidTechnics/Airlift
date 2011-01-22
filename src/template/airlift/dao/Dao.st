@@ -29,14 +29,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
 		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
 		var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
-		var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : "id";
-
-		orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
+		var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : undefined;
 		
 		var sql = "$selectAllSql$";
 
 		var query = PERSISTENCE_MANAGER.newQuery(sql);
-		query.setOrdering(orderBy);
+
+		if (orderBy)
+		{
+			orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
+			query.setOrdering(orderBy);
+		}
+		
 		query.setRange(offset, limit);
 
 		return query.execute();

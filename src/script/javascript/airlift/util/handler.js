@@ -28,7 +28,8 @@ airlift.d = function(_debugString)
 //ls - load JavaScript scripts 
 airlift.ls = function(_scriptName)
 {
-	SCRIPTING.loadScript(_scriptName);
+	var scriptName = _scriptName.replaceAll("^\\\/", "");
+	SCRIPTING.loadScript(APP_NAME + "/" + scriptName);
 };
 
 //Security checks via the Security context.
@@ -46,7 +47,7 @@ airlift.ar = function(_domainName)
 	
 	if (airlift.isDefined(airlift["create" + APP_PROFILE.getDomainShortClassName(domainName)]) !== true)
 	{
-		airlift.ls("javascript/airlift/activerecord/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
+		airlift.ls("airlift/activerecord/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
 	}
 
 	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName)]();
@@ -60,7 +61,7 @@ airlift.dao = function(_domainName)
 
 	if (airlift.isDefined(airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Dao"]) !== true)
 	{
-		airlift.ls("javascript/airlift/dao/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
+		airlift.ls("airlift/dao/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
 	}
 
 	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Dao"]();
@@ -77,8 +78,8 @@ airlift.stringTemplate = function(_templateString)
 //t - create StringTemplate object for a given locale.
 airlift.t = function(_templateName, _locale)
 {
-	LOG.info("Creating template: " + _templateName);
-	var template = (airlift.isDefined(_templateName) === true) ? TEMPLATE.getInstanceOf(_templateName) : airlift.stringTemplate();
+	var templateName = APP_NAME + "/" + _templateName.replaceAll("^\\\/", "");
+	var template = (airlift.isDefined(_templateName) === true) ? TEMPLATE.getInstanceOf(templateName) : airlift.stringTemplate();
 
 	//TODO figure how this would work using AppEngine.
 	//var localeProperties = airlift.loadLocaleProperties(_locale);
@@ -738,10 +739,11 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	var hasFilterTokens = true;
 	var inInterval = true;
 	var filteredArray = [];
-	var filterTokens = airlift.tokenizeIntoNGrams(_filterString);
 
+	var filterTokens = airlift.tokenizeIntoNGrams(_filterString);
+	
 	_resultArray.forEach(function(_item) {
-		
+
 		if (airlift.isDefined(_startDate) === true &&
 			  airlift.isDefined(_endDate) === true &&
 			  airlift.isDefined(_dateFieldName) === true &&
@@ -760,12 +762,13 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 
 			_propertyArray.forEach(function(_property)
 			{
-				indexSet.addAll(airlift.tokenizeIntoNGrams(_item[_property]));
+				var newTokenSet = airlift.tokenizeIntoNGrams(_item[_property]);
+				indexSet.addAll(newTokenSet);
 			});
-
+			
 			indexSet.retainAll(filterTokens);
 
-			hasFilterTokens = !(indexSet.isEmpty());
+			hasFilterTokens = (indexSet.isEmpty() === false);
 		}
 
 		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }

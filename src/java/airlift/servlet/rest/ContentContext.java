@@ -16,7 +16,12 @@
 package airlift.servlet.rest;
 
 public abstract class ContentContext
-{	
+{
+	public static final String JSON_TYPE = "application/json";
+	public static final String HTML_TYPE = "text/html";
+	public static final String XML_TYPE = "application/xml";
+	public static final String ATOM_TYPE = "application/atom+xml";
+	
 	public Redirect redirect;
 
 	public abstract String getContent();

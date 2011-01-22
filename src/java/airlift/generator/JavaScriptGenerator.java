@@ -33,15 +33,15 @@ public class JavaScriptGenerator
 				Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
 	{
 		String generatedString = generateValidationObject(_domainObjectModel);
-		String fileName =  "javascript/airlift/validation/domain/" + _domainObjectModel.getClassName() + "Validator.js";
+		String fileName =  _appName + "/airlift/validation/domain/" + _domainObjectModel.getClassName() + "Validator.js";
 		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
 
 		generatedString = generateDao(_domainObjectModel);
-		fileName =  "javascript/airlift/dao/" + _domainObjectModel.getClassName() + ".js";
+		fileName =  _appName + "/airlift/dao/" + _domainObjectModel.getClassName() + ".js";
 		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
 
 		generatedString = generateActiveRecord(_domainObjectModel);
-		fileName =  "javascript/airlift/activerecord/" + _domainObjectModel.getClassName() + ".js";
+		fileName =  _appName + "/airlift/activerecord/" + _domainObjectModel.getClassName() + ".js";
 		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
 	}
 

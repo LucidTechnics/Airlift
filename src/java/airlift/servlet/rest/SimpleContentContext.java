@@ -21,7 +21,7 @@ public class SimpleContentContext
 	
 	private String content;
 	private String type;
-	private String responseCode;
+	private String responseCode = "200";
 
 	public String getContent()
 	{

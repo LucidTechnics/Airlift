@@ -54,9 +54,22 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return airlift.toRdfa(config);
 	};
 
-	activeRecord.json = function()
+	activeRecord.json = function(_collection)
 	{
-		return airlift.util.AirliftUtil.toJson(this.createDO());
+		if (_collection && _collection.collection)
+		{
+			var list = new Packages.java.util.ArrayList();
+
+			_collection.collection.forEach(function(_activeRecord) { list.add(_activeRecord.createDO()); } );
+
+			var json = Packages.airlift.util.AirliftUtil.toJson(list);
+		}
+		else
+		{
+			json = Packages.airlift.util.AirliftUtil.toJson(this.createDO());
+		}
+		
+		return json;
 	};
 
 	activeRecord.form = function(_config)
@@ -131,11 +144,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.del();
 	};
 
-	activeRecord.search = function(_tokenList, _config)
+	activeRecord.search = function(_tokenList, _config, _returnRawResult)
 	{
 		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
 
-		return this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
+		return (_returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
 	};
 
 	activeRecord.collect = function(_config)
@@ -221,6 +234,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.messageManager.getMessageList(_name);
 	}
 
+	activeRecord.getAllMessageList = function()
+	{
+		return this.messageManager.getMessageList();
+	}
+
 	activeRecord.hasMessages = function()
 	{
 		return (this.getMessageMap().isEmpty() === false);
@@ -263,7 +281,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		var errorArray = [];
 
-		airlift.ls("/javascript/airlift/validation/domain/$upperCaseFirstLetterDomainClassName$Validator.js");
+		airlift.ls("airlift/validation/domain/$upperCaseFirstLetterDomainClassName$Validator.js");
 
 		errorArray = errorArray.concat($upperCaseFirstLetterDomainClassName$Validator["validate" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property)](_value));
 

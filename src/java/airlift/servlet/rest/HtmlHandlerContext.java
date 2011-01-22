@@ -152,12 +152,18 @@ public class HtmlHandlerContext
 			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(persistenceManager));
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
 
+			for (String restContextDomainName: restContext.getDomainIds())
+			{
+				log.info("Binding ids for this rest context variable: " + restContextDomainName);
+				scriptingUtil.bind(restContextDomainName.replaceAll("\\\\.", "_"), restContext.getIdValue(restContextDomainName));
+			}
+
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : "UTC";
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 
 			log.info("Executing handler: " + _handlerName);
 
-			String[] scriptResources = new String[7];
+			String[] scriptResources = new String[8];
 
 			scriptResources[0] = "/airlift/util/douglasCrockford.js";
 			scriptResources[1] = "/airlift/util/xhtml.js";
@@ -165,7 +171,8 @@ public class HtmlHandlerContext
 			scriptResources[3] = "/airlift/util/handler.js";
 			scriptResources[4] = "/airlift/util/HtmlUtil.js";
 			scriptResources[5] = "/airlift/util/validate.js";
-			scriptResources[6] = _handlerName;
+			scriptResources[6] = "/airlift/util/json2.js";
+			scriptResources[7] = _handlerName;
 
 			scriptingUtil.executeScript(scriptResources);
 

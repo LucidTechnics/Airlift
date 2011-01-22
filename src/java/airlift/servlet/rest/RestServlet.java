@@ -201,6 +201,7 @@ public class RestServlet
 				}
 				else
 				{
+					_httpServletResponse.setStatus(Integer.parseInt(contentContext.getResponseCode()));
 					_httpServletResponse.setContentType(contentContext.getType());
 					String content = contentContext.getContent();
 					_httpServletResponse.getWriter().print(content);
