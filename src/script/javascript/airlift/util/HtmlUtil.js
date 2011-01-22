@@ -600,6 +600,7 @@ airlift.toAtom = function(_config)
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : [];
 	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;
+	
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 	
 	var feed = new Packages.com.sun.syndication.feed.synd.SyndFeedImpl();
