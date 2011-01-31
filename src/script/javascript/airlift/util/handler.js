@@ -357,9 +357,12 @@ airlift.a = function(_javaType, _size)
 };
 
 //g - Convenience method to create an id generator
-airlift.g = function()
+airlift.g = function(_length)
 {
-	return Packages.airlift.util.IdGenerator.generate();
+	if (_length) { var id = Packages.airlift.util.IdGenerator.generate(_length); }
+	else { var id = Packages.airlift.util.IdGenerator.generate(); }
+	
+	return id; 
 };
 
 //p - Convenience method to print using java.lang.System.out.println

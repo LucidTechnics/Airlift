@@ -35,7 +35,7 @@ public class RestServlet
 {
 	private static Logger log = Logger.getLogger(RestServlet.class.getName());
 	private java.util.Map<String, RestfulCachingContext> cachingContextMap = new java.util.HashMap<String, RestfulCachingContext>();
-
+	// 
 	protected Map<String, Object> redirectContextMap;
 	protected static airlift.AppProfile appProfile;
 
@@ -125,7 +125,7 @@ public class RestServlet
 		}
 		else if (!success)
 		{
-			sendCodedPage("403", "Access Forbidden", uriParameterMap, _request, _response, method);
+			sendCodedPage("401", "UnAuthorized", uriParameterMap, _request, _response, method);
 		}
 		else if (success)
 		{
@@ -210,8 +210,7 @@ public class RestServlet
 			}
 			else
 			{
-				contentContext = sendCodedPage("404", "Resource Not Found", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
-				populateCache("airlift.404.cache", _method, _httpServletRequest, contentContext.getContent());
+				sendCodedPage("404", "Resource Not Found", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 			}
 		}
 		catch(Throwable t)
@@ -238,12 +237,8 @@ public class RestServlet
 			}
 			else
 			{
-				contentContext = sendCodedPage("500", "Internal Server Error", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
+				sendCodedPage("500", "Internal Server Error", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
 			}
-			
-			//TODO: This should have its own region and it should be
-			//timed out.
-			populateCache(appName, _method, _httpServletRequest, contentContext.getContent());
 		}
     }
 
@@ -261,10 +256,8 @@ public class RestServlet
 		return method;
 	}
 
-	public ContentContext sendCodedPage(String _code, String _message, Map _uriParameterMap, HttpServletRequest _request, HttpServletResponse _response, String _method)
+	public void sendCodedPage(String _code, String _message, Map _uriParameterMap, HttpServletRequest _request, HttpServletResponse _response, String _method)
 	{
-		ContentContext contentContext = null;
-
 		try
 		{
 			String handlerName = getErrorHandlerName(_code);
@@ -272,20 +265,12 @@ public class RestServlet
 			_uriParameterMap.put("a.error.code", _code);
 			_uriParameterMap.put("a.error.message", _message);
 
-			contentContext = getErrorHandlerContext().execute(getServletName(),
-				handlerName, _method, this, _request,
-				_response, _uriParameterMap,
-				null);
-
 			_response.sendError(Integer.parseInt(_code), _message);
-			_response.getWriter().print(contentContext.getContent());
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
-
-		return contentContext;
 	}
 	
 	public airlift.CachingContext isCacheable(javax.servlet.http.HttpServletRequest _request, String _domainName)
