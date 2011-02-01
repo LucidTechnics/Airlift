@@ -58,7 +58,8 @@ public class HtmlHandlerContext
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 
 		String servletName = _httpServlet.getServletName();
-		String base = "http://" + _httpServletRequest.getServerName() + ":" +
+
+		String base = _httpServletRequest.getScheme() + "://" + _httpServletRequest.getServerName() + ":" +
 					  _httpServletRequest.getServerPort() + "/";
 
 		String pathInfo = ((_httpServletRequest.getPathInfo() == null) &&
