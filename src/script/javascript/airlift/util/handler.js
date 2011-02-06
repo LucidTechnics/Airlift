@@ -495,6 +495,13 @@ airlift.isDefined = function(_variable)
 	return defined;
 };
 
+airlift.notDefined = function(_variable)
+{
+	var notDefined = (_variable === null || _variable === undefined);
+
+	return notDefined;
+};
+
 airlift.guid = function()
 {
 	return airlift.g();

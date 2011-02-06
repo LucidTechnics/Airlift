@@ -365,19 +365,34 @@ public class Compiler
 	private String determineReturnType(Element _element, Types _types)
 	{
 		String type = "";
-		String typeParameters = "";
 
 		ExecutableElement executableElement = (ExecutableElement) _element;
 		javax.lang.model.type.TypeMirror returnTypeMirror = executableElement.getReturnType();
-		javax.lang.model.type.DeclaredType declaredReturnType = (javax.lang.model.type.DeclaredType) returnTypeMirror;
-		TypeElement returnType = (TypeElement) _types.asElement(returnTypeMirror);
 
-		List<? extends javax.lang.model.type.TypeMirror> declaredTypeArgumentsList = declaredReturnType.getTypeArguments();
+		if (returnTypeMirror instanceof com.sun.tools.javac.code.Type.ArrayType)
+		{
+			type = processArrayType(returnTypeMirror, (javax.lang.model.type.ArrayType) returnTypeMirror, _types, executableElement);
+		}
+		else
+		{
+			type = processDeclaredType(returnTypeMirror, (javax.lang.model.type.DeclaredType) returnTypeMirror, _types, executableElement);
+		}
+		
+		return type;
+	}
+
+	private String processDeclaredType(javax.lang.model.type.TypeMirror _returnTypeMirror, javax.lang.model.type.DeclaredType _declaredReturnType, Types _types, javax.lang.model.element.ExecutableElement _executableElement)
+	{
+		String type = "";
+		String typeParameters = "";
+		TypeElement returnType = (TypeElement) _types.asElement(_returnTypeMirror);
+
+		List<? extends javax.lang.model.type.TypeMirror> declaredTypeArgumentsList = _declaredReturnType.getTypeArguments();
 
 		if (declaredTypeArgumentsList.isEmpty() == false)
 		{
 			typeParameters = "<";
-			
+
 			for (javax.lang.model.type.TypeMirror typeMirror: declaredTypeArgumentsList)
 			{
 				typeParameters += typeMirror.toString() + ",";
@@ -385,18 +400,18 @@ public class Compiler
 
 			typeParameters = typeParameters.replaceAll(",$", ">");
 		}
-		
+
 		if (returnType == null)
 		{
-			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Comparing this type kind: " + executableElement.getReturnType().getKind());
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Comparing this type kind: " + _executableElement.getReturnType().getKind());
 
-			if (javax.lang.model.type.TypeKind.ARRAY == executableElement.getReturnType().getKind())
+			if (javax.lang.model.type.TypeKind.ARRAY == _executableElement.getReturnType().getKind())
 			{
-				type = executableElement.getReturnType().toString();
+				type = _executableElement.getReturnType().toString();
 			}
 			else
 			{
-				type = _types.getPrimitiveType(executableElement.getReturnType().getKind()).toString();
+				type = _types.getPrimitiveType(_executableElement.getReturnType().getKind()).toString();
 			}
 		}
 		else
@@ -404,10 +419,26 @@ public class Compiler
 			type = returnType.toString();
 		}
 
-		System.out.println("type is: " + type + " and type parameters are: " + typeParameters);
-
-		
 		return type + typeParameters;
+	}
+
+	private String processArrayType(javax.lang.model.type.TypeMirror _returnTypeMirror, javax.lang.model.type.ArrayType _arrayReturnType, Types _types, javax.lang.model.element.ExecutableElement _executableElement)
+	{
+		String type = "";
+		String typeParameters = "";
+		TypeElement returnType = (TypeElement) _types.asElement(_returnTypeMirror);
+
+		if (returnType == null)
+		{
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Comparing this type kind: " + _executableElement.getReturnType().getKind());
+			type = _executableElement.getReturnType().toString();
+		}
+		else
+		{
+			type = returnType.toString();
+		}
+
+		return type;		
 	}
 	
 	private DomainObjectModel createNewDomainObjectModel(Element _element, Elements _elementUtil)
