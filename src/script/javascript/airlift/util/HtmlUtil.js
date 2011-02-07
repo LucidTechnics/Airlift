@@ -34,6 +34,23 @@ airlift.findValue = function(_annotation, _attributeName)
 	return value;
 }
 
+airlift.inFilter = function(_filterString, _name)
+{
+	var inFilter = false;
+	var filterArray = _filterString.split(",");
+
+	for (var i = 0; i < filterArray.length; i++)
+	{
+		if (filterArray[i].trim().equalsIgnoreCase(_name) === true)
+		{
+			inFilter = true;
+			break;
+		}
+	}
+
+	return inFilter;
+}
+	
 airlift.determineForeignDomainName = function(_interfaceClass, _propertyName)
 {
 	var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_propertyName);
@@ -110,7 +127,7 @@ airlift.toRdfa = function(_config)
 				if ((airlift.isDefined(filter) === false) ||
 					  (airlift.string("")).equalsIgnoreCase(filter) === true ||
 					  (Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true) ||
-					  (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains))
+					  (airlift.inFilter(filter, _property) === contains))
 				{
 					if (activeRecord.isForeignKey(_property) === false && _property.equalsIgnoreCase("id") === false)
 					{
@@ -270,7 +287,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 				  airlift.isDefined(filter) === false ||
 				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
 				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains ||
+				  airlift.inFilter(filter, _property) === contains ||
 				  airlift.isHiddenClockProperty(_property) === true))
 			{
 				if (airlift.isHiddenClockProperty(_property) === true && method.equalsIgnoreCase("PUT") === true)
@@ -512,7 +529,7 @@ airlift.toTable = function(_config)
 				  (airlift.isDefined(filter) === false ||
 				   (airlift.string("")).equalsIgnoreCase(filter) === true ||
 				   Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) == true ||
-				   Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) == contains))
+				   airlift.inFilter(filter, _property) == contains))
 			{
 				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 				var getterMethod = domainInterfaceClass.getMethod(getter);

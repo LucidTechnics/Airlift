@@ -125,7 +125,7 @@ public class RestServlet
 		}
 		else if (!success)
 		{
-			sendCodedPage("401", "UnAuthorized", uriParameterMap, _request, _response, method);
+			sendCodedPage("401", "UnAuthorized", _response);
 		}
 		else if (success)
 		{
@@ -186,13 +186,15 @@ public class RestServlet
 
 				if (handlerNotFound == true )
 				{
-					sendCodedPage("405", "Method Not Allowed", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
+					sendCodedPage("405", "Method Not Allowed", _httpServletResponse);
 				}
 
 				//Invalidate the cache if necessary
 				invalidateCache(domainName, _method, _httpServletRequest);
+				int responseCode = Integer.parseInt(contentContext.getResponseCode());
+				_httpServletResponse.setStatus(responseCode);
 
-				if (contentContext.isRedirect() == true)
+				if (responseCode == 301 || responseCode == 302 || responseCode == 303)
 					//TODO this should be checking to see if the method
 					//call is a POST PUT or DELETE.  At this point the
 					//cache is then invalidated.
@@ -201,16 +203,22 @@ public class RestServlet
 				}
 				else
 				{
-					_httpServletResponse.setStatus(Integer.parseInt(contentContext.getResponseCode()));
-					_httpServletResponse.setContentType(contentContext.getType());
-					String content = contentContext.getContent();
-					_httpServletResponse.getWriter().print(content);
-					populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
+					if (responseCode < 400)
+					{
+						_httpServletResponse.setContentType(contentContext.getType());
+						String content = contentContext.getContent();
+						_httpServletResponse.getWriter().print(content);
+						populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
+					}
+					else
+					{
+						sendCodedPage(contentContext.getResponseCode(), "", _httpServletResponse);
+					}
 				}
 			}
 			else
 			{
-				sendCodedPage("404", "Resource Not Found", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
+				sendCodedPage("404", "Resource Not Found", _httpServletResponse);
 			}
 		}
 		catch(Throwable t)
@@ -237,7 +245,7 @@ public class RestServlet
 			}
 			else
 			{
-				sendCodedPage("500", "Internal Server Error", _uriParameterMap, _httpServletRequest, _httpServletResponse, _method);
+				sendCodedPage("500", "Internal Server Error", _httpServletResponse);
 			}
 		}
     }
@@ -256,21 +264,9 @@ public class RestServlet
 		return method;
 	}
 
-	public void sendCodedPage(String _code, String _message, Map _uriParameterMap, HttpServletRequest _request, HttpServletResponse _response, String _method)
+	public void sendCodedPage(String _code, String _message, HttpServletResponse _response)
 	{
-		try
-		{
-			String handlerName = getErrorHandlerName(_code);
-
-			_uriParameterMap.put("a.error.code", _code);
-			_uriParameterMap.put("a.error.message", _message);
-
-			_response.sendError(Integer.parseInt(_code), _message);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
+		try { _response.sendError(Integer.parseInt(_code), _message); } catch (Throwable t) { log.severe(t.getMessage()); throw new RuntimeException(t); }
 	}
 	
 	public airlift.CachingContext isCacheable(javax.servlet.http.HttpServletRequest _request, String _domainName)
@@ -317,8 +313,7 @@ public class RestServlet
 
 	private void populateCache(String _cacheName, String _method, HttpServletRequest _request, String _content)
 	{
-		if ("GET".equalsIgnoreCase(_method) == true ||
-		   "COLLECT".equalsIgnoreCase(_method) == true)
+		if ("GET".equalsIgnoreCase(_method) == true || "COLLECT".equalsIgnoreCase(_method) == true)
 		{
 			try
 			{

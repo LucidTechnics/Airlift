@@ -830,3 +830,62 @@ airlift.cloneDate = function(_date)
 {
 	return new Packages.java.util.Date(_date.getTime());
 }
+
+//Encryption utilities
+airlift.doCipher = function(_message, _password, _initialVector, _algorithm)
+{
+	var key = _password.getBytes();
+	var initialVectorSpec = _initialVector.getBytes();
+	var initialBytes = _message||(new Packages.java.lang.String("").getBytes());
+	var algorithm = _algorithm||{}; 
+
+	var provider = algorithm.provider||"SunJCE";
+	var name = algorithm.name||"AES";
+	var mode = algorithm.mode||"PCBC";
+	var padding = algorithm.padding||"PKCS5PADDING";
+	var revolutions = algorithm.revolutions||20;
+	var cipherMode = ("encrypt".equalsIgnoreCase(algorithm.cipherMode) === true) ? Packages.javax.crypto.Cipher.ENCRYPT_MODE : Packages.javax.crypto.Cipher.DECRYPT_MODE;
+
+	var algorithmString = name + "/" + mode + "/" + padding;
+
+	var cipher = Packages.javax.crypto.Cipher.getInstance(algorithmString, provider); 
+	cipher.init(cipherMode,
+				new Packages.javax.crypto.spec.SecretKeySpec(key, name),
+				new Packages.javax.crypto.spec.IvParameterSpec(initialVectorSpec)); 
+
+	for (var i = 0; i < revolutions; i++)
+	{
+		initialBytes = cipher.doFinal(initialBytes); 
+	}
+
+	return initialBytes;
+}
+
+airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
+{
+	var algorithm = _algorithm||{};
+	algorithm.cipherMode = "encrypt";
+	return airlift.doCipher(_initialBytes, _password, _initialVector, algorithm);
+}
+
+airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
+{
+	var algorithm = _algorithm||{};
+	algorithm.cipherMode = "decrypt";
+	return airlift.doCipher(_initialBytes, _password, _initialVector, algorithm);
+}
+
+airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
+{
+	for (var i = 0; i < _sourceArray.length; i++)
+	{
+		if (i === _destinationArray.length)
+		{
+			break;
+		}
+		else
+		{
+			_destinationArray[i] = _conversionFunction(_sourceArray[i]);
+		}
+	}
+}

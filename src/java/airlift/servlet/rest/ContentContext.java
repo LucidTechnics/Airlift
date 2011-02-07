@@ -21,51 +21,31 @@ public abstract class ContentContext
 	public static final String HTML_TYPE = "text/html";
 	public static final String XML_TYPE = "application/xml";
 	public static final String ATOM_TYPE = "application/atom+xml";
+
+	public String redirectUri;
+
+	public String getRedirectUri() { return redirectUri; }
+	public void setRedirectUri(String _redirectUri) { redirectUri = _redirectUri; }
 	
-	public Redirect redirect;
-
 	public abstract String getContent();
-    public abstract void setContent(String _content);
+	public abstract void setContent(String _content);
 
-    public abstract String getType();
+	public abstract String getType();
 	public abstract void setType(String _type);
 
 	public abstract String getResponseCode();
 	public abstract void setResponseCode(String _responseCode);
 
-	public Redirect getRedirect() { return redirect; }
-	public void setRedirect(Redirect _redirect) { redirect = _redirect; }
-
 	public void redirect(String _uri)
 	{
-		Redirect redirect = new Redirect();
-		redirect.sendRedirect = true;
-		redirect.redirectUri = _uri;
-
-		setRedirect(redirect);
+		setRedirectUri(_uri);
+		setResponseCode("301");
 	}
 
 	public boolean isRedirect()
 	{
-		return (getRedirect() != null);
-	}
-
-	public String getRedirectUri()
-	{
-		return getRedirect().redirectUri;
+		return (getRedirectUri() != null);
 	}
 	
-	public class Redirect
-	{
-		protected boolean sendRedirect;
-		protected String redirectUri;
-
-		public Redirect()
-		{
-			sendRedirect = false;
-			redirectUri = null;
-		}
-	}
-
 	public abstract void debug(String _message);
 }
