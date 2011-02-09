@@ -206,8 +206,14 @@ public class RestServlet
 					if (responseCode < 400)
 					{
 						_httpServletResponse.setContentType(contentContext.getType());
-						String content = contentContext.getContent();
-						_httpServletResponse.getWriter().print(content);
+						byte[] content = contentContext.getContent();
+						_httpServletResponse.setContentLength(content.length);
+
+						java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+						byteArrayOutputStream.write(content, 0, content.length);
+						byteArrayOutputStream.writeTo(_httpServletResponse.getOutputStream());
+						byteArrayOutputStream.flush();
+						_httpServletResponse.getOutputStream().flush();
 						populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
 					}
 					else
@@ -319,6 +325,23 @@ public class RestServlet
 			{
 				airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
 				
+				if (cachingContext != null) { cachingContext.put(_request, _content); }
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}
+		}
+	}
+
+	private void populateCache(String _cacheName, String _method, HttpServletRequest _request, byte[] _content)
+	{
+		if ("GET".equalsIgnoreCase(_method) == true || "COLLECT".equalsIgnoreCase(_method) == true)
+		{
+			try
+			{
+				airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
+
 				if (cachingContext != null) { cachingContext.put(_request, _content); }
 			}
 			catch(Throwable t)

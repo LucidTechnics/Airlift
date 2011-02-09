@@ -27,8 +27,9 @@ public abstract class ContentContext
 	public String getRedirectUri() { return redirectUri; }
 	public void setRedirectUri(String _redirectUri) { redirectUri = _redirectUri; }
 	
-	public abstract String getContent();
+	public abstract byte[] getContent();
 	public abstract void setContent(String _content);
+	public abstract void setContent(byte[] _content);
 
 	public abstract String getType();
 	public abstract void setType(String _type);

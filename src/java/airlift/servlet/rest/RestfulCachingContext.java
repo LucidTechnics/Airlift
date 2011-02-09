@@ -78,6 +78,11 @@ public class RestfulCachingContext
 		getCache().put(constructCacheKey(_request), _content, Expiration.byDeltaSeconds(life()));
 	}
 
+	public void put(javax.servlet.http.HttpServletRequest _request, byte[] _content)
+	{
+		getCache().put(constructCacheKey(_request), _content, Expiration.byDeltaSeconds(life()));
+	}
+
 	public void remove(javax.servlet.http.HttpServletRequest _request)
 	{
 		getCache().delete(constructCacheKey(_request));

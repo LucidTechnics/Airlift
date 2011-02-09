@@ -14,16 +14,19 @@
 
 package airlift.servlet.rest;
 
+import java.util.logging.Logger;
+
 public class SimpleContentContext
    extends ContentContext
 {
+	private static Logger log = Logger.getLogger(SimpleContentContext.class.getName());
 	private java.util.List<String> messageList = new java.util.ArrayList<String>();
 	
-	private String content;
+	private byte[] contentBytes = new byte[0];
 	private String type;
 	private String responseCode = "200";
 
-	public String getContent()
+	public byte[] getContent()
 	{
 		StringBuffer stringBuffer = new StringBuffer();
 
@@ -31,13 +34,22 @@ public class SimpleContentContext
 		{
 			stringBuffer.append(message).append("\n");
 		}
-
-		stringBuffer.append(content);
 		
-		return stringBuffer.toString();
+		byte[] messageBytes =  stringBuffer.toString().getBytes();
+		byte[] byteArray = new byte[messageBytes.length + contentBytes.length];
+
+		log.info("Copying arrays");
+		
+		System.arraycopy(messageBytes, 0, byteArray, 0, messageBytes.length);
+		System.arraycopy(contentBytes, 0, byteArray, messageBytes.length, contentBytes.length);
+
+		log.info("Copied arrays");
+		
+		return byteArray;
 	}
 	
-    public void setContent(String _content) { content = _content; }
+	public void setContent(String _content) { if (_content != null) { contentBytes = _content.getBytes(); } else { contentBytes = new byte[0]; } }
+	public void setContent(byte[] _content) { contentBytes = _content; }
 
     public String getType() { return type; }
     public void setType(String _type) { type = _type; }

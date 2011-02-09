@@ -18,6 +18,7 @@ public interface CachingContext
 {
 	public String get(javax.servlet.http.HttpServletRequest _request);
 	public void put(javax.servlet.http.HttpServletRequest _request, String _content);
+	public void put(javax.servlet.http.HttpServletRequest _request, byte[] _content);
 	public void remove(javax.servlet.http.HttpServletRequest _request);
 	public boolean isCacheable();
 	public int life();
