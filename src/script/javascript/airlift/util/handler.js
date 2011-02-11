@@ -889,3 +889,97 @@ airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunctio
 		}
 	}
 }
+
+airlift.enqueueTask = function(_config)
+{
+	var url = _config.url;
+	var method = _config.method||"POST";
+	var parameters = _config.parameters||new Packages.java.util.HashMap();
+	var queueName = _config.queueName||"default";
+	var queue = ("default".equalsIgnoreCase(queueName) === true) ? Packages.com.google.appengine.api.taskqueue.QueueFactory.getDefaultQueue() : Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(queueName);
+
+	var taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(url);
+
+	switch (method)
+	{
+		case "GET":
+		case "get":
+		case "Get":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.GET;
+			break;
+
+		case "POST":
+		case "post":
+		case "Post":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
+			break;
+
+		case "PUT":
+		case "put":
+		case "Put":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.PUT;
+			break;
+
+		case "DELETE":
+		case "delete":
+		case "Delete":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.DELETE;
+			break;
+
+		default:
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
+	}
+	
+	taskOptions.method(taskMethod);
+
+	for (var parameterEntry in Iterator(parameters.entrySet()))
+	{
+		taskOptions.param(parameterEntry.getKey(), parameterEntry.getValue());
+	}
+
+	return queue.add(taskOptions); //returns TaskHandle
+}
+
+airlift.chat = function(_users, _message)
+{
+	LOG.info("Here 1");
+	var statusArray = [];
+	LOG.info("Here 2");
+	var xmppService = Packages.com.google.appengine.api.xmpp.XMPPServiceFactory.getXMPPService();
+	LOG.info("Here 3");
+	
+	_users.forEach(function(_user)
+	{
+		LOG.info("Here 3.1");
+		var jid = new Packages.com.google.appengine.api.xmpp.JID(_user.email);
+		LOG.info("Here 3.2");
+		var message = new Packages.com.google.appengine.api.xmpp.MessageBuilder()
+					  .withRecipientJids(jid)
+					  .withBody(_message)
+					  .build();
+		LOG.info("Here 3.3");
+		var messageSent = false;
+		LOG.info("Here 3.4");
+		if (xmppService.getPresence(jid).isAvailable() === true)
+		{
+			LOG.info("Here 3.5");
+			var status = xmppService.sendMessage(message);
+			LOG.info("Here 3.6");
+			messageSent = (status.getStatusMap().get(jid) === Packages.com.google.appengine.api.xmpp.SendResponse.Status.SUCCESS);
+			LOG.info("Here 3.7");
+		}
+
+		LOG.info("Here 3.8");
+		statusArray.push(messageSent);
+		LOG.info("Here 3.9");
+	});
+
+	LOG.info("Here 4");
+	return statusArray;
+}
+
+airlift.email = function(_schedulerEmails, _message)
+{
+	//TODO
+}
+	
