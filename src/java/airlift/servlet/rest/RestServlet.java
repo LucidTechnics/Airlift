@@ -496,6 +496,7 @@ public class RestServlet
 			  (_acceptValueList.contains("application/xml") == true ||
 			   _acceptValueList.contains("application/xhtml+xml") == true ||
 			   _acceptValueList.contains("text/html") == true ||
+			   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
 			   _acceptValueList.contains("text/plain") == true))
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
