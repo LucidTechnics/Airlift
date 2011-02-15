@@ -42,15 +42,15 @@ public class SqlGenerator
 	{
 		String generatedString = generateSelectSql(_domainObjectModel);
 		String fileName =  _domainObjectModel.getClassName() + "/select" + _domainObjectModel.getClassName() + ".sql";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 
 		generatedString = generateFindSql(_domainObjectModel);
 		fileName =  _domainObjectModel.getClassName() + "/find" + _domainObjectModel.getClassName() + ".sql";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 
 		generatedString = generateExistsSql(_domainObjectModel);
 		fileName =  _domainObjectModel.getClassName() + "/exists" + _domainObjectModel.getClassName() + ".sql";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 	}
 
 	public String generateSelectSql(DomainObjectModel _domainObjectModel)

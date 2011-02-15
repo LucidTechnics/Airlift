@@ -23,10 +23,14 @@ public abstract class ContentContext
 	public static final String ATOM_TYPE = "application/atom+xml";
 
 	public String redirectUri;
+	public java.util.Map<String, String> headerMap = new java.util.HashMap<String, String>();
 
 	public String getRedirectUri() { return redirectUri; }
-	public void setRedirectUri(String _redirectUri) { redirectUri = _redirectUri; }
+	public java.util.Map<String, String> getHeaderMap() { return headerMap; }
 	
+	public void setRedirectUri(String _redirectUri) { redirectUri = _redirectUri; }
+	public void setHeaderMap(java.util.Map<String, String> _headerMap) { headerMap = _headerMap; }
+
 	public abstract byte[] getContent();
 	public abstract void setContent(String _content);
 	public abstract void setContent(byte[] _content);
@@ -46,6 +50,54 @@ public abstract class ContentContext
 	public boolean isRedirect()
 	{
 		return (getRedirectUri() != null);
+	}
+
+	public void lastModified(java.util.Date _lastModifiedDate)
+	{
+		//This gives the developer a hook into setting the last
+		//modified date header
+		addHeader("Last-Modified", airlift.util.FormatUtil.format(_lastModifiedDate, "EEE, d MMM yyyy HH:mm:ss zzz"));
+	}
+
+	public void notCacheable()
+	{
+		//this says that the content is always expired.
+		addHeader("Expires",  "Sat, 1 Jan 2005 00:00:00 GMT");
+		//this says that the content can always be different.
+		addHeader("Cache-Control", " no-cache, must-revalidate");
+		//this says that the content should not be cached.
+		addHeader("Pragma",  "no-cache");
+	}
+
+	public void isCacheable()
+	{
+		//This basically says it has never been modified.
+		addHeader("Last-Modified", "Sat, 1 Jan 2005 00:00:00 GMT");
+	}
+
+	public void isJson()
+	{
+		setType(JSON_TYPE);
+	}
+
+	public void isHtml()
+	{
+		setType(HTML_TYPE);
+	}
+
+	public void isXml()
+	{
+		setType(XML_TYPE);
+	}
+	
+	public void isAtom()
+	{
+		setType(ATOM_TYPE);
+	}
+
+	public void addHeader(String _key, String _value)
+	{
+		getHeaderMap().put(_key, _value);
 	}
 	
 	public abstract void debug(String _message);

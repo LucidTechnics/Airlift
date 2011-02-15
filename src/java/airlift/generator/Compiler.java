@@ -275,7 +275,7 @@ public class Compiler
 							   Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap, Set<String> _annotationNameSet,
 							  Set _elementSet)
 	{
-		String packageName = processingEnv.getOptions().get("package");
+		String packageName = _processingEnvironment.getOptions().get("package");
 		String appName = _processingEnvironment.getOptions().get("appName");
 
 		if (appName == null)
@@ -312,32 +312,22 @@ public class Compiler
 				generator.processingEnv = _processingEnvironment;
 				generator.generate(appName, "genjava", element, domainObjectModel, _elementNameToDomainObjectModelMap);
 
-				/*
-				generator = new LuceneGenerator();
-				generator.processingEnv = _processingEnvironment;
-				generator.generate(appName, "genjava", element, domainObjectModel, _elementNameToDomainObjectModelMap);
-				*/
 			}
 		}
 
-/*		LuceneGenerator luceneGenerator = new LuceneGenerator();
-		luceneGenerator.processingEnv = _processingEnvironment;
-
-		for (String rootPackageName : rootPackageNameSet)
-		{
-			String generatedString = luceneGenerator.generateSearcherFactory(rootPackageName);
-			String fileName =  "genjava" + "." + rootPackageName + ".airlift.search.SearcherFactory";
-			luceneGenerator.writeJavaFile(fileName, generatedString, null);
-		}
-*/
 		JavaGenerator javaGenerator = new JavaGenerator();
 		javaGenerator.processingEnv = _processingEnvironment;
 
 		String generatedString = javaGenerator.generateApplicationProfile(_elementNameToDomainObjectModelMap);
-		String fileName =  "genjava" + "." + processingEnv.getOptions().get("package") + ".AppProfile";
+		String fileName =  "genjava" + "." + _processingEnvironment.getOptions().get("package") + ".AppProfile";
 		javaGenerator.writeJavaFile(fileName, generatedString, null);
 
-		
+		JavaScriptGenerator javaScriptGenerator = new JavaScriptGenerator();
+		javaScriptGenerator.processingEnv = _processingEnvironment;
+
+		generatedString = javaScriptGenerator.generateDomainConstructors(_elementNameToDomainObjectModelMap);
+		fileName =  appName + "/airlift/DomainConstructors.js";
+		javaScriptGenerator.writeResourceFile(fileName, "genscript", generatedString, null);
 	}
 
 	private String getFullClassName(Elements _elements, Element _element)

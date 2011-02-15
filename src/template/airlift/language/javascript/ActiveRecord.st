@@ -87,16 +87,16 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return airlift.toAtom(_config);
 	};
 
-	activeRecord.exists = function(_id)
+	activeRecord.exists = function(_id, _config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "GET");
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 
 		return this.dao.exists(_id);
 	};
 
-	activeRecord.get = function(_id)
+	activeRecord.get = function(_id, _config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "GET");
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 
 		var jdo = this.dao.get(_id);
 		this.copyFrom(jdo);
@@ -104,56 +104,56 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	};
 
-	activeRecord.copy = function(_id)
+	activeRecord.copy = function(_id, _config)
 	{
-		this.get(_id);
+		this.get(_id, _config);
 		this.id = null;
 
 		return this;
 	};
 
-	activeRecord.update = function()
+	activeRecord.update = function(_config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "PUT");
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
 		this.dao.update(this.createDO());
 
 		return this;
 	};
 
-	activeRecord.insert = function()
+	activeRecord.insert = function(_config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "POST");
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
 		this.setId(this.dao.insert(this.createDO()));
 
 		return this;
 	};
 
-	activeRecord.del = function()
+	activeRecord.del = function(_config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "DELETE");
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "DELETE"); }
 
 		this.dao.del(this.id);
 
 		return this;
 	};
 
-	activeRecord["delete"] = function()
+	activeRecord["delete"] = function(_config)
 	{
-		return this.del();
+		return this.del(_config);
 	};
 
-	activeRecord.search = function(_tokenList, _config, _returnRawResult)
+	activeRecord.search = function(_tokenList, _config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
 
-		return (_returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
+		return (_config && _config.returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
 	};
 
 	activeRecord.collect = function(_config)
 	{
-		airlift.checkAllowed(this.retrieveDomainName(), "GET", true);
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
 
 		return this.convertToActiveRecordArray(this.dao.collect(_config));
 	};

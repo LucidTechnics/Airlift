@@ -31,19 +31,19 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
-public class HtmlHandlerContext
+public class SimpleHandlerContext
    extends HandlerContext
 {
-	private Logger log = Logger.getLogger(HtmlHandlerContext.class.getName());
+	private Logger log = Logger.getLogger(SimpleHandlerContext.class.getName());
 	private boolean productionMode = true;
 	
-	public HtmlHandlerContext() {}
+	public SimpleHandlerContext() {}
 
-	public HtmlHandlerContext(boolean _productionMode) { productionMode = _productionMode; }
+	public SimpleHandlerContext(boolean _productionMode) { productionMode = _productionMode; }
     
 	public ContentContext execute(
 							String _appName,
-							String _handlerName,
+							RestContext _restContext,
 							String _method,
 							HttpServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
@@ -94,7 +94,7 @@ public class HtmlHandlerContext
 		log.info("base: " + base);
 		log.info("path: " + path);
 		log.info("uri: " + base + path);
-		log.info("handlerName: " + _handlerName);
+		log.info("handlers: " + _restContext.getHandlerPathList());
 		log.info("queryString: " + queryString);
 		log.info("domainObjectPaths: " + domainPathMap);
 
@@ -135,7 +135,6 @@ public class HtmlHandlerContext
 			scriptingUtil.bind("DOMAIN_OBJECT_PATHS", domainPathMap);
 			scriptingUtil.bind("ID", id);
 			scriptingUtil.bind("TITLE", title);
-			scriptingUtil.bind("HANDLER_NAME", _handlerName);
 			scriptingUtil.bind("SERVLET_NAME", servletName);
 			scriptingUtil.bind("SERVLET", _httpServlet);
 			scriptingUtil.bind("RESPONSE", _httpServletResponse);
@@ -162,9 +161,8 @@ public class HtmlHandlerContext
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : "UTC";
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 
-			log.info("Executing handler: " + _handlerName);
 
-			String[] scriptResources = new String[8];
+			String[] scriptResources = new String[9];
 
 			scriptResources[0] = "/airlift/util/douglasCrockford.js";
 			scriptResources[1] = "/airlift/util/xhtml.js";
@@ -173,11 +171,55 @@ public class HtmlHandlerContext
 			scriptResources[4] = "/airlift/util/HtmlUtil.js";
 			scriptResources[5] = "/airlift/util/validate.js";
 			scriptResources[6] = "/airlift/util/json2.js";
-			scriptResources[7] = _handlerName;
+			scriptResources[7] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
 
-			scriptingUtil.executeScript(scriptResources);
+			boolean handlerExecutionSuccessful = false;
 
-			log.info("Completed handler execution for handler: " + _handlerName);
+			for (String handlerName: _restContext.getHandlerPathList())
+			{
+				scriptResources[8] = handlerName;
+
+				try
+				{
+					log.info("Executing handler: " + handlerName);
+
+					scriptingUtil.bind("HANDLER_NAME", handlerName);
+					scriptingUtil.executeScript(scriptResources);
+
+					handlerExecutionSuccessful = true;
+					log.info("Completed handler execution for handler: " + handlerName);
+				}
+				catch(airlift.servlet.rest.HandlerException _handlerException)
+				{
+					if (_handlerException.getErrorCode() == airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND)
+					{
+						log.info("Cannot find handler: " + handlerName);
+					}
+					else
+					{
+						log.info("Encountered an exception looking to load: " + handlerName);
+						throw _handlerException;
+					}
+				}
+				catch(Throwable t)
+				{
+					log.info("Encountered exception trying to execute this handler: " + handlerName);
+					throw new RuntimeException(t);
+				}
+
+				if (handlerExecutionSuccessful == true)
+				{
+					//On first successful execution you are done
+					break;
+				}
+			}
+
+			if (handlerExecutionSuccessful == false)
+			{
+				throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Are any of the rest contexts handlers: " + _restContext.getHandlerPathList() + " in the application's classpath?",
+					airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
+			}
+
 		}
 		finally
 		{

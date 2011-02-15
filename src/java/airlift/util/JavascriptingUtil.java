@@ -85,6 +85,7 @@ public class JavascriptingUtil
 
 		try
 		{
+			log.info("Trying to find script: " + scriptResource);
 			inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
 		}
 		catch(Throwable t)
@@ -95,6 +96,7 @@ public class JavascriptingUtil
 
 		if (inputStream == null)
 		{
+			log.info("Cannot find script: " + scriptResource);
 			throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Is this resource: " + _scriptResource + " in the application's classpath?",
 				airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
 		}

@@ -701,8 +701,6 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 	
 	var widget = APP_PROFILE.getAttributeWidget(_activeRecord.retrieveDomainName(), _propertyName);
 	var type = APP_PROFILE.getAttributeType(_activeRecord.retrieveDomainName(), _propertyName);
-
-	LOG.info("Widget is: " + widget);
 	
 	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
 	{

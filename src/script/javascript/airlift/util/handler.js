@@ -53,7 +53,7 @@ airlift.ar = function(_domainName)
 	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName)]();
 };
 
-//ar - Create the DAO for the provided domain name.  If not
+//dao - Create the DAO for the provided domain name.  If not
 //domain name is provided the default DOMAIN_NAME is used instead.
 airlift.dao = function(_domainName)
 {
@@ -877,15 +877,20 @@ airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 
 airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
 {
-	for (var i = 0; i < _sourceArray.length; i++)
+	if (_sourceArray && _destinationArray)
 	{
-		if (i === _destinationArray.length)
+		var conversionFunction = _conversionFunction||function(_input) { return _input; };
+		
+		for (var i = 0; i < _sourceArray.length; i++)
 		{
-			break;
-		}
-		else
-		{
-			_destinationArray[i] = _conversionFunction(_sourceArray[i]);
+			if (i === _destinationArray.length)
+			{
+				break;
+			}
+			else
+			{
+				_destinationArray[i] = conversionFunction(_sourceArray[i]);
+			}
 		}
 	}
 }
@@ -942,44 +947,62 @@ airlift.enqueueTask = function(_config)
 
 airlift.chat = function(_users, _message)
 {
-	LOG.info("Here 1");
 	var statusArray = [];
-	LOG.info("Here 2");
 	var xmppService = Packages.com.google.appengine.api.xmpp.XMPPServiceFactory.getXMPPService();
-	LOG.info("Here 3");
+	var users = _users||[];
 	
-	_users.forEach(function(_user)
+	users.forEach(function(_user)
 	{
-		LOG.info("Here 3.1");
 		var jid = new Packages.com.google.appengine.api.xmpp.JID(_user.email);
-		LOG.info("Here 3.2");
 		var message = new Packages.com.google.appengine.api.xmpp.MessageBuilder()
 					  .withRecipientJids(jid)
 					  .withBody(_message)
 					  .build();
-		LOG.info("Here 3.3");
+
 		var messageSent = false;
-		LOG.info("Here 3.4");
+
 		if (xmppService.getPresence(jid).isAvailable() === true)
 		{
-			LOG.info("Here 3.5");
 			var status = xmppService.sendMessage(message);
-			LOG.info("Here 3.6");
 			messageSent = (status.getStatusMap().get(jid) === Packages.com.google.appengine.api.xmpp.SendResponse.Status.SUCCESS);
-			LOG.info("Here 3.7");
 		}
 
-		LOG.info("Here 3.8");
 		statusArray.push(messageSent);
-		LOG.info("Here 3.9");
 	});
 
-	LOG.info("Here 4");
 	return statusArray;
 }
 
-airlift.email = function(_schedulerEmails, _message)
+airlift.email = function(_users, _message, _subject, _from)
 {
-	//TODO
+	if (_message &&
+		  "".equals(_message) === false &&
+		  Packages.org.apache.commons.lang.StringUtils.isWhitespace(_message) === false)
+	{
+		var users = _users||[];
+		var adminEmail = APP_NAME.toLowerCase() + "@appspot.com";
+		var from = _from||{ email: adminEmail, fullName: "Admin" };
+		var subject = _subject||"From the " + APP_NAME + "application.";
+		var message = _message||"";
+
+		var properties = new Packages.java.util.Properties();
+		var session = Packages.javax.mail.Session.getDefaultInstance(properties, null);
+
+		users.forEach(function(_user)
+		{
+			if (_user && _user.email)
+			{
+				var mimeMessage = new Packages.javax.mail.internet.MimeMessage(session);
+
+				mimeMessage.setFrom(new Packages.javax.mail.internet.InternetAddress(from.email, from.fullName));
+				mimeMessage.addRecipient(
+							Packages.javax.mail.Message.RecipientType.TO,
+							new Packages.javax.mail.internet.InternetAddress(_user.email, _user.fullName||""));
+				mimeMessage.setSubject(subject);
+				mimeMessage.setText(message);
+
+				Packages.javax.mail.Transport.send(mimeMessage);
+			}
+		});
+	}
 }
-	

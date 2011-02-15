@@ -29,7 +29,7 @@ public abstract class HandlerContext
 	protected Logger log = Logger.getLogger(HandlerContext.class.getName());
 	
     public abstract ContentContext execute(String _appName,
-										   String _handlerName,
+										   RestContext _restContext,
 										   String _method,
 										   HttpServlet _httpServlet,
 									HttpServletRequest _httpServletRequest,

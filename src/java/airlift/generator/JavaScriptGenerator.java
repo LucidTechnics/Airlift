@@ -34,15 +34,15 @@ public class JavaScriptGenerator
 	{
 		String generatedString = generateValidationObject(_domainObjectModel);
 		String fileName =  _appName + "/airlift/validation/domain/" + _domainObjectModel.getClassName() + "Validator.js";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 
 		generatedString = generateDao(_domainObjectModel);
 		fileName =  _appName + "/airlift/dao/" + _domainObjectModel.getClassName() + ".js";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 
 		generatedString = generateActiveRecord(_domainObjectModel);
 		fileName =  _appName + "/airlift/activerecord/" + _domainObjectModel.getClassName() + ".js";
-		writeResourceFile(fileName, _directory, fileName, generatedString, _element);
+		writeResourceFile(fileName, _directory, generatedString, _element);
 	}
 
 	public String generateDao(DomainObjectModel _domainObjectModel)
@@ -216,8 +216,8 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; }");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");
 
-			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); }");
-			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config||{})); }");
+			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); }");
+			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config||{})); }");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 		}
@@ -394,5 +394,29 @@ public class JavaScriptGenerator
 		validationObjectStringTemplate.setAttribute("generatorComment", comment);
 
 		return validationObjectStringTemplate.toString();
+	}
+
+	public String generateDomainConstructors(Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
+	{
+		StringTemplate template = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/DomainConstructors");
+		boolean isHighLevelAttributesSet = false;
+
+		for (DomainObjectModel domainObjectModel: _elementNameToDomainObjectModelMap.values())
+		{
+			if (domainObjectModel.isAbstractDomain() == false)
+			{
+				if (isHighLevelAttributesSet == false)
+				{
+					template.setAttribute("appName", domainObjectModel.getAppName());
+
+					isHighLevelAttributesSet = true;
+				}
+
+				template.setAttribute("appNameMethod", domainObjectModel.getAppName());
+				template.setAttribute("domainName", domainObjectModel.getClassName().toLowerCase());
+			}
+		}
+
+		return template.toString();
 	}
 }

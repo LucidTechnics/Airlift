@@ -102,9 +102,32 @@ public class RestServlet
 
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
+		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
+		java.util.Enumeration<String> acceptHeaderValues = _request.getHeaders("Accept");
+
+		while (acceptHeaderValues.hasMoreElements() == true)
+		{
+			String acceptHeaderValue = acceptHeaderValues.nextElement();
+			log.info("Accept header is:  " + acceptHeaderValue);
+
+			String[] tokenArray = acceptHeaderValue.split(",");
+
+			for (int i = 0; i < tokenArray.length; i++)
+			{
+				//For now we ignore q and other parameters 
+				String acceptValue = tokenArray[i].replaceAll(";.*$", "");
+
+				if (acceptValue.contains("*") == false)
+				{
+					acceptValueList.add(acceptValue.toLowerCase());
+				}
+			}
+		}
+		
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();
-		RestContext restContext = prepareRestContext(method, _request, uriParameterMap, getServletName());
+		RestContext restContext = prepareRestContext(method, acceptValueList, _request, uriParameterMap, getServletName());
+		
 		log.info("Applying airlift security checks");
 
 		UserService userService = UserServiceFactory.getUserService();
@@ -150,15 +173,15 @@ public class RestServlet
 		
 		String appName = getServletName();
 		String domainName = _restContext.getThisDomain();
-		String handlerName = _restContext.getHandlerPath();
+		java.util.List<String> handlerPathList = _restContext.getHandlerPathList();
 
 		try
 		{
 			ContentContext contentContext = new SimpleContentContext();
 
-			if (handlerName != null)
+			if (handlerPathList != null)
 			{
-				log.info("Looking for handler: " + handlerName);
+				log.info("Looking for handlers: " + handlerPathList);
 				
 				boolean handlerNotFound = false;
 
@@ -166,7 +189,7 @@ public class RestServlet
 				{
 
 				    contentContext = getHandlerContext().execute(appName,
-									handlerName, _method, this, _httpServletRequest,
+									_restContext, _method, this, _httpServletRequest,
 									_httpServletResponse, _uriParameterMap,
 									null);
 				}
@@ -174,12 +197,10 @@ public class RestServlet
 				{
 					if (_handlerException.getErrorCode() == airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND)
 					{
-						log.info("Cannot find hander: " + handlerName);
 						handlerNotFound = true;
 					}
 					else
 					{
-						log.info("Encountered an exception looking to load: " + handlerName);
 						throw _handlerException;
 					}
 				}
@@ -205,6 +226,11 @@ public class RestServlet
 				{
 					if (responseCode < 400)
 					{
+						for (java.util.Map.Entry<String, String> header: contentContext.getHeaderMap().entrySet())
+						{
+							_httpServletResponse.addHeader(header.getKey(), header.getValue());
+						}
+						
 						_httpServletResponse.setContentType(contentContext.getType());
 						byte[] content = contentContext.getContent();
 						_httpServletResponse.setContentLength(content.length);
@@ -424,7 +450,7 @@ public class RestServlet
 	{
 		boolean productionMode = ("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.production.mode")) == true) ? true : false;
 		
-		return new HtmlHandlerContext(productionMode);
+		return new SimpleHandlerContext(productionMode);
 	}
 
 	public String determinePrimaryKeyName(String _domainName)
@@ -450,11 +476,12 @@ public class RestServlet
 		return airlift.util.AirliftUtil.isUriACollection(_uri, rootPackageName);
 	}
 
-	public RestContext prepareRestContext(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
+	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
 		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
-				
+
+
 		RestContext restContext = new RestContext(_uriParameterMap);
 		String uri = reconstructUri(getServletName(), _httpServletRequest);
 		restContext.setIsUriACollection(isUriACollection(uri));
@@ -463,14 +490,23 @@ public class RestServlet
 		restContext.setAppName(_appName);
 		
 		String domainName = restContext.getThisDomain();
-		String className = getAppProfile().getDomainShortClassName(domainName);
 
-		if (className != null)
+		if (_acceptValueList.isEmpty() == true ||
+			  _acceptValueList.size() > 1 ||
+			  (_acceptValueList.contains("application/xml") == true ||
+			   _acceptValueList.contains("application/xhtml+xml") == true ||
+			   _acceptValueList.contains("text/html") == true ||
+			   _acceptValueList.contains("text/plain") == true))
 		{
-			handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + "_" + className + ".js";
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
 		}
-		
-		restContext.setHandlerPath(handlerPath);
+
+		for(String acceptValue: _acceptValueList)
+		{
+			handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
+			restContext.addHandlerPath(handlerPath);
+		}
+
 
 		return restContext;
 	}

@@ -187,12 +187,12 @@ public abstract class Generator
 		return parameterValue.toString();
     }
 
-    protected void writeResourceFile(String _fileName, String _packageName, String _relativePath, String _content, Element _element)
+    protected void writeResourceFile(String _fileName, String _packageName, String _content, Element _element)
     {
-		writeResourceFile(_fileName, _packageName, _relativePath, _content, _element, processingEnv);
+		writeResourceFile(_fileName, _packageName, _content, _element, processingEnv);
     }
     
-    protected void writeResourceFile(String _fileName, String _packageName, String _relativePath, String _content, Element _element, ProcessingEnvironment _processingEnv)
+    protected void writeResourceFile(String _fileName, String _packageName, String _content, Element _element, ProcessingEnvironment _processingEnv)
     {
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating Resource file: " + _fileName);
 

@@ -28,7 +28,7 @@ public class RestContext
 	private static Logger log = Logger.getLogger(RestContext.class.getName());
 
 	private Map<String, Object> uriParameterMap;
-	private String handlerPath;
+	private java.util.List<String> handlerPathList = new java.util.ArrayList<String>();
 	private String method;
 	private boolean isUriACollection;
 	private String uri;
@@ -41,8 +41,9 @@ public class RestContext
 	public String getUri() { return uri; }
 	public String getAppName() { return appName; }
 	
-	public String getHandlerPath() { return handlerPath; }
-	protected void setHandlerPath(String _handlerPath) { handlerPath = _handlerPath; }
+	public java.util.List<String> getHandlerPathList() { return handlerPathList; }
+	public void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
+	
 	protected void setMethod(String _method) { method = _method; }
 	protected void setIsUriACollection(boolean _isUriACollection) { isUriACollection = _isUriACollection; }
 	protected void setUri(String _uri) { uri = _uri; }
@@ -194,6 +195,11 @@ public class RestContext
 		return domainObjectPathMap;
 	}
 
+	public void addHandlerPath(String _handlerPath)
+	{
+		getHandlerPathList().add(_handlerPath);
+	}
+	
 	public String toString()
 	{
 		return getUriParameterMap().toString();

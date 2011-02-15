@@ -38,13 +38,9 @@ public class SimpleContentContext
 		byte[] messageBytes =  stringBuffer.toString().getBytes();
 		byte[] byteArray = new byte[messageBytes.length + contentBytes.length];
 
-		log.info("Copying arrays");
-		
 		System.arraycopy(messageBytes, 0, byteArray, 0, messageBytes.length);
 		System.arraycopy(contentBytes, 0, byteArray, messageBytes.length, contentBytes.length);
 
-		log.info("Copied arrays");
-		
 		return byteArray;
 	}
 	
@@ -59,7 +55,7 @@ public class SimpleContentContext
 	
     public SimpleContentContext()
     {
-		setType("text/html");
+		setType("application/xml");
     }
 
     public SimpleContentContext(String _content, String _type)
