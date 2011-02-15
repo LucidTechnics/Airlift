@@ -21,6 +21,8 @@ public abstract class ContentContext
 	public static final String HTML_TYPE = "text/html";
 	public static final String XML_TYPE = "application/xml";
 	public static final String ATOM_TYPE = "application/atom+xml";
+	public static final String PDF_TYPE = "application/pdf";
+	public static final String FORM_TYPE = "application/x-www-form-urlencoded";
 
 	public String redirectUri;
 	public java.util.Map<String, String> headerMap = new java.util.HashMap<String, String>();
