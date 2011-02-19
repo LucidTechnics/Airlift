@@ -121,7 +121,7 @@ airlift.toRdfa = function(_config)
 			{
 				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
 				var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
-				var value = propertyValue;
+				var value = airlift.escapeXml(propertyValue);
 				var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
 
 				if ((airlift.isDefined(filter) === false) ||
@@ -147,7 +147,7 @@ airlift.toRdfa = function(_config)
 					{
 						var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
 						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
-						var foreignKeyValue = (airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "";
+						var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
 						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName + "." + _property) + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 					}
 				}
@@ -408,7 +408,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 									inputTemplate.setAttribute("maxLength", maxLength);
 									inputTemplate.setAttribute("checked", checked);
 									inputTemplate.setAttribute("displayLength", displayLength);
-									inputTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(allowedValue));
+									inputTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(allowedValue));
 									inputTemplate.setAttribute("inputClass", inputClass);
 								}
 							}
@@ -451,7 +451,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								selectOptionTemplate.setAttribute("displayValue", displayValue);
 								selectOptionTemplate.setAttribute("value", selectValue);
 								selectOptionTemplate.setAttribute("selected", selected);
-								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(selectValue));
+								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(selectValue));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
 							}
@@ -689,15 +689,13 @@ airlift.populateFormMessages = function(_formTemplate, _groupName, _propertyName
 	var messageTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "message");
 	var emClassTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "emClass");
 
-	_formTemplate.setAttribute(messageTarget, messageString);
+	_formTemplate.setAttribute(messageTarget, airlift.escapeHtml(messageString));
 	_formTemplate.setAttribute(emClassTarget, emClassString);
 }
 
 airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
 {
 	airlift.populateFormMessages(_formTemplate, _groupName, _propertyName, _activeRecord);
-
-	var valueTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "value");
 	
 	var widget = APP_PROFILE.getAttributeWidget(_activeRecord.retrieveDomainName(), _propertyName);
 	var type = APP_PROFILE.getAttributeType(_activeRecord.retrieveDomainName(), _propertyName);
@@ -705,7 +703,7 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
 	{
 		if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true &&
-		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") == true))
+		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") === true))
 		{			
 			for (var value in Iterator(_activeRecord[_propertyName]))
 			{
@@ -726,8 +724,10 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 		}
 		else
 		{
-			LOG.info(_propertyName + " text value: " + Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
-			_formTemplate.setAttribute(valueTarget, Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
+			var valueTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "value");
+			var value = airlift.escapeHtml(Packages.airlift.util.FormatUtil.format(_activeRecord[_propertyName]));
+			LOG.info(_propertyName + " text value: " + value);
+			_formTemplate.setAttribute(valueTarget, value);
 		}
 	}
 }
@@ -749,7 +749,7 @@ airlift.createSelectedTarget = function(_propertyName, _name)
 
 airlift.getCacheFormKey = function(_activeRecord, _method)
 {
-	return _method + "." + _activeRecord.retrieveDomainInterfaceClassName();
+	return airlift.string(_method + "." + _activeRecord.retrieveDomainInterfaceClassName());
 }
 
 //requires user to provide a function that can make a form template to

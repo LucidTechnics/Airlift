@@ -52,8 +52,9 @@ public class SimpleHandlerContext
     {
 		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
 		String rootPackageName = _httpServlet.getServletConfig().getInitParameter("a.root.package.name");
-		
-		ContentContext contentContext = new SimpleContentContext();
+
+		String defaultMimeType = (_httpServlet.getServletConfig().getInitParameter("a.default.mime.type") != null) ? _httpServlet.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
+		ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
 
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 

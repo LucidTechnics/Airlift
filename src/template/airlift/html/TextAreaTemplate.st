@@ -1,1 +1,1 @@
-<textarea id="$id$" name="$name$" rows="$rows$" cols=$cols$ >$value$</textarea>
+<textarea id="$id$" name="$name$" rows="$rows$" cols="$cols$" >$value$</textarea>

@@ -1006,3 +1006,23 @@ airlift.email = function(_users, _message, _subject, _from)
 		});
 	}
 }
+
+airlift.escapeXml(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
+}
+
+airlift.unescapeXml(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeXml(_value);
+}
+
+airlift.escapeHtml(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
+}
+
+airlift.unescapeHtml(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
+}

@@ -55,13 +55,18 @@ public class SimpleContentContext
 	
     public SimpleContentContext()
     {
-		setType("application/xml");
+		setType("text/html");
     }
 
-    public SimpleContentContext(String _content, String _type)
-    {
+	public SimpleContentContext(byte[] _content, String _type)
+	{
 		setType(_type);
 		setContent(_content);
+	}
+
+    public SimpleContentContext(String _content, String _type)
+	{
+		this((_content != null) ? _content.getBytes() : new byte[0], _type);
 	}
 
 	public void debug(String _message)

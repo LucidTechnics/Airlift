@@ -177,7 +177,8 @@ public class RestServlet
 
 		try
 		{
-			ContentContext contentContext = new SimpleContentContext();
+			String defaultMimeType = (this.getServletConfig().getInitParameter("a.default.mime.type") != null) ? this.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
+			ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
 
 			if (handlerPathList != null)
 			{
