@@ -383,8 +383,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 							if ((airlift.string("airlift:boolean")).equalsIgnoreCase(type) === true)
 							{
-								var checked = ((airlift.string("true")).equalsIgnoreCase(propertyMap.get(_property)) === true) ? "checked" : "";
-
+								var checked = "$" + airlift.createCheckedTarget(_property, "") + "$";
+								
 								inputTemplate.setAttribute("type", multiType);
 								inputTemplate.setAttribute("name", _property);
 								inputTemplate.setAttribute("value", "");
@@ -710,19 +710,19 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 			for (var value in Iterator(_activeRecord[_propertyName]))
 			{
 				LOG.info(_propertyName + " checked value: " + airlift.createCheckedTarget(_propertyName, value));
-				_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, value), "checked");
+				_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, value), "checked=\"\"");
 			}
 		}
 		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
 			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true)
 		{
 			LOG.info(_propertyName + " checked value: " + airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]));
-			_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]), "checked");
+			_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]), "checked=\"\"");
 		}
 		else if ("airlift.generator.Presentable.Type.SELECT".equalsIgnoreCase(widget) === true)
 		{
 			LOG.info(_propertyName + " selected value: " + airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]));
-			_formTemplate.setAttribute(airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]), "selected");
+			_formTemplate.setAttribute(airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]), "selected=\"\"");
 		}
 		else
 		{
