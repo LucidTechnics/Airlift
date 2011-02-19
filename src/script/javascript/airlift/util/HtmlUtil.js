@@ -390,7 +390,6 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								inputTemplate.setAttribute("value", "");
 								inputTemplate.setAttribute("maxLength", maxLength);
 								inputTemplate.setAttribute("checked", checked);
-								inputTemplate.setAttribute("displayLength", displayLength);
 								inputTemplate.setAttribute("id", groupName + "_" + _property);
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
@@ -404,10 +403,9 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 									inputTemplate.setAttribute("type", multiType);
 									inputTemplate.setAttribute("name", _property);
-									inputTemplate.setAttribute("value", allowedValue);
+									inputTemplate.setAttribute("value", airlift.escapeHtml(allowedValue));
 									inputTemplate.setAttribute("maxLength", maxLength);
 									inputTemplate.setAttribute("checked", checked);
-									inputTemplate.setAttribute("displayLength", displayLength);
 									inputTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(allowedValue));
 									inputTemplate.setAttribute("inputClass", inputClass);
 								}
@@ -448,8 +446,8 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								var selected = "$" + airlift.createSelectedTarget(_property, displayValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
-								selectOptionTemplate.setAttribute("displayValue", displayValue);
-								selectOptionTemplate.setAttribute("value", selectValue);
+								selectOptionTemplate.setAttribute("displayValue", airlift.escapeHtml(displayValue));
+								selectOptionTemplate.setAttribute("value", airlift.escapeHtml(selectValue));
 								selectOptionTemplate.setAttribute("selected", selected);
 								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(selectValue));
 

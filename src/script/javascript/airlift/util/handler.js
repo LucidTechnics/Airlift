@@ -1007,22 +1007,22 @@ airlift.email = function(_users, _message, _subject, _from)
 	}
 }
 
-airlift.escapeXml(_value)
+airlift.escapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
 }
 
-airlift.unescapeXml(_value)
+airlift.unescapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeXml(_value);
 }
 
-airlift.escapeHtml(_value)
+airlift.escapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
 }
 
-airlift.unescapeHtml(_value)
+airlift.unescapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
 }
