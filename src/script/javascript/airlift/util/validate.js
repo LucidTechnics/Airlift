@@ -141,15 +141,15 @@ airlift.isNumeric = function(value, paramsObj)
  *		If you do not want this to be the case then you must either add a LiveValidation.PRESENCE validation
  *		or build it into the regular expression pattern
  */
-airlift.hasFormat = function(value, paramsObj)
+airlift.hasFormat = function(_value, _paramsObj)
 {
-	value = airlift.trim(value);
+	var value = airlift.trim(_value);
+	value = String(value);
 	
 	var error;
-	var value = String(value);
-	var paramsObj = paramsObj || {};
-	var message = paramsObj.failureMessage || "Format is invalid - ";
-	var pattern = paramsObj.pattern || /./;
+	var _paramsObj = _paramsObj || {};
+	var message = _paramsObj.failureMessage || "Format is invalid - " + _value;
+	var pattern = _paramsObj.pattern || /./;
 	if(!pattern.test(value) /* && value != ''*/ ){ 
 		error = message;
 	}

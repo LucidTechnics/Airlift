@@ -289,6 +289,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		
 		var addError = function(_error, _index, _array)
 		{
+			LOG.info("Validation error: " + _error.name + ":" + _error.message + ":" + _error.category);
 			that.addError(_error.name, _error.message, _error.category);
 		}
 

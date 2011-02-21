@@ -29,6 +29,7 @@ public class DomainObjectModel
 	private String buildPackageName;
 	private String className;
 	private String appName;
+	private boolean isAbstract;
 	private Set<Annotation> domainAnnotationSet;
 	private Map<Attribute, Set<Annotation>> attributeAnnotationSetMap;
 	private Map<String, Attribute> attributeNameMap;
@@ -46,6 +47,7 @@ public class DomainObjectModel
 	public String getBuildPackageName() { return buildPackageName; }
 	public String getClassName() { return upperTheFirstCharacter(className); }
 	public String getAppName() { return appName; }
+	public boolean getIsAbstract() { return isAbstract; }
 	public Set<Annotation> getDomainAnnotationSet() { return domainAnnotationSet; }
 	public Map<Attribute, Set<Annotation>> getAttributeAnnotationSetMap() { return attributeAnnotationSetMap; }
 	public Map<String, Attribute> getAttributeNameMap() { return attributeNameMap;  }
@@ -61,6 +63,7 @@ public class DomainObjectModel
 	public void setBuildPackageName(String _buildPackageName) { buildPackageName = _buildPackageName; }
 	public void setClassName(String _className) { className = upperTheFirstCharacter(_className); }
 	public void setAppName(String _appName) { appName = _appName; }
+	public void setIsAbstract(boolean _isAbstract) { isAbstract = _isAbstract; }
 	public void setDomainAnnotationSet(Set<Annotation> _domainAnnotationSet) { domainAnnotationSet = _domainAnnotationSet; }
 	public void setAttributeAnnotationSetMap(Map<Attribute, Set<Annotation>> _attributeAnnotationSetMap) { attributeAnnotationSetMap = _attributeAnnotationSetMap; }
 	public void setAttributeNameMap(Map<String, Attribute> _attributeNameMap) { attributeNameMap = _attributeNameMap; }
@@ -100,19 +103,33 @@ public class DomainObjectModel
 
 	public void addAnnotation(Attribute _attribute, Annotation _annotation)
 	{
+		int attributeIndex = getAttributeList().size();
+		addAnnotation(_attribute, attributeIndex, _annotation);
+	}
+
+	public void addAnnotation(Attribute _attribute, int _attributeIndex, Annotation _annotation)
+	{
 		if (getReservedPropertyNameSet().contains(_attribute.getName()) == true)
 		{
 			log.warning("!!!!WARNING!!!! You should not use property name: "  + _attribute.getName() + " as it is a reserved property name for the airlift.Clockable marker interface.");
 			log.warning("!!!!WARNING!!!! You should not use property name: "  + _attribute.getName() + " as it is a reserved property name for the airlift.Clockable marker interface.");
 			log.warning("!!!!WARNING!!!! You should not use property name: "  + _attribute.getName() + " as it is a reserved property name for the airlift.Clockable marker interface.");
 		}
-		
+
 		if (getAttributeList().contains(_attribute) == false)
 		{
-			getAttributeList().add(_attribute);
+			if (_attributeIndex < getAttributeList().size())
+			{
+				getAttributeList().add(_attributeIndex, _attribute);
+			}
+			else
+			{
+				getAttributeList().add(_attribute);
+			}
+			
 			getAttributeNameMap().put(_attribute.getName(), _attribute);
 		}
-		
+
 		Set<Annotation> annotationSet = getAttributeAnnotationSetMap().get(_attribute);
 
 		if (annotationSet == null)
@@ -263,6 +280,6 @@ public class DomainObjectModel
 
 	public boolean isAbstractDomain()
 	{
-		return (getDirectSuperClassSet().contains("airlift.AbstractDomain") == true);
+		return isAbstract;
 	}
 }	

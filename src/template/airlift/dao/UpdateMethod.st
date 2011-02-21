@@ -2,6 +2,13 @@ dao.update = function(_$lowerCaseClassName$)
 {
 	if (airlift.isDefined(_$lowerCaseClassName$.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _$lowerCaseClassName$ }; }
 
+	var previousRecord = dao.get(_$lowerCaseClassName$.getId());
+
+	//Audit
+	_$lowerCaseClassName$.setAirliftPostDate(previousRecord.airliftPostDate);
+	_$lowerCaseClassName$.setAirliftPutDate(airlift.createDate());
+	if (USER) { _$lowerCaseClassName$.setAirliftUserId(USER.id); }
+
 	//Need to retry automatically ...
 	for (var i = 0; i < 5; i++)
 	{

@@ -550,8 +550,8 @@ airlift.toTable = function(_config)
 					thTemplate.setAttribute("tha", "class=\"" + _property + "\"");
 				}
 
-					//if property is a primary or foreign key you
-					//should bind an anchor instead
+				//if property is a primary or foreign key you
+				//should bind an anchor instead
 				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
 
 				if (airlift.isLinkArray(_property, _activeRecord.retrieveDomainName()) === true)
