@@ -413,7 +413,7 @@ public class JavaScriptGenerator
 				}
 
 				template.setAttribute("appNameMethod", domainObjectModel.getAppName());
-				template.setAttribute("domainName", domainObjectModel.getClassName().toLowerCase());
+				template.setAttribute("domainName", lowerTheFirstCharacter(domainObjectModel.getClassName()));
 			}
 		}
 
