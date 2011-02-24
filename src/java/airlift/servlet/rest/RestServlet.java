@@ -477,6 +477,13 @@ public class RestServlet
 		return airlift.util.AirliftUtil.isUriACollection(_uri, rootPackageName);
 	}
 
+	public boolean isUriANewDomain(String _uri)
+	{
+		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
+
+		return airlift.util.AirliftUtil.isUriANewDomain(_uri, rootPackageName);
+	}
+
 	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
@@ -490,7 +497,16 @@ public class RestServlet
 		restContext.setUri(uri);
 		restContext.setAppName(_appName);
 		
-		String domainName = restContext.getThisDomain();
+		String domainName = "";
+
+		if ("NEW".equalsIgnoreCase(prefix) == true)
+		{
+			domainName = restContext.getThisDomain().substring(3, restContext.getThisDomain().length());
+		}
+		else
+		{
+			domainName = restContext.getThisDomain();
+		}
 
 		if (_acceptValueList.isEmpty() == true ||
 			  _acceptValueList.size() > 1 ||
@@ -500,6 +516,7 @@ public class RestServlet
 			   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
 			   _acceptValueList.contains("text/plain") == true))
 		{
+			
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
 		}
 
@@ -579,14 +596,14 @@ public class RestServlet
 
 		String prefix = _method.toUpperCase();
 		String uri = reconstructUri(_appName, _httpServletRequest);
-
-		log.info("URI is now: " + uri);
-
+		
 		if (isUriACollection(uri) == true)
 		{
-			log.info("Processing a collection URI for a default handler");
-
-			if ("GET".equals(prefix) == true)
+			if (isUriANewDomain(uri) == true && "GET".equals(prefix) == true)
+			{
+				prefix = "NEW";
+			}
+			else if ("GET".equals(prefix) == true)
 			{
 				prefix = "COLLECT";
 			}

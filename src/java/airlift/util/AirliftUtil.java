@@ -169,6 +169,29 @@ public class AirliftUtil
 		return isDomainName;
 	}
 
+	public static boolean isNewDomainName(String _domainName, String _rootPackageName)
+	{
+		boolean isNewDomainName = false;
+
+		if (_domainName.startsWith("new") == true && _domainName.length() > 3)
+		{
+			String domainName = _domainName.substring(3, _domainName.length());
+			
+			try
+			{
+				airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName(_rootPackageName + ".AppProfile").newInstance();
+
+				isNewDomainName = appProfile.isValidDomain(domainName);
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException("Cannot load Airlift generated class: " + _rootPackageName + ".AppProfile");
+			}
+		}
+
+		return isNewDomainName;
+	}
+
 	public static boolean isUriACollection(String _uri, String _rootPackageName)
 	{
 		boolean isUriACollection = false;
@@ -187,6 +210,26 @@ public class AirliftUtil
 		}
 
 		return isUriACollection;
+	}
+
+	public static boolean isUriANewDomain(String _uri, String _rootPackageName)
+	{
+		boolean isUriANewDomain = false;
+
+		String[] tokenArray = _uri.split("\\/");
+
+		for (String token: tokenArray)
+		{
+			log.info("Here is the token in isUriACollection: " + token);
+		}
+
+		if (tokenArray.length > 1)
+		{
+			String last = tokenArray[tokenArray.length - 1];
+			isUriANewDomain = isNewDomainName(last, _rootPackageName);
+		}
+
+		return isUriANewDomain;
 	}
 
 	public static String determinePrimaryKeyName(String _domainName, String _rootPackageName)
