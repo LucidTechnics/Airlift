@@ -94,7 +94,7 @@ airlift.toRdfa = function(_config)
 	var appName = (airlift.isDefined(_config.appName) === true) ? _config.path : APP_NAME;
 	var anchorProperty = (airlift.isDefined(_config.anchorProperty) === true) ? _config.anchorProperty : "id";
 	var anchorClass = (airlift.isDefined(_config.anchorClass) === true) ? _config.anchorClass : "";
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : null;
+	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : "";
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var activeRecord = _config.activeRecord;
 	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : activeRecord.retrieveDomainName();
@@ -220,7 +220,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	var timezone = (airlift.isDefined(_config.timezone) === true) ? airlift.string(_config.timezone) : airlift.string("UTC");
 	var method = (airlift.isDefined(_config.method) === true) ? airlift.string(_config.method) : airlift.string("POST");
 	var groupName = (airlift.isDefined(_config.groupName) === true) ? airlift.string(_config.groupName) : _activeRecord.retrieveDomainName();
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : airlift.string("");
+	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : "id,auditPostDate,auditPutDate,auditUserEmail";
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var error = (airlift.isDefined(_config.error) === true) ? _config.error : false;
 	var domainInterfaceClass = 	_activeRecord.retrieveDomainInterface();
@@ -490,7 +490,7 @@ airlift.toTable = function(_config)
 	var tf = (airlift.isDefined(config.tf) === true) ? config.tf : "";
 	var anchorProperty = (airlift.isDefined(config.anchorProperty) === true) ? config.anchorProperty : "id";
 	var anchorClass = (airlift.isDefined(_config.anchorClass) === true) ? _config.anchorClass : "";
-	var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+	var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "auditPostDate,auditPutDate,auditUserEmail";
 	var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
 	var collection = (airlift.isDefined(config.collection) === true) ? config.collection : [];
 	var domainName = (airlift.isDefined(config.domainName) === true) ? config.domainName : (collection.length > 0) ? collection[0].retrieveDomainName() : DOMAIN_NAME;
@@ -611,7 +611,7 @@ airlift.toAtom = function(_config)
 	var baseUri = (airlift.isDefined(_config.baseUri) === true) ? _config.baseUri : "";
 	var title = (airlift.isDefined(_config.title) === true) ? _config.title : "id";
 	var description = (airlift.isDefined(_config.description) === true) ? _config.description : "";
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : false;
+	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : "";
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var collection = (airlift.isDefined(_config.collection) === true) ? _config.collection : [];
 	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : DOMAIN_NAME;

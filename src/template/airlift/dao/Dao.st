@@ -61,11 +61,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		index.set$className$Jdo(_$lowerCaseClassName$);
 
 		_$lowerCaseClassName$.set$className$IndexJdo(index);
-
-		//Audit
-		_$lowerCaseClassName$.setAirliftPostDate(airlift.createDate());
-		_$lowerCaseClassName$.setAirliftPutDate(_$lowerCaseClassName$.getAirliftPostDate());
-		if (USER) { _$lowerCaseClassName$.setAirliftUserId(USER.id); }
 		
 		for (var i = 0; i < 5; i++)
 		{

@@ -112,20 +112,29 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	};
 
+	activeRecord.audit = function()
+	{
+		this.setAuditPostDate(airlift.createDate());
+		this.setAuditPutDate(this.getAuditPostDate());
+		if (USER_EMAIL) { this.setAuditUserEmail(USER_EMAIL); }
+
+		return this;
+	}
+
 	activeRecord.update = function(_config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
-		this.dao.update(this.createDO());
+		this.audit().dao.update(this.createDO());
 
 		return this;
 	};
-
+	
 	activeRecord.insert = function(_config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
-		this.setId(this.dao.insert(this.createDO()));
+		this.setId(this.audit().dao.insert(this.createDO()));
 
 		return this;
 	};
@@ -210,18 +219,27 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var name = (airlift.isDefined(_name) === true) ? _name: "";
 		
 		this.messageManager.add(_name, _category, _message);
+
+		return this;
 	}
 
 	activeRecord.addError = function(_name, _message, _category)
 	{
 		this.error = true;
 		this.addMessage(_name, _message, _category);
+
+		return this;
 	}
 
 	activeRecord.addErrorMap = function(_errorMap)
 	{
-		this.error = true;
-		this.messageManager.add(_errorMap);
+		if (_errorMap && _errorMap.isEmpty() === false)
+		{
+			this.error = true;
+			this.messageManager.add(_errorMap);
+		}
+
+		return this;
 	}
 
 	activeRecord.getMessageMap = function()
@@ -294,6 +312,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		errorArray.forEach(addError);
+
+		return this;
 	}
 
 	/**
@@ -330,6 +350,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		orderedPropertyList.forEach(copyProperty);
+
+		return this;
 	}
 
 	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$, _config)
@@ -364,6 +386,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		orderedPropertyList.forEach(copyProperty);
+
+		return this;
 	}
 
 	activeRecord.copyTo = function(_$allLowerCaseClassName$, _config)
@@ -394,6 +418,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		orderedPropertyList.forEach(copyProperty);
+
+		return this;
 	}
 
 	activeRecord.createDO = function()
@@ -600,7 +626,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		LOG.info("The active record now has these values after populateFromRequestMap: " + impl);
 
-		return this.messageManager.getMessageMap();;
+		return this.messageManager.getMessageMap();
 	}
 
 	activeRecord.populateFromRestContext = function(_restContext)
