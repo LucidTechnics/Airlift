@@ -321,12 +321,25 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	 *
 	 */
 
+	activeRecord.sanitize = function()
+	{
+		this.auditPostDate = null;
+		this.auditPutDate = null;
+		this.auditUserEmail = null;
+
+		//TODO.  A sanitized object should automatically set all the encrypted
+		//information to null as well.  It should not return encrypted
+		//and unencrypted information together.
+		
+		return this;
+	}
+
 	activeRecord.copyFrom = function(_$allLowerCaseClassName$, _config)
 	{
 		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
 		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
-
+		
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 
@@ -341,8 +354,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
 				//this is a JDO object
-
-				if (airlift.isDefined(_$allLowerCaseClassName$[getter]) === true)
+				if (_$allLowerCaseClassName$[getter])
 				{
 					that[setter](_$allLowerCaseClassName$[getter]());
 				}
@@ -357,7 +369,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$, _config)
 	{
 		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
 		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
 
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
@@ -393,7 +405,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.copyTo = function(_$allLowerCaseClassName$, _config)
 	{
 		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? config.filter : "";
+		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
 		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
 
 		var orderedPropertyList = this.retrieveOrderedPropertyList();
