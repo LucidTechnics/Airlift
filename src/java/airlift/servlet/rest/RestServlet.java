@@ -509,35 +509,37 @@ public class RestServlet
 			domainName = restContext.getThisDomain();
 		}
 
+		String extensionPrefix = (restContext.getIsUriACollection() == true) ? "COLLECT" : "GET";
+		
 		//special suffixes (xml, xhtml, html, json, html, text) takes precedence over Accept:
 		if ("xml".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
 		}
 
 		if ("pdf".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
 		}
 
 		if ("xhtml".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
 		}
 
 		if ("json".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
 		}
 
 		if ("html".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
 		}
 
 		if ("text".equalsIgnoreCase(suffix) == true)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + "GET.js");
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
 		}
 
 		//If you get like a billion Accept header values than it is
