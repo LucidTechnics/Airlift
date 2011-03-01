@@ -213,7 +213,7 @@ public class JavaScriptGenerator
 			}
 
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
-			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; }");
+			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; }");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; }");
 
 			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); }");
