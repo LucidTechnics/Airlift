@@ -77,6 +77,11 @@ public abstract class ContentContext
 		addHeader("Last-Modified", "Sat, 1 Jan 2005 00:00:00 GMT");
 	}
 
+	public void setDownloadFile(String _downloadFileName)
+	{
+		addHeader("Content-Disposition", "attachment; filename=request-" + _downloadFileName);
+	}
+	
 	public void isJson()
 	{
 		setType(JSON_TYPE);

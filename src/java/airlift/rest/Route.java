@@ -215,7 +215,12 @@ public class Route
 			domainList.add(domainName);
 		}
 	}
-	
+
+	public static void addSuffix(Map _bindings, String _suffix)
+	{
+		_bindings.put("a.suffix", _suffix);
+	}
+
 	public static void addBindings(Map _bindings, String _parentName, String _name, String _value)
 	{
 		String token = "[,;]";

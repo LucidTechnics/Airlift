@@ -10,6 +10,7 @@ import airlift.rest.Route;
 
 import com.google.gson.GsonBuilder;
 
+
 public class AirliftUtil
 {
 	private static Logger log = Logger.getLogger(AirliftUtil.class.getName());
@@ -245,20 +246,52 @@ public class AirliftUtil
 
 		for (String token: tokenArray)
 		{
-			if (isDomainName(token, _rootPackageName) == true)
+			String candidateToken = token;
+			
+			java.util.List<String> tokenList = hasSuffix(token);
+			
+			if (tokenList.isEmpty() == false)
 			{
+				candidateToken = tokenList.get(0);
+				Route.addSuffix(_uriParameterMap, (String) tokenList.get(1));
+			}
+				
+			if (isDomainName(candidateToken, _rootPackageName) == true)
+			{				
 				Route.addDomainName(_uriParameterMap, token);
 				parentDomain = token;
 			}
 			else if (parentDomain != null)
 			{
 				String primaryKeyName = airlift.util.AirliftUtil.determinePrimaryKeyName(parentDomain, _rootPackageName);
-				Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, token);
+				String primaryKey = candidateToken;
+				
+				Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, primaryKey);
 				parentDomain = null;
 			}
 		}
 	}
 
+	public static java.util.List<String> hasSuffix(String _token)
+	{
+		java.util.List<String> list = new java.util.ArrayList<String>();
+		
+		if (_token.toLowerCase().endsWith(".xml") == true ||
+			_token.toLowerCase().endsWith(".pdf") == true ||
+			_token.toLowerCase().endsWith(".html") == true ||
+			_token.toLowerCase().endsWith(".xhtml") == true ||
+			_token.toLowerCase().endsWith(".text") == true ||
+			_token.toLowerCase().endsWith(".json") == true)
+		{
+			String[] tokenArray = _token.split("\\.");
+			
+			list.add(tokenArray[0]);
+			list.add(tokenArray[1]);
+		}
+
+		return list;
+	}
+	
 	public static String generateStringFromArray(Object[] _object)
 	{
 		StringBuffer stringBuffer = new StringBuffer();

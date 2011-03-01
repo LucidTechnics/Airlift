@@ -31,6 +31,7 @@ public class RestContext
 	private java.util.List<String> handlerPathList = new java.util.ArrayList<String>();
 	private String method;
 	private boolean isUriACollection;
+	private boolean isUriANewDomain;
 	private String uri;
 	private String appName;
 	
@@ -38,6 +39,7 @@ public class RestContext
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
 	public String getMethod() { return method; }
 	public boolean getIsUriACollection() { return isUriACollection; }
+	public boolean getIsUriANewDomain() { return isUriANewDomain; }
 	public String getUri() { return uri; }
 	public String getAppName() { return appName; }
 	
@@ -46,6 +48,7 @@ public class RestContext
 	
 	protected void setMethod(String _method) { method = _method; }
 	protected void setIsUriACollection(boolean _isUriACollection) { isUriACollection = _isUriACollection; }
+	protected void setIsUriANewDomain(boolean _isUriANewDomain) { isUriANewDomain = _isUriANewDomain; }
 	protected void setUri(String _uri) { uri = _uri; }
 	protected void setAppName(String _appName) { appName = _appName; }
 	
@@ -62,6 +65,11 @@ public class RestContext
 	public boolean uriIsACollection()
 	{
 		return getIsUriACollection();
+	}
+
+	public boolean uriIsANewDomain()
+	{
+		return getIsUriANewDomain();
 	}
 
 	public String getThisDomain()
@@ -197,7 +205,10 @@ public class RestContext
 
 	public void addHandlerPath(String _handlerPath)
 	{
-		getHandlerPathList().add(_handlerPath);
+		if (getHandlerPathList().contains(_handlerPath) == false)
+		{
+			getHandlerPathList().add(_handlerPath);
+		}
 	}
 	
 	public String toString()

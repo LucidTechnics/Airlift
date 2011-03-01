@@ -489,14 +489,15 @@ public class RestServlet
 		String handlerPath = null;
 		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
 
-
 		RestContext restContext = new RestContext(_uriParameterMap);
 		String uri = reconstructUri(getServletName(), _httpServletRequest);
 		restContext.setIsUriACollection(isUriACollection(uri));
+		restContext.setIsUriANewDomain(isUriANewDomain(uri));
 		restContext.setMethod(_method);
 		restContext.setUri(uri);
 		restContext.setAppName(_appName);
-		
+
+		String suffix = (String) _uriParameterMap.get("a.suffix");
 		String domainName = "";
 
 		if ("NEW".equalsIgnoreCase(prefix) == true)
@@ -508,6 +509,40 @@ public class RestServlet
 			domainName = restContext.getThisDomain();
 		}
 
+		//special suffixes (xml, xhtml, html, json, html, text) takes precedence over Accept:
+		if ("xml".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + "GET.js");
+		}
+
+		if ("pdf".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + "GET.js");
+		}
+
+		if ("xhtml".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + "GET.js");
+		}
+
+		if ("json".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + "GET.js");
+		}
+
+		if ("html".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + "GET.js");
+		}
+
+		if ("text".equalsIgnoreCase(suffix) == true)
+		{
+			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + "GET.js");
+		}
+
+		//If you get like a billion Accept header values than it is
+		//most likely a browser so set all HTML like requests to the
+		//default method handlers.
 		if (_acceptValueList.isEmpty() == true ||
 			  _acceptValueList.size() > 1 ||
 			  (_acceptValueList.contains("application/xml") == true ||
@@ -516,16 +551,16 @@ public class RestServlet
 			   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
 			   _acceptValueList.contains("text/plain") == true))
 		{
-			
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
 		}
 
+		//Otherwise if the Accept is specifically set for one mime type
+		//then call that handler.
 		for(String acceptValue: _acceptValueList)
 		{
 			handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
 			restContext.addHandlerPath(handlerPath);
 		}
-
 
 		return restContext;
 	}
