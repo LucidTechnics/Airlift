@@ -398,7 +398,9 @@ airlift.get = function(_id, _domainName, _appName)
 {
 	var activeRecord = airlift.ar(_domainName, _appName);
 
-	var id = (airlift.isDefined(_id) === true) ? _id : ID;
+	var id = _id||ID;
+
+	LOG.info("Looking for record with this id: " + id);
 	
 	activeRecord.get(id);
 

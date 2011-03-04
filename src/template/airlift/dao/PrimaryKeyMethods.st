@@ -27,7 +27,11 @@ dao.get = function(_id)
 		}
 	}
 
-	return got;
+	var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
+	var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
+	var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+
+	return got.decrypt(password, initialVector, null, null, null, null, revolutions);
 }
 
 $updateMethod$

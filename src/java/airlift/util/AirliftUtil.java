@@ -365,6 +365,10 @@ public class AirliftUtil
 		{
 			initialBytes = doCipher(initialBytes, _password, _initialVector, _provider, _name, _mode, _padding, _revolutions, "encrypt");
 		}
+		else
+		{
+			initialBytes = new byte[0];
+		}
 
 		return initialBytes;
 	}
@@ -376,7 +380,11 @@ public class AirliftUtil
 
 		if (initialBytes != null)
 		{
-			return doCipher(initialBytes, _password, _initialVector, _provider, _name, _mode, _padding, _revolutions, "decrypt");
+			initialBytes = doCipher(initialBytes, _password, _initialVector, _provider, _name, _mode, _padding, _revolutions, "decrypt");
+		}
+		else
+		{
+			initialBytes = new byte[0];
 		}
 
 		return initialBytes;
