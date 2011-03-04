@@ -180,11 +180,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.convertToActiveRecordArray = function(_collection)
 	{
 		var collection = [];
-
+		var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
+		var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
+		var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+		
 		for (var dataObject in Iterator(_collection))
 		{
 			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			activeRecord.copyFrom(dataObject);
+			
+			activeRecord.copyFrom(dataObject.decrypt(password, initialVector, null, null, null, null, revolutions));
 			collection.push(activeRecord);
 		}
 

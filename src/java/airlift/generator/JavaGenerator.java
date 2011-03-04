@@ -480,6 +480,7 @@ public class JavaGenerator
 				String decryptionConversionFunction = determineDecryptionConversionFunction(type);
 				
 				encryptInvokationStringTemplate.setAttribute("getterName", getterName);
+				encryptInvokationStringTemplate.setAttribute("setterName", setterName);
 				encryptInvokationStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
 				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
 
