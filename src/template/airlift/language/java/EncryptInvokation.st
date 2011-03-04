@@ -1,0 +1,1 @@
+$getterName, setterName, conversionFunction, encryptedSetterName: {g,s,c,e | $e$(new com.google.appengine.api.datastore.Blob(airlift.util.AirliftUtil.encrypt(airlift.util.AirliftUtil.$c$($g$()), _password, _initialVector, _provider, _name, _mode, _padding, _revolutions))); $s$(null); }; separator="\n"$

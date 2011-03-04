@@ -11,6 +11,7 @@ dao.get = function(_id)
 	{
 		try
 		{
+			LOG.info("GET try number: " + (i + 1));
 			got = PERSISTENCE_MANAGER.getObjectById(airlift.cc("$package$.airlift.domain.$className$Jdo"), key);
 			break;
 		}
@@ -18,7 +19,7 @@ dao.get = function(_id)
 		{
 			LOG.warning("Encountered this error while accessing the datastore for get: " + e.toString());
 
-			if (i >= 5)
+			if (i >= 4)
 			{
 				LOG.severe("After fifth try at get: " + e.toString());
 				throw e;

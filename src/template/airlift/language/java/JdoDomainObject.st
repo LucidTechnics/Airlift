@@ -35,14 +35,14 @@ public class $className$Jdo
 	
 	public $className$Jdo() {}
 
-	public $className$Jdo encrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
+	public $className$Jdo encrypt(String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
 	{
 		$attributeEncryptors$
 
 		return this;
 	}
 
-	public $className$Jdo decrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
+	public $className$Jdo decrypt(String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
 	{
 		$attributeDecryptors$
 
