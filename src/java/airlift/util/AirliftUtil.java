@@ -316,6 +316,132 @@ public class AirliftUtil
 		return stringBuffer.toString().replaceAll(",$", "") + "]";
 	}
 
+	public static byte[] doCipher(byte[] _message, String _password, String _initialVector,
+								String _provider, String _name, String _mode, String _padding,
+								int _revolutions, String _cipherMode)
+	{
+		byte[] initialBytes = (_message != null) ? _message : new byte[0];
+		
+		try
+		{
+			byte[] key = _password.getBytes();
+			byte[] initialVectorSpec = _initialVector.getBytes();
+
+			String provider = (_provider != null) ? _provider : "SunJCE"; 
+			String name = (_name != null) ? _name : "AES";
+			String mode = (_mode != null) ? _mode : "PCBC";
+			String padding = (_padding != null) ? _padding : "PKCS5PADDING";
+			int revolutions = _revolutions;
+
+			int cipherMode = ("encrypt".equalsIgnoreCase(_cipherMode) == true) ? javax.crypto.Cipher.ENCRYPT_MODE : javax.crypto.Cipher.DECRYPT_MODE;
+
+			String algorithmString = name + "/" + mode + "/" + padding;
+
+			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(algorithmString, provider);
+
+			cipher.init(cipherMode,
+						new javax.crypto.spec.SecretKeySpec(key, name),
+						new javax.crypto.spec.IvParameterSpec(initialVectorSpec)); 
+
+			for (int i = 0; i < revolutions; i++)
+			{
+				initialBytes = cipher.doFinal(initialBytes); 
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return initialBytes;
+	}
+
+	public static byte[] encrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider,
+					  String _name, String _mode, String _padding, int _revolutions)
+	{
+		byte[] initialBytes = _initialBytes;
+		
+		if (initialBytes != null)
+		{
+			initialBytes = doCipher(initialBytes, _password, _initialVector, _provider, _name, _mode, _padding, _revolutions, "encrypt");
+		}
+
+		return initialBytes;
+	}
+
+	public static byte[] decrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider,
+						  String _name, String _mode, String _padding, int _revolutions)
+	{
+		byte[] initialBytes = _initialBytes;
+
+		if (initialBytes != null)
+		{
+			return doCipher(initialBytes, _password, _initialVector, _provider, _name, _mode, _padding, _revolutions, "decrypt");
+		}
+
+		return initialBytes;
+	}
+
+	public static byte[] convert(byte[] _byteArray)
+	{
+		return _byteArray;
+	}
+	
+	public static byte[] convert(String _string)
+	{
+		return (_string == null) ? null : convert(_string.getBytes());
+	}
+
+	public static byte[] convert(java.lang.Number _number)
+	{
+		return (_number == null) ? null : convert(_number.toString());
+	}
+
+	public static byte[] convert(java.util.Date _date)
+	{
+		return (_date == null) ? null : convert(_date.getTime());
+	}
+
+	public static byte[] convertToByteArray(byte[] _byteArray)
+	{
+		return _byteArray;
+	}
+
+	public static String convertToString(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : new String(convertToByteArray(_byteArray));
+	}
+
+	public static Short convertToShort(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : Short.parseShort(convertToString(_byteArray));
+	}
+
+	public static Long convertToLong(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : Long.parseLong(convertToString(_byteArray));
+	}
+
+	public static Integer convertToInteger(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : Integer.parseInt(convertToString(_byteArray));
+	}
+
+	public static Double convertToDouble(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : Double.parseDouble(convertToString(_byteArray));
+	}
+
+	public static Float convertToFloat(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : Float.parseFloat(convertToString(_byteArray));
+	}
+
+	public static java.util.Date convertToDate(byte[] _byteArray)
+	{
+		return (_byteArray == null) ? null : new java.util.Date(convertToLong(_byteArray));
+	}
+	
 	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
 	{
 		java.util.Map<String, Object> descriptionMap = new java.util.HashMap<String, Object>();

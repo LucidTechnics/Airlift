@@ -380,6 +380,8 @@ public class JavaGenerator
 		StringTemplate attributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeDeclaration");
 		StringTemplate getterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeGetterDeclaration");
 		StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeSetterDeclaration");
+		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/EncryptInvokation");
+		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DecryptInvokation");
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
 
@@ -408,7 +410,7 @@ public class JavaGenerator
 		while (attributes.hasNext() == true)
 		{
 			Attribute attribute = (Attribute) attributes.next();
-
+					
 			String name = attribute.getName();
 			String type = attribute.getType();
 			String scope = "public";
@@ -437,7 +439,7 @@ public class JavaGenerator
 			setterStringTemplate.setAttribute("type", type);
 			setterStringTemplate.setAttribute("setterName", setterName);
 			setterStringTemplate.setAttribute("name", name);
-
+			
 			printMessage("Checking is type: " + type);
 
 			if (isArrayType(type) == true)
@@ -451,6 +453,40 @@ public class JavaGenerator
 
 			stringBufferStringTemplate.setAttribute("name", name);
 
+			Annotation persist = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
+			String encrypted = findValue(persist, "encrypted()");
+
+			if ("true".equalsIgnoreCase(encrypted) == true)
+			{
+				String encryptedName = name + "Encrypted";
+				String encryptedGetterName = getGetterName(encryptedName);
+				String encryptedSetterName = getSetterName(encryptedName);
+
+				attributeStringTemplate.setAttribute("scope", "private");
+				attributeStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
+				attributeStringTemplate.setAttribute("name", encryptedName);
+
+				getterStringTemplate.setAttribute("scope", scope);
+				getterStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
+				getterStringTemplate.setAttribute("getterName", encryptedGetterName);
+				getterStringTemplate.setAttribute("name", encryptedName);
+
+				setterStringTemplate.setAttribute("scope", scope);
+				setterStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
+				setterStringTemplate.setAttribute("setterName", encryptedSetterName);
+				setterStringTemplate.setAttribute("name", encryptedName);
+
+				String encryptionConversionFunction = determineEncryptionConversionFunction(type);
+				String decryptionConversionFunction = determineDecryptionConversionFunction(type);
+				
+				encryptInvokationStringTemplate.setAttribute("getterName", getterName);
+				encryptInvokationStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
+				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
+
+				decryptInvokationStringTemplate.setAttribute("setterName", setterName);
+				decryptInvokationStringTemplate.setAttribute("encryptedGetterName", encryptedGetterName);
+				decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
+			}
 		}
 
 		if (_domainObjectModel.isClockable() == true)
@@ -545,6 +581,8 @@ public class JavaGenerator
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeSetters", setterStringTemplate);
+		domainObjectStringTemplate.setAttribute("attributeEncryptors", encryptInvokationStringTemplate);
+		domainObjectStringTemplate.setAttribute("attributeDecryptors", decryptInvokationStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
 		domainObjectStringTemplate.setAttribute("generatorComment", comment	);
 		domainObjectStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
@@ -665,7 +703,7 @@ public class JavaGenerator
 
 	    return daoStringTemplate.toString();
 	}
-	
+
 	protected class PropertyOrder
 		implements Comparable<PropertyOrder>
 	{

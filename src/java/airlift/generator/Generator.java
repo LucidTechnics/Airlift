@@ -378,6 +378,51 @@ public abstract class Generator
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, _message);
 	}
 
+	public String determineEncryptionConversionFunction(String _type)
+	{
+		return "convert";
+	}
+	
+	public String determineDecryptionConversionFunction(String _type)
+	{
+		String decryptionConversionFunction = "convertToString";
+		
+		if ("java.lang.String".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToString";
+		}
+		else if ("java.util.Date".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToDate";
+		}
+		else if ("java.lang.Long".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToLong";
+		}
+		else if ("java.lang.Integer".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToInteger";
+		}
+		else if ("java.lang.Double".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToDouble";
+		}
+		else if ("java.lang.Float".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToFloat";
+		}
+		else if ("java.lang.Short".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToShort";
+		}
+		else if ("java.lang.Byte[]".equalsIgnoreCase(_type) == true)
+		{
+			decryptionConversionFunction = "convertToByteArray";
+		}
+
+		return decryptionConversionFunction;
+	}
+
     protected abstract void generate(String _appName,
 					String _directory,
 					Element _element,
