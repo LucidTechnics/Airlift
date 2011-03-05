@@ -400,7 +400,27 @@ public class AirliftUtil
 		return (_string == null) ? null : convert(_string.getBytes());
 	}
 
-	public static byte[] convert(java.lang.Number _number)
+	public static byte[] convert(java.lang.Long _number)
+	{
+		return (_number == null) ? null : convert(_number.toString());
+	}
+
+	public static byte[] convert(java.lang.Short _number)
+	{
+		return (_number == null) ? null : convert(_number.toString());
+	}
+
+	public static byte[] convert(java.lang.Integer _number)
+	{
+		return (_number == null) ? null : convert(_number.toString());
+	}
+
+	public static byte[] convert(java.lang.Double _number)
+	{
+		return (_number == null) ? null : convert(_number.toString());
+	}
+
+	public static byte[] convert(java.lang.Float _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
