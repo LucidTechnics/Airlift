@@ -112,10 +112,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	};
 
-	activeRecord.audit = function()
+	activeRecord.postAudit = function()
 	{
 		this.setAuditPostDate(airlift.createDate());
 		this.setAuditPutDate(this.getAuditPostDate());
+		if (USER_EMAIL) { this.setAuditUserEmail(USER_EMAIL); }
+
+		return this;
+	}
+
+	activeRecord.putAudit = function()
+	{
+		this.setAuditPutDate(airlift.createDate());
 		if (USER_EMAIL) { this.setAuditUserEmail(USER_EMAIL); }
 
 		return this;
@@ -125,7 +133,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
-		this.audit().dao.update(this.createDO());
+		this.putAudit().dao.update(this.createDO());
 
 		return this;
 	};
@@ -134,7 +142,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
-		this.setId(this.audit().dao.insert(this.createDO()));
+		this.setId(this.postAudit().dao.insert(this.createDO()));
 
 		return this;
 	};
