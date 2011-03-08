@@ -1009,12 +1009,12 @@ airlift.unescapeHtml = function(_value)
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
 }
 
-airlift.audit = function(_data, _action)
+airlift.audit = function(_data, _action, _id)
 {
 	var auditTrail = new Packages.airlift.servlet.rest.AuditTrail();
 
 	auditTrail.id = airlift.g();
-	auditTrail.domainId = ID;
+	auditTrail.domainId = _id||ID;
 	auditTrail.action = _action;
 	auditTrail.domain = DOMAIN_NAME;
 	auditTrail.uri = URI;

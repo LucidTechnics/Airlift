@@ -145,7 +145,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
 		this.setId(this.postAudit().dao.insert(this.createDO()));
-		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.rdfa(), "INSERT"); }
+		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.rdfa(), "INSERT", this.id); }
 
 		return this;
 	};
