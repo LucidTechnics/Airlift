@@ -85,7 +85,7 @@ public class JavaGenerator
 
 					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 					String concept = findValue(persist, "concept()");
-					if (concept != null || "".equals(concept) != true) { concept += ","; }
+					if (concept != null && "".equals(concept) != true) { concept += ","; }
 					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + urnRoot + ":"  + concept + attribute.getName() + "\");");
 
 					Annotation present = domainObjectModel.getAnnotation(attribute, "airlift.generator.Presentable");
