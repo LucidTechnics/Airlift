@@ -1008,3 +1008,21 @@ airlift.unescapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
 }
+
+airlift.audit = function(_data, _action)
+{
+	var auditTrail = new Packages.airlift.servlet.rest.AuditTrail();
+
+	auditTrail.id = airlift.g();
+	auditTrail.domainId = ID;
+	auditTrail.action = _action;
+	auditTrail.domain = DOMAIN_NAME;
+	auditTrail.uri = URI;
+	auditTrail.handlerName = HANDLER_NAME;
+	auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(_data);
+	auditTrail.email = USER_EMAIL;
+	auditTrail.actionDate = airlift.createDate();
+	auditTrail.recordDate = auditTrail.actionDate;
+
+	AUDIT_CONTEXT.insert(auditTrail);
+}

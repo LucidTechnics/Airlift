@@ -100,7 +100,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var jdo = this.dao.get(_id);
 		this.copyFrom(jdo);
-
+		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.rdfa(), "GET"); }
+		
 		return this;
 	};
 
@@ -134,6 +135,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
 		this.putAudit().dao.update(this.createDO());
+		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.rdfa(), "UPDATE"); }
 
 		return this;
 	};
@@ -143,6 +145,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
 		this.setId(this.postAudit().dao.insert(this.createDO()));
+		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.rdfa(), "INSERT"); }
 
 		return this;
 	};
@@ -152,7 +155,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "DELETE"); }
 
 		this.dao.del(this.id);
-
+		if ("on".equalsIgnoreCase(AUDITING_DELETE) === true)  { airlift.audit(this.rdfa(), "DELETE"); }
+		
 		return this;
 	};
 

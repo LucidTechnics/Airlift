@@ -72,7 +72,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		{
 			try
 			{
-				PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
+				PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);				
 				break;
 			}
 			catch(e)

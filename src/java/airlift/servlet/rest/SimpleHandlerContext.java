@@ -53,6 +53,11 @@ public class SimpleHandlerContext
 		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
 		String rootPackageName = _httpServlet.getServletConfig().getInitParameter("a.root.package.name");
 
+		String auditingInsert = _httpServlet.getServletConfig().getInitParameter("a.auditing.insert");
+		String auditingGet = _httpServlet.getServletConfig().getInitParameter("a.auditing.get");
+		String auditingUpdate = _httpServlet.getServletConfig().getInitParameter("a.auditing.update");
+		String auditingDelete = _httpServlet.getServletConfig().getInitParameter("a.auditing.delete");
+
 		String defaultMimeType = (_httpServlet.getServletConfig().getInitParameter("a.default.mime.type") != null) ? _httpServlet.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
 		ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
 
@@ -151,8 +156,13 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("USER_EMAIL", userEmail);
 			scriptingUtil.bind("APP_PROFILE", appProfile);
 			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(persistenceManager));
+			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext(persistenceManager));
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
-
+			scriptingUtil.bind("AUDITING_INSERT", auditingInsert);
+			scriptingUtil.bind("AUDITING_GET", auditingGet);
+			scriptingUtil.bind("AUDITING_UPDATE", auditingUpdate);
+			scriptingUtil.bind("AUDITING_DELETE", auditingDelete);
+			
 			for (String restContextDomainName: restContext.getDomainIds())
 			{
 				log.info("Binding ids for this rest context variable: " + restContextDomainName);

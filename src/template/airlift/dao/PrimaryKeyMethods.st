@@ -11,7 +11,6 @@ dao.get = function(_id)
 	{
 		try
 		{
-			LOG.info("GET try number: " + (i + 1));
 			got = PERSISTENCE_MANAGER.getObjectById(airlift.cc("$package$.airlift.domain.$className$Jdo"), key);
 			break;
 		}
