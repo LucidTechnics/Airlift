@@ -16,6 +16,7 @@ package airlift.generator;
 
 @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 
+
 public @interface Persistable
 {
     public enum Semantic { NONE, EMAIL, ADDRESS, CREDIT_CARD, ZIPCODE, PHONENUMBER }
@@ -24,7 +25,7 @@ public @interface Persistable
 	public boolean isVersionable() default false;
 	public String tableName() default "";
 	public String field() default "";
-	public int maxLength() default 100;
+	public int maxLength() default 200;
 	public int precision() default 10;
 	public int scale() default 2;
 	public boolean isPrimaryKey() default false;

@@ -2,8 +2,6 @@ dao.update = function(_$lowerCaseClassName$)
 {
 	if (airlift.isDefined(_$lowerCaseClassName$.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _$lowerCaseClassName$ }; }
 
-	var previousRecord = dao.get(_$lowerCaseClassName$.getId());
-
 	var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
 	var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
 	var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;

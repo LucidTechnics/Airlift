@@ -1,4 +1,4 @@
-//$comment$
+//$generatorComment$
 
 var airlift;
 
@@ -51,6 +51,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var id = Packages.airlift.util.IdGenerator.generate(12);
 		_$lowerCaseClassName$.setId(id);
 
+		var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
+		var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
+		var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+
+		_$lowerCaseClassName$.encrypt(password, initialVector, null, null, null, null, revolutions);
+
 		var indexList = this.index(_$lowerCaseClassName$);
 
 		var index = new $className$IndexJdo();
@@ -61,12 +67,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		index.set$className$Jdo(_$lowerCaseClassName$);
 
 		_$lowerCaseClassName$.set$className$IndexJdo(index);
-
-		var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
-		var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
-		var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
-		
-		_$lowerCaseClassName$.encrypt(password, initialVector, null, null, null, null, revolutions);
 		
 		for (var i = 0; i < 5; i++)
 		{
