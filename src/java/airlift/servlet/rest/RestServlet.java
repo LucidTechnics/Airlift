@@ -516,30 +516,34 @@ public class RestServlet
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
 		}
-
-		if ("pdf".equalsIgnoreCase(suffix) == true)
+		else if ("pdf".equalsIgnoreCase(suffix) == true)
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
 		}
-
-		if ("xhtml".equalsIgnoreCase(suffix) == true)
+		else if ("xhtml".equalsIgnoreCase(suffix) == true)
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
 		}
-
-		if ("json".equalsIgnoreCase(suffix) == true)
+		else if ("json".equalsIgnoreCase(suffix) == true)
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
 		}
-
-		if ("html".equalsIgnoreCase(suffix) == true)
+		else if ("html".equalsIgnoreCase(suffix) == true)
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
 		}
-
-		if ("text".equalsIgnoreCase(suffix) == true)
+		else if ("text".equalsIgnoreCase(suffix) == true)
 		{
 			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
+		}
+		else
+		{
+			String mimetype = getServletConfig().getInitParameter("a.extension." + suffix);
+
+			if (mimetype != null)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + mimetype + "/" + extensionPrefix + ".js");
+			}
 		}
 
 		//If you get like a billion Accept header values than it is

@@ -199,14 +199,16 @@ public class AirliftUtil
 
 		String[] tokenArray = _uri.split("\\/");
 
-		for (String token: tokenArray)
-		{
-			log.info("Here is the token in isUriACollection: " + token);
-		}
-
 		if (tokenArray.length > 1)
 		{
 			String last = tokenArray[tokenArray.length - 1];
+
+			if (last.contains(".") == true)
+			{
+				String[] lastTokenArray = last.split("\\.");
+				last = lastTokenArray[0];
+			}
+			
 			isUriACollection = isDomainName(last, _rootPackageName);
 		}
 
@@ -219,14 +221,16 @@ public class AirliftUtil
 
 		String[] tokenArray = _uri.split("\\/");
 
-		for (String token: tokenArray)
-		{
-			log.info("Here is the token in isUriACollection: " + token);
-		}
-
 		if (tokenArray.length > 1)
 		{
 			String last = tokenArray[tokenArray.length - 1];
+
+			if (last.contains(".") == true)
+			{
+				String[] lastTokenArray = last.split("\\.");
+				last = lastTokenArray[0];
+			}
+
 			isUriANewDomain = isNewDomainName(last, _rootPackageName);
 		}
 
@@ -247,19 +251,19 @@ public class AirliftUtil
 		for (String token: tokenArray)
 		{
 			String candidateToken = token;
-			
+
 			java.util.List<String> tokenList = hasSuffix(token);
-			
+
 			if (tokenList.isEmpty() == false)
 			{
 				candidateToken = tokenList.get(0);
 				Route.addSuffix(_uriParameterMap, (String) tokenList.get(1));
 			}
-				
+
 			if (isDomainName(candidateToken, _rootPackageName) == true)
 			{				
-				Route.addDomainName(_uriParameterMap, token);
-				parentDomain = token;
+				Route.addDomainName(_uriParameterMap, candidateToken);
+				parentDomain = candidateToken;
 			}
 			else if (parentDomain != null)
 			{
@@ -270,18 +274,15 @@ public class AirliftUtil
 				parentDomain = null;
 			}
 		}
+
+		log.info("uri parameter map is: " + _uriParameterMap);
 	}
 
 	public static java.util.List<String> hasSuffix(String _token)
 	{
 		java.util.List<String> list = new java.util.ArrayList<String>();
 		
-		if (_token.toLowerCase().endsWith(".xml") == true ||
-			_token.toLowerCase().endsWith(".pdf") == true ||
-			_token.toLowerCase().endsWith(".html") == true ||
-			_token.toLowerCase().endsWith(".xhtml") == true ||
-			_token.toLowerCase().endsWith(".text") == true ||
-			_token.toLowerCase().endsWith(".json") == true)
+		if (_token.contains(".") == true)
 		{
 			String[] tokenArray = _token.split("\\.");
 			

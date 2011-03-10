@@ -1026,3 +1026,8 @@ airlift.audit = function(_data, _action, _id)
 
 	AUDIT_CONTEXT.insert(auditTrail);
 }
+
+airlift.formatDate = function(_date, _mask)
+{
+	return Packages.airlift.util.FormatUtil.format(_date, _mask);
+}
