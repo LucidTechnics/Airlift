@@ -1029,5 +1029,5 @@ airlift.audit = function(_data, _action, _id)
 
 airlift.formatDate = function(_date, _mask)
 {
-	return Packages.airlift.util.FormatUtil.format(_date, _mask);
+	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy");
 }
