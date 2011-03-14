@@ -61,7 +61,40 @@ public final class Browser
 			throw new RuntimeException(t);
 		}
 
-		return executeRequest(httpRequest);
+		HTTPResponse response = null;
+		int tryCount = 0;
+		Throwable throwable = null;
+		boolean success = false;
+		
+		for (int i = 0; i < 10; i++)
+		{
+			log.info("Attempting to reach: " + _url + " after this many tries: " + tryCount);
+			
+			tryCount++;
+			
+			try
+			{
+				response = executeRequest(httpRequest);
+				success = true;
+			}
+			catch(Throwable t)
+			{
+				throwable = t;
+			}
+
+			if (success == true)
+			{
+				break;
+			}
+		}
+
+		if (success == false)
+		{
+			log.severe("Unable to reach: " + _url + " after this many tries: " + tryCount);
+			log.severe("last error encountered was: " + throwable.getMessage());
+		}
+
+		return response;
 	}
 
 	public HTTPResponse executeRequest(HTTPRequest _httpRequest)

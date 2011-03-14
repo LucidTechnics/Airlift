@@ -12,15 +12,20 @@ import airlift.servlet.rest.RestfulSecurityContext;
 public class AppProfile
    implements airlift.AppProfile
 {
-	private static final java.util.Collection<String> collection = new java.util.ArrayList<String>();
-	private static final java.util.Map<String, String> map = new java.util.HashMap<String, String>();
-	private static final java.util.Map<String, String> widgetMap = new java.util.HashMap<String, String>();
-	private static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
-	private static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
-	private static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
-	
+	public static final java.util.Collection<String> domainCollection = new java.util.ArrayList<String>();
+	public static final java.util.Map<String, String> domainAttributeTypeMap = new java.util.HashMap<String, String>();
+	public static final java.util.Map<String, String> widgetMap = new java.util.HashMap<String, String>();
+	public static final java.util.Map<String, String> domainToClassMap = new java.util.HashMap<String, String>();
+	public static final java.util.Map<String, String> domainToShortClassMap = new java.util.HashMap<String, String>();
+	public static final java.util.Map<String, String> conceptMap = new java.util.HashMap<String, String>();
+
+	$domainAttributeList; separator="\n"$
+	$domainAttributeListGetter; separator="\n"$								
+			
 	static
 	{
+		$addToDomainAttributeList; separator="\n"$
+				
 		//Domains
 		$addToDomainCollection; separator="\n"$
 
@@ -45,14 +50,18 @@ public class AppProfile
 
 	public AppProfile() {}
 
+
+	public String appName = "$appName$";
+	public String rootPackageName = "$rootPackage$";
+	
 	public String getAppName()
 	{
-		return "$appName$";
+		return appName;
 	}
 
 	public String getRootPackageName()
 	{
-		return "$rootPackage$";
+		return rootPackageName;
 	}
 
 	public String getDomainShortClassName(String _domainName)
@@ -88,17 +97,17 @@ public class AppProfile
 
 	public java.util.Collection<String> getValidDomains()
 	{
-		return new java.util.ArrayList<String>(collection);
+		return new java.util.ArrayList<String>(domainCollection);
 	}
 
 	public boolean isValidDomain(String _domainName)
 	{
-		return collection.contains(_domainName.toLowerCase());
+		return domainCollection.contains(_domainName.toLowerCase());
 	}
 
 	public String getAttributeType(String _domainName, String _attributeName)
 	{
-		return map.get(_domainName.toLowerCase() + "." + _attributeName);
+		return domainAttributeTypeMap.get(_domainName.toLowerCase() + "." + _attributeName);
 	}
 
 	public String getAttributeWidget(String _domainName, String _attributeName)
@@ -108,7 +117,7 @@ public class AppProfile
 
 	public boolean hasAttribute(String _domainName, String _attributeName)
 	{
-		return map.containsKey(_domainName.toLowerCase() + "." + _attributeName);
+		return domainAttributeTypeMap.containsKey(_domainName.toLowerCase() + "." + _attributeName);
 	}
 
 	public String getConcept(String _conceptHandle)

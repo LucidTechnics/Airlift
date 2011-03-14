@@ -13,6 +13,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 {
 	var activeRecord = {};
 
+	activeRecord.appProfile = new Packages.$package$.AppProfile();
+	
 	$defineProperty; separator="\n"$
 
 	$setMethod; separator="\n"$
@@ -280,12 +282,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.getAppProfile = function()
 	{
-		return new Packages.$package$.AppProfile();
+		return this.appProfile;
 	}
 
 	activeRecord.getAttributeType = function(_attributeName)
 	{
-		return new Packages.$package$.AppProfile().getAttributeType("$allLowerCaseClassName$", _attributeName);
+		return this.appProfile.getAttributeType("$allLowerCaseClassName$", _attributeName);
 	}
 
 	activeRecord.retrieveDomainName = function()
@@ -296,8 +298,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.retrieveOrderedPropertyList = function()
 	{
 		var propertyList = [];
-
-		$addPropertyName; separator="\n"$
+		
+		for (var attribute in Iterator(this.appProfile.$domainName$AttributeList))
+		{
+			propertyList.push(attribute);
+		}
 
 		return propertyList;
 	}

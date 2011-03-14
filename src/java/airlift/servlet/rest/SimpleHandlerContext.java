@@ -52,7 +52,6 @@ public class SimpleHandlerContext
     {
 		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
 		String rootPackageName = _httpServlet.getServletConfig().getInitParameter("a.root.package.name");
-
 		String auditingInsert = _httpServlet.getServletConfig().getInitParameter("a.auditing.insert");
 		String auditingGet = _httpServlet.getServletConfig().getInitParameter("a.auditing.get");
 		String auditingUpdate = _httpServlet.getServletConfig().getInitParameter("a.auditing.update");
@@ -103,7 +102,6 @@ public class SimpleHandlerContext
 		log.info("handlers: " + _restContext.getHandlerPathList());
 		log.info("queryString: " + queryString);
 		log.info("domainObjectPaths: " + domainPathMap);
-
 
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();

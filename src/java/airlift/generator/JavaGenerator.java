@@ -67,7 +67,10 @@ public class JavaGenerator
 					isHighLevelAttributesSet = true;
 				}
 
-				template.setAttribute("addToDomainCollection", "collection.add(\"" + domainObjectModel.getClassName().toLowerCase() + "\");");
+				String domainAttributeListName = lowerTheFirstCharacter(domainObjectModel.getClassName()) + "AttributeList";
+				
+				template.setAttribute("domainAttributeList", "public static final java.util.Collection<String> " + domainAttributeListName + " = new java.util.ArrayList<String>();");
+				template.setAttribute("addToDomainCollection", "domainCollection.add(\"" + domainObjectModel.getClassName().toLowerCase() + "\");");
 				template.setAttribute("addToDomainToShortClassMap", "domainToShortClassMap.put(\"" +
 									  domainObjectModel.getClassName().toLowerCase() + "\", \"" +
 									  domainObjectModel.getClassName() + "\");");
@@ -81,7 +84,8 @@ public class JavaGenerator
 				
 				for (Attribute attribute: domainObjectModel.getAttributeNameMap().values())
 				{
-					template.setAttribute("addToDomainAttributeTypeMap", "map.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + attribute.getType() + "\");");
+					template.setAttribute("addToDomainAttributeList", domainAttributeListName + ".add(\"" + attribute.getName() + "\");");
+					template.setAttribute("addToDomainAttributeTypeMap", "domainAttributeTypeMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + attribute.getType() + "\");");
 
 					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 					String concept = findValue(persist, "concept()");

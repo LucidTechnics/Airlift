@@ -959,7 +959,7 @@ airlift.email = function(_users, _message, _subject, _from)
 {
 	if (_message &&
 		  "".equals(_message) === false &&
-		  Packages.org.apache.commons.lang.StringUtils.isWhitespace(_message) === false)
+		  airlift.isWhitespace(_message) === false)
 	{
 		var users = _users||[];
 		var adminEmail = APP_NAME.toLowerCase() + "@appspot.com";
@@ -1030,4 +1030,14 @@ airlift.audit = function(_data, _action, _id)
 airlift.formatDate = function(_date, _mask)
 {
 	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy");
+}
+
+airlift.browser = function()
+{
+	return new Packages.airlift.util.Browser();
+}
+
+airlift.isWhitespace = function(_string)
+{
+	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 }
