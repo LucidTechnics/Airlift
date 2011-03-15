@@ -46,13 +46,24 @@ public class FormatUtil
 		return format((java.util.Date) _timestamp, _pattern);
 	}
 
+	public static String format(java.sql.Timestamp _timestamp, String _pattern, java.util.TimeZone _timeZone)
+	{
+		return format((java.util.Date) _timestamp, _pattern, _timeZone);
+	}
+
 	public static String format(java.util.Date _date, String _pattern)
+	{
+		return format(_date, _pattern, java.util.TimeZone.getDefault());
+	}
+	
+	public static String format(java.util.Date _date, String _pattern, java.util.TimeZone _timeZone)
 	{
 		String date = "";
 
 		try
 		{
 			java.text.SimpleDateFormat format = new java.text.SimpleDateFormat(_pattern);
+			format.setTimeZone(_timeZone);
 
 			if (_date != null)
 			{
@@ -63,7 +74,7 @@ public class FormatUtil
 		{
 			throw new RuntimeException(t);
 		}
-		
+
 		return date;
 	}
 

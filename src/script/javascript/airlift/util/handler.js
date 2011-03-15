@@ -799,18 +799,24 @@ airlift.production = function(_productionValue, _devValue)
 	return (PRODUCTION_MODE === true) ? _productionValue : _devValue;
 }
 
+airlift.createTimeZone = function(_timeZoneString)
+{
+	return new Packages.java.util.TimeZone.getTimeZone(_timeZoneString);
+}
+
 airlift.createCalendar = function(_config)
 {
-	var date = (airlift.isDefined(_config) === true && airlift.isDefined(_config.date) === true) ? _config.date : null;
-	var dateOffset = (airlift.isDefined(_config) === true && airlift.isDefined(_config.dateOffset) === true) ? _config.dateOffset : 0;
-	var dateOffsetType = (airlift.isDefined(_config) === true && airlift.isDefined(_config.dateOffsetType) === true) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
-	var timeZone = (airlift.isDefined(_config) === true && airlift.isDefined(_config.timeZone) === true) ? _config.timeZone : TIMEZONE;
-	var locale = (airlift.isDefined(_config) === true && airlift.isDefined(_config.locale) === true) ? _config.locale : LOCALE;
+	var date = (_config && _config.date) ? _config.date : null;
+	var dateOffset = (_config && _config.dateOffset) ? _config.dateOffset : 0;
+	var dateOffsetType = (_config && _config.dateOffsetType) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
+	var timeZone = (_config && _config.timeZone) ? _config.timeZone : TIMEZONE;
+	var locale = (_config && _config.locale) ? _config.locale : LOCALE;
 
 	if (airlift.isDefined(date) === true)
 	{
 		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
 		calendar.setTime(date);
+		calendar.setTimeZone(timeZone);
 	}
 	else
 	{
@@ -1027,9 +1033,9 @@ airlift.audit = function(_data, _action, _id)
 	AUDIT_CONTEXT.insert(auditTrail);
 }
 
-airlift.formatDate = function(_date, _mask)
+airlift.formatDate = function(_date, _mask, _timeZone)
 {
-	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy");
+	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy", _timeZone||TIMEZONE);
 }
 
 airlift.browser = function()

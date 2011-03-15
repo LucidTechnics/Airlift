@@ -100,6 +100,18 @@ public class RestServlet
 
 	}
 
+	protected boolean timedOut(AirliftUser _user)
+	{
+		boolean timedOut = false;
+
+		if (_user.getTimeOutDate() != null)
+		{
+			timedOut = (System.currentTimeMillis() <= _user.getTimeOutDate().getTime());
+		}
+		
+		return timedOut;
+	}
+
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
@@ -133,7 +145,9 @@ public class RestServlet
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 
-		boolean success = allowed(user, restContext);
+		RestfulSecurityContext securityContext = new RestfulSecurityContext();
+		
+		boolean success = allowed(user, restContext, securityContext);
 
 		if (!success && user == null)
 		{
@@ -150,10 +164,37 @@ public class RestServlet
 		{
 			sendCodedPage("401", "UnAuthorized", _response);
 		}
+		else if (success && timedOut(restContext.getAirliftUser()) == true)
+		{
+			try
+			{
+				_response.sendRedirect(userService.createLoginURL(_request.getRequestURI()));
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}			
+		}
 		else if (success)
 		{
 			try
 			{
+				if (restContext.getAirliftUser() != null)
+				{
+					String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
+
+					long duration = (durationString == null) ? (20 * 60 * 1000) : Long.parseLong(durationString);
+
+					//If you set duration to 0 then you are always
+					//required to provide credentials.
+					long timeOutTime = duration + System.currentTimeMillis();
+					
+					restContext.getAirliftUser().setTimeOutDate(new java.util.Date(timeOutTime));
+					restContext.getAirliftUser().setGoogleUserId(user.getUserId());
+
+					securityContext.update(restContext.getAirliftUser());
+				}
+				
 				processRequest(_request, _response, method, restContext, uriParameterMap);
 			}
 			catch(Throwable t)
@@ -161,6 +202,8 @@ public class RestServlet
 				throw new RuntimeException(t);
 			}
 		}
+
+		
 
 		return restContext;
 	}
@@ -571,14 +614,13 @@ public class RestServlet
 		return restContext;
 	}
 
-	public boolean allowed(User _user, RestContext _restContext)
+	public boolean allowed(User _user, RestContext _restContext, RestfulSecurityContext _securityContext)
 	{
 		boolean allowed = true;
-		RestfulSecurityContext securityContext = new RestfulSecurityContext();
 
 		try
 		{
-			allowed = securityContext.allowed(_user, _restContext, getAppProfile());
+			allowed = _securityContext.allowed(_user, _restContext, getAppProfile());
 		}
 		catch(Throwable t)
 		{

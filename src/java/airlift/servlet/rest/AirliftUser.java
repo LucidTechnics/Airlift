@@ -31,6 +31,7 @@ public class AirliftUser
 	@Persistent private java.util.List<String> roleList = new java.util.ArrayList<String>();
 	@Persistent private boolean active;
 	@Persistent private java.util.Date createDate;
+	@Persistent private java.util.Date timeOutDate;
 	
 	public String getId() { return id; }
 	public String getFamilyName() { return familyName; }
@@ -40,7 +41,8 @@ public class AirliftUser
 	public java.util.List<String> getRoleList() { return roleList; }
 	public boolean getActive() { return active; }
 	public java.util.Date getCreateDate() { return createDate; }
-
+	public java.util.Date getTimeOutDate() { return timeOutDate; }
+	
 	public void setId(String _id) { id = _id; }
 	public void setGoogleUserId(String _googleUserId) { googleUserId = _googleUserId; }
 	public void setFamilyName(String _familyName) { familyName = _familyName; }
@@ -49,4 +51,5 @@ public class AirliftUser
 	public void setRoleList(java.util.List<String> _roleList) { roleList = _roleList; }
 	public void setActive(boolean _active) { active = _active; }
 	public void setCreateDate(java.util.Date _createDate) { createDate = _createDate; }
+	public void setTimeOutDate(java.util.Date _timeOutDate) { timeOutDate = _timeOutDate; }
 }

@@ -82,7 +82,7 @@ public class JavaGenerator
 				String urnRoot = "urn:" + domainObjectModel.getAppName() + ":" + domainObjectModel.getClassName().toLowerCase();
 				template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \"" + urnRoot  + "\");");
 				
-				for (Attribute attribute: domainObjectModel.getAttributeNameMap().values())
+				for (Attribute attribute: domainObjectModel.getAttributeList())
 				{
 					template.setAttribute("addToDomainAttributeList", domainAttributeListName + ".add(\"" + attribute.getName() + "\");");
 					template.setAttribute("addToDomainAttributeTypeMap", "domainAttributeTypeMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + attribute.getType() + "\");");

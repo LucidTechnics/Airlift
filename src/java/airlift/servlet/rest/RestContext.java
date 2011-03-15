@@ -34,6 +34,7 @@ public class RestContext
 	private boolean isUriANewDomain;
 	private String uri;
 	private String appName;
+	private AirliftUser airliftUser;
 	
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
@@ -42,6 +43,7 @@ public class RestContext
 	public boolean getIsUriANewDomain() { return isUriANewDomain; }
 	public String getUri() { return uri; }
 	public String getAppName() { return appName; }
+	public AirliftUser getAirliftUser() { return airliftUser; }
 	
 	public java.util.List<String> getHandlerPathList() { return handlerPathList; }
 	public void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
@@ -51,6 +53,7 @@ public class RestContext
 	protected void setIsUriANewDomain(boolean _isUriANewDomain) { isUriANewDomain = _isUriANewDomain; }
 	protected void setUri(String _uri) { uri = _uri; }
 	protected void setAppName(String _appName) { appName = _appName; }
+	protected void setAirliftUser(AirliftUser _airliftUser) { airliftUser = _airliftUser; }
 	
 	public RestContext()
 	{

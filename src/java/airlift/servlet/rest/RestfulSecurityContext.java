@@ -41,10 +41,13 @@ public class RestfulSecurityContext
 
 	public boolean allowed(User _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
-		return allowed(_user, _restContext.getMethod(), _appProfile, _restContext.getThisDomain(), _restContext.uriIsACollection());
+		AirliftUser user = fetchAirliftUser(_user);
+		_restContext.setAirliftUser(user);
+
+		return allowed(user, _restContext.getMethod(), _appProfile, _restContext.getThisDomain(), _restContext.uriIsACollection());
 	}
 
-	public boolean allowed(User _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
+	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
 	{
 		boolean allowed = true;
 		
@@ -128,7 +131,7 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
-	private boolean checkAllowed(java.util.Set<String> _roleSet, User _user)
+	private boolean checkAllowed(java.util.Set<String> _roleSet, AirliftUser _user)
 	{
 		boolean allowed = false;
 		
@@ -162,10 +165,10 @@ public class RestfulSecurityContext
 		return allowed;
 	}
 
-	public java.util.Set<String> fetchUserRoleSet(com.google.appengine.api.users.User _user)
+	public AirliftUser fetchAirliftUser(com.google.appengine.api.users.User _user)
 	{
-		java.util.Set<String> roleList = new java.util.HashSet<String>();
-
+		AirliftUser user = null;
+		
 		if (_user != null)
 		{
 			java.util.List<AirliftUser> userList = collectByEmail(_user.getEmail(), 0, 10, "email", true);
@@ -174,9 +177,20 @@ public class RestfulSecurityContext
 
 			if (userList.isEmpty() != true)
 			{
-				AirliftUser user = userList.get(0);
-				roleList.addAll(user.getRoleList());
+				user = userList.get(0);
 			}
+		}
+
+		return user;
+	}
+
+	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user)
+	{
+		java.util.Set<String> roleList = new java.util.HashSet<String>();
+
+		if (_user != null)
+		{
+			roleList.addAll(_user.getRoleList());
 		}
 
 		return roleList;
