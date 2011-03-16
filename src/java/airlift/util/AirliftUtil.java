@@ -433,32 +433,38 @@ public class AirliftUtil
 
 	public static Short convertToShort(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : Short.parseShort(convertToString(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Short.parseShort(convertedBytes) : null;
 	}
 
 	public static Long convertToLong(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : Long.parseLong(convertToString(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Long.parseLong(convertedBytes) : null;
 	}
 
 	public static Integer convertToInteger(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : Integer.parseInt(convertToString(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Integer.parseInt(convertedBytes) : null;
 	}
 
 	public static Double convertToDouble(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : Double.parseDouble(convertToString(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Double.parseDouble(convertedBytes) : null;
 	}
 
 	public static Float convertToFloat(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : Float.parseFloat(convertToString(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Float.parseFloat(convertedBytes) : null;
 	}
 
 	public static java.util.Date convertToDate(byte[] _byteArray)
 	{
-		return (_byteArray == null) ? null : new java.util.Date(convertToLong(_byteArray));
+		String convertedBytes = convertToString(_byteArray);
+		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? new java.util.Date(Long.parseLong(convertedBytes)) : null;
 	}
 	
 	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
