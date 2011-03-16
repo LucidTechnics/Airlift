@@ -120,104 +120,31 @@ public class Compiler
 
 					processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Type element is: " + typeElement.toString());
 
-					if ("airlift.generator.TargetDatabase".equalsIgnoreCase(typeElement.toString()) == true)
+					for (Element element: annotatedElementSet)
 					{
-						processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Processing Target Database");
+						if (element.getKind() == ElementKind.METHOD)
+						{						
+							//Find the enclosing class and get the
+							//domain object model for that class. Then populate or
+							//overwrite the field's information only
+							String methodName = element.getSimpleName().toString();
 
-						for (Element element: annotatedElementSet)
-						{
-							processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Processing Target Database Annotations");
-
-							List<? extends AnnotationMirror> annotationMirrorList = elements.getAllAnnotationMirrors(element);
-
-							if (annotationMirrorList.size() != 1) { throw new RuntimeException("A class with TargetDatabase annotation can not declare other annotations"); }
-
-							AnnotationMirror annotationMirror = annotationMirrorList.get(0);
-
-							Map parameterValueMap = elements.getElementValuesWithDefaults(annotationMirror);
-
-							processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "parameter map: " + parameterValueMap);
-							
-							Map<String, String> tempMap = new HashMap<String, String>();
-							
-							for (Object object: parameterValueMap.entrySet())
+							if (isGetter(methodName) == true)
 							{
-								Map.Entry entry = (Map.Entry) object;
-								processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Moving value: " + entry.getValue().toString());
+								String attributeName = deduceAttributeName(methodName);
+								Attribute attribute = new Attribute();
+								attribute.setName(attributeName);
+								attribute.setType(determineReturnType(element, types));
 
-								tempMap.put(entry.getKey().toString(), entry.getValue().toString().replaceAll("\"", ""));
-							}
+								Element interfaceElement = element.getEnclosingElement();
+								getElementSet().add(interfaceElement);
+								DomainObjectModel domainObjectModel = getRelevantDomainObjectModel(interfaceElement, elements);
 
-							String generateFromSchema = tempMap.get("generateFromSchema()");
-
-							if ("true".equalsIgnoreCase(generateFromSchema) == true)
-							{
-								processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Accessing database");
-
-								String jdbcUrl = (String) tempMap.get("jdbcUrl()");
-								String driverClass = (String) tempMap.get("driverClass()");
-								String schema = (String) tempMap.get("schema()");
-								String username = (String) tempMap.get("username()");
-								String password = (String) tempMap.get("password()");
-
-								spawnInterfaceClasses(jdbcUrl, driverClass, schema, username, password);
-								generateInterfaceFiles(element);
-							}
-						}
-					}
-					else
-					{
-						for (Element element: annotatedElementSet)
-						{
-							if (element.getKind() == ElementKind.METHOD)
-							{						
-								//Find the enclosing class and get the
-								//domain object model for that class. Then populate or
-								//overwrite the field's information only
-								String methodName = element.getSimpleName().toString();
-
-								if (isGetter(methodName) == true)
-								{
-									String attributeName = deduceAttributeName(methodName);
-									Attribute attribute = new Attribute();
-									attribute.setName(attributeName);
-									attribute.setType(determineReturnType(element, types));
-
-									Element interfaceElement = element.getEnclosingElement();
-									getElementSet().add(interfaceElement);
-									DomainObjectModel domainObjectModel = getRelevantDomainObjectModel(interfaceElement, elements);
-
-									List<? extends AnnotationMirror> annotationMirrorList = elements.getAllAnnotationMirrors(element);
-
-									for (AnnotationMirror annotationMirror: annotationMirrorList)
-									{
-										Annotation annotation = new Annotation();
-										annotation.setName(annotationMirror.getAnnotationType().toString());
-
-										Map parameterValueMap = elements.getElementValuesWithDefaults(annotationMirror);
-
-										for (Object object: parameterValueMap.entrySet())
-										{
-											Map.Entry entry = (Map.Entry) object;
-
-											annotation.addParameterValue(entry.getKey().toString(), entry.getValue());
-										}
-
-										domainObjectModel.addAnnotation(attribute, annotation);
-									}
-								}
-							}
-							else if (element.getKind() == ElementKind.INTERFACE)
-							{
-								getElementSet().add(element);
-								DomainObjectModel domainObjectModel = getRelevantDomainObjectModel(element, elements);
-
-								List<? extends Element> methodElementList = ElementFilter.methodsIn(element.getEnclosedElements());
 								List<? extends AnnotationMirror> annotationMirrorList = elements.getAllAnnotationMirrors(element);
 
 								for (AnnotationMirror annotationMirror: annotationMirrorList)
 								{
-									Annotation annotation = new Annotation();							
+									Annotation annotation = new Annotation();
 									annotation.setName(annotationMirror.getAnnotationType().toString());
 
 									Map parameterValueMap = elements.getElementValuesWithDefaults(annotationMirror);
@@ -225,33 +152,58 @@ public class Compiler
 									for (Object object: parameterValueMap.entrySet())
 									{
 										Map.Entry entry = (Map.Entry) object;
-										annotation.addParameterValue(entry.getKey().toString(), entry.getValue().toString());
+
+										annotation.addParameterValue(entry.getKey().toString(), entry.getValue());
 									}
 
-									for (Element methodElement: methodElementList)
+									domainObjectModel.addAnnotation(attribute, annotation);
+								}
+							}
+						}
+						else if (element.getKind() == ElementKind.INTERFACE)
+						{
+							getElementSet().add(element);
+							DomainObjectModel domainObjectModel = getRelevantDomainObjectModel(element, elements);
+
+							List<? extends Element> methodElementList = ElementFilter.methodsIn(element.getEnclosedElements());
+							List<? extends AnnotationMirror> annotationMirrorList = elements.getAllAnnotationMirrors(element);
+
+							for (AnnotationMirror annotationMirror: annotationMirrorList)
+							{
+								Annotation annotation = new Annotation();							
+								annotation.setName(annotationMirror.getAnnotationType().toString());
+
+								Map parameterValueMap = elements.getElementValuesWithDefaults(annotationMirror);
+
+								for (Object object: parameterValueMap.entrySet())
+								{
+									Map.Entry entry = (Map.Entry) object;
+									annotation.addParameterValue(entry.getKey().toString(), entry.getValue().toString());
+								}
+
+								for (Element methodElement: methodElementList)
+								{
+									Attribute attribute = new Attribute();
+									String methodName = methodElement.getSimpleName().toString();
+
+									if (isGetter(methodName) == true)
 									{
-										Attribute attribute = new Attribute();
-										String methodName = methodElement.getSimpleName().toString();
+										String attributeName = deduceAttributeName(methodName);
+										attribute.setName(attributeName);
+										attribute.setType(determineReturnType(methodElement, types));
 
-										if (isGetter(methodName) == true)
+										if (domainObjectModel.contains(attribute, annotation) == false)
 										{
-											String attributeName = deduceAttributeName(methodName);
-											attribute.setName(attributeName);
-											attribute.setType(determineReturnType(methodElement, types));
-
-											if (domainObjectModel.contains(attribute, annotation) == false)
-											{
-												domainObjectModel.addAnnotation(attribute, annotation);
-											}
+											domainObjectModel.addAnnotation(attribute, annotation);
 										}
 									}
 								}
 							}
-							else
-							{
-								//Don't know how to process this guy
-							}
-						}	
+						}
+						else
+						{
+							//Don't know how to process this guy
+						}
 					}
 				}
 			}

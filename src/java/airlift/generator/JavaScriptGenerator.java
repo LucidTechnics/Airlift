@@ -44,7 +44,7 @@ public class JavaScriptGenerator
 		fileName =  _appName + "/airlift/activerecord/" + _domainObjectModel.getClassName() + ".js";
 		writeResourceFile(fileName, _directory, generatedString, _element);
 	}
-
+	
 	public String generateDao(DomainObjectModel _domainObjectModel)
 	{
 		String domainName = _domainObjectModel.getClassName();

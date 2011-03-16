@@ -169,25 +169,15 @@ public class AirliftUtil
 
 		return isDomainName;
 	}
-
+	
 	public static boolean isNewDomainName(String _domainName, String _rootPackageName)
 	{
 		boolean isNewDomainName = false;
 
-		if (_domainName.startsWith("new") == true && _domainName.length() > 3)
+		if (_domainName.toLowerCase().startsWith("new_") == true && _domainName.length() > 3)
 		{
-			String domainName = _domainName.substring(3, _domainName.length());
-			
-			try
-			{
-				airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName(_rootPackageName + ".AppProfile").newInstance();
-
-				isNewDomainName = appProfile.isValidDomain(domainName);
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException("Cannot load Airlift generated class: " + _rootPackageName + ".AppProfile");
-			}
+			String domainName = _domainName.substring(4, _domainName.length());
+			isNewDomainName = isDomainName(domainName, _rootPackageName);
 		}
 
 		return isNewDomainName;
@@ -260,7 +250,7 @@ public class AirliftUtil
 				Route.addSuffix(_uriParameterMap, (String) tokenList.get(1));
 			}
 
-			if (isDomainName(candidateToken, _rootPackageName) == true)
+			if (isDomainName(candidateToken, _rootPackageName) == true || isNewDomainName(candidateToken, _rootPackageName) == true)
 			{				
 				Route.addDomainName(_uriParameterMap, candidateToken);
 				parentDomain = candidateToken;

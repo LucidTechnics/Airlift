@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.users.User;
+
 public class RestContext
 {
 	private static Logger log = Logger.getLogger(RestContext.class.getName());
@@ -35,6 +37,7 @@ public class RestContext
 	private String uri;
 	private String appName;
 	private AirliftUser airliftUser;
+	private User googleUser;
 	
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
@@ -44,6 +47,7 @@ public class RestContext
 	public String getUri() { return uri; }
 	public String getAppName() { return appName; }
 	public AirliftUser getAirliftUser() { return airliftUser; }
+	public User getGoogleUser() { return googleUser; }
 	
 	public java.util.List<String> getHandlerPathList() { return handlerPathList; }
 	public void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
@@ -54,6 +58,7 @@ public class RestContext
 	protected void setUri(String _uri) { uri = _uri; }
 	protected void setAppName(String _appName) { appName = _appName; }
 	protected void setAirliftUser(AirliftUser _airliftUser) { airliftUser = _airliftUser; }
+	protected void setGoogleUser(User _googleUser) { googleUser = _googleUser; }
 	
 	public RestContext()
 	{
@@ -77,7 +82,7 @@ public class RestContext
 
 	public String getThisDomain()
 	{
-		String domainName = null;
+		String domainName = "airlift.not.found.domain.name";
 
 		List<String> domainList = (List<String>) getUriParameterMap().get("a.domain.list");
 
@@ -86,10 +91,6 @@ public class RestContext
 		if (domainList != null && domainList.isEmpty() == false)
 		{
 			domainName = domainList.get(domainList.size() - 1);
-		}
-		else
-		{
-			throw new RuntimeException("Domain list is null or empty for this URI");
 		}
 
 		return domainName;

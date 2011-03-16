@@ -39,12 +39,16 @@ public class RestfulSecurityContext
 		setPersistenceManager(_persistenceManager);
 	}
 
-	public boolean allowed(User _user, RestContext _restContext, airlift.AppProfile _appProfile)
+	public boolean allowed(AirliftUser _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
-		AirliftUser user = fetchAirliftUser(_user);
-		_restContext.setAirliftUser(user);
+		String domainName = _restContext.getThisDomain();
 
-		return allowed(user, _restContext.getMethod(), _appProfile, _restContext.getThisDomain(), _restContext.uriIsACollection());
+		if (_restContext.uriIsANewDomain() == true)
+		{
+			domainName = domainName.substring(4, domainName.length());
+		}
+
+		return allowed(_user, _restContext.getMethod(), _appProfile, domainName, _restContext.uriIsACollection());
 	}
 
 	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
@@ -211,6 +215,8 @@ public class RestfulSecurityContext
 	public String insert(AirliftUser _airliftUser)
 	{
 		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
+		_airliftUser.setAuditPostDate(new java.util.Date());
+		_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
 		
 		getPersistenceManager().makePersistent(_airliftUser);
 
@@ -234,6 +240,8 @@ public class RestfulSecurityContext
 			throw new RuntimeException("Cannot update. Null id found for object: " + _airliftUser);
 		}
 
+		_airliftUser.setAuditPutDate(new java.util.Date());
+		
 		getPersistenceManager().makePersistent(_airliftUser);
 	}
 
@@ -278,10 +286,23 @@ public class RestfulSecurityContext
 		return (java.util.List<AirliftUser>) query.execute(_value);
 	}
 
-	public java.util.List<AirliftUser> collectByCreateDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftUser> collectByAuditPostDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE createDate >= lowerBound && createDate <= upperBound";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE auditPostDate >= lowerBound && auditPostDate <= upperBound";
+
+		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
+		query.setOrdering(orderBy);
+		query.setRange(_offset, _limit);
+		query.declareParameters("java.util.Date lowerBound, java.util.Date upperBound");
+
+		return (java.util.List<AirliftUser>) query.execute(_begin, _end);
+	}
+
+	public java.util.List<AirliftUser> collectByAuditPutDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE auditPutDate >= lowerBound && auditPutDate <= upperBound";
 
 		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);

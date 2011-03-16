@@ -756,20 +756,35 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	
 	_resultArray.forEach(function(_item) {
 
-		if (airlift.isDefined(_startDate) === true &&
-			  airlift.isDefined(_endDate) === true &&
-			  airlift.isDefined(_dateFieldName) === true &&
+		LOG.info("Date Field: " + _item[_dateFieldName]);
+		LOG.info("Start Date: " + _startDate);
+		LOG.info("End Date: " + _endDate);
+
+		LOG.info("Date Field Time: " + _item[_dateFieldName].getTime());
+		LOG.info("Start Date Time: " + _startDate.getTime());
+		LOG.info("End Date Time: " + _endDate.getTime());
+
+		if ((_startDate && _endDate && _dateFieldName) &&
 			  (
 			   _item[_dateFieldName].getTime() <= _startDate.getTime() ||
 			   _item[_dateFieldName].getTime() >= _endDate.getTime()
 			  )
 			)
 		{
+			LOG.info("Not in interval");
 			inInterval = false;
 		}
-
+		else
+		{
+			inInterval = true;
+			LOG.info("Right in interval");
+		}
+			
 		if (filterTokens.isEmpty() === false)
 		{
+			LOG.info("filter token is not empty:" + filterTokens.size());
+			LOG.info("filter token has these things in it:" + filterTokens);
+			
 			var indexSet = new Packages.java.util.HashSet();
 
 			_propertyArray.forEach(function(_property)
@@ -786,6 +801,8 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }
 	});
 
+	LOG.info("filtered array has this many items: " + filteredArray.length);
+	
 	return filteredArray;
 }
 

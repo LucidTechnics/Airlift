@@ -24,32 +24,35 @@ public class AirliftUser
 	public AirliftUser() {}
 
 	@Persistent @PrimaryKey private String id;
-	@Persistent private String familyName;
-	@Persistent private String givenName;
+	@Persistent private String fullName;
+	@Persistent private String shortName;
 	@Persistent private String googleUserId;
 	@Persistent private String email;
 	@Persistent private java.util.List<String> roleList = new java.util.ArrayList<String>();
 	@Persistent private boolean active;
-	@Persistent private java.util.Date createDate;
+	@Persistent private java.util.Date auditPostDate;
+	@Persistent private java.util.Date auditPutDate;
 	@Persistent private java.util.Date timeOutDate;
 	
 	public String getId() { return id; }
-	public String getFamilyName() { return familyName; }
-	public String getGivenName() { return givenName; }
+	public String getFullName() { return fullName; }
+	public String getShortName() { return shortName; }
 	public String getGoogleUserId() { return googleUserId; }
 	public String getEmail() { return email; }
 	public java.util.List<String> getRoleList() { return roleList; }
 	public boolean getActive() { return active; }
-	public java.util.Date getCreateDate() { return createDate; }
+	public java.util.Date getAuditPostDate() { return auditPostDate; }
+	public java.util.Date getAuditPutDate() { return auditPutDate; }
 	public java.util.Date getTimeOutDate() { return timeOutDate; }
 	
 	public void setId(String _id) { id = _id; }
 	public void setGoogleUserId(String _googleUserId) { googleUserId = _googleUserId; }
-	public void setFamilyName(String _familyName) { familyName = _familyName; }
-	public void setGivenName(String _givenName) { givenName = _givenName; }
+	public void setFullName(String _fullName) { fullName = _fullName; }
+	public void setShortName(String _shortName) { shortName = _shortName; }
 	public void setEmail(String _email) { email = _email; }
 	public void setRoleList(java.util.List<String> _roleList) { roleList = _roleList; }
 	public void setActive(boolean _active) { active = _active; }
-	public void setCreateDate(java.util.Date _createDate) { createDate = _createDate; }
+	public void setAuditPostDate(java.util.Date _auditPostDate) { auditPostDate = _auditPostDate; }
+	public void setAuditPutDate(java.util.Date _auditPutDate) { auditPutDate = _auditPutDate; }
 	public void setTimeOutDate(java.util.Date _timeOutDate) { timeOutDate = _timeOutDate; }
 }

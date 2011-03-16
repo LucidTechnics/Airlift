@@ -18,5 +18,5 @@ import com.google.appengine.api.users.User;
 
 public interface SecurityContext
 {
-	public boolean allowed(User _user, airlift.servlet.rest.RestContext _restContext, airlift.AppProfile _appProfile);
+	public boolean allowed(airlift.servlet.rest.AirliftUser _user, airlift.servlet.rest.RestContext _restContext, airlift.AppProfile _appProfile);
 }

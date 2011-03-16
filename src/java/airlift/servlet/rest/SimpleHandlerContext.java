@@ -103,9 +103,8 @@ public class SimpleHandlerContext
 		log.info("queryString: " + queryString);
 		log.info("domainObjectPaths: " + domainPathMap);
 
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		String userName = (user != null) ? user.getNickname() : null;
+		AirliftUser user = _restContext.getAirliftUser();
+		String userName = (user != null) ? user.getFullName() : null;
 		String userEmail = (user != null) ? user.getEmail() : null;
 
 		airlift.AppProfile appProfile = null;
@@ -149,6 +148,7 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
 			scriptingUtil.bind("OUT", System.out);
 			scriptingUtil.bind("LOG", log);
+			scriptingUtil.bind("GOOGLE_USER", _restContext.getGoogleUser());
 			scriptingUtil.bind("USER", user);
 			scriptingUtil.bind("USER_NAME", userName);
 			scriptingUtil.bind("USER_EMAIL", userEmail);

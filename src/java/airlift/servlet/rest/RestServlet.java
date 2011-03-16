@@ -104,14 +104,26 @@ public class RestServlet
 	{
 		boolean timedOut = false;
 
-		if (_user.getTimeOutDate() != null)
+		if (_user != null && _user.getTimeOutDate() != null)
 		{
-			timedOut = (System.currentTimeMillis() <= _user.getTimeOutDate().getTime());
+			timedOut = (System.currentTimeMillis() >= _user.getTimeOutDate().getTime());
 		}
 		
 		return timedOut;
 	}
 
+	protected void requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
+	{
+		try
+		{
+			_response.sendRedirect(_userService.createLoginURL(_request.getRequestURI()));
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+	}
+	
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
@@ -139,6 +151,11 @@ public class RestServlet
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();
 		RestContext restContext = prepareRestContext(method, acceptValueList, _request, uriParameterMap, getServletName());
+
+		if (restContext.getHandlerPathList().isEmpty() == true)
+		{
+			sendCodedPage("404", "Not Found", _response);
+		}
 		
 		log.info("Applying airlift security checks");
 
@@ -146,40 +163,39 @@ public class RestServlet
 		User user = userService.getCurrentUser();
 
 		RestfulSecurityContext securityContext = new RestfulSecurityContext();
-		
-		boolean success = allowed(user, restContext, securityContext);
+		AirliftUser airliftUser = securityContext.fetchAirliftUser(user);
+		restContext.setAirliftUser(airliftUser);
+		restContext.setGoogleUser(user);
 
+		if (airliftUser == null && user != null)
+		{
+			log.info("No Airlift user found for Google user identified by email: " + user.getEmail());
+		}
+		
+		boolean success = allowed(airliftUser, restContext, securityContext);
+		
 		if (!success && user == null)
 		{
-			try
-			{
-				_response.sendRedirect(userService.createLoginURL(_request.getRequestURI()));
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
+			log.info("Can't have access and user is null");
+			requestLogin(_request, _response, userService);
 		}
-		else if (!success)
+		else if (!success && user != null)
 		{
+			log.info("Can't have access and user is NOT null");
 			sendCodedPage("401", "UnAuthorized", _response);
 		}
-		else if (success && timedOut(restContext.getAirliftUser()) == true)
+		else if (success && timedOut(airliftUser) == true)
 		{
-			try
-			{
-				_response.sendRedirect(userService.createLoginURL(_request.getRequestURI()));
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}			
+			log.info("Can have access and user is NOT null but timed out");
+			requestLogin(_request, _response, userService);
 		}
 		else if (success)
 		{
+			log.info("Can have access and user is NOT null and NOT timed out");
+			
 			try
 			{
-				if (restContext.getAirliftUser() != null)
+				if (airliftUser != null)
 				{
 					String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
 
@@ -189,12 +205,12 @@ public class RestServlet
 					//required to provide credentials.
 					long timeOutTime = duration + System.currentTimeMillis();
 					
-					restContext.getAirliftUser().setTimeOutDate(new java.util.Date(timeOutTime));
-					restContext.getAirliftUser().setGoogleUserId(user.getUserId());
+					airliftUser.setTimeOutDate(new java.util.Date(timeOutTime));
+					airliftUser.setGoogleUserId(user.getUserId());
 
-					securityContext.update(restContext.getAirliftUser());
+					securityContext.update(airliftUser);
 				}
-				
+
 				processRequest(_request, _response, method, restContext, uriParameterMap);
 			}
 			catch(Throwable t)
@@ -202,8 +218,6 @@ public class RestServlet
 				throw new RuntimeException(t);
 			}
 		}
-
-		
 
 		return restContext;
 	}
@@ -213,7 +227,6 @@ public class RestServlet
 					String _method, RestContext _restContext, Map _uriParameterMap)
 	    throws ServletException, IOException
 	{
-		
 		String appName = getServletName();
 		String domainName = _restContext.getThisDomain();
 		java.util.List<String> handlerPathList = _restContext.getHandlerPathList();
@@ -222,7 +235,7 @@ public class RestServlet
 		{
 			String defaultMimeType = (this.getServletConfig().getInitParameter("a.default.mime.type") != null) ? this.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
 			ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
-
+			
 			if (handlerPathList != null)
 			{
 				log.info("Looking for handlers: " + handlerPathList);
@@ -235,7 +248,7 @@ public class RestServlet
 				    contentContext = getHandlerContext().execute(appName,
 									_restContext, _method, this, _httpServletRequest,
 									_httpServletResponse, _uriParameterMap,
-									null);
+						null);
 				}
 				catch(airlift.servlet.rest.HandlerException _handlerException)
 				{
@@ -492,9 +505,7 @@ public class RestServlet
 	
     protected HandlerContext getHandlerContext()
 	{
-		boolean productionMode = ("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.production.mode")) == true) ? true : false;
-		
-		return new SimpleHandlerContext(productionMode);
+		return new SimpleHandlerContext(productionModeIsOn());
 	}
 
 	public String determinePrimaryKeyName(String _domainName)
@@ -530,10 +541,13 @@ public class RestServlet
 	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
-		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
 
+		String uri = reconstructUri(_appName, _httpServletRequest);
+		String prefix = determinePrefix(uri, _appName, _method, _httpServletRequest, _uriParameterMap);
+
+		populateDomainInformation(uri, _uriParameterMap);
+		
 		RestContext restContext = new RestContext(_uriParameterMap);
-		String uri = reconstructUri(getServletName(), _httpServletRequest);
 		restContext.setIsUriACollection(isUriACollection(uri));
 		restContext.setIsUriANewDomain(isUriANewDomain(uri));
 		restContext.setMethod(_method);
@@ -545,96 +559,106 @@ public class RestServlet
 
 		if ("NEW".equalsIgnoreCase(prefix) == true)
 		{
-			domainName = restContext.getThisDomain().substring(3, restContext.getThisDomain().length());
+			domainName = restContext.getThisDomain().substring(4, restContext.getThisDomain().length());
 		}
 		else
 		{
 			domainName = restContext.getThisDomain();
 		}
 
-		String extensionPrefix = (restContext.getIsUriACollection() == true) ? "COLLECT" : "GET";
-		
-		//special suffixes (xml, xhtml, html, json, html, text) takes precedence over Accept:
-		if ("xml".equalsIgnoreCase(suffix) == true)
+		if ("airlift.not.found.domain.name".equalsIgnoreCase(domainName) == false)
 		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
-		}
-		else if ("pdf".equalsIgnoreCase(suffix) == true)
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
-		}
-		else if ("xhtml".equalsIgnoreCase(suffix) == true)
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
-		}
-		else if ("json".equalsIgnoreCase(suffix) == true)
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
-		}
-		else if ("html".equalsIgnoreCase(suffix) == true)
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
-		}
-		else if ("text".equalsIgnoreCase(suffix) == true)
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
-		}
-		else
-		{
-			String mimetype = getServletConfig().getInitParameter("a.extension." + suffix);
+			String extensionPrefix = (restContext.getIsUriACollection() == true) ? "COLLECT" : "GET";
 
-			if (mimetype != null)
+			//special suffixes (xml, xhtml, html, json, html, text) takes precedence over Accept:
+			if ("xml".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + mimetype + "/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
 			}
-		}
+			else if ("pdf".equalsIgnoreCase(suffix) == true)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
+			}
+			else if ("xhtml".equalsIgnoreCase(suffix) == true)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
+			}
+			else if ("json".equalsIgnoreCase(suffix) == true)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
+			}
+			else if ("html".equalsIgnoreCase(suffix) == true)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
+			}
+			else if ("text".equalsIgnoreCase(suffix) == true)
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
+			}
+			else
+			{
+				String mimetype = getServletConfig().getInitParameter("a.extension." + suffix);
 
-		//If you get like a billion Accept header values than it is
-		//most likely a browser so set all HTML like requests to the
-		//default method handlers.
-		if (_acceptValueList.isEmpty() == true ||
-			  _acceptValueList.size() > 1 ||
-			  (_acceptValueList.contains("application/xml") == true ||
-			   _acceptValueList.contains("application/xhtml+xml") == true ||
-			   _acceptValueList.contains("text/html") == true ||
-			   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
-			   _acceptValueList.contains("text/plain") == true))
-		{
-			restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
-		}
+				if (mimetype != null)
+				{
+					restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + mimetype + "/" + extensionPrefix + ".js");
+				}
+			}
 
-		//Otherwise if the Accept is specifically set for one mime type
-		//then call that handler.
-		for(String acceptValue: _acceptValueList)
-		{
-			handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
-			restContext.addHandlerPath(handlerPath);
+			//If you get like a bunch of "Accept" header values than it is
+			//most likely a web browser (IE for instance) so set all
+			//HTML like requests to the default method handlers.
+			if (_acceptValueList.isEmpty() == true ||
+				  _acceptValueList.size() > 1 ||
+				  (_acceptValueList.contains("application/xml") == true ||
+				   _acceptValueList.contains("application/xhtml+xml") == true ||
+				   _acceptValueList.contains("text/html") == true ||
+				   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
+				   _acceptValueList.contains("text/plain") == true))
+			{
+				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
+			}
+
+			//Otherwise if the Accept is specifically set for one mime type
+			//then call that handler.  This is because this is most
+			//likely an AJAX call or a client calling on this resource as a web
+			//service.
+			for(String acceptValue: _acceptValueList)
+			{
+				handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
+				restContext.addHandlerPath(handlerPath);
+			}
 		}
 
 		return restContext;
 	}
 
-	public boolean allowed(User _user, RestContext _restContext, RestfulSecurityContext _securityContext)
+	public boolean allowed(AirliftUser _user, RestContext _restContext, RestfulSecurityContext _securityContext)
 	{
 		boolean allowed = true;
-
-		try
+		
+		if (productionModeIsOn() == true || (productionModeIsOn() == false && devUserSecurityIsOn() == true))
 		{
-			allowed = _securityContext.allowed(_user, _restContext, getAppProfile());
+			try
+			{
+				allowed = _securityContext.allowed(_user, _restContext, getAppProfile());
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}
 		}
-		catch(Throwable t)
+		else if (productionModeIsOn() == false && devUserSecurityIsOn() == false)
 		{
-			throw new RuntimeException(t);
+			log.info(	"\n\n" +
+						"****************************************************************\n" + 
+						"****************************************************************\n" +
+						"* Server in DEVELOPMENT MODE with DEV USER SECURITY turned OFF *\n" +
+						"****************************************************************\n" +
+						"****************************************************************\n");
 		}
 
 		return allowed;
-	}
-
-	public String prepareGenericHandler(String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
-	{
-		String prefix = determinePrefix(_appName, _method, _httpServletRequest, _uriParameterMap);
-		
-		return "/airlift/handler/" + prefix + ".js";
 	}
 
 	public String getErrorHandlerName(String _errorCode)
@@ -650,11 +674,19 @@ public class RestServlet
 		return handlerName;
 	}
 
+	public boolean productionModeIsOn()
+	{
+		return 	("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.production.mode")) == true) ? true : false;
+	}
+
+	public boolean devUserSecurityIsOn()
+	{
+		return 	("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.dev.user.security")) == true) ? true : false;
+	}
+
 	public ErrorHandlerContext getErrorHandlerContext()
 	{
-		boolean productionMode = ("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.root.package.name")) == true) ? true : false;
-
-		return new airlift.servlet.rest.ErrorHandlerContext(productionMode);
+		return new airlift.servlet.rest.ErrorHandlerContext(productionModeIsOn());
 	}
 
 	public void populateDomainInformation(String _uri, java.util.Map _uriParameterMap)
@@ -673,26 +705,20 @@ public class RestServlet
 		return _appName + "/" + path;
 	}
 	
-	public String determinePrefix(String _appName, String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap)
+	public String determinePrefix(String _uri, String _appName, String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap)
 	{
 		_uriParameterMap.clear();
 
 		String prefix = _method.toUpperCase();
-		String uri = reconstructUri(_appName, _httpServletRequest);
 		
-		if (isUriACollection(uri) == true)
+		if (isUriACollection(_uri) == true && "GET".equals(prefix) == true)
 		{
-			if (isUriANewDomain(uri) == true && "GET".equals(prefix) == true)
-			{
-				prefix = "NEW";
-			}
-			else if ("GET".equals(prefix) == true)
-			{
-				prefix = "COLLECT";
-			}
+			prefix = "COLLECT";
 		}
-
-		populateDomainInformation(uri, _uriParameterMap);
+		else if (isUriANewDomain(_uri) == true && "GET".equals(prefix) == true)
+		{
+			prefix = "NEW";
+		}
 
 		return prefix;
 	}
