@@ -399,8 +399,6 @@ airlift.get = function(_id, _domainName, _appName)
 	var activeRecord = airlift.ar(_domainName, _appName);
 
 	var id = _id||ID;
-
-	LOG.info("Looking for record with this id: " + id);
 	
 	activeRecord.get(id);
 
@@ -709,38 +707,23 @@ airlift.getMonthIntervals = function(_date1, _date2)
 		var interval = airlift.createCalendar({date: startDate.getTime()});
 		interval.set(interval.DAY_OF_MONTH, 1);
 
-		LOG.info("firstIntervalTime: " + interval.getTimeInMillis());
-		LOG.info("firstEndDateTime: " + endDate.getTimeInMillis());
-
 		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
 		{
 			var month = interval.get(interval.MONTH);
-			LOG.info("interval month: " + month);
 
 			var fullYear = interval.get(interval.YEAR);
-			LOG.info("interval year: " + fullYear);
 
 			monthList.add(interval);
 
 			interval = airlift.createCalendar({date: interval.getTime()});
 
 			var nextMonth = month + 1;
-			LOG.info("next month: " + nextMonth);
 
 			var nextYear = fullYear + 1;
-			LOG.info("next year: " + nextYear);
 			
 			interval.set(interval.MONTH, (((nextMonth) > 11) ? 0 : nextMonth));
 			interval.set(interval.YEAR, (interval.get(interval.MONTH) === 0) ? nextYear : fullYear);
-
-			LOG.info("intervalTime: " + interval.getTimeInMillis());
-			LOG.info("endDateTime: " + endDate.getTimeInMillis());
 		}
-
-
-		LOG.info("lastIntervalTime: " + interval.getTimeInMillis());
-		LOG.info("lastEndDateTime: " + endDate.getTimeInMillis());
-
 	}
 
 	return monthList;
@@ -756,14 +739,6 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	
 	_resultArray.forEach(function(_item) {
 
-		LOG.info("Date Field: " + _item[_dateFieldName]);
-		LOG.info("Start Date: " + _startDate);
-		LOG.info("End Date: " + _endDate);
-
-		LOG.info("Date Field Time: " + _item[_dateFieldName].getTime());
-		LOG.info("Start Date Time: " + _startDate.getTime());
-		LOG.info("End Date Time: " + _endDate.getTime());
-
 		if ((_startDate && _endDate && _dateFieldName) &&
 			  (
 			   _item[_dateFieldName].getTime() <= _startDate.getTime() ||
@@ -771,20 +746,15 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 			  )
 			)
 		{
-			LOG.info("Not in interval");
 			inInterval = false;
 		}
 		else
 		{
 			inInterval = true;
-			LOG.info("Right in interval");
 		}
 			
 		if (filterTokens.isEmpty() === false)
-		{
-			LOG.info("filter token is not empty:" + filterTokens.size());
-			LOG.info("filter token has these things in it:" + filterTokens);
-			
+		{			
 			var indexSet = new Packages.java.util.HashSet();
 
 			_propertyArray.forEach(function(_property)
@@ -801,8 +771,6 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }
 	});
 
-	LOG.info("filtered array has this many items: " + filteredArray.length);
-	
 	return filteredArray;
 }
 

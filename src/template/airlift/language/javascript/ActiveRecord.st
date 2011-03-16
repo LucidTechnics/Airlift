@@ -32,9 +32,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	var javaDateTimePatternArray = java.lang.reflect.Array.newInstance(Packages.java.lang.String, allowedDateTimePatterns.length);
 
-	function addDateTimeString(_element, _index, _array) { javaDateTimePatternArray[_index] = new Packages.java.lang.String(_element); }
-
-	allowedDateTimePatterns.every(addDateTimeString);
+	allowedDateTimePatterns.forEach(function (_element, _index, _array) { javaDateTimePatternArray[_index] = new Packages.java.lang.String(_element); });
 	
 	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray, TIMEZONE);
 

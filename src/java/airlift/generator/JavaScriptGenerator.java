@@ -200,7 +200,7 @@ public class JavaScriptGenerator
 			
 			if (processedDatable == false)
 			{
-				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\"}";
+				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\", \"MM-dd-yyyy Z\", \"MM-dd-yyyy HH:mm:ss Z\"}";
 				activeRecordStringTemplate.setAttribute("dateTimePatterns", dateTimePatterns.replaceAll("^\\s*\\{", "[").replaceAll("\\}$\\s*", "]"));
 			}
 
