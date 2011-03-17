@@ -96,13 +96,6 @@ public class SimpleHandlerContext
 
 		Map<String, String> domainPathMap = restContext.extractDomainObjectPaths(path);
 
-		log.info("base: " + base);
-		log.info("path: " + path);
-		log.info("uri: " + base + path);
-		log.info("handlers: " + _restContext.getHandlerPathList());
-		log.info("queryString: " + queryString);
-		log.info("domainObjectPaths: " + domainPathMap);
-
 		AirliftUser user = _restContext.getAirliftUser();
 		String userName = (user != null) ? user.getFullName() : null;
 		String userEmail = (user != null) ? user.getEmail() : null;
@@ -163,7 +156,6 @@ public class SimpleHandlerContext
 			
 			for (String restContextDomainName: restContext.getDomainIds())
 			{
-				log.info("Binding ids for this rest context variable: " + restContextDomainName);
 				scriptingUtil.bind(restContextDomainName.replaceAll("\\\\.", "_"), restContext.getIdValue(restContextDomainName));
 			}
 
@@ -204,17 +196,17 @@ public class SimpleHandlerContext
 				{
 					if (_handlerException.getErrorCode() == airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND)
 					{
-						log.info("Cannot find handler: " + handlerName);
+						log.warning("Cannot find handler: " + handlerName);
 					}
 					else
 					{
-						log.info("Encountered an exception looking to load: " + handlerName);
+						log.warning("Encountered an exception looking to load: " + handlerName);
 						throw _handlerException;
 					}
 				}
 				catch(Throwable t)
 				{
-					log.info("Encountered exception trying to execute this handler: " + handlerName);
+					log.severe("Encountered exception trying to execute this handler: " + handlerName);
 					throw new RuntimeException(t);
 				}
 

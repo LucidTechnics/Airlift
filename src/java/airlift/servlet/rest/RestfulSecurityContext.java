@@ -130,8 +130,6 @@ public class RestfulSecurityContext
 			roleSet.add(token.toLowerCase().trim());
 		}
 
-		log.info("Role set: " + roleSet);
-
 		return roleSet;
 	}
 
@@ -143,7 +141,6 @@ public class RestfulSecurityContext
 		{
 			if (_roleSet.contains("all") == true)
 			{
-				log.info("Role set contains all");
 				allowed = true;
 			}
 			else
@@ -152,18 +149,10 @@ public class RestfulSecurityContext
 
 				if (userRoleSet.isEmpty() == false)
 				{
-					boolean changeSet = userRoleSet.retainAll(_roleSet);
-
-					log.info("User role set after retainAll: " + userRoleSet);
-					log.info("User role set change indicator: " + changeSet);
-					
+					boolean changeSet = userRoleSet.retainAll(_roleSet);					
 					allowed = (userRoleSet.isEmpty() == false);
 				}
 			}
-		}
-		else
-		{
-			log.info("Role set contains no one");
 		}
 
 		return allowed;
@@ -241,8 +230,19 @@ public class RestfulSecurityContext
 		}
 
 		_airliftUser.setAuditPutDate(new java.util.Date());
+
+		AirliftUser airliftUser = new AirliftUser();
+
+		try
+		{
+			org.apache.commons.beanutils.PropertyUtils.copyProperties(airliftUser, _airliftUser);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
 		
-		getPersistenceManager().makePersistent(_airliftUser);
+		getPersistenceManager().makePersistent(airliftUser);
 	}
 
 	public void delete(AirliftUser _airliftUser)

@@ -17,8 +17,9 @@ package airlift.servlet.rest;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.IdentityType;
 
-@PersistenceCapable
+@PersistenceCapable(identityType = IdentityType.APPLICATION, detachable="true")
 public class AirliftUser
 {
 	public AirliftUser() {}
@@ -55,4 +56,24 @@ public class AirliftUser
 	public void setAuditPostDate(java.util.Date _auditPostDate) { auditPostDate = _auditPostDate; }
 	public void setAuditPutDate(java.util.Date _auditPutDate) { auditPutDate = _auditPutDate; }
 	public void setTimeOutDate(java.util.Date _timeOutDate) { timeOutDate = _timeOutDate; }
+
+	public String toString()
+	{
+		StringBuffer stringBuffer = new StringBuffer();
+
+		stringBuffer.append("[** AirliftUser ...").append("\n");
+		stringBuffer.append("fullName:").append(getFullName()).append("\n");
+		stringBuffer.append("shortName:").append(getShortName()).append("\n");
+		stringBuffer.append("googleUserId:").append(getGoogleUserId()).append("\n");
+		stringBuffer.append("email:").append(getEmail()).append("\n");
+		stringBuffer.append("roleList:").append(getRoleList()).append("\n");
+		stringBuffer.append("active:").append(getActive()).append("\n");
+		stringBuffer.append("auditPostDate:").append(getAuditPostDate()).append("\n");
+		stringBuffer.append("auditPutDate:").append(getAuditPutDate()).append("\n");
+		stringBuffer.append("timeOutDate:").append(getTimeOutDate()).append("\n");
+		stringBuffer.append("id:").append(getId()).append("\n"); 
+		stringBuffer.append("**]\n");
+
+		return stringBuffer.toString();
+	}
 }

@@ -142,7 +142,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		
 		return objectMap;
 	}
-	
+
 	$insertChangeEvent$
 
 	$primaryKeyMethods$

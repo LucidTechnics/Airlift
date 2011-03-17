@@ -86,8 +86,6 @@ public class RestContext
 
 		List<String> domainList = (List<String>) getUriParameterMap().get("a.domain.list");
 
-		log.info("RestContext has this domain list: " + domainList);
-
 		if (domainList != null && domainList.isEmpty() == false)
 		{
 			domainName = domainList.get(domainList.size() - 1);

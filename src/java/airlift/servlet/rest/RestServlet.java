@@ -123,7 +123,34 @@ public class RestServlet
 			throw new RuntimeException(t);
 		}
 	}
-	
+
+	protected void logUserOut(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
+	{
+		try
+		{
+			_response.sendRedirect(_userService.createLogoutURL(_request.getRequestURI()));
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+	}
+
+	private java.util.Date calculateNextTimeOutDate()
+	{
+		String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
+
+		long duration = (durationString == null) ? (20 * 60 * 1000) : Long.parseLong(durationString);
+
+		//If you set duration to 0 then you are always
+		//required to provide credentials.
+		java.util.Date currentDate = new java.util.Date();
+		long currentTime = currentDate.getTime();
+		long timeOutTime = duration + currentTime;
+
+		return new java.util.Date(timeOutTime);
+	}
+
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
@@ -157,8 +184,6 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 		
-		log.info("Applying airlift security checks");
-
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 
@@ -166,46 +191,39 @@ public class RestServlet
 		AirliftUser airliftUser = securityContext.fetchAirliftUser(user);
 		restContext.setAirliftUser(airliftUser);
 		restContext.setGoogleUser(user);
-
-		if (airliftUser == null && user != null)
-		{
-			log.info("No Airlift user found for Google user identified by email: " + user.getEmail());
-		}
 		
 		boolean success = allowed(airliftUser, restContext, securityContext);
 		
 		if (!success && user == null)
 		{
-			log.info("Can't have access and user is null");
 			requestLogin(_request, _response, userService);
 		}
 		else if (!success && user != null)
 		{
-			log.info("Can't have access and user is NOT null");
+			if (airliftUser != null)
+			{
+				securityContext.update(airliftUser);
+			}
 			sendCodedPage("401", "UnAuthorized", _response);
 		}
 		else if (success && timedOut(airliftUser) == true)
 		{
-			log.info("Can have access and user is NOT null but timed out");
-			requestLogin(_request, _response, userService);
+			airliftUser.setTimeOutDate(null); // A user with a null time out date cannot be time out.
+			securityContext.update(airliftUser);
+			logUserOut(_request, _response, userService);
 		}
 		else if (success)
 		{
-			log.info("Can have access and user is NOT null and NOT timed out");
+			//User is not timed out and the user can access this page.
+			//Not being timed out means that your time out date time is null
+			//or your time out date time is greater than the current date
+			//time.
 			
 			try
 			{
 				if (airliftUser != null)
 				{
-					String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
-
-					long duration = (durationString == null) ? (20 * 60 * 1000) : Long.parseLong(durationString);
-
-					//If you set duration to 0 then you are always
-					//required to provide credentials.
-					long timeOutTime = duration + System.currentTimeMillis();
-					
-					airliftUser.setTimeOutDate(new java.util.Date(timeOutTime));
+					airliftUser.setTimeOutDate(calculateNextTimeOutDate());
 					airliftUser.setGoogleUserId(user.getUserId());
 
 					securityContext.update(airliftUser);
@@ -238,8 +256,6 @@ public class RestServlet
 			
 			if (handlerPathList != null)
 			{
-				log.info("Looking for handlers: " + handlerPathList);
-				
 				boolean handlerNotFound = false;
 
 				try
@@ -517,10 +533,7 @@ public class RestServlet
 
 	public boolean isDomainName(String _domainName)
 	{
-		log.info("RestServlet is asking is this a valid domain name? " + _domainName);
-		
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
-
 		return airlift.util.AirliftUtil.isDomainName(_domainName, rootPackageName);
 	}
 

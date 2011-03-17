@@ -85,7 +85,6 @@ public class JavascriptingUtil
 
 		try
 		{
-			log.info("Trying to find script: " + scriptResource);
 			inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
 		}
 		catch(Throwable t)
@@ -96,7 +95,7 @@ public class JavascriptingUtil
 
 		if (inputStream == null)
 		{
-			log.info("Cannot find script: " + scriptResource);
+			log.severe("Cannot find script: " + scriptResource);
 			throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Is this resource: " + _scriptResource + " in the application's classpath?",
 				airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
 		}
@@ -215,12 +214,9 @@ public class JavascriptingUtil
 		
 		try
 		{
-			log.info("Attempting to load script: " + _scriptResource);			
-
 			if (getScriptResourceMap().containsKey(_scriptResource) == false)
 			{
-				
-				log.info("Compiled script not cached: " + System.currentTimeMillis());
+				log.info("Compiled script not cached: " + _scriptResource);
 				reader = new InputStreamReader(findScript(_scriptResource));
 
 				try
@@ -242,7 +238,6 @@ public class JavascriptingUtil
 			}
 			else
 			{
-				log.info("Compiled script cached: " + System.currentTimeMillis());
 				script = getScriptResourceMap().get(_scriptResource);
 			}
 		}
@@ -250,8 +245,6 @@ public class JavascriptingUtil
 		{
 			if (reader != null) { try { reader.close(); } catch(Throwable t) {} }
 		}
-
-		log.info("Returning script: " + System.currentTimeMillis());
 
 		return script;
 	}

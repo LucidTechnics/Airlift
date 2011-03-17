@@ -39,11 +39,6 @@ public final class Browser
 			if (HTTPMethod.GET == _method)
 			{
 				_url = _url + createQueryString(_parameterMap);
-
-				if (log.isLoggable(java.util.logging.Level.INFO) == true)
-				{
-					log.info("The GET URI is: " + _url);
-				}
 			}
 
 			httpRequest = new HTTPRequest(new java.net.URL(_url), _method);
@@ -128,11 +123,6 @@ public final class Browser
 				if (count > 1)	{ prefix = "&";	}
 				queryString.append(prefix).append(encode(name, "UTF-8")).append("=").append(encode(_parameterMap.get(name), "UTF-8"));
 			}
-		}
-
-		if (log.isLoggable(java.util.logging.Level.INFO) == true)
-		{
-			log.info("The query string is: " + queryString.toString());
 		}
 
 		return queryString.toString();

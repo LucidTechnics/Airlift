@@ -264,8 +264,6 @@ public class AirliftUtil
 				parentDomain = null;
 			}
 		}
-
-		log.info("uri parameter map is: " + _uriParameterMap);
 	}
 
 	public static java.util.List<String> hasSuffix(String _token)

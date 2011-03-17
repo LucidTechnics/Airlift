@@ -96,29 +96,26 @@ public class ErrorHandlerContext
 
 			try
 			{
-				log.info("Executing handler: " + handlerName);
-				
 				scriptingUtil.bind("HANDLER_NAME", handlerName);
 				scriptingUtil.executeScript(scriptResources);
 
 				handlerExecutionSuccessful = true;
-				log.info("Completed handler execution for handler: " + handlerName);
 			}
 			catch(airlift.servlet.rest.HandlerException _handlerException)
 			{
 				if (_handlerException.getErrorCode() == airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND)
 				{
-					log.info("Cannot find hander: " + handlerName);
+					log.warning("Cannot find hander: " + handlerName);
 				}
 				else
 				{
-					log.info("Encountered an exception looking to load: " + handlerName);
+					log.warning("Encountered an exception looking to load: " + handlerName);
 					throw _handlerException;
 				}
 			}
 			catch(Throwable t)
 			{
-				log.info("Encountered exception trying to execute this handler: " + handlerName);
+				log.severe("Encountered exception trying to execute this handler: " + handlerName);
 				throw new RuntimeException(t);
 			}
 
