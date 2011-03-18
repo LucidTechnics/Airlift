@@ -386,8 +386,6 @@ public class JavaGenerator
 		StringTemplate attributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeDeclaration");
 		StringTemplate getterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeGetterDeclaration");
 		StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeSetterDeclaration");
-		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/EncryptInvokation");
-		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DecryptInvokation");
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
 
@@ -408,8 +406,8 @@ public class JavaGenerator
 		setterStringTemplate.setAttribute("setterName", getSetterName(_domainObjectModel.getClassName() + "IndexJdo"));
 		setterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
 
-		stringBufferStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo()"));
-		stringBufferStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+		//stringBufferStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo()"));
+		//stringBufferStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
 
 		Iterator attributes = _domainObjectModel.getAttributes();
 
@@ -485,19 +483,6 @@ public class JavaGenerator
 				setterStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
 				setterStringTemplate.setAttribute("setterName", encryptedSetterName);
 				setterStringTemplate.setAttribute("name", encryptedName);
-
-				String encryptionConversionFunction = determineEncryptionConversionFunction(type);
-				String decryptionConversionFunction = determineDecryptionConversionFunction(type);
-				
-				encryptInvokationStringTemplate.setAttribute("getterName", getterName);
-				encryptInvokationStringTemplate.setAttribute("setterName", setterName);
-				encryptInvokationStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
-				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
-
-				decryptInvokationStringTemplate.setAttribute("setterName", setterName);
-				decryptInvokationStringTemplate.setAttribute("encryptedGetterName", encryptedGetterName);
-				decryptInvokationStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
-				decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
 			}
 		}
 
@@ -505,8 +490,6 @@ public class JavaGenerator
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeSetters", setterStringTemplate);
-		domainObjectStringTemplate.setAttribute("attributeEncryptors", encryptInvokationStringTemplate);
-		domainObjectStringTemplate.setAttribute("attributeDecryptors", decryptInvokationStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
 		domainObjectStringTemplate.setAttribute("generatorComment", comment	);
 		domainObjectStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());

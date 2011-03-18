@@ -1,0 +1,1 @@
+$setterName, conversionFunction, encryptedGetterName: {s,c,eg | this.$s$(Packages.airlift.util.AirliftUtil.$c$(Packages.airlift.util.AirliftUtil.decrypt(_jdo.$eg$().getBytes(), password, initialVector, null, null, null, null, revolutions))); }; separator="\n"$

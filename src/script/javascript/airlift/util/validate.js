@@ -148,7 +148,7 @@ airlift.hasFormat = function(_value, _paramsObj)
 	
 	var error;
 	var _paramsObj = _paramsObj || {};
-	var message = _paramsObj.failureMessage || "Format is invalid - " + _value;
+	var message = _paramsObj.failureMessage || "The value you entered: " + _value + " is not formatted correctly.";
 	var pattern = _paramsObj.pattern || /./;
 	if(!pattern.test(value) /* && value != ''*/ ){ 
 		error = message;

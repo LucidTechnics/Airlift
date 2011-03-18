@@ -26,6 +26,7 @@ public class AuditTrail
 	@Persistent @PrimaryKey private String id;
 	@Persistent private String domainId;
 	@Persistent private String action;
+	@Persistent private String method;
 	@Persistent private String domain;
 	@Persistent private String uri;
 	@Persistent private String handlerName;
@@ -37,6 +38,7 @@ public class AuditTrail
 	public String getId() { return id; }
 	public String getDomainId() { return domainId; }
 	public String getAction() { return action; }
+	public String getMethod() { return method; }
 	public String getDomain() { return domain; }
 	public String getUri() { return uri; }
 	public String getHandlerName() { return handlerName; }
@@ -48,6 +50,7 @@ public class AuditTrail
 	public void setId(String _id) { id = _id; }
 	public void setDomainId(String _domainId) { domainId = _domainId; }
 	public void setAction(String _action) { action = _action; }
+	public void setMethod(String _method) { method = _method; }
 	public void setDomain(String _domain) { domain = _domain; }
 	public void setUri(String _uri) { uri = _uri; }
 	public void setHandlerName(String _handlerName) { handlerName = _handlerName; }

@@ -168,7 +168,8 @@ public class RestfulSecurityContext
 
 			if (userList.size() > 1) { throw new RuntimeException("Multiple users for email address: " + _user.getEmail() + " found."); }
 
-			if (userList.isEmpty() != true)
+			//Only return active users ...
+			if (userList.isEmpty() != true && userList.get(0).getActive() == true)
 			{
 				user = userList.get(0);
 			}
@@ -179,14 +180,14 @@ public class RestfulSecurityContext
 
 	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user)
 	{
-		java.util.Set<String> roleList = new java.util.HashSet<String>();
+		java.util.Set<String> roleSet = new java.util.HashSet<String>();
 
 		if (_user != null)
 		{
-			roleList.addAll(_user.getRoleList());
+			roleSet.addAll(_user.getRoleSet());
 		}
 
-		return roleList;
+		return roleSet;
 	}
 
 	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)

@@ -848,6 +848,113 @@ airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 	return Packages.airlift.util.AirliftUtil.decrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
 }
 
+airlift.createArray = function(_size, _type, _initializer)
+{
+	var size = _size||0;
+	var type = _type||Packages.java.lang.String;
+	initializer = _initializer||[];
+	
+	var newArray = java.lang.reflect.Array.newInstance(type, size);
+	initializer.forEach(function(_item, _index) { newArray[_index] = _item; });
+
+	return newArray;
+}
+
+airlift.stringArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.String, _initializer);
+}
+
+airlift.byteArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Byte.TYPE, _initializer);
+}
+
+airlift.byteObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Byte, _initializer);
+}
+
+airlift.shortArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Short.TYPE, _initializer);
+}
+
+airlift.shortObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Short, _initializer);
+}
+
+airlift.charArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Character.TYPE, _initializer);
+}
+
+airlift.charObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Character, _initializer);
+}
+
+airlift.characterObjectArray = function(_size, _initializer)
+{
+	return airlift.charObjectArray(_size, _initializer);
+}
+
+airlift.intArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Integer.TYPE, _initializer);
+}
+
+airlift.intObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Integer, _initializer);
+}
+
+airlift.integerObjectArray = function(_size, _initializer)
+{
+	return airlift.intObjectArray(_size, _initializer);
+}
+
+airlift.longArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Long.TYPE, _initializer);
+}
+
+airlift.longObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Long, _initializer);
+}
+
+airlift.booleanArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Boolean.TYPE, _initializer);
+}
+
+airlift.booleanObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Boolean, _initializer);
+}
+
+airlift.floatArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Float.TYPE, _initializer);
+}
+
+airlift.floatObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Float, _initializer);
+}
+
+airlift.doubleArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Double.TYPE, _initializer);
+}
+
+airlift.doubleObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Double, _initializer);
+}
+
 airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
 {
 	if (_sourceArray && _destinationArray)
@@ -1007,6 +1114,7 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.id = airlift.g();
 	auditTrail.domainId = _id||ID;
 	auditTrail.action = _action;
+	auditTrail.method = METHOD;
 	auditTrail.domain = DOMAIN_NAME;
 	auditTrail.uri = URI;
 	auditTrail.handlerName = HANDLER_NAME;

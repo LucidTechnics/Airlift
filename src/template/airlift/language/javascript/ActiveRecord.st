@@ -96,12 +96,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.get = function(_id, _config)
 	{
+		var jdo = this.dao.get(_id);
+
+		this.decrypt(jdo);
+		
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 
-		var jdo = this.dao.get(_id);
-		this.copyFrom(jdo);
 		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.rdfa(), "GET"); }
-		
+
 		return this;
 	};
 
@@ -130,11 +132,35 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	}
 
+	activeRecord.decrypt = function(_jdo)
+	{
+		this.copyFrom(_jdo);
+		
+		$encryptionSetup$
+
+		$decryptToActiveRecordAttribute$
+	}
+
+	activeRecord.encrypt = function()
+	{
+		$encryptionSetup$
+
+		$encryptedAttribute$
+
+		var dataObject = this.createDO();
+
+		$setDataObjectEncryptedField$
+
+		return dataObject;
+	}
+		
 	activeRecord.update = function(_config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
-		this.putAudit().dao.update(this.createDO());
+		var dataObject = this.putAudit().encrypt();
+		this.dao.update(dataObject);
+		
 		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.rdfa(), "UPDATE"); }
 
 		return this;
@@ -144,7 +170,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
-		this.setId(this.postAudit().dao.insert(this.createDO()));
+		var dataObject = this.postAudit().encrypt();		
+		this.setId(this.dao.insert(dataObject));
 		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.rdfa(), "INSERT", this.id); }
 
 		return this;
@@ -199,8 +226,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		for (var dataObject in Iterator(_collection))
 		{
 			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			
-			activeRecord.copyFrom(dataObject.decrypt(password, initialVector, null, null, null, null, revolutions));
+			activeRecord.decrypt(dataObject);
 			collection.push(activeRecord);
 		}
 

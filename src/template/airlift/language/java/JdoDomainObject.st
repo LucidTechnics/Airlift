@@ -35,32 +35,6 @@ public class $className$Jdo
 	
 	public $className$Jdo() {}
 
-	public $className$Jdo encrypt(String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
-	{
-		$attributeEncryptors$
-
-		$className$Jdo newJdo = new $className$Jdo();
-
-		try
-		{
-
-			org.apache.commons.beanutils.PropertyUtils.copyProperties(newJdo, this);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-
-		return newJdo;
-	}
-
-	public $className$Jdo decrypt(String _password, String _initialVector, String _provider, String _name, String _mode, String _padding, int _revolutions)
-	{
-		$attributeDecryptors$
-
-		return this;
-	}
-
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();

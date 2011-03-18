@@ -29,7 +29,7 @@ public class AirliftUser
 	@Persistent private String shortName;
 	@Persistent private String googleUserId;
 	@Persistent private String email;
-	@Persistent private java.util.List<String> roleList = new java.util.ArrayList<String>();
+	@Persistent private java.util.Set<String> roleSet = new java.util.HashSet<String>();
 	@Persistent private boolean active;
 	@Persistent private java.util.Date auditPostDate;
 	@Persistent private java.util.Date auditPutDate;
@@ -40,7 +40,7 @@ public class AirliftUser
 	public String getShortName() { return shortName; }
 	public String getGoogleUserId() { return googleUserId; }
 	public String getEmail() { return email; }
-	public java.util.List<String> getRoleList() { return roleList; }
+	public java.util.Set<String> getRoleSet() { return roleSet; }
 	public boolean getActive() { return active; }
 	public java.util.Date getAuditPostDate() { return auditPostDate; }
 	public java.util.Date getAuditPutDate() { return auditPutDate; }
@@ -51,7 +51,7 @@ public class AirliftUser
 	public void setFullName(String _fullName) { fullName = _fullName; }
 	public void setShortName(String _shortName) { shortName = _shortName; }
 	public void setEmail(String _email) { email = _email; }
-	public void setRoleList(java.util.List<String> _roleList) { roleList = _roleList; }
+	public void setRoleSet(java.util.Set<String> _roleSet) { roleSet = _roleSet; }
 	public void setActive(boolean _active) { active = _active; }
 	public void setAuditPostDate(java.util.Date _auditPostDate) { auditPostDate = _auditPostDate; }
 	public void setAuditPutDate(java.util.Date _auditPutDate) { auditPutDate = _auditPutDate; }
@@ -66,7 +66,7 @@ public class AirliftUser
 		stringBuffer.append("shortName:").append(getShortName()).append("\n");
 		stringBuffer.append("googleUserId:").append(getGoogleUserId()).append("\n");
 		stringBuffer.append("email:").append(getEmail()).append("\n");
-		stringBuffer.append("roleList:").append(getRoleList()).append("\n");
+		stringBuffer.append("roleSet:").append(getRoleSet()).append("\n");
 		stringBuffer.append("active:").append(getActive()).append("\n");
 		stringBuffer.append("auditPostDate:").append(getAuditPostDate()).append("\n");
 		stringBuffer.append("auditPutDate:").append(getAuditPutDate()).append("\n");

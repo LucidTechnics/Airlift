@@ -175,15 +175,20 @@ public class JavaScriptGenerator
 	{
 		String domainName = _domainObjectModel.getClassName();
 		StringTemplate activeRecordStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ActiveRecord");
+		StringTemplate encryptionSetupTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/EncryptionSetup");
+		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/EncryptInvokation");
+		StringTemplate setDataObjectEncryptedFieldStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/SetDataObjectEncryptedField");
+		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/DecryptInvokation");
 
 		activeRecordStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		activeRecordStringTemplate.setAttribute("appName", _domainObjectModel.getAppName());
 		activeRecordStringTemplate.setAttribute("domainName", lowerTheFirstCharacter(domainName));
 		activeRecordStringTemplate.setAttribute("upperCaseFirstLetterDomainClassName", upperTheFirstCharacter(domainName));
 		activeRecordStringTemplate.setAttribute("fullyQualifiedDomainClassName", _domainObjectModel.getFullyQualifiedClassName());
-		activeRecordStringTemplate.setAttribute("allLowerCaseClassName", _domainObjectModel.getClassName().toLowerCase()); 
-
+		activeRecordStringTemplate.setAttribute("allLowerCaseClassName", _domainObjectModel.getClassName().toLowerCase());
+		
 		boolean processedDatable = false;
+		boolean processedEncryptionHeader = false;
 		
 		java.util.Iterator attributes = _domainObjectModel.getAttributes();
 
@@ -191,6 +196,9 @@ public class JavaScriptGenerator
 		{
 			Attribute attribute = (Attribute) attributes.next();
 			String name = attribute.getName();
+			String type = attribute.getType();
+			String getterName = getGetterName(name);
+			String setterName = getSetterName(name);
 
 			Annotation datable = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Datable");
 			Annotation persist = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Persistable");
@@ -220,8 +228,45 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config||{})); };");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
+
+			String encrypted = findValue(persist, "encrypted()");
+
+			if ("true".equalsIgnoreCase(encrypted) == true)
+			{
+				if (processedEncryptionHeader == false)
+				{
+					activeRecordStringTemplate.setAttribute("encryptionSetup", encryptionSetupTemplate.toString());
+					processedEncryptionHeader = true;
+				}
+				
+				String encryptedName = name + "Encrypted";
+				String encryptedGetterName = getGetterName(encryptedName);
+				String encryptedSetterName = getSetterName(encryptedName);
+
+				String encryptionConversionFunction = determineEncryptionConversionFunction(type);
+				String decryptionConversionFunction = determineDecryptionConversionFunction(type);
+
+				encryptInvokationStringTemplate.setAttribute("getterName", getterName);
+				encryptInvokationStringTemplate.setAttribute("setterName", setterName);
+				encryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
+				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
+
+				setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedName", encryptedName);
+				setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
+
+				decryptInvokationStringTemplate.setAttribute("setterName", setterName);
+				decryptInvokationStringTemplate.setAttribute("encryptedGetterName", encryptedGetterName);
+				decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
+			}
 		}
 
+		if (processedEncryptionHeader == true)
+		{
+			activeRecordStringTemplate.setAttribute("setDataObjectEncryptedField", setDataObjectEncryptedFieldStringTemplate.toString());
+			activeRecordStringTemplate.setAttribute("encryptedAttribute", encryptInvokationStringTemplate.toString());
+			activeRecordStringTemplate.setAttribute("decryptToActiveRecordAttribute", decryptInvokationStringTemplate.toString());
+		}
+		
 		return activeRecordStringTemplate.toString();
 	}
 
