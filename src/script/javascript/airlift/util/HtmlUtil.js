@@ -169,9 +169,8 @@ airlift.toForm = function(_config)
 
 	var buttonName = (airlift.isDefined(config.buttonName) === true) ? config.buttonName : "submit";
 	var groupName = (airlift.isDefined(config.groupName) === true) ? config.groupName : "";
-	var path = (airlift.isDefined(config.path) === true) ? config.path : PATH;
 
-	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(path, groupName, buttonName);
+	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(groupName, buttonName);
 	var slice = Array.prototype.slice;
 	var argumentArray = slice.apply(arguments, [1]);
 
@@ -728,6 +727,16 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 			_formTemplate.setAttribute(valueTarget, value);
 		}
 	}
+}
+
+airlift.setFormPath = function(_formTemplate, _path)
+{
+	airlift.setFormAction(_formTemplate, _path);
+}
+
+airlift.setFormAction = function(_formTemplate, _path)
+{
+	_formTemplate.setAttribute("formTemplateAction", _path||PATH);
 }
 
 airlift.escapeForStringTemplate = function(_name)

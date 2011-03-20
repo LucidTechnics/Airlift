@@ -104,6 +104,9 @@ public class JavaGenerator
 
 	public String generateDomainSubInterface(DomainObjectModel _domainObjectModel)
 	{
+		String json = airlift.util.AirliftUtil.toJson(_domainObjectModel);
+		printMessage("JSON is: " + json);
+		
 		StringTemplate domainSubInterfaceStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DomainSubInterface");
 
 		Iterator attributes = _domainObjectModel.getAttributes();

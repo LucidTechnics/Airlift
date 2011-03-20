@@ -179,7 +179,8 @@ public class JavaScriptGenerator
 		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/EncryptInvokation");
 		StringTemplate setDataObjectEncryptedFieldStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/SetDataObjectEncryptedField");
 		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/DecryptInvokation");
-
+		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/AttributeStringBufferAppends");
+		
 		activeRecordStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		activeRecordStringTemplate.setAttribute("appName", _domainObjectModel.getAppName());
 		activeRecordStringTemplate.setAttribute("domainName", lowerTheFirstCharacter(domainName));
@@ -231,6 +232,17 @@ public class JavaScriptGenerator
 
 			String encrypted = findValue(persist, "encrypted()");
 
+			if (isArrayType(type) == true)
+			{
+				stringBufferStringTemplate.setAttribute("getterName", "airlift.util.AirliftUtil.generateStringFromArray(" + getterName + "())");
+			}
+			else
+			{
+				stringBufferStringTemplate.setAttribute("getterName", getterName + "()");
+			}
+
+			stringBufferStringTemplate.setAttribute("name", name);
+
 			if ("true".equalsIgnoreCase(encrypted) == true)
 			{
 				if (processedEncryptionHeader == false)
@@ -266,6 +278,8 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("encryptedAttribute", encryptInvokationStringTemplate.toString());
 			activeRecordStringTemplate.setAttribute("decryptToActiveRecordAttribute", decryptInvokationStringTemplate.toString());
 		}
+
+		activeRecordStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
 		
 		return activeRecordStringTemplate.toString();
 	}

@@ -22,12 +22,12 @@ public class XhtmlTemplateUtil
 {
 	public static final StringTemplateGroup stringTemplateGroup = new StringTemplateGroup("Airlift");
 
-	public static StringTemplate createFormTemplate(String _uri, String _groupName, String _buttonName)
+	public static StringTemplate createFormTemplate(String _groupName, String _buttonName)
 	{
 		StringTemplate formTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ViewHTMLTemplate");
 		String formId = _groupName + "_form";
 		
-		formTemplate.setAttribute("formName", _uri);
+		formTemplate.setAttribute("formName", "$formTemplateAction$");
 		formTemplate.setAttribute("formId",  formId);
 		formTemplate.setAttribute("buttonName", _buttonName);
 		formTemplate.setAttribute("buttonId", formId + "_button");
@@ -159,12 +159,7 @@ public class XhtmlTemplateUtil
 		formEntryTemplate.setAttribute("name", _name);
 		formEntryTemplate.setAttribute("label", _label);
 
-		
-		//if (_error && _message != null && !StringUtils.isWhitespace(_message))
-		{
-			formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");
-		}
-
+		formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");
 		
 		formEntryTemplate.setAttribute("emId", "em_" + _groupName + "_" + _name);
 		formEntryTemplate.setAttribute("message", _message);

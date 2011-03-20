@@ -757,6 +757,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return errorMap;
 	}
-	
+
+	activeRecord.toString = function()
+	{
+		var stringBuffer = new Packages.java.lang.StringBuffer();
+
+		stringBuffer.append("[** $className$ ... $className$").append("\n");
+		$attributeStringBufferAppends$
+				stringBuffer.append("**]\n");
+
+		return stringBuffer.toString();
+	}
+
 	return activeRecord;
 };
