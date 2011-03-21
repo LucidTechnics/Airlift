@@ -46,9 +46,36 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		return query.execute();
 	}
 
+	dao.provideUniqueId = function()
+	{
+		var tries = 0; 
+		
+		do
+		{
+			var id = Packages.airlift.util.IdGenerator.generate(12);
+			//Make sure this randomly generated id has not already been
+			//assigned to a resource in this table. 
+			testObject = dao.get(id);
+			tries++;
+		}
+		while (testObject && (tries < 100))
+
+		if (tries >= 100)
+		{
+			throw new Error("Unable to generate a random unique id for creation of resource: $lowerCaseClassName$.  Are ids saturated?");
+		}
+		else if (tries > 1)
+		{
+			LOG.info("Got a unique id after: " +  tries + " tries.");
+		}
+		
+		return id;
+	}
+	
 	dao.insert = function(_$lowerCaseClassName$)
 	{
-		var id = Packages.airlift.util.IdGenerator.generate(12);
+		var id = this.provideUniqueId()
+
 		_$lowerCaseClassName$.setId(id);
 
 		var indexList = this.index(_$lowerCaseClassName$);

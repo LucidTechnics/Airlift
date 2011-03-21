@@ -112,7 +112,7 @@ public class SimpleHandlerContext
 		}
 
 		PersistenceManager persistenceManager = null;
-
+		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
 		try
 		{
 			persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
@@ -162,10 +162,9 @@ public class SimpleHandlerContext
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : _httpServlet.getServletConfig().getInitParameter("a.timezone");
 			timezone = (timezone == null) ?  "UTC" : timezone;
 			
-			log.info("Using servlet specified time zone: " + timezone);
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
-
-			String[] scriptResources = new String[9];
+			
+			String[] scriptResources = new String[8];
 
 			scriptResources[0] = "/airlift/util/douglasCrockford.js";
 			scriptResources[1] = "/airlift/util/xhtml.js";
@@ -177,17 +176,25 @@ public class SimpleHandlerContext
 			scriptResources[7] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
 
 			boolean handlerExecutionSuccessful = false;
+			
+			try
+			{
+				log.info("Executing airlift resource scripts");
+				scriptingUtil.executeScript(scriptResources, false, scriptingContext);
+				log.info("Completed airlift resource script execution:");
+			}
+			catch(Throwable t)
+			{
+				throw new RuntimeException(t);
+			}
 
 			for (String handlerName: _restContext.getHandlerPathList())
 			{
-				scriptResources[8] = handlerName;
-
 				try
 				{
 					log.info("Executing handler: " + handlerName);
-
 					scriptingUtil.bind("HANDLER_NAME", handlerName);
-					scriptingUtil.executeScript(scriptResources);
+					scriptingUtil.executeScript(handlerName, true, scriptingContext);
 
 					handlerExecutionSuccessful = true;
 					log.info("Completed handler execution for handler: " + handlerName);
@@ -222,11 +229,11 @@ public class SimpleHandlerContext
 				throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Are any of the rest contexts handlers: " + _restContext.getHandlerPathList() + " in the application's classpath?",
 					airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
 			}
-
 		}
 		finally
 		{
 			if (persistenceManager != null) {  persistenceManager.close(); }
+			if (scriptingContext != null) { scriptingContext.exit(); }
 		}
 
 		return contentContext;

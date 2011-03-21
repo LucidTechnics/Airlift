@@ -401,8 +401,9 @@ airlift.get = function(_id, _domainName, _appName)
 	var id = _id||ID;
 	
 	activeRecord.get(id);
-
-	return activeRecord;
+	var foundRecord = (airlift.isDefined(activeRecord.id) === true);
+	
+	return [activeRecord, foundRecord];
 };
 
 airlift.collect = function(_domainName, _request, _appName)
@@ -739,17 +740,30 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	
 	_resultArray.forEach(function(_item) {
 
+		LOG.info("For date field: " + _dateFieldName);
+		LOG.info("START TIME: " + _startDate.getTime());
+		LOG.info("END TIME: " + _endDate.getTime());
+		LOG.info("ITEM TIME: " + _item[_dateFieldName].getTime());
+
+		LOG.info("START TIME: " + _startDate);
+		LOG.info("END TIME: " + _endDate);
+		LOG.info("ITEM TIME: " + _item[_dateFieldName]);
+
 		if ((_startDate && _endDate && _dateFieldName) &&
 			  (
-			   _item[_dateFieldName].getTime() <= _startDate.getTime() ||
-			   _item[_dateFieldName].getTime() >= _endDate.getTime()
+			   _item[_dateFieldName].getTime() < _startDate.getTime() ||
+			   _item[_dateFieldName].getTime() > _endDate.getTime()
 			  )
 			)
 		{
+			LOG.info(_item[_dateFieldName].getTime() + " is NOT in interval");
+			LOG.info(_item[_dateFieldName] + " is NOT in interval");
 			inInterval = false;
 		}
 		else
 		{
+			LOG.info(_item[_dateFieldName].getTime() + " is in interval");
+			LOG.info(_item[_dateFieldName] + " is in interval");
 			inInterval = true;
 		}
 			

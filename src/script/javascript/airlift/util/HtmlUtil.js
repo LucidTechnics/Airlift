@@ -166,13 +166,27 @@ airlift.toRdfa = function(_config)
 airlift.toForm = function(_config)
 {
 	var config = (airlift.isDefined(_config) === true) ? _config :  {};
-
 	var buttonName = (airlift.isDefined(config.buttonName) === true) ? config.buttonName : "submit";
-	var groupName = (airlift.isDefined(config.groupName) === true) ? config.groupName : "";
 
-	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(groupName, buttonName);
+	//Determine active record array
 	var slice = Array.prototype.slice;
 	var argumentArray = slice.apply(arguments, [1]);
+
+	function determineGroupName(_groupName, _activeRecordArray)
+	{
+		var groupName = _groupName;
+
+		if (airlift.isDefined(groupName) === false && _activeRecordArray.length === 1)
+		{
+			groupName = _activeRecordArray[0].retrieveDomainName();
+		}
+
+		return groupName;
+	}
+			
+	var groupName = (airlift.isDefined(determineGroupName(config.groupName, argumentArray)) === true) ? determineGroupName(config.groupName, argumentArray) : "";
+
+	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(groupName, buttonName);
 
 	var processFieldSet = function(_activeRecord, _index, _array)
 	{

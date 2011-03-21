@@ -14,6 +14,11 @@ dao.get = function(_id)
 			got = PERSISTENCE_MANAGER.getObjectById(airlift.cc("$package$.airlift.domain.$className$Jdo"), key);
 			break;
 		}
+		catch(e if e.javaException instanceof javax.jdo.JDOObjectNotFoundException)
+		{
+			LOG.warning("No resource of type: " + $className$ + " exists for the provided key: " + _id);
+			break;
+		}
 		catch(e)
 		{
 			LOG.warning("Encountered this error while accessing the datastore for get: " + e.toString());

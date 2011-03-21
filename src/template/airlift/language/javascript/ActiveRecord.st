@@ -96,11 +96,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.get = function(_id, _config)
 	{
+		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
+		
 		var jdo = this.dao.get(_id);
 
-		this.decrypt(jdo);
-		
-		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
+		if (jdo)
+		{
+			this.decrypt(jdo);
+		}
 
 		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.rdfa(), "GET"); }
 

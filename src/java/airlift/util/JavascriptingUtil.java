@@ -105,13 +105,27 @@ public class JavascriptingUtil
 
 	public Object executeScript(String _scriptResource)
 	{
-		Context context = createContext();
+		return executeScript(_scriptResource, false, null);
+	}
+
+	public Object executeScript(String _scriptResource, boolean _timeScript)
+	{
+		return executeScript(_scriptResource, _timeScript, null);
+	}
+
+	public Object executeScript(String _scriptResource, boolean _timeScript, Context _context)
+	{
+		Context context = (_context == null) ? createContext() : _context;
+		
 		long startTime = 0l;
 		Object result = null;
 
 		try
 		{
-			setScope(new org.mozilla.javascript.ImporterTopLevel(context, false));
+			if (getScope() == null)
+			{
+				resetScope(context);
+			}
 
 			for (String key: getBindingsMap().keySet())
 			{
@@ -119,14 +133,14 @@ public class JavascriptingUtil
 				ScriptableObject.putProperty(getScope(), key, object);
 			}
 
-			if (log.isLoggable(java.util.logging.Level.INFO) == true)
+			if (_timeScript == true)
 			{
 				startTime = System.currentTimeMillis();
 			}
 
 			result = compileScript(_scriptResource).exec(context, getScope());
 
-			if (log.isLoggable(java.util.logging.Level.INFO) == true)
+			if (_timeScript == true)
 			{
 				long total = System.currentTimeMillis() - startTime;
 				log.info("Script: " + _scriptResource + " took this many milliseconds to run: " + total);
@@ -142,7 +156,7 @@ public class JavascriptingUtil
 		}
 		finally
 		{
-			context.exit();
+			if (_context == null) { context.exit(); }
 		}
 
 		return result;
@@ -150,7 +164,17 @@ public class JavascriptingUtil
 
 	public Object executeScript(String[] _scriptResources)
 	{
-		Context context = createContext();
+		return executeScript(_scriptResources, false, null);
+	}
+
+	public Object executeScript(String[] _scriptResources, boolean _timeScript)
+	{
+		return executeScript(_scriptResources, _timeScript, null);
+	}
+
+	public Object executeScript(String[] _scriptResources, boolean _timeScripts, Context _context)
+	{
+		Context context = (_context == null) ? createContext() : _context;
 		long startTime = 0l;
 		
 		Object result = null;
@@ -158,7 +182,10 @@ public class JavascriptingUtil
 
 		try
 		{
-			setScope(new org.mozilla.javascript.ImporterTopLevel(context, false));
+			if (getScope() == null)
+			{
+				resetScope(context);
+			}
 
 			for (String key: getBindingsMap().keySet())
 			{
@@ -168,14 +195,14 @@ public class JavascriptingUtil
 
 			for (i = 0; i < _scriptResources.length; i++)
 			{
-				if (log.isLoggable(java.util.logging.Level.INFO) == true)
+				if (_timeScripts)
 				{
 					startTime = System.currentTimeMillis();
 				}
 				
 				result = compileScript(_scriptResources[i]).exec(context, getScope());
 
-				if (log.isLoggable(java.util.logging.Level.INFO) == true)
+				if (_timeScripts)
 				{
 					long total = System.currentTimeMillis() - startTime;
 					log.info("Script: " + _scriptResources[i] + " took this many milliseconds to run: " + total);
@@ -193,16 +220,25 @@ public class JavascriptingUtil
 		}
 		finally
 		{
-			context.exit();
+			if (_context == null) { context.exit(); }
 		}
 
 		return result;
 	}
 
-	private Context createContext()
+	public Context createContext()
 	{
-		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
+		Context context = null;
+		
+		if (Context.getCurrentContext() != null)
+		{
+			context = Context.getCurrentContext();
+		}
+		else
+		{
+			context = (new ContextFactory()).enterContext();
+			context.setLanguageVersion(170);
+		}
 
 		return context;
 	}
@@ -247,5 +283,10 @@ public class JavascriptingUtil
 		}
 
 		return script;
+	}
+
+	public void resetScope(Context _context)
+	{
+		setScope(new org.mozilla.javascript.ImporterTopLevel(_context, false));
 	}
 }
