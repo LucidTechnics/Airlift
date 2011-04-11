@@ -270,16 +270,6 @@
 		<jar destfile="${dist}/lib/${jar}-core.jar"
 		       basedir="${src.script}/javascript"
 			   update="true"
-		  />		
-
-		<jar destfile="${dist}/lib/${jar}-spring.jar"
-		       basedir="${classes}"
-			   includes="**\*spring*\*.*"
-		  />
-
-		<tar destfile="${dist}/lib/${jar}-php.tar"
-		       basedir="${src.php}"
-			   includes="**\*.*"
 		  />
 
     </target>

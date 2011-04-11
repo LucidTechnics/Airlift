@@ -4,7 +4,7 @@ rootPackage=airlift
 
 rootDeployDir=${basedir}/deploy
 
-version=beta-0.70.1_rc
+version=beta-0.70_rc_108
 revision=734
 
 deployDir=${rootDeployDir}

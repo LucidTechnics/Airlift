@@ -740,15 +740,6 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	
 	_resultArray.forEach(function(_item) {
 
-		LOG.info("For date field: " + _dateFieldName);
-		LOG.info("START TIME: " + _startDate.getTime());
-		LOG.info("END TIME: " + _endDate.getTime());
-		LOG.info("ITEM TIME: " + _item[_dateFieldName].getTime());
-
-		LOG.info("START TIME: " + _startDate);
-		LOG.info("END TIME: " + _endDate);
-		LOG.info("ITEM TIME: " + _item[_dateFieldName]);
-
 		if ((_startDate && _endDate && _dateFieldName) &&
 			  (
 			   _item[_dateFieldName].getTime() < _startDate.getTime() ||
@@ -756,14 +747,10 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 			  )
 			)
 		{
-			LOG.info(_item[_dateFieldName].getTime() + " is NOT in interval");
-			LOG.info(_item[_dateFieldName] + " is NOT in interval");
 			inInterval = false;
 		}
 		else
 		{
-			LOG.info(_item[_dateFieldName].getTime() + " is in interval");
-			LOG.info(_item[_dateFieldName] + " is in interval");
 			inInterval = true;
 		}
 			
