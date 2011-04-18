@@ -169,7 +169,7 @@ airlift.l = function(_list)
 		return this.get(_index);
 	};
 
-	list.every = function(_function)
+	list.forEach = function(_function)
 	{
 		airlift.every(list, _function);
 		return list;
@@ -236,7 +236,7 @@ airlift.s = function(_set)
 		return this;
 	};
 
-	set.every = function(_function)
+	set.forEach = function(_function)
 	{
 		airlift.every(set, _function);
 		return this;
@@ -303,13 +303,13 @@ airlift.m = function(_map)
 		return this;
 	};
 
-	map.everyKey = function(_function)
+	map.forEachKey = function(_function)
 	{
 		airlift.every(this.keySet(), _function);
 		return this;
 	}
 
-	map.everyValue = function(_function)
+	map.forEachValue = function(_function)
 	{
 		airlift.every(this.values(), _function);
 		return this;
@@ -547,16 +547,16 @@ airlift.ic = function(_className)
 
 airlift.prepareUri = function(_id, _uri)
 {
-	var baseURI = (airlift.isDefined(_uri) === true) ? new Packages.java.lang.String(_uri) : URI;
+	var baseURI = (airlift.isDefined(_uri) === true) ? airlift.string(_uri) : URI;
 	
-	var uri = new Packages.java.lang.String(baseURI).replaceAll("\\/$", "");
+	var uri = airlift.string(baseURI).replaceAll("\\/$", "");
 
 	return uri + "/" + _id;
 };
 
 airlift.toJavaString = function(_string)
 {
-	return new Packages.java.lang.String(_string);
+	return airlift.string(_string);
 };
 
 airlift.appender = function(_initialText, _delimiter)
@@ -1137,7 +1137,32 @@ airlift.browser = function()
 	return new Packages.airlift.util.Browser();
 }
 
+airlift.isWhiteSpace = function(_string)
+{
+	return airlift.isWhitespace(_string);
+}
+					   
 airlift.isWhitespace = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 }
+
+airlift.rightPad = function(_string, _size, _character)
+{
+	var character = _character||'';
+	
+	return Packages.org.apache.commons.lang.StringUtils.rightPad(_string, _size, character);
+}
+
+airlift.leftPad = function(_string, _size, _character)
+{
+	var character = _character||'';
+
+	return Packages.org.apache.commons.lang.StringUtils.leftPad(_string, _size, character);
+}
+
+airlift.trim = function(_string)
+{
+	return Packages.org.apache.commons.lang.StringUtils.trim(_string);
+}
+

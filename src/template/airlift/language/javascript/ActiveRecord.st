@@ -54,23 +54,35 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return airlift.toRdfa(config);
 	};
 
-	activeRecord.json = function(_collection)
+	activeRecord.json = function(_config)
 	{
-		if (_collection && _collection.collection)
+		if (_config && _config.collection)
 		{
 			var list = new Packages.java.util.ArrayList();
 
-			_collection.collection.forEach(function(_activeRecord) { list.add(_activeRecord.createDO()); } );
+			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord.restify(_activeRecord.createDO())); } );
 
 			var json = Packages.airlift.util.AirliftUtil.toJson(list);
 		}
 		else
 		{
-			json = Packages.airlift.util.AirliftUtil.toJson(this.createDO());
+			json = Packages.airlift.util.AirliftUtil.toJson(this.restify(this.createDO()));
 		}
 		
 		return json;
 	};
+
+	activeRecord.restify = function(_do)
+	{
+		_do.id = BASE + "a/" + this.retrieveDomainName() + "/" + _do.id;
+		
+		activeRecord.retrieveOrderedForeignKeyList().forEach(function(_foreignKeyName)
+		{
+			_do[_foreignKeyName] = BASE + "a/" + _foreignKeyName.replaceAll("[Ii][Dd]\$", "") + "/" + _do[_foreignKeyName];
+		});
+		
+		return _do;
+	}
 
 	activeRecord.form = function(_config)
 	{
