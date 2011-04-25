@@ -3,9 +3,13 @@ package airlift.servlet.rest;
 public class GoogleUserService
    implements UserService
 {
+	private javax.servlet.http.HttpServletRequest httpServletRequest;
 	private com.google.appengine.api.users.UserService userService;
-	
+
+	private javax.servlet.http.HttpServletRequest getHttpServletRequest() { return httpServletRequest; }
 	private com.google.appengine.api.users.UserService getUserService() { return userService; }
+
+	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest) { httpServletRequest = _httpServletRequest; }
 	private void setUserService(com.google.appengine.api.users.UserService _userService) { userService = _userService; }
 
 	protected GoogleUserService() { setUserService(com.google.appengine.api.users.UserServiceFactory.getUserService()); }

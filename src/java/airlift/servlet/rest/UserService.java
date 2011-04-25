@@ -25,4 +25,6 @@ public interface UserService
 
 	//Returns true if there is a user logged in, false otherwise.
 	public boolean isUserLoggedIn();
+
+	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
 }

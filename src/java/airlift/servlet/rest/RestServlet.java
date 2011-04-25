@@ -751,15 +751,14 @@ public class RestServlet
 
 	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
 	{
-		String userServiceFactoryClassName = this.getServletConfig().getInitParameter("a.user.service.factory");
+		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
 
-		UserServiceFactory userServiceFactory = null;
 		UserService userService = null;
 
 		try
 		{
-			userServiceFactory = (userServiceFactoryClassName != null) ? (UserServiceFactory) Class.forName(userServiceFactoryClassName).newInstance() : new GoogleUserServiceFactory();
-			userService = userServiceFactory.getUserService(_httpServletRequest);
+			userService = (userServiceClassName != null) ? (UserService) Class.forName(userServiceClassName).newInstance() : new GoogleUserService();
+			userService.setHttpServletRequest(_httpServletRequest);
 		}
 		catch(Throwable t)
 		{
