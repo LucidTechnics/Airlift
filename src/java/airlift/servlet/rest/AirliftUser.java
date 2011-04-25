@@ -27,7 +27,7 @@ public class AirliftUser
 	@Persistent @PrimaryKey private String id;
 	@Persistent private String fullName;
 	@Persistent private String shortName;
-	@Persistent private String googleUserId;
+	@Persistent private String externalUserId; //usually google but could be another identifier
 	@Persistent private String email;
 	@Persistent private java.util.Set<String> roleSet = new java.util.HashSet<String>();
 	@Persistent private boolean active;
@@ -38,7 +38,7 @@ public class AirliftUser
 	public String getId() { return id; }
 	public String getFullName() { return fullName; }
 	public String getShortName() { return shortName; }
-	public String getGoogleUserId() { return googleUserId; }
+	public String getExternalUserId() { return externalUserId; }
 	public String getEmail() { return email; }
 	public java.util.Set<String> getRoleSet() { return roleSet; }
 	public boolean getActive() { return active; }
@@ -47,7 +47,7 @@ public class AirliftUser
 	public java.util.Date getTimeOutDate() { return timeOutDate; }
 	
 	public void setId(String _id) { id = _id; }
-	public void setGoogleUserId(String _googleUserId) { googleUserId = _googleUserId; }
+	public void setExternalUserId(String _externalUserId) { externalUserId = _externalUserId; }
 	public void setFullName(String _fullName) { fullName = _fullName; }
 	public void setShortName(String _shortName) { shortName = _shortName; }
 	public void setEmail(String _email) { email = _email; }
@@ -56,7 +56,7 @@ public class AirliftUser
 	public void setAuditPostDate(java.util.Date _auditPostDate) { auditPostDate = _auditPostDate; }
 	public void setAuditPutDate(java.util.Date _auditPutDate) { auditPutDate = _auditPutDate; }
 	public void setTimeOutDate(java.util.Date _timeOutDate) { timeOutDate = _timeOutDate; }
-
+	
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();
@@ -64,7 +64,7 @@ public class AirliftUser
 		stringBuffer.append("[** AirliftUser ...").append("\n");
 		stringBuffer.append("fullName:").append(getFullName()).append("\n");
 		stringBuffer.append("shortName:").append(getShortName()).append("\n");
-		stringBuffer.append("googleUserId:").append(getGoogleUserId()).append("\n");
+		stringBuffer.append("externalUserId:").append(getExternalUserId()).append("\n");
 		stringBuffer.append("email:").append(getEmail()).append("\n");
 		stringBuffer.append("roleSet:").append(getRoleSet()).append("\n");
 		stringBuffer.append("active:").append(getActive()).append("\n");

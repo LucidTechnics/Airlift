@@ -74,14 +74,34 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.restify = function(_do)
 	{
-		_do.id = BASE + "a/" + this.retrieveDomainName() + "/" + _do.id;
+		if (_do && _do.id && airlift.isWhitespace(_do.id) === false)
+		{
+			_do.id = BASE + "a/" + this.retrieveDomainName() + "/" + _do.id;
+		}
 		
 		activeRecord.retrieveOrderedForeignKeyList().forEach(function(_foreignKeyName)
 		{
-			_do[_foreignKeyName] = BASE + "a/" + _foreignKeyName.replaceAll("[Ii][Dd]\$", "") + "/" + _do[_foreignKeyName];
+			if (_do && _do[_foreignKeyName] && airlift.isWhitespace(_do[_foreignKeyName]) === false)
+			{
+				_do[_foreignKeyName] = BASE + "a/" + _foreignKeyName.replaceAll("[Ii][Dd]\$", "") + "/" + _do[_foreignKeyName];
+			}
 		});
 		
 		return _do;
+	}
+
+	activeRecord.join = function(_collectionOrArray)
+	{
+		if (_collectionOrArray.push)
+		{
+			_collectionOrArray.push(this);
+		}
+		else if (_collectionOrArray.add)
+		{
+			_collectionOrArray.add(this);
+		}
+
+		return this;
 	}
 
 	activeRecord.form = function(_config)

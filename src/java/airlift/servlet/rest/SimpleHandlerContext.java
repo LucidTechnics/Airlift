@@ -28,8 +28,6 @@ import airlift.domain.DomainConfiguration;
 import airlift.util.JavascriptingUtil;
 
 import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 public class SimpleHandlerContext
    extends HandlerContext
@@ -96,7 +94,7 @@ public class SimpleHandlerContext
 
 		Map<String, String> domainPathMap = restContext.extractDomainObjectPaths(path);
 
-		AirliftUser user = _restContext.getAirliftUser();
+		AbstractUser user = _restContext.getUser();
 		String userName = (user != null) ? user.getFullName() : null;
 		String userEmail = (user != null) ? user.getEmail() : null;
 
@@ -141,7 +139,6 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
 			scriptingUtil.bind("OUT", System.out);
 			scriptingUtil.bind("LOG", log);
-			scriptingUtil.bind("GOOGLE_USER", _restContext.getGoogleUser());
 			scriptingUtil.bind("USER", user);
 			scriptingUtil.bind("USER_NAME", userName);
 			scriptingUtil.bind("USER_EMAIL", userEmail);
@@ -153,10 +150,15 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("AUDITING_GET", auditingGet);
 			scriptingUtil.bind("AUDITING_UPDATE", auditingUpdate);
 			scriptingUtil.bind("AUDITING_DELETE", auditingDelete);
+
+			log.info("URI Parameter map is: " + restContext.getUriParameterMap());
+			log.info("Domain ids are:" + restContext.getDomainIds());
 			
 			for (String restContextDomainName: restContext.getDomainIds())
 			{
-				scriptingUtil.bind(restContextDomainName.replaceAll("\\\\.", "_"), restContext.getIdValue(restContextDomainName));
+				String key = restContextDomainName.replaceAll("\\.", "_").toUpperCase();
+				log.info("binding this: " + key);
+				scriptingUtil.bind(key, restContext.getIdValue(restContextDomainName));
 			}
 
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : _httpServlet.getServletConfig().getInitParameter("a.timezone");

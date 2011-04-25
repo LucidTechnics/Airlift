@@ -26,10 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import airlift.rest.Method;
 
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 public class RestServlet
    extends HttpServlet
 {
@@ -183,16 +179,15 @@ public class RestServlet
 		{
 			sendCodedPage("404", "Not Found", _response);
 		}
-		
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
+
+		UserService userService = getUserService();
+		AbstractUser user = userService.getCurrentUser();
 
 		RestfulSecurityContext securityContext = new RestfulSecurityContext();
-		AirliftUser airliftUser = securityContext.fetchAirliftUser(user);
-		restContext.setAirliftUser(airliftUser);
-		restContext.setGoogleUser(user);
+		securityContext.populate(user);
+		restContext.setUser(user);
 		
-		boolean success = allowed(airliftUser, restContext, securityContext);
+		boolean success = allowed(user, restContext, securityContext);
 		
 		if (!success && user == null)
 		{
@@ -200,16 +195,17 @@ public class RestServlet
 		}
 		else if (!success && user != null)
 		{
-			if (airliftUser != null)
+			if (user.getId() != null)
 			{
-				securityContext.update(airliftUser);
+				securityContext.update(user);
 			}
+
 			sendCodedPage("401", "UnAuthorized", _response);
 		}
-		else if (success && timedOut(airliftUser) == true)
+		else if (success && timedOut(user) == true)
 		{
-			airliftUser.setTimeOutDate(null); // A user with a null time out date cannot be time out.
-			securityContext.update(airliftUser);
+			user.setTimeOutDate(null); // A user with a null time out date cannot be time out.
+			securityContext.update(user);
 			logUserOut(_request, _response, userService);
 		}
 		else if (success)
@@ -221,12 +217,12 @@ public class RestServlet
 			
 			try
 			{
-				if (airliftUser != null)
+				if (user != null)
 				{
-					airliftUser.setTimeOutDate(calculateNextTimeOutDate());
-					airliftUser.setGoogleUserId(user.getUserId());
+					user.setTimeOutDate(calculateNextTimeOutDate());
+					user.setExternalUserId(user.getUserId());
 
-					securityContext.update(airliftUser);
+					securityContext.update(user);
 				}
 
 				processRequest(_request, _response, method, restContext, uriParameterMap);
@@ -751,5 +747,23 @@ public class RestServlet
 		}
 
 		return appProfile;
+	}
+
+	public UserService getUserService()
+	{
+		String userServiceFactoryClassName = this.getServletConfig().getInitParameter("a.user.service.factory");
+
+		UserService userService = null;
+
+		try
+		{
+			userService = (userServiceFactoryClassName != null) ? (UserService) Class.forName(userServiceFactoryClassName).newInstance() : new GoogleUserService();
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return userService;
 	}
 }

@@ -508,6 +508,11 @@ airlift.guid = function()
 	return airlift.g();
 };
 
+airlift.hash = function(_hashAlgorithm, _string)
+{
+	return Packages.airlift.util.IdGenerator.hash(_hashAlgorithm||"SHA1", _string);
+}
+
 airlift.renderError = function(_errorMap)
 {	
 	var stringBuffer = java.lang.StringBuffer(); 

@@ -24,12 +24,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	
 	dao.collect = function(_config)
 	{
-		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		
-		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
-		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
-		var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
-		var orderBy = (airlift.isDefined(_config.orderBy) === true) ? _config.orderBy : undefined;
+		var offset = (airlift.isDefined(_config && _config.offset) === true) ? _config.offset : 0;
+		var limit = (airlift.isDefined(_config && _config.limit) === true) ? _config.limit : 20;
+		var asc = (airlift.isDefined(_config && _config.asc) === true) ? _config.asc : true;
+		var orderBy = (airlift.isDefined(_config && _config.orderBy) === true) ? _config.orderBy : undefined;
 		
 		var sql = "$selectAllSql$";
 

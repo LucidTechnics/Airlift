@@ -17,7 +17,6 @@ package airlift.servlet.rest;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import com.google.appengine.api.users.User;
 
 public class RestfulSecurityContext
    implements airlift.SecurityContext
@@ -158,24 +157,32 @@ public class RestfulSecurityContext
 		return allowed;
 	}
 
-	public AirliftUser fetchAirliftUser(com.google.appengine.api.users.User _user)
+	public AirliftUser populate(AirliftUser _user)
 	{
-		AirliftUser user = null;
-		
 		if (_user != null)
 		{
-			java.util.List<AirliftUser> userList = collectByEmail(_user.getEmail(), 0, 10, "email", true);
+			java.util.List<AirliftUser> userList = collectByExternalUserId(_user.getExternalUserId(), 0, 10, "externalUserId", true);
 
-			if (userList.size() > 1) { throw new RuntimeException("Multiple users for email address: " + _user.getEmail() + " found."); }
+			if (userList.size() > 1) { throw new RuntimeException("Multiple users for external user id: " + _user.getExternalUserId() + " found."); }
 
 			//Only return active users ...
 			if (userList.isEmpty() != true && userList.get(0).getActive() == true)
 			{
-				user = userList.get(0);
+				AirliftUser user = userList.get(0);
+
+				_user.setId(user.getId());
+				_user.setFullName(user.getFullName());
+				_user.setShortName(user.getShortName());
+				_user.setEmail(user.getEmail());
+				_user.setRoleSet(user.getRoleSet());
+				_user.setAuditPostDate(user.getAuditPostDate());
+				_user.setAuditPutDate(user.getAuditPutDate());
+				_user.setActive(user.getActive());
+				_user.setTimeOutDate(user.getTimeOutDate());
 			}
 		}
 
-		return user;
+		return _user;
 	}
 
 	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user)
@@ -204,13 +211,24 @@ public class RestfulSecurityContext
 
 	public String insert(AirliftUser _airliftUser)
 	{
-		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
-		_airliftUser.setAuditPostDate(new java.util.Date());
-		_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
-		
-		getPersistenceManager().makePersistent(_airliftUser);
+		AirliftUser airliftUser = new AirliftUser();
 
-		return _airliftUser.getId();
+		try
+		{
+			org.apache.commons.beanutils.PropertyUtils.copyProperties(airliftUser, _airliftUser);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		airliftUser.setId(airlift.util.IdGenerator.generate(12));
+		airliftUser.setAuditPostDate(new java.util.Date());
+		airliftUser.setAuditPutDate(airliftUser.getAuditPostDate());
+
+		getPersistenceManager().makePersistent(airliftUser);
+
+		return airliftUser.getId();
 	}
 
 	public boolean exists(String _id)
@@ -251,10 +269,10 @@ public class RestfulSecurityContext
 		getPersistenceManager().deletePersistent(_airliftUser);
 	}
 
-	public java.util.List<AirliftUser> collectByGoogleId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftUser> collectByExternalUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE googleUserId == :attribute";
+		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE externalUserId == :attribute";
 
 		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
 		query.setOrdering(orderBy);
