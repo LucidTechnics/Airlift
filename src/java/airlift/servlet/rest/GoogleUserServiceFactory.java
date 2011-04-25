@@ -3,5 +3,5 @@ package airlift.servlet.rest;
 public class GoogleUserServiceFactory
    implements UserServiceFactory
 {
-	public UserService getUserService() { return new GoogleUserService(); }
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest) { return new GoogleUserService(); }
 }

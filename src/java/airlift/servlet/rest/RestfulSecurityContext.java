@@ -198,7 +198,7 @@ public class RestfulSecurityContext
 	}
 
 	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)
-	{
+	{ 
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser";
 

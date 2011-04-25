@@ -180,7 +180,7 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 
-		UserService userService = getUserService();
+		UserService userService = getUserService(_request);
 		AbstractUser user = userService.getCurrentUser();
 
 		RestfulSecurityContext securityContext = new RestfulSecurityContext();
@@ -749,15 +749,17 @@ public class RestServlet
 		return appProfile;
 	}
 
-	public UserService getUserService()
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
 	{
 		String userServiceFactoryClassName = this.getServletConfig().getInitParameter("a.user.service.factory");
 
+		UserServiceFactory userServiceFactory = null;
 		UserService userService = null;
 
 		try
 		{
-			userService = (userServiceFactoryClassName != null) ? (UserService) Class.forName(userServiceFactoryClassName).newInstance() : new GoogleUserService();
+			userServiceFactory = (userServiceFactoryClassName != null) ? (UserServiceFactory) Class.forName(userServiceFactoryClassName).newInstance() : new GoogleUserServiceFactory();
+			userService = userServiceFactory.getUserService(_httpServletRequest);
 		}
 		catch(Throwable t)
 		{

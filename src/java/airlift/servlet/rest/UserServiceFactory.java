@@ -2,5 +2,5 @@ package airlift.servlet.rest;
 
 public interface UserServiceFactory
 {
-	public UserService getUserService();
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest);
 }
