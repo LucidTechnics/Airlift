@@ -34,10 +34,19 @@ public class SimpleHandlerContext
 {
 	private Logger log = Logger.getLogger(SimpleHandlerContext.class.getName());
 	private boolean productionMode = true;
+
+	private PersistenceManager persistenceManager;
+
+	private PersistenceManager getPersistenceManager() { return persistenceManager; }
+	private void setPersistenceManager(PersistenceManager _persistenceManager) { persistenceManager = _persistenceManager; }
 	
 	public SimpleHandlerContext() {}
 
-	public SimpleHandlerContext(boolean _productionMode) { productionMode = _productionMode; }
+	public SimpleHandlerContext(boolean _productionMode, PersistenceManager _persistenceManager)
+	{
+		productionMode = _productionMode;
+		setPersistenceManager(_persistenceManager);
+	}
     
 	public ContentContext execute(
 							String _appName,
@@ -57,8 +66,6 @@ public class SimpleHandlerContext
 
 		String defaultMimeType = (_httpServlet.getServletConfig().getInitParameter("a.default.mime.type") != null) ? _httpServlet.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
 		ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
-
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 
 		String servletName = _httpServlet.getServletName();
 
@@ -109,15 +116,19 @@ public class SimpleHandlerContext
 			throw new RuntimeException(t);
 		}
 
-		PersistenceManager persistenceManager = null;
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
+		
 		try
 		{
-			persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
-			
-			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
-			scriptingUtil.bind("PERSISTENCE_MANAGER", persistenceManager);
+			log.info("Starting binding");
 			scriptingUtil.bind("APP_NAME", _appName);
+			scriptingUtil.bind("OUT", System.out);
+			scriptingUtil.bind("LOG", log);
+			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
+			scriptingUtil.bind("PERSISTENCE_MANAGER", getPersistenceManager());
+			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(getPersistenceManager()));
+			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext(getPersistenceManager()));
 			scriptingUtil.bind("BASE", base);
 			scriptingUtil.bind("PATH", path);
 			scriptingUtil.bind("URI", base + path);
@@ -137,14 +148,10 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("REST_CONTEXT", restContext);
 			scriptingUtil.bind("SCRIPTING", scriptingUtil);
 			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
-			scriptingUtil.bind("OUT", System.out);
-			scriptingUtil.bind("LOG", log);
 			scriptingUtil.bind("USER", user);
 			scriptingUtil.bind("USER_NAME", userName);
 			scriptingUtil.bind("USER_EMAIL", userEmail);
 			scriptingUtil.bind("APP_PROFILE", appProfile);
-			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(persistenceManager));
-			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext(persistenceManager));
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
 			scriptingUtil.bind("AUDITING_INSERT", auditingInsert);
 			scriptingUtil.bind("AUDITING_GET", auditingGet);
@@ -166,18 +173,12 @@ public class SimpleHandlerContext
 			
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 			
-			String[] scriptResources = new String[8];
+			String[] scriptResources = new String[4];
 
-			scriptResources[0] = "/airlift/util/douglasCrockford.js";
-			scriptResources[1] = "/airlift/util/xhtml.js";
-			scriptResources[2] = "/airlift/util/error.js";
-			scriptResources[3] = "/airlift/util/handler.js";
-			scriptResources[4] = "/airlift/util/HtmlUtil.js";
-			scriptResources[5] = "/airlift/util/validate.js";
-			scriptResources[6] = "/airlift/util/json2.js";
-			scriptResources[7] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
-
-			boolean handlerExecutionSuccessful = false;
+			scriptResources[0] = "/airlift/util/error.js";
+			scriptResources[1] = "/airlift/util/handler.js";
+			scriptResources[2] = "/airlift/util/HtmlUtil.js";
+			scriptResources[3] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
 			
 			try
 			{
@@ -189,6 +190,8 @@ public class SimpleHandlerContext
 			{
 				throw new RuntimeException(t);
 			}
+
+			boolean handlerExecutionSuccessful = false;
 
 			for (String handlerName: _restContext.getHandlerPathList())
 			{
@@ -234,7 +237,6 @@ public class SimpleHandlerContext
 		}
 		finally
 		{
-			if (persistenceManager != null) {  persistenceManager.close(); }
 			if (scriptingContext != null) { scriptingContext.exit(); }
 		}
 

@@ -34,6 +34,7 @@ public class JavascriptingUtil
 	private static final Map<String, Script> scriptResourceMap = new HashMap<String, Script>();
 	private Map<String, Object> bindingsMap;
 	private Scriptable scope;
+	private static final ScriptableObject sharedScope;
 	private boolean compileScript = true;
 
 	private Map<String, Script> getScriptResourceMap() { return scriptResourceMap; }
@@ -43,6 +44,46 @@ public class JavascriptingUtil
 	public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 	public void setScope(Scriptable _scope) { scope = _scope; }
 
+	static
+	{
+		log.info("running static");
+		Context context = (new ContextFactory()).enterContext();
+		
+		try
+		{
+			sharedScope = context.initStandardObjects();
+
+			String[] scriptResources = new String[3];
+
+			scriptResources[0] = "/airlift/util/douglasCrockford.js";
+			scriptResources[1] = "/airlift/util/validate.js";
+			scriptResources[2] = "/airlift/util/json2.js";
+
+			for (int i = 0; i < scriptResources.length; i++)
+			{
+				try
+				{
+					InputStream inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream(scriptResources[i]);
+					java.io.InputStreamReader reader = new InputStreamReader(inputStream);
+					Script script = Context.getCurrentContext().compileReader(reader, scriptResources[i], 0, null);
+					script.exec(Context.getCurrentContext(), sharedScope);
+				}
+				catch(Throwable t)
+				{
+					throw new RuntimeException(t);
+				}
+			}
+
+			//sharedScope.sealObject();
+		}
+		finally
+		{
+			log.info("Closing static context");
+			context.exit();
+			log.info("Done closing static context");
+		}
+	}
+	
     public JavascriptingUtil()
 	{
 		setBindingsMap(new HashMap<String, Object>());
@@ -266,10 +307,10 @@ public class JavascriptingUtil
 
 				if (this.compileScript == true)
 				{
-					synchronized(getScriptResourceMap())
-					{
+	//				synchronized(getScriptResourceMap())
+//					{
 						getScriptResourceMap().put(_scriptResource, script);
-					}
+		//			}
 				}
 			}
 			else
@@ -287,6 +328,9 @@ public class JavascriptingUtil
 
 	public void resetScope(Context _context)
 	{
-		setScope(new org.mozilla.javascript.ImporterTopLevel(_context, false));
+		Scriptable scriptable = _context.newObject(sharedScope);
+		scriptable.setPrototype(sharedScope);
+		scriptable.setParentScope(null);
+		setScope(scriptable);
 	}
 }

@@ -3,12 +3,15 @@ package airlift.servlet.rest;
 public class GoogleUserService
    implements UserService
 {
+	private airlift.servlet.rest.RestfulSecurityContext restfulSecurityContext;
 	private javax.servlet.http.HttpServletRequest httpServletRequest;
 	private com.google.appengine.api.users.UserService userService;
 
+	private airlift.servlet.rest.RestfulSecurityContext getRestfulSecurityContext() { return restfulSecurityContext; }
 	private javax.servlet.http.HttpServletRequest getHttpServletRequest() { return httpServletRequest; }
 	private com.google.appengine.api.users.UserService getUserService() { return userService; }
 
+	public void setRestfulSecurityContext(airlift.servlet.rest.RestfulSecurityContext _restfulSecurityContext) { restfulSecurityContext = _restfulSecurityContext; }
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest) { httpServletRequest = _httpServletRequest; }
 	private void setUserService(com.google.appengine.api.users.UserService _userService) { userService = _userService; }
 
@@ -47,7 +50,15 @@ public class GoogleUserService
 	//If the user is logged in, this method will return a User that contains information about them.
 	public AbstractUser	getCurrentUser()
 	{
-		return new GoogleUser(getUserService().getCurrentUser());
+		AbstractUser abstractUser = null;
+		com.google.appengine.api.users.User user = getUserService().getCurrentUser();
+		
+		if (user != null)
+		{
+			abstractUser = new GoogleUser(getUserService().getCurrentUser());
+		}
+		
+		return abstractUser;
 	}
 
 	//Returns true if the user making this request is an admin for this application, false otherwise.

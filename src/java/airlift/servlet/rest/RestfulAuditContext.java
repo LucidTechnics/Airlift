@@ -28,10 +28,7 @@ public class RestfulAuditContext
 	private PersistenceManager getPersistenceManager() { return persistenceManager; }
 	private void setPersistenceManager(PersistenceManager _persistenceManager) { persistenceManager = _persistenceManager; }
 	
-	public RestfulAuditContext()
-	{
-		setPersistenceManager(airlift.dao.PMF.get().getPersistenceManager());
-	}
+	public RestfulAuditContext() {}
 
 	public RestfulAuditContext(PersistenceManager _persistenceManager)
 	{

@@ -1,20 +1,20 @@
 dao.exists = function(_id)
 {
-	return (airlift.isDefined(this.get(_id)) === true);
+	return (airlift.isDefined(dao.get(_id)) === true);
 }
 
 dao.get = function(_id)
 {
-	var got, key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey(airlift.cc("$package$.airlift.domain.$className$Jdo").getSimpleName(), _id);
+	var  got, objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
 	for (var i = 0; i < 5; i++)
 	{
 		try
 		{
-			got = PERSISTENCE_MANAGER.getObjectById(airlift.cc("$package$.airlift.domain.$className$Jdo"), key);
+			got = objectify.get(Packages.$package$.airlift.domain.$className$Do, _id);
 			break;
 		}
-		catch(e if e.javaException instanceof javax.jdo.JDOObjectNotFoundException)
+		catch(e if e.javaException instanceof Packages.com.googlecode.objectify.NotFoundException)
 		{
 			LOG.warning("No resource of type: " + $className$ + " exists for the provided key: " + _id);
 			break;
@@ -38,6 +38,8 @@ $updateMethod$
 
 dao.del = function(_id)
 {
+	var objectify = com.googlecode.objectify.ObjectifyService.begin();
+
 	var object = dao.get(_id);
 	
 	//Need to retry automatically ...
@@ -45,7 +47,7 @@ dao.del = function(_id)
 	{
 		try
 		{
-			PERSISTENCE_MANAGER.deletePersistent(object);
+			objectify["delete"](object);
 			break;
 		}
 		catch(e)
@@ -63,5 +65,5 @@ dao.del = function(_id)
 
 dao["delete"] = function(_$lowerCaseClassName$)
 {
-	del(_$lowerCaseClassName$);
+	dao.del(_$lowerCaseClassName$);
 }

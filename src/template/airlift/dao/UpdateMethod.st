@@ -2,12 +2,24 @@ dao.update = function(_$lowerCaseClassName$)
 {
 	if (airlift.isDefined(_$lowerCaseClassName$.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _$lowerCaseClassName$ }; }
 
-	//Need to retry automatically ...
+	//indexing
+	var indexList = this.index(_$lowerCaseClassName$);
+
+	var index = new $className$IndexDo();
+
+	index.setId(id);
+	index.setIndex(indexList);
+	index.set$className$Do(_$lowerCaseClassName$);
+
+	_$lowerCaseClassName$.set$className$IndexDo(index);
+
+	var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+
 	for (var i = 0; i < 5; i++)
 	{
 		try
 		{
-			PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);
+			objectify.put(_$lowerCaseClassName$);
 			break;
 		}
 		catch(e)
@@ -21,4 +33,6 @@ dao.update = function(_$lowerCaseClassName$)
 			}
 		}
 	}
+
+	return id;
 }

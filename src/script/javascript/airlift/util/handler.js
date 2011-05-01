@@ -150,6 +150,11 @@ airlift.partition = function(_collection, _attribute)
 	return [orderedKeys, partitionMap];
 };
 
+airlift.list = function(_collection)
+{
+	return (_collection && new Packages.java.util.ArrayList(_collection)) || new Packages.java.util.ArrayList();
+}
+
 //l - create an enhanced java.util.ArrayList
 airlift.l = function(_list)
 {
@@ -225,6 +230,11 @@ airlift.l = function(_list)
 	return list;
 };
 
+airlift.set = function(_collection)
+{
+	return (_collection && new Packages.java.util.HashSet(_collection)) || new Packages.java.util.HashSet();
+}
+
 //s - create an enhanced java.util.HashSet
 airlift.s = function(_set)
 {
@@ -291,6 +301,11 @@ airlift.s = function(_set)
 
 	return set;
 };
+
+airlift.map = function(_map)
+{
+	return (_map && new Packages.java.util.HashMap()) || new Packages.java.util.HashMap();
+}
 
 //m - create an enhanced java.util.HashMap
 airlift.m = function(_map)
@@ -544,11 +559,6 @@ airlift.integer = function(_integer)
 {
 	return (airlift.isDefined(_integer) === true) ? new Packages.java.lang.Integer(_integer) : new Packages.java.lang.Integer();
 }
-
-airlift.ic = function(_className)
-{
-	importClass("Packages." + _className)
-};
 
 airlift.prepareUri = function(_id, _uri)
 {
@@ -1171,3 +1181,33 @@ airlift.trim = function(_string)
 	return Packages.org.apache.commons.lang.StringUtils.trim(_string);
 }
 
+airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
+{
+	var airliftUserList = SECURITY_CONTEXT.collectByExternalUserId(_abstractUser.externalUserId, 0, 10, "externalUserId", true);
+
+	var airliftUser = (airliftUserList.isEmpty() === true) ? new Packages.airlift.servlet.rest.AirliftUser() : airliftUserList.get(0);
+
+	LOG.info("Airlift user list is: " + airliftUserList);
+	LOG.info("Abstract user is: " + _abstractUser);
+	LOG.info("Airlift user is: " + airliftUser);
+
+	if (airliftUser) { LOG.info("Airlift user role set:" + airliftUser.roleSet); }
+	if (_abstractUser) { LOG.info("Abstract user role set:" + _abstractUser.roleSet); }
+	
+	_abstractUser.copyTo(airliftUser, {filter: "id,roleSet"});
+	airliftUser.roleSet = new Packages.java.util.HashSet(_abstractUser.roleSet);
+
+	if (_syncFunction)
+	{
+		_syncFunction(airliftUser, _abstractUser);
+	}
+
+	if (airliftUser.id)
+	{
+		SECURITY_CONTEXT.update(airliftUser);
+	}
+	else
+	{
+		SECURITY_CONTEXT.insert(airliftUser);
+	}
+}

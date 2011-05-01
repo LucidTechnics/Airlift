@@ -27,4 +27,6 @@ public interface UserService
 	public boolean isUserLoggedIn();
 
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
+
+	public void setRestfulSecurityContext(airlift.servlet.rest.RestfulSecurityContext _restfulSecurityContext);
 }

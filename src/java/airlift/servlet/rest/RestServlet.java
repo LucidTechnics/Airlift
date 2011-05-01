@@ -170,7 +170,7 @@ public class RestServlet
 				}
 			}
 		}
-		
+
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();
 		RestContext restContext = prepareRestContext(method, acceptValueList, _request, uriParameterMap, getServletName());
@@ -180,21 +180,24 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 
-		UserService userService = getUserService(_request);
+		RestfulSecurityContext securityContext = new RestfulSecurityContext();
+
+		UserService userService = getUserService(_request, securityContext);
 		AbstractUser user = userService.getCurrentUser();
 
-		RestfulSecurityContext securityContext = new RestfulSecurityContext();
 		securityContext.populate(user);
 		restContext.setUser(user);
-		
+
 		boolean success = allowed(user, restContext, securityContext);
-		
+
 		if (!success && user == null)
 		{
 			requestLogin(_request, _response, userService);
 		}
 		else if (!success && user != null)
 		{
+			//if user has an id then there is an AirliftUser in the
+			//database.
 			if (user.getId() != null)
 			{
 				securityContext.update(user);
@@ -208,20 +211,22 @@ public class RestServlet
 			securityContext.update(user);
 			logUserOut(_request, _response, userService);
 		}
-		else if (success)
+		else if (success)	
 		{
 			//User is not timed out and the user can access this page.
 			//Not being timed out means that your time out date time is null
 			//or your time out date time is greater than the current date
 			//time.
-			
+
 			try
 			{
-				if (user != null)
+				//if user id is null there is no AirliftUser for this
+				//user.
+				if (user != null && user.getId() != null)
 				{
+					//TODO ... time outs should be put in memcache most
+					//of the time ...
 					user.setTimeOutDate(calculateNextTimeOutDate());
-					user.setExternalUserId(user.getUserId());
-
 					securityContext.update(user);
 				}
 
@@ -749,7 +754,7 @@ public class RestServlet
 		return appProfile;
 	}
 
-	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest, RestfulSecurityContext _securityContext)
 	{
 		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
 
@@ -759,6 +764,7 @@ public class RestServlet
 		{
 			userService = (userServiceClassName != null) ? (UserService) Class.forName(userServiceClassName).newInstance() : new GoogleUserService();
 			userService.setHttpServletRequest(_httpServletRequest);
+			userService.setRestfulSecurityContext(_securityContext);
 		}
 		catch(Throwable t)
 		{

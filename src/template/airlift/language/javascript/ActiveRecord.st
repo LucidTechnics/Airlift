@@ -251,21 +251,23 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
 	}
 
-	activeRecord.convertToActiveRecordArray = function(_collection)
+	activeRecord.convertToActiveRecordArray = function(_collection, _convertToActiveRecord)
 	{
-		var collection = [];
 		var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
 		var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
 		var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
-		
-		for (var dataObject in Iterator(_collection))
+
+		if (_convertToActiveRecord)
 		{
-			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			activeRecord.decrypt(dataObject);
-			collection.push(activeRecord);
+			_collection.forEach(function(_dataObject)
+			{
+				var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
+				activeRecord.decrypt(_dataObject);
+				_collection[_index] = activeRecord;	
+			});
 		}
 
-		return collection;
+		return _collection;
 	}
 
 	activeRecord.convertIndexToActiveRecordArray = function(_map)

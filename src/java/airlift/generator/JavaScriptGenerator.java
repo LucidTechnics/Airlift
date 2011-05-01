@@ -104,23 +104,22 @@ public class JavaScriptGenerator
 				daoAttributeStringTemplate.setAttribute("attributeName", name);
 				daoAttributeStringTemplate.setAttribute("attributeType", type);
 				daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+				daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
 				
 				daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());
 
-				StringTemplate daoRangeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoRange");
+				if (type.endsWith("[]") == true ||
+					  type.startsWith("java.util.List") == true ||
+					  type.startsWith("java.util.Set") == true ||
+					  type.startsWith("java.util.ArrayList") == true ||
+					  type.startsWith("java.util.HashSet") == true)
 
-				daoRangeStringTemplate.setAttribute("findByRangeSql", databaseGenerator.generateFindByThisRangeSql(_domainObjectModel, fieldName));
-				daoRangeStringTemplate.setAttribute("rangeParameters", type + " lowerBound, " + type + " upperBound");
-				daoRangeStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
-				daoRangeStringTemplate.setAttribute("attribute", name);
-				daoStringTemplate.setAttribute("collectByRange", daoRangeStringTemplate.toString());
-
-				if (type.endsWith("[]") == true || type.startsWith("java.util.List") == true)
 				{
 					StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
 
 					daoMembershipStringTemplate.setAttribute("findByMembershipSql", databaseGenerator.generateFindByThisMembershipSql(_domainObjectModel, fieldName));
 					daoMembershipStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
+					daoMembershipStringTemplate.setAttribute("lowercaseAttribute", lowerTheFirstCharacter(name));
 					daoMembershipStringTemplate.setAttribute("attribute", name);
 					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
 				}
@@ -226,7 +225,6 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
 
 			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); };");
-			activeRecordStringTemplate.setAttribute("collectByRange", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Range = function(_begin, _end, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "Range(_begin, _end, _config||{})); };");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 

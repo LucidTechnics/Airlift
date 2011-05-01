@@ -50,7 +50,7 @@ airlift.httpError = function (_error)
 
 	var error = new Packages.hannibal.ErrorImpl(path, code, message);
 
-	return HTML_UTIL.toRdfa(APP_NAME, error) + errorMapRdfa;
+	return airlift.toRdfa(APP_NAME, error) + errorMapRdfa;
 };
 
 airlift.httpMessage = function (_message)
@@ -62,7 +62,7 @@ airlift.httpMessage = function (_message)
 
 	var message = new Packages.hannibal.MessageImpl(path, code, message);
 
-	return HTML_UTIL.toRdfa(APP_NAME, message) + messageMapRdfa;
+	return airlift.toRdfa(APP_NAME, message) + messageMapRdfa;
 };
 
 airlift.msg200 = function(_path)

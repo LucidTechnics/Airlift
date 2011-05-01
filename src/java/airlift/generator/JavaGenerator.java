@@ -36,12 +36,12 @@ public class JavaGenerator
 		String fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Impl";
 		writeJavaFile(fileName, generatedString, _element);
 
-		generatedString = generateJdoDomainObject(_domainObjectModel);
-		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Jdo";
+		generatedString = generateDoDomainObject(_domainObjectModel);
+		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Do";
 		writeJavaFile(fileName, generatedString, _element);
 
-		generatedString = generateJdoDomainIndexObject(_domainObjectModel);
-		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "IndexJdo";
+		generatedString = generateDoDomainIndexObject(_domainObjectModel);
+		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "IndexDo";
 		writeJavaFile(fileName, generatedString, _element);
 
 		generatedString = generateDomainSubInterface(_domainObjectModel);
@@ -384,33 +384,30 @@ public class JavaGenerator
 		return domainObjectStringTemplate.toString();
 	}
 
-	public String generateJdoDomainObject(DomainObjectModel _domainObjectModel)
+	public String generateDoDomainObject(DomainObjectModel _domainObjectModel)
 	{
 		StringTemplate attributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeDeclaration");
 		StringTemplate getterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeGetterDeclaration");
 		StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeSetterDeclaration");
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
-		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainObject");
+		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DoDomainObject");
 
 		//index property
 		attributeStringTemplate.setAttribute("annotation", "@Persistent(dependent=\"true\")");
 		
 		attributeStringTemplate.setAttribute("scope", "private");
-		attributeStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
-		attributeStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+		attributeStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "Do");
+		attributeStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
 
 		getterStringTemplate.setAttribute("scope", "public");
-		getterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
-		getterStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo"));
-		getterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+		getterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexDo");
+		getterStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexDo"));
+		getterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
 
 		setterStringTemplate.setAttribute("scope", "public");
-		setterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexJdo");
-		setterStringTemplate.setAttribute("setterName", getSetterName(_domainObjectModel.getClassName() + "IndexJdo"));
-		setterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
-
-		//stringBufferStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexJdo()"));
-		//stringBufferStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexJdo"));
+		setterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexDo");
+		setterStringTemplate.setAttribute("setterName", getSetterName(_domainObjectModel.getClassName() + "IndexDo"));
+		setterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
 
 		Iterator attributes = _domainObjectModel.getAttributes();
 
@@ -426,11 +423,7 @@ public class JavaGenerator
 
 			if ("id".equals(name) == true)
 			{
-				attributeStringTemplate.setAttribute("annotation", "@Persistent @Extension(vendorName=\"datanucleus\", key=\"gae.pk-name\", value=\"true\")");
-			}
-			else
-			{
-				attributeStringTemplate.setAttribute("annotation", "@Persistent");
+				attributeStringTemplate.setAttribute("annotation", "@Id");
 			}
 
 			attributeStringTemplate.setAttribute("scope", "private");
@@ -502,9 +495,9 @@ public class JavaGenerator
 		return domainObjectStringTemplate.toString();
 	}
 
-	public String generateJdoDomainIndexObject(DomainObjectModel _domainObjectModel)
+	public String generateDoDomainIndexObject(DomainObjectModel _domainObjectModel)
 	{
-		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/JdoDomainIndexObject");
+		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DoDomainIndexObject");
 
 		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		domainObjectStringTemplate.setAttribute("generatorComment", comment	);

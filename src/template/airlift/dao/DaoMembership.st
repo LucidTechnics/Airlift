@@ -9,43 +9,33 @@
 
 dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 {
-	var config = (airlift.isDefined(_config) === true) ? _config : {};
+	var config = (_config) ? _config : {};
 
-	var offset = (airlift.isDefined(_config.offset) === true) ? 0 : 0;
-	var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
-	var asc = (airlift.isDefined(_config.asc) === true) ? _config.asc : true;
-	var orderBy = (airlift.isDefined(_config.orderBy) === true && _config.orderBy.length > 0) ? "$attribute$," + _config.orderBy : "$attribute$";
+	var offset = config.offset||0;
+	var limit = config.limit||20;
+	var asc = config.asc||true;
+	var orderBy = config.orderBy||"$attribute$";
 
 	orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
 	
-	var sql = "$findByMembershipSql$";
+	var objectify = com.googlecode.objectify.ObjectifyService.begin();
 
-	var whereClause = airlift.appender("WHERE", " AND ");
-	var parameters = airlift.appender("", ", ");
+	var query = objectify.query(Packages.$package$.airlift.domain.$className$).
+				limit(limit).
+				offset(offset).
+				order(orderBy);
 
-	var index = 0;
-	for (var element in Iterator(_membershipList))
+	_membershipList.forEach(function(_member)
 	{
-		whereClause.append("$attribute$ = :" + (index + 1));
-		index++;
-		/*
-		 * For membership queries, _element must be a
-		 * java.lang.String, java.lang.Number.
-		 * Other complex objects including Date objects should have
-		 * already been serialized into a java.lang.String or
-		 * summarily decomposed into constituent parts that are also
-		 * strings.
-		 * We may revisit this in the future.
-		*/
-		
-		parameters.append("java.lang.String " + element);
+		query = query.filter("$attribute$ ==", _member);
+	});
+					
+	var results = [];
+
+	for (var $lowerCaseClassName$ in Iterator(query))
+	{
+		results.push($lowerCaseClassName$);
 	}
-	
-	sql += " " + whereClause.toString();
-	
-	var query = PERSISTENCE_MANAGER.newQuery(sql);
 
-	query.declareParameters(parameters.toString());
-
-	return query.execute(_membershipList.toArray());
+	return results;
 }

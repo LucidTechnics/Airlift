@@ -22,20 +22,11 @@ public class RestfulSecurityContext
    implements airlift.SecurityContext
 {
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
-
-	private PersistenceManager persistenceManager;
-
-	private PersistenceManager getPersistenceManager() { return persistenceManager; }
-	private void setPersistenceManager(PersistenceManager _persistenceManager) { persistenceManager = _persistenceManager; }
 	
-	public RestfulSecurityContext()
-	{
-		setPersistenceManager(airlift.dao.PMF.get().getPersistenceManager());
-	}
+	public RestfulSecurityContext() {}
 
 	public RestfulSecurityContext(PersistenceManager _persistenceManager)
 	{
-		setPersistenceManager(_persistenceManager);
 	}
 
 	public boolean allowed(AirliftUser _user, RestContext _restContext, airlift.AppProfile _appProfile)
@@ -202,11 +193,18 @@ public class RestfulSecurityContext
 		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
 		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser";
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
+		PersistenceManager persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
+			
+		javax.jdo.Query query = persistenceManager.newQuery(sql);
 		query.setOrdering(orderBy);
 		query.setRange(_offset, _limit);
 
-		return (java.util.List<AirliftUser>) query.execute();
+		java.util.List<AirliftUser> list = (java.util.List<AirliftUser>) query.execute();
+		list.size();
+
+		persistenceManager.close();
+
+		return list;
 	}
 
 	public String insert(AirliftUser _airliftUser)
@@ -226,7 +224,11 @@ public class RestfulSecurityContext
 		airliftUser.setAuditPostDate(new java.util.Date());
 		airliftUser.setAuditPutDate(airliftUser.getAuditPostDate());
 
-		getPersistenceManager().makePersistent(airliftUser);
+		PersistenceManager persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
+
+		persistenceManager.makePersistent(airliftUser);
+
+		persistenceManager.close();
 
 		return airliftUser.getId();
 	}

@@ -11,12 +11,7 @@ else if (typeof airlift != "object")
 	throw new Error("airlift already exists and it is not an object");
 }
 
-importClass(Packages.$package$.airlift.domain.$className$);
-importClass(Packages.$package$.airlift.domain.$className$Jdo);
-importClass(Packages.$package$.airlift.domain.$className$IndexJdo);
-
-importClass(Packages.javax.jdo.Query);
-importClass(Packages.javax.jdo.PersistenceManager);
+var $className$IndexDo = Packages.$package$.airlift.domain.$className$IndexDo;
 
 airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 {
@@ -24,24 +19,28 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	
 	dao.collect = function(_config)
 	{
-		var offset = (airlift.isDefined(_config && _config.offset) === true) ? _config.offset : 0;
-		var limit = (airlift.isDefined(_config && _config.limit) === true) ? _config.limit : 20;
-		var asc = (airlift.isDefined(_config && _config.asc) === true) ? _config.asc : true;
-		var orderBy = (airlift.isDefined(_config && _config.orderBy) === true) ? _config.orderBy : undefined;
+		var offset = (_config && _config.offset) ? _config.offset : 0;
+		var limit = (_config && _config.limit) ? _config.limit : 20;
+		var asc = (_config && _config.asc) ? _config.asc : true;
+		var orderBy = (_config && _config.orderBy) ? _config.orderBy : "auditPutDate";
+
+		if (asc === false) { orderBy = "-" + orderBy; }
+
+		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+
+		var query = objectify.query(Packages.$package$.airlift.domain.$className$).
+					limit(limit).
+					offset(offset).
+					order(orderBy);
+
+		var results = [];
 		
-		var sql = "$selectAllSql$";
-
-		var query = PERSISTENCE_MANAGER.newQuery(sql);
-
-		if (orderBy)
+		for (var $lowerCaseClassName$ in Iterator(query))
 		{
-			orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
-			query.setOrdering(orderBy);
+			results.push($lowerCaseClassName$);
 		}
-		
-		query.setRange(offset, limit);
 
-		return query.execute();
+		return results;
 	}
 
 	dao.provideUniqueId = function()
@@ -53,7 +52,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			var id = Packages.airlift.util.IdGenerator.generate(12);
 			//Make sure this randomly generated id has not already been
 			//assigned to a resource in this table. 
-			testObject = dao.get(id);
+			testObject = this.get(id);
 			tries++;
 		}
 		while (testObject && (tries < 100))
@@ -72,26 +71,28 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	
 	dao.insert = function(_$lowerCaseClassName$)
 	{
-		var id = this.provideUniqueId()
+		var id = this.provideUniqueId();
 
 		_$lowerCaseClassName$.setId(id);
 
+		//indexing
 		var indexList = this.index(_$lowerCaseClassName$);
 
-		var index = new $className$IndexJdo();
-		var indexId = Packages.airlift.util.IdGenerator.generate(12);
+		var index = new $className$IndexDo();
 
-		index.setId(indexId);
+		index.setId(id);
 		index.setIndex(indexList);
-		index.set$className$Jdo(_$lowerCaseClassName$);
+		index.set$className$Do(_$lowerCaseClassName$);
 
-		_$lowerCaseClassName$.set$className$IndexJdo(index);
-		
+		_$lowerCaseClassName$.set$className$IndexDo(index);
+
+		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+
 		for (var i = 0; i < 5; i++)
 		{
 			try
 			{
-				PERSISTENCE_MANAGER.makePersistent(_$lowerCaseClassName$);				
+				objectify.put(_$lowerCaseClassName$);				
 				break;
 			}
 			catch(e)
@@ -121,45 +122,30 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	dao.search = function(_tokenList, _config)
 	{
 		var config = (airlift.isDefined(_config) === true) ? _config : {};
-
 		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
 		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
 
-		var sql = new Packages.java.lang.StringBuffer("$findKeysSql$ WHERE ");
+		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+
+		var query = objectify.query(Packages.$package$.airlift.domain.$className$IndexDo).
+					limit(limit).
+					offset(offset);
 		
 		for (var token in Iterator(_tokenList))
 		{
-			sql.append("index == \"" + token + "\" || ");
+			query = query.filter("index ==", token);
 		}
 
-		sql = sql.toString().replaceAll(" \\\|\\\| \$", "");
+		var parents = query.fetchParents();
 
-		LOG.info("SQL is: " + sql);
-
-		var query = PERSISTENCE_MANAGER.newQuery(sql);
-
-		query.setRange(offset, limit);
-
-		var indexKeyList = query.execute();
-		var keyList = new Packages.java.util.ArrayList();
+		var results = [];
 		
-		for (var indexKey in Iterator(indexKeyList))
+		for (var parent in Iterator(parents.valueSet()))
 		{
-			var key = Packages.com.google.appengine.api.datastore.KeyFactory.stringToKey(indexKey);
-			if (airlift.isDefined(key.getParent() === true))
-			{
-				keyList.add(key.getParent());
-			}
-		}
-
-		var objectMap = new Packages.java.util.HashMap();
-		
-		if (keyList.isEmpty() === false)
-		{
-			objectMap = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory.getDatastoreService().get(keyList);
+			results.push(parent);
 		}
 		
-		return objectMap;
+		return results;
 	}
 
 	$insertChangeEvent$
