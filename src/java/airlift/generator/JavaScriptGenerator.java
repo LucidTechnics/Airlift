@@ -104,6 +104,8 @@ public class JavaScriptGenerator
 				daoAttributeStringTemplate.setAttribute("attributeName", name);
 				daoAttributeStringTemplate.setAttribute("attributeType", type);
 				daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+				daoAttributeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+				daoAttributeStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
 				daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
 				
 				daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());
@@ -121,6 +123,8 @@ public class JavaScriptGenerator
 					daoMembershipStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
 					daoMembershipStringTemplate.setAttribute("lowercaseAttribute", lowerTheFirstCharacter(name));
 					daoMembershipStringTemplate.setAttribute("attribute", name);
+					daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+					daoMembershipStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
 					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
 				}
 

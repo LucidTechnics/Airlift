@@ -11,12 +11,12 @@ dao.get = function(_id)
 	{
 		try
 		{
-			got = objectify.get(Packages.$package$.airlift.domain.$className$Do, _id);
+			got = objectify.get(airlift.cc("$package$.airlift.domain.$className$Do"), _id);
 			break;
 		}
 		catch(e if e.javaException instanceof Packages.com.googlecode.objectify.NotFoundException)
 		{
-			LOG.warning("No resource of type: " + $className$ + " exists for the provided key: " + _id);
+			LOG.warning("No resource of type: $className$ exists for the provided key: " + _id);
 			break;
 		}
 		catch(e)

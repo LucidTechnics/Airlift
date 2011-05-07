@@ -24,6 +24,9 @@ public class AppProfile
 			
 	static
 	{
+		//register domain classes with Objectify ...
+		$registerDao; separator="\n"$
+
 		$addToDomainAttributeList; separator="\n"$
 				
 		//Domains

@@ -14,26 +14,22 @@
 
 package airlift.servlet.rest; 
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.IdentityType;
-
-@PersistenceCapable(identityType = IdentityType.APPLICATION, detachable="true")
+@javax.persistence.Entity(name="AirliftUser")
+@com.googlecode.objectify.annotation.Indexed
 public class AirliftUser
 {
 	public AirliftUser() {}
 
-	@Persistent @PrimaryKey private String id;
-	@Persistent private String fullName;
-	@Persistent private String shortName;
-	@Persistent private String externalUserId; //usually google but could be another identifier
-	@Persistent private String email;
-	@Persistent private java.util.Set<String> roleSet = new java.util.HashSet<String>();
-	@Persistent private boolean active;
-	@Persistent private java.util.Date auditPostDate;
-	@Persistent private java.util.Date auditPutDate;
-	@Persistent private java.util.Date timeOutDate;
+	@javax.persistence.Id private String id;
+	private String fullName;
+	private String shortName;
+	private String externalUserId; //usually google but could be another identifier
+	private String email;
+	private java.util.Set<String> roleSet = new java.util.HashSet<String>();
+	private boolean active;
+	private java.util.Date auditPostDate;
+	private java.util.Date auditPutDate;
+	private java.util.Date timeOutDate;
 	
 	public String getId() { return id; }
 	public String getFullName() { return fullName; }

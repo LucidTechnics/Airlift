@@ -14,26 +14,23 @@
 
 package airlift.servlet.rest; 
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
-
-@PersistenceCapable
+@javax.persistence.Entity(name="AuditTrail")
+@com.googlecode.objectify.annotation.Indexed
 public class AuditTrail
 {
 	public AuditTrail() {}
 
-	@Persistent @PrimaryKey private String id;
-	@Persistent private String domainId;
-	@Persistent private String action;
-	@Persistent private String method;
-	@Persistent private String domain;
-	@Persistent private String uri;
-	@Persistent private String handlerName;
-	@Persistent private com.google.appengine.api.datastore.Text data;
-	@Persistent private String email;
-	@Persistent private java.util.Date actionDate;
-	@Persistent private java.util.Date recordDate;
+	@javax.persistence.Id private String id;
+	private String domainId;
+	private String action;
+	private String method;
+	private String domain;
+	private String uri;
+	private String handlerName;
+	private com.google.appengine.api.datastore.Text data;
+	private String email;
+	private java.util.Date actionDate;
+	private java.util.Date recordDate;
 	
 	public String getId() { return id; }
 	public String getDomainId() { return domainId; }

@@ -48,7 +48,7 @@ public class JavaGenerator
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName();
 		writeJavaFile(fileName, generatedString, _element);
 	}
-
+	
 	public String generateApplicationProfile(Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
 	{
 		StringTemplate template = getStringTemplateGroup().getInstanceOf("airlift/language/java/AppProfile");
@@ -65,7 +65,11 @@ public class JavaGenerator
 					template.setAttribute("appName", domainObjectModel.getAppName());
 
 					isHighLevelAttributesSet = true;
+
 				}
+
+				template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "Do.class);");
+				template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "IndexDo.class);");
 
 				String domainAttributeListName = lowerTheFirstCharacter(domainObjectModel.getClassName()) + "AttributeList";
 				
@@ -391,24 +395,7 @@ public class JavaGenerator
 		StringTemplate setterStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeSetterDeclaration");
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/AttributeStringBufferAppends");
 		StringTemplate domainObjectStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DoDomainObject");
-
-		//index property
-		attributeStringTemplate.setAttribute("annotation", "@Persistent(dependent=\"true\")");
 		
-		attributeStringTemplate.setAttribute("scope", "private");
-		attributeStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "Do");
-		attributeStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
-
-		getterStringTemplate.setAttribute("scope", "public");
-		getterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexDo");
-		getterStringTemplate.setAttribute("getterName", getGetterName(_domainObjectModel.getClassName() + "IndexDo"));
-		getterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
-
-		setterStringTemplate.setAttribute("scope", "public");
-		setterStringTemplate.setAttribute("type", _domainObjectModel.getClassName() + "IndexDo");
-		setterStringTemplate.setAttribute("setterName", getSetterName(_domainObjectModel.getClassName() + "IndexDo"));
-		setterStringTemplate.setAttribute("name", lowerTheFirstCharacter(_domainObjectModel.getClassName() + "IndexDo"));
-
 		Iterator attributes = _domainObjectModel.getAttributes();
 
 		while (attributes.hasNext() == true)
@@ -423,9 +410,13 @@ public class JavaGenerator
 
 			if ("id".equals(name) == true)
 			{
-				attributeStringTemplate.setAttribute("annotation", "@Id");
+				attributeStringTemplate.setAttribute("annotation", "@javax.persistence.Id");
 			}
-
+			else
+			{
+				attributeStringTemplate.setAttribute("annotation", "");
+			}
+			
 			attributeStringTemplate.setAttribute("scope", "private");
 			attributeStringTemplate.setAttribute("type", type);
 			attributeStringTemplate.setAttribute("name", name);
@@ -463,19 +454,15 @@ public class JavaGenerator
 				String encryptedSetterName = getSetterName(encryptedName);
 
 				attributeStringTemplate.setAttribute("scope", "private");
-				//attributeStringTemplate.setAttribute("type", "byte[]");
-				attributeStringTemplate.setAttribute("annotation", "@Persistent");
 				attributeStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
 				attributeStringTemplate.setAttribute("name", encryptedName);
 
 				getterStringTemplate.setAttribute("scope", scope);
-				//getterStringTemplate.setAttribute("type", "byte[]");
 				getterStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
 				getterStringTemplate.setAttribute("getterName", encryptedGetterName);
 				getterStringTemplate.setAttribute("name", encryptedName);
 
 				setterStringTemplate.setAttribute("scope", scope);
-				//setterStringTemplate.setAttribute("type", "byte[]");
 				setterStringTemplate.setAttribute("type", "com.google.appengine.api.datastore.Blob");
 				setterStringTemplate.setAttribute("setterName", encryptedSetterName);
 				setterStringTemplate.setAttribute("name", encryptedName);
@@ -606,6 +593,7 @@ public class JavaGenerator
 
 	    return daoStringTemplate.toString();
 	}
+
 
 	protected class PropertyOrder
 		implements Comparable<PropertyOrder>

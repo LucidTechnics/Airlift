@@ -20,7 +20,7 @@ dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 	
 	var objectify = com.googlecode.objectify.ObjectifyService.begin();
 
-	var query = objectify.query(Packages.$package$.airlift.domain.$className$).
+	var query = objectify.query(airlift.cc("$buildPackage$.airlift.domain.$className$Do")).
 				limit(limit).
 				offset(offset).
 				order(orderBy);
@@ -29,12 +29,12 @@ dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 	{
 		query = query.filter("$attribute$ ==", _member);
 	});
-					
+
 	var results = [];
 
-	for (var $lowerCaseClassName$ in Iterator(query))
+	for (var result in Iterator(query))
 	{
-		results.push($lowerCaseClassName$);
+		results.push(result);
 	}
 
 	return results;

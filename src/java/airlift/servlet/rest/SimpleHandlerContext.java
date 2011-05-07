@@ -17,7 +17,6 @@ package airlift.servlet.rest;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,18 +33,12 @@ public class SimpleHandlerContext
 {
 	private Logger log = Logger.getLogger(SimpleHandlerContext.class.getName());
 	private boolean productionMode = true;
-
-	private PersistenceManager persistenceManager;
-
-	private PersistenceManager getPersistenceManager() { return persistenceManager; }
-	private void setPersistenceManager(PersistenceManager _persistenceManager) { persistenceManager = _persistenceManager; }
 	
 	public SimpleHandlerContext() {}
 
-	public SimpleHandlerContext(boolean _productionMode, PersistenceManager _persistenceManager)
+	public SimpleHandlerContext(boolean _productionMode)
 	{
 		productionMode = _productionMode;
-		setPersistenceManager(_persistenceManager);
 	}
     
 	public ContentContext execute(
@@ -126,9 +119,8 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("OUT", System.out);
 			scriptingUtil.bind("LOG", log);
 			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
-			scriptingUtil.bind("PERSISTENCE_MANAGER", getPersistenceManager());
-			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext(getPersistenceManager()));
-			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext(getPersistenceManager()));
+			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext());
+			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext());
 			scriptingUtil.bind("BASE", base);
 			scriptingUtil.bind("PATH", path);
 			scriptingUtil.bind("URI", base + path);

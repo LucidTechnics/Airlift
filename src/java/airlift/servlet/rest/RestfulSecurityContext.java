@@ -16,18 +16,17 @@ package airlift.servlet.rest;
 
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-
 public class RestfulSecurityContext
    implements airlift.SecurityContext
 {
+	static
+	{
+		com.googlecode.objectify.ObjectifyService.register(AirliftUser.class);	
+	}
+
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 	
 	public RestfulSecurityContext() {}
-
-	public RestfulSecurityContext(PersistenceManager _persistenceManager)
-	{
-	}
 
 	public boolean allowed(AirliftUser _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
@@ -190,47 +189,26 @@ public class RestfulSecurityContext
 
 	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{ 
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser";
+		String orderBy = _orderBy;
 
-		PersistenceManager persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
-			
-		javax.jdo.Query query = persistenceManager.newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
+		if (_asc == false) { orderBy = "-" + _orderBy; }
 
-		java.util.List<AirliftUser> list = (java.util.List<AirliftUser>) query.execute();
-		list.size();
-
-		persistenceManager.close();
-
-		return list;
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
+											   limit(_limit).
+											   offset(_offset).
+											   order(orderBy);
+		return query.list();
 	}
 
 	public String insert(AirliftUser _airliftUser)
 	{
-		AirliftUser airliftUser = new AirliftUser();
+		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
+		_airliftUser.setAuditPostDate(new java.util.Date());
+		_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
 
-		try
-		{
-			org.apache.commons.beanutils.PropertyUtils.copyProperties(airliftUser, _airliftUser);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-
-		airliftUser.setId(airlift.util.IdGenerator.generate(12));
-		airliftUser.setAuditPostDate(new java.util.Date());
-		airliftUser.setAuditPutDate(airliftUser.getAuditPostDate());
-
-		PersistenceManager persistenceManager = airlift.dao.PMF.get().getPersistenceManager();
-
-		persistenceManager.makePersistent(airliftUser);
-
-		persistenceManager.close();
-
-		return airliftUser.getId();
+		com.googlecode.objectify.ObjectifyService.begin().put(_airliftUser);
+		
+		return _airliftUser.getId();
 	}
 
 	public boolean exists(String _id)
@@ -240,7 +218,7 @@ public class RestfulSecurityContext
 
 	public AirliftUser get(String _id)
 	{
-		return getPersistenceManager().getObjectById(AirliftUser.class, _id);
+		return com.googlecode.objectify.ObjectifyService.begin().get(AirliftUser.class, _id);
 	}
 
 	public void update(AirliftUser _airliftUser)
@@ -252,84 +230,86 @@ public class RestfulSecurityContext
 
 		_airliftUser.setAuditPutDate(new java.util.Date());
 
-		AirliftUser airliftUser = new AirliftUser();
-
-		try
-		{
-			org.apache.commons.beanutils.PropertyUtils.copyProperties(airliftUser, _airliftUser);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-		
-		getPersistenceManager().makePersistent(airliftUser);
+		com.googlecode.objectify.ObjectifyService.begin().put(_airliftUser);
 	}
 
 	public void delete(AirliftUser _airliftUser)
 	{
-		getPersistenceManager().deletePersistent(_airliftUser);
+		com.googlecode.objectify.ObjectifyService.begin().delete(_airliftUser);
 	}
 
 	public java.util.List<AirliftUser> collectByExternalUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE externalUserId == :attribute";
+		String orderBy = _orderBy;
+		
+		if (_asc == false) { orderBy = "-" + _orderBy; }
+		
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
+					limit(_limit).
+					offset(_offset).
+					order(orderBy).
+					filter("externalUserId ==", _value);
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
-
-		return (java.util.List<AirliftUser>) query.execute(_value);
+		return query.list();
 	}
 
 	public java.util.List<AirliftUser> collectByEmail(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE email == :attribute";
+		String orderBy = _orderBy;
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
+		if (_asc == false) { orderBy = "-" + _orderBy; }
 
-		return (java.util.List<AirliftUser>) query.execute(_value);
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
+					limit(_limit).
+					offset(_offset).
+					order(orderBy).
+					filter("email ==", _value);
+
+		return query.list();
 	}
 
 	public java.util.List<AirliftUser> collectByActive(boolean _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE active == :attribute";
+		String orderBy = _orderBy;
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
+		if (_asc == false) { orderBy = "-" + _orderBy; }
 
-		return (java.util.List<AirliftUser>) query.execute(_value);
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).					limit(_limit).
+					offset(_offset).
+					order(orderBy).
+					filter("active ==", _value);
+
+		return query.list();
 	}
 
 	public java.util.List<AirliftUser> collectByAuditPostDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE auditPostDate >= lowerBound && auditPostDate <= upperBound";
+		String orderBy = _orderBy;
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
-		query.declareParameters("java.util.Date lowerBound, java.util.Date upperBound");
+		if (_asc == false) { orderBy = "-" + _orderBy; }
 
-		return (java.util.List<AirliftUser>) query.execute(_begin, _end);
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).					limit(_limit).
+					offset(_offset).
+					order(orderBy).
+					filter("auditPostDateRange >=", _begin).
+					filter("auditPostDateRange <", _end);
+
+		return query.list();
 	}
 
 	public java.util.List<AirliftUser> collectByAuditPutDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = (_asc == true) ? _orderBy + " asc" : _orderBy + " desc";
-		String sql = "SELECT FROM airlift.servlet.rest.AirliftUser WHERE auditPutDate >= lowerBound && auditPutDate <= upperBound";
+		String orderBy = _orderBy;
 
-		javax.jdo.Query query = getPersistenceManager().newQuery(sql);
-		query.setOrdering(orderBy);
-		query.setRange(_offset, _limit);
-		query.declareParameters("java.util.Date lowerBound, java.util.Date upperBound");
+		if (_asc == false) { orderBy = "-" + _orderBy; }
 
-		return (java.util.List<AirliftUser>) query.execute(_begin, _end);
+		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
+					limit(_limit).
+					offset(_offset).
+					order(orderBy).
+					filter("auditPutDateRange >=", _begin).
+					filter("auditPutDateRange <", _end);
+
+		return query.list();
 	}
 }

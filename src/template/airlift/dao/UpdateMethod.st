@@ -4,35 +4,18 @@ dao.update = function(_$lowerCaseClassName$)
 
 	//indexing
 	var indexList = this.index(_$lowerCaseClassName$);
-
 	var index = new $className$IndexDo();
-
-	index.setId(id);
+	index.setId(_$lowerCaseClassName$.getId());
 	index.setIndex(indexList);
-	index.set$className$Do(_$lowerCaseClassName$);
 
-	_$lowerCaseClassName$.set$className$IndexDo(index);
+	var Key = Packages.com.googlecode.objectify.Key;		
+	var parentKey = new Key(airlift.cc("$package$.airlift.domain.$className$Do"), id);  
+	index.set$className$DoKey(new Key(parentKey, airlift.cc("$package$.airlift.domain.$className$IndexDo"), id));
 
 	var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-	for (var i = 0; i < 5; i++)
-	{
-		try
-		{
-			objectify.put(_$lowerCaseClassName$);
-			break;
-		}
-		catch(e)
-		{
-			LOG.warning("Encountered this error while accessing the datastore for update: " + e.toString());
-
-			if (i >= 5)
-			{
-				LOG.severe("After fifth try at update: " + e.toString());
-				throw e;
-			}
-		}
-	}
+	dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for insert");
+	dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for insert");
 
 	return id;
 }

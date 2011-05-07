@@ -130,11 +130,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 		
-		var jdo = this.dao.get(_id);
+		var dataObject = this.dao.get(_id);
 
-		if (jdo)
+		if (dataObject)
 		{
-			this.decrypt(jdo);
+			this.decrypt(dataObject);
 		}
 
 		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.rdfa(), "GET"); }
@@ -167,9 +167,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	}
 
-	activeRecord.decrypt = function(_jdo)
+	activeRecord.decrypt = function(_dataObject)
 	{
-		this.copyFrom(_jdo);
+		this.copyFrom(_dataObject);
 		
 		$encryptionSetup$
 
@@ -251,19 +251,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
 	}
 
-	activeRecord.convertToActiveRecordArray = function(_collection, _convertToActiveRecord)
+	activeRecord.convertToActiveRecordArray = function(_collection, _doNotConvertToActiveRecord)
 	{
-		var password = SERVLET.getServletConfig().getInitParameter("a.cipher.password");
-		var initialVector = SERVLET.getServletConfig().getInitParameter("a.cipher.initial.vector");
-		var revolutions = SERVLET.getServletConfig().getInitParameter("a.cipher.revolutions")||20;
-
-		if (_convertToActiveRecord)
+		if (airlift.isDefined(_doNotConvertToActiveRecord) === false)
 		{
-			_collection.forEach(function(_dataObject)
+			_collection.forEach(function(_dataObject, _index)
 			{
 				var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
 				activeRecord.decrypt(_dataObject);
-				_collection[_index] = activeRecord;	
+				_collection[_index] = activeRecord;
 			});
 		}
 
@@ -435,7 +431,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-				//this is a JDO object
+				//this is a DO object
 				if (_$allLowerCaseClassName$[getter])
 				{
 					that[setter](_$allLowerCaseClassName$[getter]());
@@ -466,7 +462,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			{
 				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
 
-				//this is a Datastore entity and not a JDO object.
+				//this is a Datastore entity and not a DO object.
 				that[setter](_$allLowerCaseClassName$.getProperty(_property));
 
 				if ("java.util.Date".equals(that.getAttributeType(_property)) === true)
@@ -518,7 +514,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.createDO = function()
 	{
-		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Jdo();
+		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Do();
 		this.copyTo($allLowerCaseClassName$);
 
 		return $allLowerCaseClassName$;

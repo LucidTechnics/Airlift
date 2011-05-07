@@ -16,6 +16,28 @@ var $className$IndexDo = Packages.$package$.airlift.domain.$className$IndexDo;
 airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 {
 	var dao = {};
+
+	dao.multiTry = function(_function, _tryCount, _message)
+	{
+		for (var i = 0; i < _tryCount; i++)
+		{
+			try
+			{
+				_function();
+				break;
+			}
+			catch(e)
+			{
+				LOG.warning(_message + " " + e.toString());
+
+				if (i >= _tryCount)
+				{
+					LOG.severe("After this many tries: " + _tryCount + " - " +  e.toString());
+					throw e;
+				}
+			}
+		}
+	}
 	
 	dao.collect = function(_config)
 	{
@@ -28,18 +50,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-		var query = objectify.query(Packages.$package$.airlift.domain.$className$).
+		var query = objectify.query(airlift.cc("$package$.airlift.domain.$className$Do")).
 					limit(limit).
 					offset(offset).
 					order(orderBy);
 
 		var results = [];
-		
-		for (var $lowerCaseClassName$ in Iterator(query))
-		{
-			results.push($lowerCaseClassName$);
-		}
 
+		for (var result in Iterator(query))
+		{
+			results.push(result);
+		}
+		
 		return results;
 	}
 
@@ -82,30 +104,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		index.setId(id);
 		index.setIndex(indexList);
-		index.set$className$Do(_$lowerCaseClassName$);
 
-		_$lowerCaseClassName$.set$className$IndexDo(index);
+		var Key = Packages.com.googlecode.objectify.Key;		
+		var parentKey = new Key(airlift.cc("$package$.airlift.domain.$className$Do"), id);  
+		index.set$className$DoKey(new Key(parentKey, airlift.cc("$package$.airlift.domain.$className$IndexDo"), id));
 
 		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-		for (var i = 0; i < 5; i++)
-		{
-			try
-			{
-				objectify.put(_$lowerCaseClassName$);				
-				break;
-			}
-			catch(e)
-			{
-				LOG.warning("Encountered this error while accessing the datastore for insert: " + e.toString());
-
-				if (i >= 5)
-				{
-					LOG.severe("After fifth try at insert: " + e.toString());
-					throw e;
-				}
-			}
-		}
+		dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for insert");
+		dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for insert");
 
 		return id;
 	}
@@ -127,7 +134,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-		var query = objectify.query(Packages.$package$.airlift.domain.$className$IndexDo).
+		var query = objectify.query(airlift.cc("$package$.airlift.domain.$className$IndexDo")).
 					limit(limit).
 					offset(offset);
 		
@@ -136,16 +143,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			query = query.filter("index ==", token);
 		}
 
-		var parents = query.fetchParents();
-
-		var results = [];
-		
-		for (var parent in Iterator(parents.valueSet()))
-		{
-			results.push(parent);
-		}
-		
-		return results;
+		return query.fetchParents();
 	}
 
 	$insertChangeEvent$

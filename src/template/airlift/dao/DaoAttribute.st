@@ -9,7 +9,7 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 
 	var objectify = com.googlecode.objectify.ObjectifyService.begin();
 
-	var query = objectify.query(Packages.$package$.airlift.domain.$className$).
+	var query = objectify.query(airlift.cc("$buildPackage$.airlift.domain.$className$Do")).
 				limit(limit).
 				offset(offset).
 				order(orderBy).
@@ -17,9 +17,9 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 
 	var results = [];
 
-	for (var $lowerCaseClassName$ in Iterator(query))
+	for (var result in Iterator(query))
 	{
-		results.push($lowerCaseClassName$);
+		results.push(result);
 	}
 
 	return results;
