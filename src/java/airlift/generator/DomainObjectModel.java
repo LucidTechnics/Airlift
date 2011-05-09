@@ -30,6 +30,7 @@ public class DomainObjectModel
 	private String className;
 	private String appName;
 	private boolean isAbstract;
+	private boolean isReference;
 	private Set<Annotation> domainAnnotationSet;
 	private Map<Attribute, Set<Annotation>> attributeAnnotationSetMap;
 	private Map<String, Attribute> attributeNameMap;
@@ -48,6 +49,7 @@ public class DomainObjectModel
 	public String getClassName() { return upperTheFirstCharacter(className); }
 	public String getAppName() { return appName; }
 	public boolean getIsAbstract() { return isAbstract; }
+	public boolean getIsReference() { return isReference; }
 	public Set<Annotation> getDomainAnnotationSet() { return domainAnnotationSet; }
 	public Map<Attribute, Set<Annotation>> getAttributeAnnotationSetMap() { return attributeAnnotationSetMap; }
 	public Map<String, Attribute> getAttributeNameMap() { return attributeNameMap;  }
@@ -64,6 +66,7 @@ public class DomainObjectModel
 	public void setClassName(String _className) { className = upperTheFirstCharacter(_className); }
 	public void setAppName(String _appName) { appName = _appName; }
 	public void setIsAbstract(boolean _isAbstract) { isAbstract = _isAbstract; }
+	public void setIsReference(boolean _isReference) { isReference = _isReference; }
 	public void setDomainAnnotationSet(Set<Annotation> _domainAnnotationSet) { domainAnnotationSet = _domainAnnotationSet; }
 	public void setAttributeAnnotationSetMap(Map<Attribute, Set<Annotation>> _attributeAnnotationSetMap) { attributeAnnotationSetMap = _attributeAnnotationSetMap; }
 	public void setAttributeNameMap(Map<String, Attribute> _attributeNameMap) { attributeNameMap = _attributeNameMap; }
@@ -281,5 +284,10 @@ public class DomainObjectModel
 	public boolean isAbstractDomain()
 	{
 		return isAbstract;
+	}
+
+	public boolean isReferenceDomain()
+	{
+		return isReference;
 	}
 }	

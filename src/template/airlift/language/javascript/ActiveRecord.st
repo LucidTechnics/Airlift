@@ -48,14 +48,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.rdfa = function(_config)
 	{
+		LOG.info("Starting RDFA");
 		var config = (airlift.isDefined(_config) === true) ? _config :  {};
 		config.activeRecord = this;
-
-		return airlift.toRdfa(config);
+		
+		var rdfa = airlift.toRdfa(config);
+		LOG.info("Ending RDFA");
+		
+		return rdfa;
 	};
 
 	activeRecord.json = function(_config)
 	{
+		LOG.info("Starting JSON");
 		if (_config && _config.collection)
 		{
 			var list = new Packages.java.util.ArrayList();
@@ -68,6 +73,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			json = Packages.airlift.util.AirliftUtil.toJson(this.restify(this.createDO()));
 		}
+		LOG.info("Ending JSON");
 		
 		return json;
 	};
@@ -137,7 +143,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			this.decrypt(dataObject);
 		}
 
-		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.rdfa(), "GET"); }
+		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), "GET"); }
 
 		return this;
 	};
@@ -196,7 +202,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var dataObject = this.putAudit().encrypt();
 		this.dao.update(dataObject);
 		
-		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.rdfa(), "UPDATE"); }
+		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.json(), "UPDATE"); }
 
 		return this;
 	};
@@ -207,7 +213,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var dataObject = this.postAudit().encrypt();		
 		this.setId(this.dao.insert(dataObject));
-		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.rdfa(), "INSERT", this.id); }
+		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), "INSERT", this.id); }
 
 		return this;
 	};
@@ -217,7 +223,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "DELETE"); }
 
 		this.dao.del(this.id);
-		if ("on".equalsIgnoreCase(AUDITING_DELETE) === true)  { airlift.audit(this.rdfa(), "DELETE"); }
+		if ("on".equalsIgnoreCase(AUDITING_DELETE) === true)  { airlift.audit(this.json(), "DELETE"); }
 		
 		return this;
 	};

@@ -401,7 +401,10 @@ public class JavaGenerator
 		while (attributes.hasNext() == true)
 		{
 			Attribute attribute = (Attribute) attributes.next();
-					
+
+			Annotation persist = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
+			String isSearchable = findValue(persist, "isSearchable()");
+
 			String name = attribute.getName();
 			String type = attribute.getType();
 			String scope = "public";
@@ -411,6 +414,10 @@ public class JavaGenerator
 			if ("id".equals(name) == true)
 			{
 				attributeStringTemplate.setAttribute("annotation", "@javax.persistence.Id");
+			}
+			else if ("true".equalsIgnoreCase(isSearchable) == true)
+			{
+				attributeStringTemplate.setAttribute("annotation", "@com.googlecode.objectify.annotation.Indexed");
 			}
 			else
 			{
@@ -444,7 +451,6 @@ public class JavaGenerator
 
 			stringBufferStringTemplate.setAttribute("name", name);
 
-			Annotation persist = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 			String encrypted = findValue(persist, "encrypted()");
 
 			if ("true".equalsIgnoreCase(encrypted) == true)
@@ -469,6 +475,17 @@ public class JavaGenerator
 			}
 		}
 
+		Annotation cacheable = new airlift.generator.Annotation();
+		cacheable.setName("airlift.generator.Cacheable");
+
+		//TODO ... We should really inspect the annotation and get the
+		//live value instead of just hard coding it to 600 seconds.
+		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
+		{
+			
+			domainObjectStringTemplate.setAttribute("cacheable", "@com.googlecode.objectify.annotation.Cached(expirationSeconds=600)");
+		}
+		
 		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);

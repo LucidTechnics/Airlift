@@ -15,7 +15,7 @@
 package airlift.servlet.rest; 
 
 @javax.persistence.Entity(name="AirliftUser")
-@com.googlecode.objectify.annotation.Indexed
+@com.googlecode.objectify.annotation.Unindexed
 public class AirliftUser
 {
 	public AirliftUser() {}
@@ -23,8 +23,8 @@ public class AirliftUser
 	@javax.persistence.Id private String id;
 	private String fullName;
 	private String shortName;
-	private String externalUserId; //usually google but could be another identifier
-	private String email;
+	@com.googlecode.objectify.annotation.Indexed private String externalUserId; //usually Google Id but could be another identifier
+	@com.googlecode.objectify.annotation.Indexed private String email;
 	private java.util.Set<String> roleSet = new java.util.HashSet<String>();
 	private boolean active;
 	private java.util.Date auditPostDate;

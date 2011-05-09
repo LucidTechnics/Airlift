@@ -28,6 +28,7 @@ public @interface Persistable
 	public int maxLength() default 200;
 	public int precision() default 10;
 	public int scale() default 2;
+	public boolean isSearchable() default false;
 	public boolean isPrimaryKey() default false;
 	public boolean isUniqueKey() default false;
 	public boolean isAutoIncrementedPrimaryKey() default false;

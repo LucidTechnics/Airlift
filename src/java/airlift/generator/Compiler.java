@@ -173,6 +173,8 @@ public class Compiler
 								Annotation annotation = new Annotation();							
 								annotation.setName(annotationMirror.getAnnotationType().toString());
 
+								domainObjectModel.getDomainAnnotationSet().add(annotation);
+
 								Map parameterValueMap = elements.getElementValuesWithDefaults(annotationMirror);
 
 								for (Object object: parameterValueMap.entrySet())

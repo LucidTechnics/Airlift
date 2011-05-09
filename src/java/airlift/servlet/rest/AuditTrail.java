@@ -15,20 +15,20 @@
 package airlift.servlet.rest; 
 
 @javax.persistence.Entity(name="AuditTrail")
-@com.googlecode.objectify.annotation.Indexed
+@com.googlecode.objectify.annotation.Unindexed
 public class AuditTrail
 {
 	public AuditTrail() {}
 
 	@javax.persistence.Id private String id;
-	private String domainId;
+	@com.googlecode.objectify.annotation.Indexed private String domainId;
 	private String action;
 	private String method;
 	private String domain;
 	private String uri;
 	private String handlerName;
 	private com.google.appengine.api.datastore.Text data;
-	private String email;
+	@com.googlecode.objectify.annotation.Indexed private String email;
 	private java.util.Date actionDate;
 	private java.util.Date recordDate;
 	

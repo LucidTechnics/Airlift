@@ -46,7 +46,7 @@ public class RestfulAuditContext
 	{
 		_auditTrail.setId(airlift.util.IdGenerator.generate(12));
 		
-		com.googlecode.objectify.ObjectifyService.begin().put(_auditTrail);
+		com.googlecode.objectify.ObjectifyService.begin().async().put(_auditTrail);
 
 		return _auditTrail.getId();
 	}
@@ -68,12 +68,12 @@ public class RestfulAuditContext
 			throw new RuntimeException("Cannot update. Null id found for object: " + _auditTrail);
 		}
 
-		com.googlecode.objectify.ObjectifyService.begin().put(_auditTrail);
+		com.googlecode.objectify.ObjectifyService.begin().async().put(_auditTrail);
 	}
 
 	public void delete(AuditTrail _auditTrail)
 	{
-		com.googlecode.objectify.ObjectifyService.begin().delete(_auditTrail);
+		com.googlecode.objectify.ObjectifyService.begin().async().delete(_auditTrail);
 	}
 
 	public java.util.List<AuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)

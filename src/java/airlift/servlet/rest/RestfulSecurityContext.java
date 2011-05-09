@@ -206,7 +206,7 @@ public class RestfulSecurityContext
 		_airliftUser.setAuditPostDate(new java.util.Date());
 		_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
 
-		com.googlecode.objectify.ObjectifyService.begin().put(_airliftUser);
+		com.googlecode.objectify.ObjectifyService.begin().async().put(_airliftUser);
 		
 		return _airliftUser.getId();
 	}
@@ -230,12 +230,12 @@ public class RestfulSecurityContext
 
 		_airliftUser.setAuditPutDate(new java.util.Date());
 
-		com.googlecode.objectify.ObjectifyService.begin().put(_airliftUser);
+		com.googlecode.objectify.ObjectifyService.begin().async().put(_airliftUser);
 	}
 
 	public void delete(AirliftUser _airliftUser)
 	{
-		com.googlecode.objectify.ObjectifyService.begin().delete(_airliftUser);
+		com.googlecode.objectify.ObjectifyService.begin().async().delete(_airliftUser);
 	}
 
 	public java.util.List<AirliftUser> collectByExternalUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)

@@ -5,32 +5,21 @@ dao.exists = function(_id)
 
 dao.get = function(_id)
 {
-	var  got, objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+	var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-	for (var i = 0; i < 5; i++)
+	var got = dao.multiTry(function()
 	{
 		try
 		{
-			got = objectify.get(airlift.cc("$package$.airlift.domain.$className$Do"), _id);
-			break;
+			return objectify.get(airlift.cc("$package$.airlift.domain.$className$Do"), _id);
 		}
 		catch(e if e.javaException instanceof Packages.com.googlecode.objectify.NotFoundException)
 		{
 			LOG.warning("No resource of type: $className$ exists for the provided key: " + _id);
-			break;
-		}
-		catch(e)
-		{
-			LOG.warning("Encountered this error while accessing the datastore for get: " + e.toString());
-
-			if (i >= 4)
-			{
-				LOG.severe("After fifth try at get: " + e.toString());
-				throw e;
-			}
-		}
-	}
-
+		}		
+	},
+	5, "Encountered this error while getting $className$ indentified by: " + _id);
+	
 	return got;
 }
 
@@ -41,29 +30,11 @@ dao.del = function(_id)
 	var objectify = com.googlecode.objectify.ObjectifyService.begin();
 
 	var object = dao.get(_id);
-	
-	//Need to retry automatically ...
-	for (var i = 0; i < 5; i++)
-	{
-		try
-		{
-			objectify["delete"](object);
-			break;
-		}
-		catch(e)
-		{
-			LOG.warning("Encountered this error while accessing the datastore for delete: " + e.toString());
 
-			if (i >= 5)
-			{
-				LOG.severe("After fifth try at delete: " + e.toString());
-				throw e;
-			}
-		}
-	}
+	dao.multiTry(function() { objectify.async()["delete"](object); }, 5, "Encountered this error while deleting $className$ identified by: " + _id);
 }
 
-dao["delete"] = function(_$lowerCaseClassName$)
+dao["delete"] = function(_id)
 {
-	dao.del(_$lowerCaseClassName$);
+	dao.del(_id);
 }

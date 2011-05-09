@@ -19,12 +19,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.multiTry = function(_function, _tryCount, _message)
 	{
-		for (var i = 0; i < _tryCount; i++)
+		LOG.info("START multi try");
+
+		var result, success = false;
+		
+		for (var i = 0; i < _tryCount && success === false; i++)
 		{
 			try
 			{
-				_function();
-				break;
+				LOG.info("Try number: " + i);
+				result = _function();
+				success = true;
 			}
 			catch(e)
 			{
@@ -37,7 +42,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 				}
 			}
 		}
-	}
+
+		LOG.info("END multi try");
+		
+		return result;
+	};
 	
 	dao.collect = function(_config)
 	{
@@ -63,7 +72,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		}
 		
 		return results;
-	}
+	};
 
 	dao.provideUniqueId = function()
 	{
@@ -89,7 +98,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		}
 		
 		return id;
-	}
+	};
 	
 	dao.insert = function(_$lowerCaseClassName$)
 	{
@@ -111,11 +120,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
 
-		dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for insert");
-		dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for insert");
+		dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for $className$ insert");
+		dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for $className$ index insert");
 
 		return id;
-	}
+	};
 
 	dao.index = function(_$lowerCaseClassName$)
 	{
@@ -124,7 +133,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		$indexAddAll; separator="\n"$
 
 		return new Packages.java.util.ArrayList(indexSet);
-	}
+	};
 
 	dao.search = function(_tokenList, _config)
 	{
@@ -144,7 +153,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		}
 
 		return query.fetchParents();
-	}
+	};
 
 	$insertChangeEvent$
 

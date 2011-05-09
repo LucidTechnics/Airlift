@@ -20,5 +20,5 @@ public @interface Cacheable
 {
 	public boolean isCacheable() default true;
 	public boolean cacheCollections() default false; //URIs that appear to be collections will not be cached by default
-	public int life() default 0; //0 means cache forever.  Otherwise set this value to determine number of seconds to cache.
+	public int life() default 600; //0 means cache forever.  Otherwise set this value to determine number of seconds to cache.
 }

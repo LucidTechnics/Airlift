@@ -8,7 +8,8 @@ package $package$.airlift.domain;
 )
 
 @javax.persistence.Entity(name="$className$")
-@com.googlecode.objectify.annotation.Indexed
+@com.googlecode.objectify.annotation.Unindexed
+$cacheable$
 public class $className$Do
    implements $package$.airlift.domain.$className$, java.io.Serializable
 {

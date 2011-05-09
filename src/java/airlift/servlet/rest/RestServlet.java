@@ -149,6 +149,8 @@ public class RestServlet
 
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
+		log.info("Starting security checks ... ");
+		
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
 		java.util.Enumeration<String> acceptHeaderValues = _request.getHeaders("Accept");
 

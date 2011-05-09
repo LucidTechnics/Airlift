@@ -153,6 +153,8 @@ public class JavaScriptGenerator
 		{
 			updateMethodStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 			updateMethodStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
+			updateMethodStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
+			
 			primaryKeyMethodsStringTemplate.setAttribute("updateMethod", updateMethodStringTemplate.toString());
 			primaryKeyMethodsStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 			primaryKeyMethodsStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
