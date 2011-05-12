@@ -1,4 +1,4 @@
-$className$Validator.validate$propertyName$ = function(_value)
+validator.validate$propertyName$ = function(_value)
 {
 	var errorArray = [];
 	var message;

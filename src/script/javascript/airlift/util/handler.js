@@ -67,6 +67,20 @@ airlift.dao = function(_domainName)
 	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Dao"]();
 };
 
+//validator - Create the validator for the provided domain name.  If not
+//domain name is provided the default DOMAIN_NAME is used instead.
+airlift.validator = function(_domainName)
+{
+	var domainName = (!_domainName) ? DOMAIN_NAME : (new Packages.java.lang.String(_domainName).toLowerCase());
+
+	if (airlift.isDefined(airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Validator"]) !== true)
+	{
+		airlift.ls("airlift/validation/domain/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
+	}
+
+	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Validator"]();
+};
+
 //Convenience method for creating a blank StringTemplate object
 airlift.stringTemplate = function(_templateString)
 {

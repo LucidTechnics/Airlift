@@ -43,7 +43,7 @@ public class RestServlet
 	    throws ServletException
 	{		
 		setRedirectContextMap(new HashMap<String, Object>());
-		initCache();
+		//initCache();
     }
 
 	public void initCache() 
@@ -53,14 +53,14 @@ public class RestServlet
 
 		//For each domain that is cacheable create the relevant caching
 		//context.
-		for (String domainName: getAppProfile().getValidDomains())
+/*		for (String domainName: getAppProfile().getValidDomains())
 		{
 			if (cachingContextMap.containsKey(domainName) != true)
 			{
 				airlift.generator.Cacheable cacheableAnnotation = (airlift.generator.Cacheable) getAppProfile().getAnnotation(domainName, airlift.generator.Cacheable.class);
 				cachingContextMap.put(domainName, new RestfulCachingContext(domainName, cacheableAnnotation.isCacheable(), cacheableAnnotation.life(), cacheableAnnotation.cacheCollections()));
 			}
-		}
+		}*/
 	}
 	
     @Override
@@ -149,6 +149,10 @@ public class RestServlet
 
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
+		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
+
+		log.info("RestServlet 0a: " + quotaService.getCpuTimeInMegaCycles());
+
 		log.info("Starting security checks ... ");
 		
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
@@ -231,8 +235,9 @@ public class RestServlet
 					user.setTimeOutDate(calculateNextTimeOutDate());
 					securityContext.update(user);
 				}
-
+				log.info("RestServlet 0b: " + quotaService.getCpuTimeInMegaCycles());
 				processRequest(_request, _response, method, restContext, uriParameterMap);
+				log.info("RestServlet 0c: " + quotaService.getCpuTimeInMegaCycles());
 			}
 			catch(Throwable t)
 			{
@@ -240,6 +245,10 @@ public class RestServlet
 			}
 		}
 
+		long totalMegaCycles = quotaService.getCpuTimeInMegaCycles();
+		log.info("RestServlet 0d: " + totalMegaCycles);
+		log.info("RestServlet 0d: " + quotaService.convertMegacyclesToCpuSeconds(totalMegaCycles));
+		
 		return restContext;
 	}
 
@@ -248,12 +257,17 @@ public class RestServlet
 					String _method, RestContext _restContext, Map _uriParameterMap)
 	    throws ServletException, IOException
 	{
+		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
+
+		log.info("RestServlet 1: " + quotaService.getCpuTimeInMegaCycles());
+		
 		String appName = getServletName();
 		String domainName = _restContext.getThisDomain();
 		java.util.List<String> handlerPathList = _restContext.getHandlerPathList();
 
 		try
 		{
+			log.info("RestServlet 2: " + quotaService.getCpuTimeInMegaCycles());
 			String defaultMimeType = (this.getServletConfig().getInitParameter("a.default.mime.type") != null) ? this.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
 			ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
 			
@@ -263,11 +277,12 @@ public class RestServlet
 
 				try
 				{
-
+					log.info("RestServlet 3: " + quotaService.getCpuTimeInMegaCycles());
 				    contentContext = getHandlerContext().execute(appName,
 									_restContext, _method, this, _httpServletRequest,
 									_httpServletResponse, _uriParameterMap,
 						null);
+					log.info("RestServlet 4: " + quotaService.getCpuTimeInMegaCycles());
 				}
 				catch(airlift.servlet.rest.HandlerException _handlerException)
 				{
@@ -281,22 +296,26 @@ public class RestServlet
 					}
 				}
 
+				log.info("RestServlet 5: " + quotaService.getCpuTimeInMegaCycles());
 				if (handlerNotFound == true )
 				{
 					sendCodedPage("405", "Method Not Allowed", _httpServletResponse);
 				}
 
+				log.info("RestServlet 6: " + quotaService.getCpuTimeInMegaCycles());
 				//Invalidate the cache if necessary
-				invalidateCache(domainName, _method, _httpServletRequest);
+				//invalidateCache(domainName, _method, _httpServletRequest);
 				int responseCode = Integer.parseInt(contentContext.getResponseCode());
 				_httpServletResponse.setStatus(responseCode);
 
+				log.info("RestServlet 7: " + quotaService.getCpuTimeInMegaCycles());
 				if (responseCode == 301 || responseCode == 302 || responseCode == 303)
 					//TODO this should be checking to see if the method
 					//call is a POST PUT or DELETE.  At this point the
 					//cache is then invalidated.
 				{
 					_httpServletResponse.sendRedirect(contentContext.getRedirectUri());
+					log.info("RestServlet 7a: " + quotaService.getCpuTimeInMegaCycles());
 				}
 				else
 				{
@@ -316,17 +335,20 @@ public class RestServlet
 						byteArrayOutputStream.writeTo(_httpServletResponse.getOutputStream());
 						byteArrayOutputStream.flush();
 						_httpServletResponse.getOutputStream().flush();
-						populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
+						log.info("RestServlet 7b-1: " + quotaService.getCpuTimeInMegaCycles());
+						//populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
 					}
 					else
 					{
 						sendCodedPage(contentContext.getResponseCode(), "", _httpServletResponse);
+						log.info("RestServlet 7b-2: " + quotaService.getCpuTimeInMegaCycles());
 					}
 				}
 			}
 			else
 			{
 				sendCodedPage("404", "Resource Not Found", _httpServletResponse);
+				log.info("RestServlet 7c: " + quotaService.getCpuTimeInMegaCycles());
 			}
 		}
 		catch(Throwable t)
@@ -355,6 +377,7 @@ public class RestServlet
 			{
 				sendCodedPage("500", "Internal Server Error", _httpServletResponse);
 			}
+			log.info("RestServlet 7d: " + quotaService.getCpuTimeInMegaCycles());
 		}
     }
 

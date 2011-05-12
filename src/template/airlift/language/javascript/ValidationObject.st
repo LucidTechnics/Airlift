@@ -1,15 +1,22 @@
 //$generatorComment$
 //$dateString$
 
-var $className$Validator;
+var airlift;
 
-if (!$className$Validator)
+if (!airlift)
 {
-	$className$Validator = {};
+	airlift = {};
 }
-else if (typeof $className$Validator != "object")
+else if (typeof airlift != "object")
 {
-	throw new Error("$className$Validator already exists and it is not an object");
+	throw new Error("airlift already exists and it is not an object");
 }
 
-$validationFunction; separator="\n\n"$
+airlift.create$upperCaseFirstLetterDomainClassName$Validator = function()
+{
+	var validator = {};
+
+	$validationFunction; separator="\n\n"$
+
+	return validator;
+}

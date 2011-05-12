@@ -23,6 +23,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.error = false;
 	activeRecord.dao = airlift.dao("$upperCaseFirstLetterDomainClassName$");
+	activeRecord.validator = airlift.validator("$upperCaseFirstLetterDomainClassName$");
 	activeRecord.messageManager = new Packages.airlift.MessageManager();
 	activeRecord.foreignKeySet = new Packages.java.util.HashSet();
 
@@ -60,40 +61,53 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.json = function(_config)
 	{
+		//create a Javascript object {} //
+		//Convert Java values to JavaScript values and copy to Object
+		//call JSON.stringify on the JavaScript Object.
+		
 		LOG.info("Starting JSON");
 		if (_config && _config.collection)
 		{
 			var list = new Packages.java.util.ArrayList();
 
-			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord.restify(_activeRecord.createDO())); } );
+			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord && _activeRecord.restify()); } );
 
 			var json = Packages.airlift.util.AirliftUtil.toJson(list);
 		}
 		else
 		{
-			json = Packages.airlift.util.AirliftUtil.toJson(this.restify(this.createDO()));
+			json = Packages.airlift.util.AirliftUtil.toJson(this.restify());
 		}
 		LOG.info("Ending JSON");
 		
 		return json;
 	};
 
-	activeRecord.restify = function(_do)
+
+	activeRecord.createImpl = function()
 	{
-		if (_do && _do.id && airlift.isWhitespace(_do.id) === false)
-		{
-			_do.id = BASE + "a/" + this.retrieveDomainName() + "/" + _do.id;
-		}
+		var impl = new Packages.$package$.airlift.domain.$className$Impl();
+		this.copyToImpl(impl);
+
+		return impl;
+	}
+
+	activeRecord.copyToImpl = function(_impl)
+	{
+		$copyPropertyToImpl; separator="\n"$
+
+		return this;
+	}
+
+	activeRecord.restify = function(_base)
+	{
+		var impl = this.createImpl();
+		var base = _base||BASE;
 		
-		activeRecord.retrieveOrderedForeignKeyList().forEach(function(_foreignKeyName)
-		{
-			if (_do && _do[_foreignKeyName] && airlift.isWhitespace(_do[_foreignKeyName]) === false)
-			{
-				_do[_foreignKeyName] = BASE + "a/" + _foreignKeyName.replaceAll("[Ii][Dd]\$", "") + "/" + _do[_foreignKeyName];
-			}
-		});
-		
-		return _do;
+		impl.setId(base + "a/$allLowerCaseClassName$/" + this.id);
+		$restifyForeignKey; separator="\n"$
+						
+		return impl;
 	}
 
 	activeRecord.join = function(_collectionOrArray)
@@ -136,11 +150,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 		
-		var dataObject = this.dao.get(_id);
+		var entity = this.dao.get(_id);
 
-		if (dataObject)
+		if (entity)
 		{
-			this.decrypt(dataObject);
+			this.decrypt(entity);
 		}
 
 		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), "GET"); }
@@ -160,7 +174,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		this.setAuditPostDate(airlift.createDate());
 		this.setAuditPutDate(this.getAuditPostDate());
-		if (USER_EMAIL) { this.setAuditUserEmail(USER_EMAIL); }
+		this.setAuditUserEmail(USER_EMAIL||null);
 
 		return this;
 	}
@@ -173,9 +187,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	}
 
-	activeRecord.decrypt = function(_dataObject)
+	activeRecord.decrypt = function(_entity)
 	{
-		this.copyFrom(_dataObject);
+		this.copyFrom(_entity);
 		
 		$encryptionSetup$
 
@@ -188,15 +202,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		$encryptedAttribute$
 
-		var dataObject = this.createDO();
+		var entity = this.createEntity();
 
 		$setDataObjectEncryptedField$
 
-		return dataObject;
+		return entity;
 	}
 		
 	activeRecord.update = function(_config)
 	{
+		//TODO this should only generate audit persistence if requested
+		//to compile time
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
 		var dataObject = this.putAudit().encrypt();
@@ -209,6 +225,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.insert = function(_config)
 	{
+		//TODO this should only generate audit persistence if requested
+		//to compile time
+
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
 		var dataObject = this.postAudit().encrypt();		
@@ -220,6 +239,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.del = function(_config)
 	{
+		//TODO this should only generate audit persistence if requested
+		//to compile time
+
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "DELETE"); }
 
 		this.dao.del(this.id);
@@ -237,7 +259,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
 
-		return (_config && _config.returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertIndexToActiveRecordArray(this.dao.search(_tokenList, _config));
+		return (_config && _config.returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertEntityMapToActiveRecordArray(this.dao.search(_tokenList, _config));
 	};
 
 	activeRecord.collect = function(_config)
@@ -261,10 +283,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (airlift.isDefined(_doNotConvertToActiveRecord) === false)
 		{
-			_collection.forEach(function(_dataObject, _index)
+			_collection.forEach(function(_entity, _index)
 			{
 				var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-				activeRecord.decrypt(_dataObject);
+				activeRecord.decrypt(_entity);
 				_collection[_index] = activeRecord;
 			});
 		}
@@ -272,15 +294,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return _collection;
 	}
 
-	activeRecord.convertIndexToActiveRecordArray = function(_map)
+	activeRecord.convertEntityMapToActiveRecordArray = function(_entityMap)
 	{
 		var collection = [];
 
-		for (var entry in Iterator(_map.entrySet()))
+		for (var entry in Iterator(_entityMap.entrySet()))
 		{
 			var key = entry.getKey();
 			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			activeRecord.copyFromEntity(entry.getValue());
+			activeRecord.copyFrom(entry.getValue());
 			activeRecord.setId(key.name);
 			collection.push(activeRecord);
 		}
@@ -360,32 +382,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.retrieveOrderedPropertyList = function()
 	{
-		var propertyList = [];
-		
-		for (var attribute in Iterator(this.appProfile.$domainName$AttributeList))
-		{
-			propertyList.push(attribute);
-		}
-
-		return propertyList;
+		return [$propertyListEntry; separator=", "$];
 	}
 
 	activeRecord.retrieveOrderedForeignKeyList = function()
 	{
-		var foreignKeyList = [];
-
-		$addForeignKeyName; separator="\n"$
-
-		return foreignKeyList;
+		var foreignKeyList = [$foreignKeyListEntry; separator=", "$];
 	}
 
-	activeRecord.validateProperty = function(_property, _value)
+	activeRecord.validate = function(_value, _validationFunction)
 	{
 		var errorArray = [];
 
-		airlift.ls("airlift/validation/domain/$upperCaseFirstLetterDomainClassName$Validator.js");
-
-		errorArray = errorArray.concat($upperCaseFirstLetterDomainClassName$Validator["validate" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property)](_value));
+		errorArray = errorArray.concat(_validationFunction(_value));
 
 		var that = this;
 		
@@ -410,164 +419,57 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.auditPostDate = null;
 		this.auditPutDate = null;
 		this.auditUserEmail = null;
-
-		//TODO.  A sanitized object should automatically set all the encrypted
-		//information to null as well.  It should not return encrypted
-		//and unencrypted information together.
 		
 		return this;
 	}
 
-	activeRecord.copyFrom = function(_$allLowerCaseClassName$, _config)
+	activeRecord.filterContains = function(_filter, _propertyName)
 	{
-		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
-		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+		var contains = false;
+
+		_filter.forEach(function(_item)
+		{
+			_item.equalsIgnoreCase(_propertyName) === true)
+			{
+				contains = true;
+			}
+		});
+
+		return contains;
+	}
+
+	activeRecord.copyFrom = function(_entity, _config)
+	{
+		var config = _config||{};
+		var filter = config.filter||[];
+		var contains = config.contains||false;
 		
-		var orderedPropertyList = this.retrieveOrderedPropertyList();
 		var that = this;
 
-		var copyProperty = function(_property, _index, _array)
-		{
-			if (airlift.isDefined(filter) === false ||
-			 (airlift.string("")).equalsIgnoreCase(filter) === true ||
-			 Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
-			{
-				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-
-				//this is a DO object
-				if (_$allLowerCaseClassName$[getter])
-				{
-					that[setter](_$allLowerCaseClassName$[getter]());
-				}
-			}
-		}
-
-		orderedPropertyList.forEach(copyProperty);
+		$copyFromEntityToActiveRecord; separator="\n"$
 
 		return this;
 	}
 
-	activeRecord.copyFromEntity = function(_$allLowerCaseClassName$, _config)
+	activeRecord.copyTo = function(_entity, _config)
 	{
-		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
-		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
-
-		var orderedPropertyList = this.retrieveOrderedPropertyList();
-		var that = this;
-		
-		var copyProperty = function(_property, _index, _array)
-		{
-			if (airlift.isDefined(filter) === false ||
-				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
-			{
-				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-
-				//this is a Datastore entity and not a DO object.
-				that[setter](_$allLowerCaseClassName$.getProperty(_property));
-
-				if ("java.util.Date".equals(that.getAttributeType(_property)) === true)
-				{
-					//Need to convert date to value that has the handler's
-					//timezone.
-					var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-					that[setter](airlift.createDate({date: that[getter]()}));
-				}
-			}
-		}
-
-		orderedPropertyList.forEach(copyProperty);
-
-		return this;
-	}
-
-	activeRecord.copyTo = function(_$allLowerCaseClassName$, _config)
-	{
-		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var filter = (airlift.isDefined(config.filter) === true) ? airlift.string(config.filter) : airlift.string("");
-		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
-
-		var orderedPropertyList = this.retrieveOrderedPropertyList();
+		var config = _config||{};
+		var filter = config.filter||[];
+		var contains = config.contains||false;
 
 		var that = this;
 
-		var copyProperty = function(_property, _index, _array)
-		{
-			if (airlift.isDefined(filter) === false ||
-				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true ||
-				  Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(filter, _property) === contains)
-			{
-				var setter = "set" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-				var getter = "get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property);
-
-				if (airlift.isDefined(_$allLowerCaseClassName$[setter]) === true)
-				{
-					_$allLowerCaseClassName$[setter](that[getter]());
-				}
-			}
-		}
-
-		orderedPropertyList.forEach(copyProperty);
+		$copyFromActiveRecordToEntity; separator="\n"$
 
 		return this;
 	}
 
-	activeRecord.createDO = function()
+	activeRecord.createEntity = function()
 	{
-		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Do();
-		this.copyTo($allLowerCaseClassName$);
+		var entity = (this.id) ? new Packages.google.appengine.api.datastore.Entity("$className$", this.id) : new Packages.google.appengine.api.datastore.Entity("$className$");
+		this.copyTo(entity);
 
-		return $allLowerCaseClassName$;
-	}
-
-	activeRecord.createImpl = function()
-	{
-		var $allLowerCaseClassName$ = new Packages.$package$.airlift.domain.$upperCaseFirstLetterDomainClassName$Impl();
-		this.copyTo($allLowerCaseClassName$);
-
-		return $allLowerCaseClassName$;
-	}
-
-	/**
-	 * Retrieve the attributes of this domain.
-	 * in the order specified by the displayOrder attribute of the
-	 * Presentation annotation defined in this active record's domain
-	 * interface.
-	 *
-	 * @param _propertyName the name of the property to copy the value
-	 * to.
-	 * @param _value the value to be copied.
-	 * @return The exception experienced if the copy was not successful.
-	 */
-
-	activeRecord.copyProperty = function(_impl, _propertyName, _value)
-	{
-		var throwable;
-		
-		try 
-		{ 
-			this.beanUtilsBean.copyProperty(_impl, _propertyName, _value); 
-		} 
-		catch(t) 
-		{
-			throwable = t;
-			LOG.warning("Unable to copy property: " + _propertyName + " to domain: " + this.retrieveDomainName());
-			LOG.warning("with value: " + _value);
-			LOG.warning(t.toString());
-		}
-
-		return throwable;
-	}
-
-	activeRecord.describe = function()
-	{
-		return Packages.airlift.util.AirliftUtil.describe(this.createDO(), this.retrieveDomainInterface());
+		return entity;
 	}
 
 	activeRecord.getPresentableAnnotation = function(_propertyName)
@@ -578,211 +480,34 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 	}
 	
-	activeRecord.populateFromRequestMap = function(_attributeMap)
+	activeRecord.copyValueArrayToCollection = function(_valueArray, _collection)
 	{
-		var orderedPropertyList = this.retrieveOrderedPropertyList();
-		var that = this;
-		var impl = this.createImpl();
-
-		var processProperty = function(_property, _index, _array)
+		if (_valueArray)
 		{
-			if ("id".equalsIgnoreCase(_property) === false)
+			for (var i = 0; i < _valueArray.length; i++)
 			{
-				var property = new Packages.java.lang.String(_property);
-				var methodPresentable = that.getPresentableAnnotation(property);
-				var attributeType = that.getAttributeType(property);
-
-				function copyValueArrayToCollection(_valueArray, _collection)
-				{
-					if (airlift.isDefined(_valueArray) === true)
-					{
-						for (var i = 0; i < _valueArray.length; i++)
-						{
-							_collection.add(_valueArray[i]);
-						}
-					}
-				}
-
-				if ((airlift.isDefined(methodPresentable) === true) &&
-					  (methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.CHECKBOX ||
-					   methodPresentable.inputType() === Packages.airlift.generator.Presentable.Type.SELECT)
-				   )
-				{
-					LOG.info("property name is: " + property);
-					LOG.info("attribute map has: " + _attributeMap);
-					var result = null, valueArray = _attributeMap.get(property), stringBuffer = new Packages.java.lang.StringBuffer();
-
-					if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
-					{
-						LOG.info("This is an array");
-						//This only works for arrays of strings!!!
-						result = valueArray;
-					}
-					else if (attributeType.startsWith("java.util.List") === true)
-					//attribute is of type collection.
-					{
-						LOG.info("This is a ArrayList");
-						var valueCollection = new Packages.java.util.ArrayList();
-						copyValueArrayToCollection(valueArray, valueCollection);
-						result = valueCollection;
-					}
-					else if (attributeType.startsWith("java.util.Set") === true)
-					{
-						LOG.info("This is a HashSet");
-						var valueCollection = new Packages.java.util.HashSet();
-						copyValueArrayToCollection(valueArray, valueCollection);
-						result = valueCollection;
-					}
-					else if (airlift.isDefined(valueArray) === true && valueArray.length > 0)
-					{
-						LOG.info("This is a something else");
-						LOG.info("assigning this to result: ");
-						result = (airlift.isDefined(valueArray) === true && valueArray.length > 0 && airlift.isDefined(valueArray[0]) === true) ? valueArray[0] : null;
-					}
-
-					if ((new Packages.java.lang.String("java.lang.Boolean")).equalsIgnoreCase(attributeType) === true
-						  || (new Packages.java.lang.String("boolean")).equalsIgnoreCase(attributeType) === true)
-					{
-						if (result != null && ((new Packages.java.lang.String("yes")).equalsIgnoreCase(result) === true ||
-											   (new Packages.java.lang.String("y")).equalsIgnoreCase(result) === true ||
-											   (new Packages.java.lang.String("true")).equalsIgnoreCase(result) === true ||
-											   (new Packages.java.lang.String("on")).equalsIgnoreCase(result) === true ||
-											   (new Packages.java.lang.String("1")).equalsIgnoreCase(result) === true ||
-							//registering "" (empty string) as a true value to support checkboxes with
-							//the value attribute not being set.  Setting the value
-							//atrribute wil make the value visible on the form.  This may
-							//not be desired for a simple yes-no option hence the need to
-							//register "" as true.
-											   (new Packages.java.lang.String("")).equals(result) === true))
-						{
-							result = "true";
-						}
-						else
-						{
-							result = "false";
-						}
-					}
-
-					if (airlift.isDefined(result) === true)
-					{
-						if (airlift.isDefined(that.copyProperty(impl, property, result)) === true && airlift.isDefined(result) === true)
-						{
-							if (airlift.isDefined(valueArray) === true && attributeType.endsWith("[]") === true)
-							{
-								that.addError(property, "conversion", result + " is an invalid entry for " + property + ".");
-							}
-							else if (airlift.isDefined(valueArray) === true)
-							{
-								that.addError(property, "conversion", result + " is an invalid entry for " + property + ".");
-							}
-
-							that.copyProperty(impl, property, null);
-						}
-					}
-				}
-				else
-				{
-					var valueArray = _attributeMap.get(property);
-
-					if (attributeType.endsWith("[]") === true)
-					{
-						var value = valueArray;
-						that.validateProperty(property, value);
-					}
-					else if ((new Packages.java.lang.String("java.util.ArrayList")).equalsIgnoreCase(attributeType) === true)
-					{
-						var valueCollection = new Packages.java.util.ArrayList();
-						copyValueArrayToCollection(valueArray, valueCollection);
-						var value = valueCollection;
-						that.validateProperty(property, value);
-					}
-					else if ((new Packages.java.lang.String("java.util.HashSet")).equalsIgnoreCase(attributeType) === true)
-					{
-						var valueCollection = new Packages.java.util.HashSet();
-						copyValueArrayToCollection(valueArray, valueCollection);
-						var value = valueCollection;
-						that.validateProperty(property, value);
-					}
-					else
-					{
-						var value = (valueArray && (valueArray.length > 0) && valueArray[0]) ? valueArray[0] : "";
-						that.validateProperty(property, value + "");
-					}
-
-					if (airlift.isDefined(that.copyProperty(impl, property, value)) === true)
-					{
-						that.copyProperty(impl, property, null);
-					}
-				}
+				_collection.add(_valueArray[i]);
 			}
 		}
 
-		orderedPropertyList.forEach(processProperty);
-		this.copyFrom(impl);
+		return _collection;
+	};
 
-		LOG.info("The active record now has these values after populateFromRequestMap: " + impl);
+	activeRecord.populateFromRequestMap = function(_attributeMap)
+	{
+		var value;
+
+		$copyPropertyFromRequestMap; separator="\n"$
+		$validateProperty; separator="\n"$
 
 		return this.messageManager.getMessageMap();
 	}
 
 	activeRecord.populateFromRestContext = function(_restContext)
 	{
-		var impl = this.createImpl();
-		that = this;
-		var orderedForeignKeyList = this.retrieveOrderedForeignKeyList();
-
-		var processForeignKeys = function(_foreignKeyName, _index, _array)
-		{
-			var persistable = Packages.airlift.util.AirliftUtil.getMethodAnnotation(that.retrieveDomainInterface(),
-				_foreignKeyName, Packages.java.lang.Class.forName("airlift.generator.Persistable"));
-
-			var mapTo = persistable.mapTo();
-			var tokenArray = mapTo.split("\\.");
-
-			var foreignDomainName = tokenArray[0];
-			var foreignAttributeName = null;
-
-			if (tokenArray.length === 2)
-			{
-				foreignAttributeName = tokenArray[1];
-			}
-			else
-			{
-				foreignAttributeName = "id";
-			}
-
-			var value = _restContext.getIdValue(foreignDomainName + "." + foreignAttributeName);
-
-			if (airlift.isDefined(value) === true)
-			{
-				var throwable = that.copyProperty(impl, foreignKeyName, value);
-
-				if (throwable && value && Packages.airlift.util.AirliftUtil.isWhitespace(value) !== true)
-				{
-					that.copyProperty(foreignKeyName, null);
-					that.addMessage(foreignKeyName, "conversion", value + " is an invalid entry for " + foreignKeyName + ".");
-				}
-			}
-		}
-
-		orderedForeignKeyList.forEach(processForeignKeys);
-
-		var id = _restContext.getIdValue(this.retrieveDomainName() + "." + "id");
-
-		if (airlift.isDefined(id) === true)
-		{
-			var throwable = this.copyProperty(impl, "id", id);
-
-			if (throwable && id && Packages.airlift.util.AirliftUtil.isWhitespace(id) !== true)
-			{
-				this.id = null;
-				this.addMessage("id", "conversion", id + "  is an invalid entry for " + _activeRecord.retrievePrimaryKeyName() + ".");
-			}
-		}
-
-		this.copyFrom(impl);
+		$assignForeignKeyFromRestContext; separator="\n"$
 		
-		LOG.info("The active record now has these values after populateFromRestContext: " + impl);
+		this.id = _restContext.getIdValue("$allLowerCaseClassName$.id");
 	}
 	
 	activeRecord.populate = function(_attributeMap, _restContext, _method)

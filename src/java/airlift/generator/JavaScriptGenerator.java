@@ -188,10 +188,10 @@ public class JavaScriptGenerator
 		
 		activeRecordStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		activeRecordStringTemplate.setAttribute("appName", _domainObjectModel.getAppName());
-		activeRecordStringTemplate.setAttribute("domainName", lowerTheFirstCharacter(domainName));
 		activeRecordStringTemplate.setAttribute("upperCaseFirstLetterDomainClassName", upperTheFirstCharacter(domainName));
 		activeRecordStringTemplate.setAttribute("fullyQualifiedDomainClassName", _domainObjectModel.getFullyQualifiedClassName());
 		activeRecordStringTemplate.setAttribute("allLowerCaseClassName", _domainObjectModel.getClassName().toLowerCase());
+		activeRecordStringTemplate.setAttribute("className", _domainObjectModel.getClassName());
 		
 		boolean processedDatable = false;
 		boolean processedEncryptionHeader = false;
@@ -224,6 +224,10 @@ public class JavaScriptGenerator
 			{
 				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "activeRecord.foreignKeySet.add(\"" + name + "\");");
 				activeRecordStringTemplate.setAttribute("addForeignKeyName", "foreignKeyList.push(airlift.string(\"" + name + "\"));");
+				activeRecordStringTemplate.setAttribute("restifyForeignKey", "impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this." + name + ");");
+				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
+
+				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\");");
 			}
 
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
@@ -233,7 +237,38 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); };");
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
+			activeRecordStringTemplate.setAttribute("copyPropertyToImpl", "_impl.set" + upperTheFirstCharacter(name) + "(this." + name + ");");
+			activeRecordStringTemplate.setAttribute("propertyListEntry", "\"" + name + "\"");
 
+			if ("id".equalsIgnoreCase(name) == false)
+			{
+				activeRecordStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (this.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\");");
+				activeRecordStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(this.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", this." + name + ");");
+			}
+			else
+			{
+				activeRecordStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (this.filterContains(filter, \"" + name + "\") === contains) && _entity.getKey().getName();");
+			}
+			
+			if (!("id".equalsIgnoreCase(name) == true || "false".equals(isForeignKey) == true) == true)
+			{
+				if ("java.util.List".equalsIgnoreCase(type) == true ||
+					"java.util.ArrayList".equalsIgnoreCase(type) == true)  
+				{
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
+					activeRecordStringTemplate.setAttribute("validateProperty", "this.validator.validate" + upperTheFirstCharacter(name) + "(this." + name + " + \"\"");
+				}
+				else if ("java.util.Set".equalsIgnoreCase(type) == true ||
+						"java.util.HashSet".equalsIgnoreCase(type) == true)  
+				{
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
+				}
+				else
+				{
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.org.apache.commons.beanutils.ConvertUtils.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+				}
+			}
+			
 			String encrypted = findValue(persist, "encrypted()");
 
 			if (isArrayType(type) == true)
@@ -268,10 +303,9 @@ public class JavaScriptGenerator
 				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
 
 				setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedName", encryptedName);
-				setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedSetterName", encryptedSetterName);
 
 				decryptInvokationStringTemplate.setAttribute("setterName", setterName);
-				decryptInvokationStringTemplate.setAttribute("encryptedGetterName", encryptedGetterName);
+				decryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
 				decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
 			}
 		}

@@ -1,1 +1,1 @@
-$encryptedSetterName, encryptedName: {es,e | dataObject.$es$($e$);}; separator="\n"$
+$encryptedName: {e | impl.setProperty("$e$", $e$);}; separator="\n"$
