@@ -146,16 +146,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.dao.exists(_id);
 	};
 
-	activeRecord.get = function(_id, _config)
+	activeRecord.get = function(_config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 		
-		var entity = this.dao.get(_id);
-
-		if (entity)
-		{
-			this.decrypt(entity);
-		}
+		this.dao.get(this, _config);
 
 		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), "GET"); }
 
@@ -164,50 +159,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.copy = function(_id, _config)
 	{
-		this.get(_id, _config);
+		this.id = _id;
+		this.get(_config);
 		this.id = null;
 
 		return this;
 	};
-
-	activeRecord.postAudit = function()
-	{
-		this.setAuditPostDate(airlift.createDate());
-		this.setAuditPutDate(this.getAuditPostDate());
-		this.setAuditUserEmail(USER_EMAIL||null);
-
-		return this;
-	}
-
-	activeRecord.putAudit = function()
-	{
-		this.setAuditPutDate(airlift.createDate());
-		if (USER_EMAIL) { this.setAuditUserEmail(USER_EMAIL); }
-
-		return this;
-	}
-
-	activeRecord.decrypt = function(_entity)
-	{
-		this.copyFrom(_entity);
-		
-		$encryptionSetup$
-
-		$decryptToActiveRecordAttribute$
-	}
-
-	activeRecord.encrypt = function()
-	{
-		$encryptionSetup$
-
-		$encryptedAttribute$
-
-		var entity = this.createEntity();
-
-		$setDataObjectEncryptedField$
-
-		return entity;
-	}
 		
 	activeRecord.update = function(_config)
 	{
@@ -215,8 +172,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		//to compile time
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
-		var dataObject = this.putAudit().encrypt();
-		this.dao.update(dataObject);
+		this.dao.update(this);
 		
 		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.json(), "UPDATE"); }
 
@@ -230,8 +186,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
-		var dataObject = this.postAudit().encrypt();		
-		this.setId(this.dao.insert(dataObject));
+		this.setId(this.dao.insert(this));
+		
 		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), "INSERT", this.id); }
 
 		return this;
@@ -438,7 +394,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return contains;
 	}
 
-	activeRecord.copyFrom = function(_entity, _config)
+	activeRecord.copyFrom = function(_activeRecord, _config)
 	{
 		var config = _config||{};
 		var filter = config.filter||[];
@@ -451,7 +407,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	}
 
-	activeRecord.copyTo = function(_entity, _config)
+	activeRecord.copyTo = function(_activeRecord, _config)
 	{
 		var config = _config||{};
 		var filter = config.filter||[];
@@ -498,8 +454,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var value;
 
 		$copyPropertyFromRequestMap; separator="\n"$
+
+		var errorList = [];
+											   
 		$validateProperty; separator="\n"$
 
+		errorList.forEach(function(_error) { this.addError(_error.name, _error.message, _error.category); });
+
+		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName + " has errors: " + this.messageManager.getMessageMap()); }
+		
 		return this.messageManager.getMessageMap();
 	}
 

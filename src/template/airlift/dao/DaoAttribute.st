@@ -1,25 +1,24 @@
 dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 {
-	var offset = (_config && _config.offset) ? _config.offset : 0;
-	var limit = (_config && _config.limit) ? _config.limit : 20;
-	var asc = (_config && _config.asc) ? _config.asc : true;
-	var orderBy = (_config && _config.orderBy) ? _config.orderBy : "auditPutDate";
+	var config = _config||{};
+	var offset = config.offset||0;
+	var limit = config.limit||20;
+	var asc = config.asc||true;
+	var orderBy = config.orderBy||"auditPutDate";
 
-	if (asc === false) { orderBy = "-" + orderBy; }
+	var Query = Packages.com.google.appengine.api.datastore.Query;
+	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-	var objectify = com.googlecode.objectify.ObjectifyService.begin();
-
-	var query = objectify.query(airlift.cc("$buildPackage$.airlift.domain.$className$Do")).
-				limit(limit).
-				offset(offset).
-				order(orderBy).
-				filter("$lowercaseAttributeName$ ==", _value);
+	var query = new Query("$className$").addSort(orderBy, sort).addFilter("$attribute$", Query.FilterOperator.EQUAL, token);
+	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));
 
 	var results = [];
 
-	for (var result in Iterator(query))
+	for (var result in queryResults)
 	{
-		results.push(result);
+		var activeRecord = airlift.ar("$lowerCaseClassName$");
+		dao.copyTo(activeRecord, result);
+		results.push(activeRecord);
 	}
 
 	return results;

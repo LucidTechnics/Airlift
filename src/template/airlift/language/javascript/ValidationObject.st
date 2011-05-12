@@ -12,7 +12,7 @@ else if (typeof airlift != "object")
 	throw new Error("airlift already exists and it is not an object");
 }
 
-airlift.create$upperCaseFirstLetterDomainClassName$Validator = function()
+airlift.create$className$Validator = function()
 {
 	var validator = {};
 

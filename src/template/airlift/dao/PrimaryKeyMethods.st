@@ -1,37 +1,29 @@
-dao.exists = function(_id)
+dao.exists = function(_activeRecord)
 {
-	return (airlift.isDefined(dao.get(_id)) === true);
+	return (airlift.isDefined(dao.get(_activeRecord) === true);
 }
 
-dao.get = function(_id)
+dao.get = function(_activeRecord)
 {
-	var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
-
-	var got = dao.multiTry(function()
+	return dao.multiTry(function()
 	{
 		try
 		{
-			return objectify.get(airlift.cc("$package$.airlift.domain.$className$Do"), _id);
+			return this.datastore.get(Packages.google.appengine.api.datastore.KeyFactory.createKey("$className$", _id)).get();
 		}
-		catch(e if e.javaException instanceof Packages.com.googlecode.objectify.NotFoundException)
+		catch(e if e.javaException instanceof Packages.google.appengine.api.datastore.EntityNotFoundException)
 		{
 			LOG.warning("No resource of type: $className$ exists for the provided key: " + _id);
-		}		
+		}
 	},
-	5, "Encountered this error while getting $className$ indentified by: " + _id);
-	
-	return got;
+	5, "Encountered this error while getting $className$ identified by: " + _id);
 }
 
 $updateMethod$
 
 dao.del = function(_id)
 {
-	var objectify = com.googlecode.objectify.ObjectifyService.begin();
-
-	var object = dao.get(_id);
-
-	dao.multiTry(function() { objectify.async()["delete"](object); }, 5, "Encountered this error while deleting $className$ identified by: " + _id);
+	dao.multiTry(function() { this.datastore["delete"](Packages.google.appengine.api.datastore.KeyFactory.createKey("$className$", _id)); }, 5, "Encountered this error while deleting $className$ identified by: " + _id);
 }
 
 dao["delete"] = function(_id)

@@ -128,19 +128,22 @@ public class JavaScriptGenerator
 					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
 				}
 
-				String indexAddAll = "";
-				
-				if ("java.util.Date".equals(type) == true)
+				if ("true".equalsIgnoreCase(isSearchable) === true)
 				{
-					indexAddAll = "indexSet.addAll(airlift.tokenizeIntoDateParts(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "(), \"" + name + "\"));"; 
-				}
-				else
-				//For all other types change to a string and index it!
-				{
-					indexAddAll = "indexSet.addAll(airlift.tokenizeIntoNGrams(_" + lowerTheFirstCharacter(_domainObjectModel.getClassName()) + ".get" + upperTheFirstCharacter(name) + "()));"; 
-				}
+					String indexAddAll = "";
 
-				daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
+					if ("java.util.Date".equals(type) == true)
+					{
+						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoDateParts(_activeRecord." + name + ", \"" + name + "\"));"; 
+					}
+					else
+					//For all other types change to a string and index it!
+					{
+						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoNGrams(_activeRecord." + name + "));"; 
+					}
+
+					daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
+				}
 			}
 		}
 
@@ -250,13 +253,12 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (this.filterContains(filter, \"" + name + "\") === contains) && _entity.getKey().getName();");
 			}
 			
-			if (!("id".equalsIgnoreCase(name) == true || "false".equals(isForeignKey) == true) == true)
+			if ("id".equalsIgnoreCase(name) == false && "false".equals(isForeignKey) == true)
 			{
 				if ("java.util.List".equalsIgnoreCase(type) == true ||
 					"java.util.ArrayList".equalsIgnoreCase(type) == true)  
 				{
 					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
-					activeRecordStringTemplate.setAttribute("validateProperty", "this.validator.validate" + upperTheFirstCharacter(name) + "(this." + name + " + \"\"");
 				}
 				else if ("java.util.Set".equalsIgnoreCase(type) == true ||
 						"java.util.HashSet".equalsIgnoreCase(type) == true)  
@@ -266,6 +268,7 @@ public class JavaScriptGenerator
 				else
 				{
 					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.org.apache.commons.beanutils.ConvertUtils.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+					activeRecordStringTemplate.setAttribute("validateProperty", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
 				}
 			}
 			
@@ -486,7 +489,7 @@ public class JavaScriptGenerator
 
 			validationObjectStringTemplate.setAttribute("validationFunction", validationFunctionStringTemplate.toString());
 		}
-		
+
 		validationObjectStringTemplate.setAttribute("className", _domainObjectModel.getClassName());
 		validationObjectStringTemplate.setAttribute("generatorComment", comment);
 

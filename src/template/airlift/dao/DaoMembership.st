@@ -9,32 +9,31 @@
 
 dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 {
-	var config = (_config) ? _config : {};
-
+	var config = _config||{};
 	var offset = config.offset||0;
 	var limit = config.limit||20;
 	var asc = config.asc||true;
 	var orderBy = config.orderBy||"$attribute$";
 
-	orderBy = (asc === true) ? orderBy + " asc" : orderBy + " desc";
-	
-	var objectify = com.googlecode.objectify.ObjectifyService.begin();
+	var Query = Packages.com.google.appengine.api.datastore.Query;
+	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-	var query = objectify.query(airlift.cc("$buildPackage$.airlift.domain.$className$Do")).
-				limit(limit).
-				offset(offset).
-				order(orderBy);
+	var query = new Query("$className$").addSort(orderBy, sort);
 
 	_membershipList.forEach(function(_member)
 	{
-		query = query.filter("$attribute$ ==", _member);
+		query.addFilter("$attribute$", Query.FilterOperator.EQUAL, _member);
 	});
+	
+	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));
 
 	var results = [];
 
-	for (var result in Iterator(query))
+	for (var result in queryResults)
 	{
-		results.push(result);
+		var activeRecord = airlift.ar("$lowerCaseClassName$");
+		dao.copyTo(activeRecord, result);
+		results.push(activeRecord);
 	}
 
 	return results;

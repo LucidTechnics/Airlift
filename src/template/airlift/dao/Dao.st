@@ -17,7 +17,74 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 {
 	var dao = {};
 
-	dao.multiTry = function(_function, _tryCount, _message)
+	dao.datastore = this.getDatastore();
+	
+	dao.decrypt = function(_entity)
+	{
+		this.copyFrom(_entity);
+
+		$encryptionSetup$
+
+		$decryptToActiveRecordAttribute$
+	}
+
+	dao.encrypt = function()
+	{
+		$encryptionSetup$
+
+		$encryptedAttribute$
+
+		var entity = this.createEntity();
+
+		$setDataObjectEncryptedField$
+
+		return entity;
+	}
+
+	dao.copyFrom = function(_activeRecord, _entity,  _config)
+	{
+		var config = _config||{};
+		var filter = config.filter||[];
+		var contains = config.contains||false;
+
+		var that = this;
+
+		$copyFromEntityToActiveRecord; separator="\n"$
+
+			return this;
+	}
+
+	dao.copyTo = function(_activeRecord, _entity, _config)
+	{
+		var config = _config||{};
+		var filter = config.filter||[];
+		var contains = config.contains||false;
+
+		var that = this;
+
+		$copyFromActiveRecordToEntity; separator="\n"$
+
+		return this;
+	}
+	
+	dao.postAudit = function(_activeRecord)
+	{
+		_activeRecord.setAuditPostDate(airlift.createDate());
+		_activeRecord.setAuditPutDate(_activeRecord.getAuditPostDate());
+		_activeRecord.setAuditUserEmail(USER_EMAIL||null);
+
+		return this;
+	}
+
+	dao.putAudit = function(_activeRecord)
+	{
+		_activeRecord.setAuditPutDate(airlift.createDate());
+		if (USER_EMAIL) { _activeRecord.setAuditUserEmail(USER_EMAIL); }
+
+		return this;
+	}
+	
+	dao.multiTry = function(_executable, _tryCount, _message, _completeFailure)
 	{
 		LOG.info("START multi try");
 
@@ -28,7 +95,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			try
 			{
 				LOG.info("Try number: " + i);
-				result = _function();
+				result = _executable(i);
 				success = true;
 			}
 			catch(e)
@@ -37,6 +104,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 				if (i >= _tryCount)
 				{
+					_completeFailure && _completeFailure(_tries);
 					LOG.severe("After this many tries: " + _tryCount + " - " +  e.toString());
 					throw e;
 				}
@@ -47,7 +115,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		
 		return result;
 	};
-	
+
+	dao.getDatastore = function(_sync)
+	{
+		var sync = _sync||false;
+		var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
+		return (sync && factory.getDatastoreService()) || factory.getAsyncDatastoreService();
+	}		
+
 	dao.collect = function(_config)
 	{
 		var offset = (_config && _config.offset) ? _config.offset : 0;
@@ -55,20 +130,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var asc = (_config && _config.asc) ? _config.asc : true;
 		var orderBy = (_config && _config.orderBy) ? _config.orderBy : "auditPutDate";
 
-		if (asc === false) { orderBy = "-" + orderBy; }
+		var Query = Packages.com.google.appengine.api.datastore.Query;
+		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
-
-		var query = objectify.query(airlift.cc("$package$.airlift.domain.$className$Do")).
-					limit(limit).
-					offset(offset).
-					order(orderBy);
+		var query = new Query("$className$").addSort(orderBy, sort);
+		var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));
 
 		var results = [];
 
-		for (var result in Iterator(query))
+		for (var result in queryResults)
 		{
-			results.push(result);
+			var activeRecord = airlift.ar("$lowerCaseClassName$");
+			dao.copyTo(activeRecord, result);
+			results.push(activeRecord);
 		}
 		
 		return results;
@@ -76,57 +150,45 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.provideUniqueId = function()
 	{
-		var tries = 0; 
-		
-		do
+		var test = function(_tries)
 		{
 			var id = Packages.airlift.util.IdGenerator.generate(12);
 			//Make sure this randomly generated id has not already been
 			//assigned to a resource in this table. 
-			testObject = this.get(id);
-			tries++;
-		}
-		while (testObject && (tries < 100))
+			this.get(id) && throw new Packages.java.lang.RuntimeException("Found entity of type $className$ with id: " + id);
 
-		if (tries >= 100)
-		{
-			throw new Error("Unable to generate a random unique id for creation of resource: $lowerCaseClassName$.  Are ids saturated?");
+			LOG.info("Got a unique id: " + id + " after trying this many times: " +  _tries);
+			
+			return id;
 		}
-		else if (tries > 1)
-		{
-			LOG.info("Got a unique id after: " +  tries + " tries.");
-		}
+		
+		return dao.multiTry(test, 100, "Unable to generate a random unique id for creation of resource: $lowerCaseClassName$.  Are ids saturated?");
+	};
+	
+	dao.insert = function(_activeRecord)
+	{
+		dao.postAudit(_activeRecord);
+		
+		var id = this.provideUniqueId();
+		
+		var parentKey = Packages.google.appengine.api.datastore.KeyFactory.createKey("$className$", id);
+		var parent = new Packages.google.appengine.api.datastore.Entity(parentKey);
+		dao.copyTo(_activeRecord, parent);
+		
+		//indexing
+		var indexList = this.index(_activeRecord);
+		var index = new Packages.google.appengine.api.datastore.Entity("$className$Index", id, parentKey);
+		index.setProperty("index", indexList);
+
+		var transaction = this.dataStore.beginTransaction();
+		
+		var parentWritten = dao.multiTry(function() { dataStore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
+		var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, "Encountered this error while accessing the datastore for $className$ index insert", function() { transaction.rollbackAsync(); });
 		
 		return id;
 	};
-	
-	dao.insert = function(_$lowerCaseClassName$)
-	{
-		var id = this.provideUniqueId();
 
-		_$lowerCaseClassName$.setId(id);
-
-		//indexing
-		var indexList = this.index(_$lowerCaseClassName$);
-
-		var index = new $className$IndexDo();
-
-		index.setId(id);
-		index.setIndex(indexList);
-
-		var Key = Packages.com.googlecode.objectify.Key;		
-		var parentKey = new Key(airlift.cc("$package$.airlift.domain.$className$Do"), id);  
-		index.set$className$DoKey(new Key(parentKey, airlift.cc("$package$.airlift.domain.$className$IndexDo"), id));
-
-		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
-
-		dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for $className$ insert");
-		dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for $className$ index insert");
-
-		return id;
-	};
-
-	dao.index = function(_$lowerCaseClassName$)
+	dao.index = function(_activeRecord)
 	{
 		var indexSet = new Packages.java.util.HashSet();
 
@@ -137,22 +199,37 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.search = function(_tokenList, _config)
 	{
-		var config = (airlift.isDefined(_config) === true) ? _config : {};
-		var offset = (airlift.isDefined(_config.offset) === true) ? _config.offset : 0;
-		var limit = (airlift.isDefined(_config.limit) === true) ? _config.limit : 20;
+		var config = _config||{};
+		var offset = config.offset||0;
+		var limit = config.limit||20;
 
-		var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+		var Query = Packages.com.google.appengine.api.datastore.Query;
+		var query = new Query("$className$Index").setKeysOnly();
 
-		var query = objectify.query(airlift.cc("$package$.airlift.domain.$className$IndexDo")).
-					limit(limit).
-					offset(offset);
-		
 		for (var token in Iterator(_tokenList))
 		{
-			query = query.filter("index ==", token);
+			query = query.addFilter("index", Query.FilterOperator.EQUAL, token);
 		}
 
-		return query.fetchParents();
+		var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));		
+
+		var parentKeys = new Packages.java.util.HashSet();
+
+		for (var key in queryResults)
+		{
+			parentKeys.add(key.getParent());
+		}
+
+		var queryResults = this.datastore.get(parentKeys);
+
+		for (var entry in Iterator(queryResults.get().entrySet()))
+		{
+			var activeRecord = airlift.ar("$lowerCaseClassName$");
+			dao.copyTo(activeRecord, entry.getValue());
+			results.push(activeRecord);
+		}
+
+		return results;
 	};
 
 	$insertChangeEvent$

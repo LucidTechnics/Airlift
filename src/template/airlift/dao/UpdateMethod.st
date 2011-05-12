@@ -1,23 +1,22 @@
-dao.update = function(_$lowerCaseClassName$)
+dao.update = function(_activeRecord)
 {
-	if (airlift.isDefined(_$lowerCaseClassName$.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _$lowerCaseClassName$ }; }
+	if (airlift.isDefined(_activeRecord.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _activeRecord }; }
+
+	dao.putAudit(_activeRecord);
+
+	var parentKey = Packages.google.appengine.api.datastore.KeyFactory.createKey("$className$", _activeRecord.id);
+	var parent = new Packages.google.appengine.api.datastore.Entity(parentKey);
+	dao.copyTo(_activeRecord, parent);
 
 	//indexing
-	LOG.info("START airlift indexing");
-	var indexList = this.index(_$lowerCaseClassName$);
-	var index = new $className$IndexDo();
-	index.setId(_$lowerCaseClassName$.getId());
-	index.setIndex(indexList);
+	var indexList = this.index(_activeRecord);
+	var index = new Packages.google.appengine.api.datastore.Entity("$className$Index", _activeRecord.id, parentKey);
+	index.setProperty("index", indexList);
 
-	var Key = Packages.com.googlecode.objectify.Key;		
-	var parentKey = new Key(airlift.cc("$package$.airlift.domain.$className$Do"), _$lowerCaseClassName$.getId());  
-	index.set$className$DoKey(new Key(parentKey, airlift.cc("$package$.airlift.domain.$className$IndexDo"), _$lowerCaseClassName$.getId()));
-	LOG.info("END airlift indexing");
-	
-	var objectify = Packages.com.googlecode.objectify.ObjectifyService.begin();
+	var transaction = this.dataStore.beginTransaction();
 
-	dao.multiTry(function() { objectify.async().put(_$lowerCaseClassName$); }, 5, "Encountered this error while accessing the datastore for $className$ update");
-	dao.multiTry(function() { objectify.async().put(index); }, 5, "Encountered this error while accessing the datastore for $className$ index update");
+	var parentWritten = dao.multiTry(function() { dataStore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ update", function() { transaction.rollbackAsync(); });
+	var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, "Encountered this error while accessing the datastore for $className$ index update", function() { transaction.rollbackAsync(); });
 
-	return _$lowerCaseClassName$.getId();
+	return _activeRecord.id;
 }
