@@ -1229,5 +1229,7 @@ airlift.filterContains = function(_filter, _propertyName)
 		}
 	});
 
+	LOG.info("returning contains ===  " + contains);
+	
 	return contains;
 }

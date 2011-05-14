@@ -149,20 +149,31 @@ public class JavaScriptGenerator
 
 				if ("id".equalsIgnoreCase(name) == false)
 				{
-					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\");");
-
-					if ("true".equalsIgnoreCase(isSearchable) == true)
+					if (type.startsWith("java.util.List") == true)
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", this." + name + ");");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && new Packages.java.util.ArrayList(_entity.getProperty(\"" + name + "\")))||null;");
+					}
+					else if (type.startsWith("java.util.Set") == true)
+					{
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && new Packages.java.util.HashSet(_entity.getProperty(\"" + name + "\")))||null;");
 					}
 					else
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setUnindexedProperty(\"" + name + "\", this." + name + ");");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null;");
+					}
+
+					if ("true".equalsIgnoreCase(isSearchable) == true)
+					{
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", _activeRecord." + name + ");");
+					}
+					else
+					{
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setUnindexedProperty(\"" + name + "\", _activeRecord." + name + ");");
 					}
 				}
 				else
 				{
-					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this.id = (airlift.filterContains(filter, \"id\") === contains) && _entity.getKey().getName();");
+					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord.id = (airlift.filterContains(filter, \"id\") === contains) && _entity.getKey().getName();");
 				}
 
 				if ("true".equalsIgnoreCase(encrypted) == true)
@@ -310,11 +321,11 @@ public class JavaScriptGenerator
 			{
 				if (type.startsWith("java.util.List") == true)  
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = _attributeMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
 				}
 				else if (type.startsWith("java.util.Set") == true)
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = _attributeMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
 				}
 				else
 				{

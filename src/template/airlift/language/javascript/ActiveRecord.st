@@ -308,25 +308,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var foreignKeyList = [$foreignKeyListEntry; separator=", "$];
 	}
 
-	activeRecord.validate = function(_value, _validationFunction)
-	{
-		var errorArray = [];
-
-		errorArray = errorArray.concat(_validationFunction(_value));
-
-		var that = this;
-		
-		var addError = function(_error, _index, _array)
-		{
-			LOG.info("Validation error: " + _error.name + ":" + _error.message + ":" + _error.category);
-			that.addError(_error.name, _error.message, _error.category);
-		}
-
-		errorArray.forEach(addError);
-
-		return this;
-	}
-
 	/**
 	 * Copy the attributes of a $className$ DO to this one.
 	 *

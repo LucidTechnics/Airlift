@@ -184,6 +184,7 @@ public class RestfulSecurityContext
 
 	public AirliftUser copyEntityToAirliftUser(com.google.appengine.api.datastore.Entity _entity)
 	{
+
 		AirliftUser airliftUser = new AirliftUser();
 		
 		airliftUser.setId((String) _entity.getKey().getName());
@@ -191,7 +192,16 @@ public class RestfulSecurityContext
 		airliftUser.setShortName((String) _entity.getProperty("shortName"));
 		airliftUser.setExternalUserId((String) _entity.getProperty("externalUserId"));
 		airliftUser.setEmail((String) _entity.getProperty("email"));
-		airliftUser.setRoleSet((java.util.Set<String>) _entity.getProperty("roleSet"));
+
+		if (_entity.getProperty("roleSet") != null)
+		{
+			airliftUser.setRoleSet(new java.util.HashSet<String>((java.util.Collection)_entity.getProperty("roleSet")));
+		}
+		else
+		{
+			airliftUser.setRoleSet(new java.util.HashSet<String>());
+		}
+		
 		airliftUser.setActive((Boolean) _entity.getProperty("active"));
 		airliftUser.setAuditPostDate((java.util.Date) _entity.getProperty("auditPostDate"));
 		airliftUser.setAuditPutDate((java.util.Date) _entity.getProperty("auditPutDate"));
