@@ -182,17 +182,15 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		dao.encrypt(parent);
 		
 		//indexing
-		var indexList = this.index(_activeRecord);
-		var index = new Packages.com.google.appengine.api.datastore.Entity("$className$Index", id, parentKey);
-		index.setProperty("index", indexList);
+		$index$
 
 		var datastore = this.datastore;
 		var transaction = datastore.beginTransaction().get();
 		
 		var parentWritten = dao.multiTry(function() { datastore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
-		var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, "Encountered this error while accessing the datastore for $className$ index insert", function() { transaction.rollbackAsync(); });
+		$writeIndex$
 
-		indexWritten && parentWritten && transaction.commitAsync();
+		$indexWritten$parentWritten && transaction.commitAsync();
 		
 		return id;
 	};

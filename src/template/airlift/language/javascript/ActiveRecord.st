@@ -144,8 +144,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 		
 		this.dao.get(this, _config);
-
-		if ("on".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), "GET"); }
+		$auditGet$
 
 		return this;
 	};
@@ -161,40 +160,30 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		
 	activeRecord.update = function(_config)
 	{
-		//TODO this should only generate audit persistence if requested
-		//to compile time
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
 		this.dao.update(this);
-		
-		if ("on".equalsIgnoreCase(AUDITING_UPDATE) === true)  { airlift.audit(this.json(), "UPDATE"); }
+		$auditPut$
 
 		return this;
 	};
 	
 	activeRecord.insert = function(_config)
 	{
-		//TODO this should only generate audit persistence if requested
-		//to compile time
-
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
 		this.setId(this.dao.insert(this));
-		
-		if ("on".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), "INSERT", this.id); }
+		$auditPost$
 
 		return this;
 	};
 
 	activeRecord.del = function(_config)
 	{
-		//TODO this should only generate audit persistence if requested
-		//to compile time
-
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "DELETE"); }
 
 		this.dao.del(this.id);
-		if ("on".equalsIgnoreCase(AUDITING_DELETE) === true)  { airlift.audit(this.json(), "DELETE"); }
+		$auditDelete$
 		
 		return this;
 	};

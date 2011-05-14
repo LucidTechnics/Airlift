@@ -483,10 +483,19 @@ public class JavaGenerator
 		//live value instead of just hard coding it to 600 seconds.
 		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
 		{
-			
-			domainObjectStringTemplate.setAttribute("cacheable", "@com.googlecode.objectify.annotation.Cached(expirationSeconds=600)");
+			domainObjectStringTemplate.setAttribute("cacheable", "@airlift.generator.Cacheable()");
 		}
-		
+
+		Annotation auditable = new airlift.generator.Annotation();
+		auditable.setName("airlift.generator.Auditable");
+
+		//TODO ... We should really inspect the annotation and get the
+		//live value instead of just hard coding it to 600 seconds.
+		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
+		{
+			domainObjectStringTemplate.setAttribute("auditable", "@airlift.generator.Auditable()");
+		}
+
 		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 		domainObjectStringTemplate.setAttribute("attributes", attributeStringTemplate);
 		domainObjectStringTemplate.setAttribute("attributeGetters", getterStringTemplate);

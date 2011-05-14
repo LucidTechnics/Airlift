@@ -68,6 +68,7 @@ public class JavaScriptGenerator
 
 		String isUndoable = "false";
 		boolean processedEncryptionHeader = false;
+		boolean thisDomainIsSearchable = false;
 		
 		while (attributes.hasNext() == true)
 		{
@@ -82,6 +83,7 @@ public class JavaScriptGenerator
 			String requestPersistence = findValue(persist, "isPersistable()");
 
 			String isSearchable = "false";
+			String isIndexable = "false";
 
 			if ("true".equals(requestPersistence) == true)
 			{
@@ -98,12 +100,33 @@ public class JavaScriptGenerator
 				String rangeable = findValue(persist, "rangeable()");
 				String isImmutable = findValue(persist, "immutable()");
 
+				isIndexable = findValue(persist, "isIndexable()");
 				isSearchable = findValue(persist, "isSearchable()");
-
-				hasPrimaryKey = true;
 
 				if ("true".equalsIgnoreCase(isSearchable) == true)
 				{
+					thisDomainIsSearchable = true;
+
+					String indexAddAll = "";
+
+					if ("java.util.Date".equals(type) == true)
+					{
+						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoDateParts(_activeRecord." + name + ", \"" + name + "\"));"; 
+					}
+					else
+					//For all other types change to a string and index it!
+					{
+						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoNGrams(_activeRecord." + name + "));"; 
+					}
+
+					daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
+				}
+				
+				hasPrimaryKey = true;
+
+				if ("true".equalsIgnoreCase(isIndexable) == true)
+				{
+
 					if (type.endsWith("[]") == true ||
 						  type.startsWith("java.util.List") == true ||
 						  type.startsWith("java.util.Set") == true ||
@@ -131,20 +154,6 @@ public class JavaScriptGenerator
 					daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
 
 					daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());	
-					
-					String indexAddAll = "";
-
-					if ("java.util.Date".equals(type) == true)
-					{
-						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoDateParts(_activeRecord." + name + ", \"" + name + "\"));"; 
-					}
-					else
-					//For all other types change to a string and index it!
-					{
-						indexAddAll = "indexSet.addAll(airlift.tokenizeIntoNGrams(_activeRecord." + name + "));"; 
-					}
-
-					daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
 				}
 
 				if ("id".equalsIgnoreCase(name) == false)
@@ -162,7 +171,7 @@ public class JavaScriptGenerator
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null;");
 					}
 
-					if ("true".equalsIgnoreCase(isSearchable) == true)
+					if ("true".equalsIgnoreCase(isIndexable) == true)
 					{
 						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", _activeRecord." + name + ");");
 					}
@@ -213,7 +222,14 @@ public class JavaScriptGenerator
 			updateMethodStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 			updateMethodStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 			updateMethodStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
-			
+
+			if (thisDomainIsSearchable == true)
+			{
+				updateMethodStringTemplate.setAttribute("index", "var indexList = this.index(_activeRecord), index = new Packages.com.google.appengine.api.datastore.Entity(\"" + _domainObjectModel.getClassName() + "Index\", _activeRecord.id, parentKey); index.setProperty(\"index\", indexList);");
+				updateMethodStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index update\", function() { transaction.rollbackAsync(); });");
+				updateMethodStringTemplate.setAttribute("indexWritten", "indexWritten && ");
+			}
+
 			primaryKeyMethodsStringTemplate.setAttribute("updateMethod", updateMethodStringTemplate.toString());
 			primaryKeyMethodsStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 			primaryKeyMethodsStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
@@ -230,6 +246,13 @@ public class JavaScriptGenerator
 			daoStringTemplate.setAttribute("decryptToActiveRecordAttribute", decryptInvokationStringTemplate.toString());
 		}
 
+		if (thisDomainIsSearchable == true)
+		{
+			daoStringTemplate.setAttribute("index", "var indexList = this.index(_activeRecord), index = new Packages.com.google.appengine.api.datastore.Entity(\"" + _domainObjectModel.getClassName() + "Index\", id, parentKey); index.setProperty(\"index\", indexList);");
+			daoStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index insert\", function() { transaction.rollbackAsync(); });");
+			daoStringTemplate.setAttribute("indexWritten", "indexWritten && ");
+		}
+		
 		daoStringTemplate.setAttribute("generatorComment", comment);
 		daoStringTemplate.setAttribute("upperCaseFirstLetterDomainClassName", upperTheFirstCharacter(domainName));
 		daoStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
@@ -344,6 +367,27 @@ public class JavaScriptGenerator
 			}
 
 			stringBufferStringTemplate.setAttribute("name", name);
+		}
+
+		/*Annotation cacheable = new airlift.generator.Annotation();
+		cacheable.setName("airlift.generator.Cacheable");
+
+		//TODO ... We should really inspect the annotation and get the
+		//live value instead of just hard coding it to 600 seconds.
+		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
+		{
+			domainObjectStringTemplate.setAttribute("cacheable", "@airlift.generator.Cacheable()");
+		}*/
+
+		Annotation auditable = new airlift.generator.Annotation();
+		auditable.setName("airlift.generator.Auditable");
+
+		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
+		{
+			activeRecordStringTemplate.setAttribute("auditGet", "if (\"on\".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), \"GET\"); }");
+			activeRecordStringTemplate.setAttribute("auditPut", "if (\"on\".equalsIgnoreCase(AUDITING_UPDATE) === true) { airlift.audit(this.json(), \"UPDATE\"); }");
+			activeRecordStringTemplate.setAttribute("auditPost", "if (\"on\".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), \"INSERT\"); }");
+			activeRecordStringTemplate.setAttribute("auditDelete", "if (\"on\".equalsIgnoreCase(AUDITING_DELETE) === true) { airlift.audit(this.json(), \"DELETE\"); }");
 		}
 		
 		activeRecordStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
