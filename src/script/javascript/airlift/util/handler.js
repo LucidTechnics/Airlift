@@ -414,15 +414,6 @@ airlift.populate = function(_domainName, _appName)
 	return [activeRecord, errorMap];
 };
 
-airlift.exists = function(_id, _domainName)
-{
-	var activeRecord = airlift.ar(_domainName);
-
-	var id = (airlift.isDefined(_id) === true) ? _id : ID;
-
-	return activeRecord.exists(id);
-};
-
 airlift.get = function(_id, _domainName, _appName)
 {
 	var activeRecord = airlift.ar(_domainName, _appName);
@@ -1149,7 +1140,7 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.uri = URI;
 	auditTrail.handlerName = HANDLER_NAME;
 	auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(_data);
-	auditTrail.email = USER_EMAIL;
+	auditTrail.userId = USER_EMAIL;
 	auditTrail.actionDate = airlift.createDate();
 	auditTrail.recordDate = auditTrail.actionDate;
 
@@ -1224,4 +1215,19 @@ airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
 	{
 		SECURITY_CONTEXT.insert(airliftUser);
 	}
+}
+
+airlift.filterContains = function(_filter, _propertyName)
+{
+	var contains = false;
+
+	_filter.forEach(function(_item)
+	{
+		if (_item.equalsIgnoreCase(_propertyName) === true)
+		{
+			contains = true;
+		}
+	});
+
+	return contains;
 }

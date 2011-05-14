@@ -1,10 +1,12 @@
 /**
- * _membership list must be a java.lang.List object.
- * _config can optional have as attributes
+ * _membership list must be a Javascript array.
+ * _config can optionally have as attributes ...
+ * 
  * offset: starting point for returned objects
  * limit: total number of returned objects
  * asc: the direction ordering should be performed
  * orderBy: the attribute on which ordering should be performed.
+ * 
  */
 
 dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
@@ -25,14 +27,15 @@ dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 		query.addFilter("$attribute$", Query.FilterOperator.EQUAL, _member);
 	});
 	
-	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));
+	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	var results = [];
 
-	for (var result in queryResults)
+	for (var result in Iterator(queryResults))
 	{
+		dao.decrypt(result);
 		var activeRecord = airlift.ar("$lowerCaseClassName$");
-		dao.copyTo(activeRecord, result);
+		dao.copyFromEntity(activeRecord, result);
 		results.push(activeRecord);
 	}
 

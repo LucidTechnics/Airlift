@@ -70,7 +70,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			var list = new Packages.java.util.ArrayList();
 
-			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord && _activeRecord.restify()); } );
+			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord.restify()); } );
 
 			var json = Packages.airlift.util.AirliftUtil.toJson(list);
 		}
@@ -137,13 +137,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.atom = function(_config)
 	{
 		return airlift.toAtom(_config);
-	};
-
-	activeRecord.exists = function(_id, _config)
-	{
-		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
-
-		return this.dao.exists(_id);
 	};
 
 	activeRecord.get = function(_config)
@@ -215,14 +208,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
 
-		return (_config && _config.returnRawResult) ? this.dao.search(_tokenList, _config) : this.convertEntityMapToActiveRecordArray(this.dao.search(_tokenList, _config));
+		return this.dao.search(_tokenList, _config);
 	};
 
 	activeRecord.collect = function(_config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
 
-		return this.convertToActiveRecordArray(this.dao.collect(_config));
+		return this.dao.collect(_config);
 	};
 
 	activeRecord.retrieveDomainInterfaceClassName = function()
@@ -235,41 +228,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
 	}
 
-	activeRecord.convertToActiveRecordArray = function(_collection, _doNotConvertToActiveRecord)
-	{
-		if (airlift.isDefined(_doNotConvertToActiveRecord) === false)
-		{
-			_collection.forEach(function(_entity, _index)
-			{
-				var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-				activeRecord.decrypt(_entity);
-				_collection[_index] = activeRecord;
-			});
-		}
-
-		return _collection;
-	}
-
-	activeRecord.convertEntityMapToActiveRecordArray = function(_entityMap)
-	{
-		var collection = [];
-
-		for (var entry in Iterator(_entityMap.entrySet()))
-		{
-			var key = entry.getKey();
-			var activeRecord = airlift.create$upperCaseFirstLetterDomainClassName$();
-			activeRecord.copyFrom(entry.getValue());
-			activeRecord.setId(key.name);
-			collection.push(activeRecord);
-		}
-
-		return collection;
-	}
-
 	//For every collect method do the same.
 	$collectByAttribute; separator="\n\n"$
 
-	$collectByRange; separator="\n\n"$
+	$collectByMembership; separator="\n\n"$
 
 	activeRecord.addMessage = function(_name, _message, _category)
 	{
@@ -379,21 +341,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	}
 
-	activeRecord.filterContains = function(_filter, _propertyName)
-	{
-		var contains = false;
-
-		_filter.forEach(function(_item)
-		{
-			_item.equalsIgnoreCase(_propertyName) === true)
-			{
-				contains = true;
-			}
-		});
-
-		return contains;
-	}
-
 	activeRecord.copyFrom = function(_activeRecord, _config)
 	{
 		var config = _config||{};
@@ -461,7 +408,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		errorList.forEach(function(_error) { this.addError(_error.name, _error.message, _error.category); });
 
-		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName + " has errors: " + this.messageManager.getMessageMap()); }
+		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
 		
 		return this.messageManager.getMessageMap();
 	}

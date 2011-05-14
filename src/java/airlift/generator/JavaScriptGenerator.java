@@ -33,7 +33,7 @@ public class JavaScriptGenerator
 				Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
 	{
 		String generatedString = generateValidationObject(_domainObjectModel);
-		String fileName =  _appName + "/airlift/validation/domain/" + _domainObjectModel.getClassName() + "Validator.js";
+		String fileName =  _appName + "/airlift/validation/domain/" + _domainObjectModel.getClassName() + ".js";
 		writeResourceFile(fileName, _directory, generatedString, _element);
 
 		generatedString = generateDao(_domainObjectModel);
@@ -55,26 +55,33 @@ public class JavaScriptGenerator
 		StringTemplate updateMethodStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/UpdateMethod");
 		StringTemplate updateMethodNotSupportedStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/UpdateMethodNotSupported");
 
+		//Encryption templates ...
+		StringTemplate encryptionSetupTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/EncryptionSetup");
+		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/EncryptInvokation");
+		StringTemplate setDataObjectEncryptedFieldStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/SetDataObjectEncryptedField");
+		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DecryptInvokation");
+
 		java.util.Iterator attributes = _domainObjectModel.getAttributes();
 
 		boolean hasPrimaryKey = false;
 		boolean updateIsAvailable = false;
 
 		String isUndoable = "false";
-
+		boolean processedEncryptionHeader = false;
+		
 		while (attributes.hasNext() == true)
 		{
-			String isSearchable = "false";
-
 			Attribute attribute = (Attribute) attributes.next();
 			Annotation persist = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Persistable");
-			Annotation search = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Searchable");
 			Annotation undo = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Undoable");
+
+			String encrypted = findValue(persist, "encrypted()");
 
 			isUndoable = (undo != null) ? findValue(undo, "isUndoable()") : "false";
 
 			String requestPersistence = findValue(persist, "isPersistable()");
-			String requestSearchable = findValue(persist, "isSearchable()");			
+
+			String isSearchable = "false";
 
 			if ("true".equals(requestPersistence) == true)
 			{
@@ -91,45 +98,40 @@ public class JavaScriptGenerator
 				String rangeable = findValue(persist, "rangeable()");
 				String isImmutable = findValue(persist, "immutable()");
 
-				if (search != null)
-				{
-					isSearchable = findValue(search, "isSearchable()");
-				}
+				isSearchable = findValue(persist, "isSearchable()");
 
 				hasPrimaryKey = true;
 
-				StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");
-
-				daoAttributeStringTemplate.setAttribute("findByThisAttributeSql", databaseGenerator.generateFindByThisAttributeSql(_domainObjectModel, fieldName));
-				daoAttributeStringTemplate.setAttribute("attributeName", name);
-				daoAttributeStringTemplate.setAttribute("attributeType", type);
-				daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
-				daoAttributeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-				daoAttributeStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
-				daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
-				
-				daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());
-
-				if (type.endsWith("[]") == true ||
-					  type.startsWith("java.util.List") == true ||
-					  type.startsWith("java.util.Set") == true ||
-					  type.startsWith("java.util.ArrayList") == true ||
-					  type.startsWith("java.util.HashSet") == true)
-
+				if ("true".equalsIgnoreCase(isSearchable) == true)
 				{
-					StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
+					if (type.endsWith("[]") == true ||
+						  type.startsWith("java.util.List") == true ||
+						  type.startsWith("java.util.Set") == true ||
+						  type.startsWith("java.util.ArrayList") == true ||
+						  type.startsWith("java.util.HashSet") == true)
 
-					daoMembershipStringTemplate.setAttribute("findByMembershipSql", databaseGenerator.generateFindByThisMembershipSql(_domainObjectModel, fieldName));
-					daoMembershipStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
-					daoMembershipStringTemplate.setAttribute("lowercaseAttribute", lowerTheFirstCharacter(name));
-					daoMembershipStringTemplate.setAttribute("attribute", name);
-					daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-					daoMembershipStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
-					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
-				}
+					{
+						StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
 
-				if ("true".equalsIgnoreCase(isSearchable) === true)
-				{
+						daoMembershipStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
+						daoMembershipStringTemplate.setAttribute("lowercaseAttribute", lowerTheFirstCharacter(name));
+						daoMembershipStringTemplate.setAttribute("attribute", name);
+						daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+						daoMembershipStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
+						daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
+					}
+					
+					StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");
+
+					daoAttributeStringTemplate.setAttribute("attributeName", name);
+					daoAttributeStringTemplate.setAttribute("attributeType", type);
+					daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+					daoAttributeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+					daoAttributeStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
+					daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
+
+					daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());	
+					
 					String indexAddAll = "";
 
 					if ("java.util.Date".equals(type) == true)
@@ -144,6 +146,49 @@ public class JavaScriptGenerator
 
 					daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
 				}
+
+				if ("id".equalsIgnoreCase(name) == false)
+				{
+					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\");");
+
+					if ("true".equalsIgnoreCase(isSearchable) == true)
+					{
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", this." + name + ");");
+					}
+					else
+					{
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setUnindexedProperty(\"" + name + "\", this." + name + ");");
+					}
+				}
+				else
+				{
+					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this.id = (airlift.filterContains(filter, \"id\") === contains) && _entity.getKey().getName();");
+				}
+
+				if ("true".equalsIgnoreCase(encrypted) == true)
+				{
+					if (processedEncryptionHeader == false)
+					{
+						daoStringTemplate.setAttribute("encryptionSetup", encryptionSetupTemplate.toString());
+						processedEncryptionHeader = true;
+					}
+
+					String encryptedName = name + "Encrypted";
+
+					String encryptionConversionFunction = determineEncryptionConversionFunction(type);
+					String decryptionConversionFunction = determineDecryptionConversionFunction(type);
+
+					encryptInvokationStringTemplate.setAttribute("name", name);
+					encryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
+					encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
+
+					setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedName", encryptedName);
+
+					decryptInvokationStringTemplate.setAttribute("name", name);
+					decryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
+					decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
+				}
+
 			}
 		}
 
@@ -167,6 +212,13 @@ public class JavaScriptGenerator
 			daoStringTemplate.setAttribute("primaryKeyMethods", primaryKeyMethodsStringTemplate.toString());
 		}
 
+		if (processedEncryptionHeader == true)
+		{
+			daoStringTemplate.setAttribute("setDataObjectEncryptedField", setDataObjectEncryptedFieldStringTemplate.toString());
+			daoStringTemplate.setAttribute("encryptedAttribute", encryptInvokationStringTemplate.toString());
+			daoStringTemplate.setAttribute("decryptToActiveRecordAttribute", decryptInvokationStringTemplate.toString());
+		}
+
 		daoStringTemplate.setAttribute("generatorComment", comment);
 		daoStringTemplate.setAttribute("upperCaseFirstLetterDomainClassName", upperTheFirstCharacter(domainName));
 		daoStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
@@ -183,10 +235,6 @@ public class JavaScriptGenerator
 	{
 		String domainName = _domainObjectModel.getClassName();
 		StringTemplate activeRecordStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ActiveRecord");
-		StringTemplate encryptionSetupTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/EncryptionSetup");
-		StringTemplate encryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/EncryptInvokation");
-		StringTemplate setDataObjectEncryptedFieldStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/SetDataObjectEncryptedField");
-		StringTemplate decryptInvokationStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/DecryptInvokation");
 		StringTemplate stringBufferStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/AttributeStringBufferAppends");
 		
 		activeRecordStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
@@ -197,7 +245,6 @@ public class JavaScriptGenerator
 		activeRecordStringTemplate.setAttribute("className", _domainObjectModel.getClassName());
 		
 		boolean processedDatable = false;
-		boolean processedEncryptionHeader = false;
 		
 		java.util.Iterator attributes = _domainObjectModel.getAttributes();
 
@@ -214,7 +261,10 @@ public class JavaScriptGenerator
 			
 			String requestDatable = findValue(datable, "isDatable()");
 			String isForeignKey = findValue(persist, "mapTo()");
-			
+
+			String isSearchable = "false";
+			isSearchable = findValue(persist, "isSearchable()");
+
 			if (processedDatable == false)
 			{
 				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\", \"MM-dd-yyyy Z\", \"MM-dd-yyyy HH:mm:ss Z\"}";
@@ -223,7 +273,7 @@ public class JavaScriptGenerator
 
 			processedDatable = true;
 
-			if ("false".equals(isForeignKey) == false)
+			if ("false".equalsIgnoreCase(isForeignKey) == false)
 			{
 				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "activeRecord.foreignKeySet.add(\"" + name + "\");");
 				activeRecordStringTemplate.setAttribute("addForeignKeyName", "foreignKeyList.push(airlift.string(\"" + name + "\"));");
@@ -237,31 +287,32 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
 
-			activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.convertToActiveRecordArray(this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{})); };");
+			if ("true".equalsIgnoreCase(isSearchable) == true)
+			{
+				if (type.endsWith("[]") == true ||
+					  type.startsWith("java.util.List") == true ||
+					  type.startsWith("java.util.Set") == true ||
+					  type.startsWith("java.util.ArrayList") == true ||
+					  type.startsWith("java.util.HashSet") == true)
+
+				{
+					activeRecordStringTemplate.setAttribute("collectByMembership", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Membership = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "Membership(_value, _config||{}); };");
+				}
+
+				activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{}); };");
+			}
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
 			activeRecordStringTemplate.setAttribute("copyPropertyToImpl", "_impl.set" + upperTheFirstCharacter(name) + "(this." + name + ");");
 			activeRecordStringTemplate.setAttribute("propertyListEntry", "\"" + name + "\"");
-
-			if ("id".equalsIgnoreCase(name) == false)
-			{
-				activeRecordStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (this.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\");");
-				activeRecordStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(this.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", this." + name + ");");
-			}
-			else
-			{
-				activeRecordStringTemplate.setAttribute("copyFromEntityToActiveRecord", "this." + name + " = (this.filterContains(filter, \"" + name + "\") === contains) && _entity.getKey().getName();");
-			}
 			
 			if ("id".equalsIgnoreCase(name) == false && "false".equals(isForeignKey) == true)
 			{
-				if ("java.util.List".equalsIgnoreCase(type) == true ||
-					"java.util.ArrayList".equalsIgnoreCase(type) == true)  
+				if (type.startsWith("java.util.List") == true)  
 				{
 					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
 				}
-				else if ("java.util.Set".equalsIgnoreCase(type) == true ||
-						"java.util.HashSet".equalsIgnoreCase(type) == true)  
+				else if (type.startsWith("java.util.Set") == true)
 				{
 					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\"))||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
 				}
@@ -272,8 +323,6 @@ public class JavaScriptGenerator
 				}
 			}
 			
-			String encrypted = findValue(persist, "encrypted()");
-
 			if (isArrayType(type) == true)
 			{
 				stringBufferStringTemplate.setAttribute("getterName", "airlift.util.AirliftUtil.generateStringFromArray(" + getterName + "())");
@@ -284,42 +333,8 @@ public class JavaScriptGenerator
 			}
 
 			stringBufferStringTemplate.setAttribute("name", name);
-
-			if ("true".equalsIgnoreCase(encrypted) == true)
-			{
-				if (processedEncryptionHeader == false)
-				{
-					activeRecordStringTemplate.setAttribute("encryptionSetup", encryptionSetupTemplate.toString());
-					processedEncryptionHeader = true;
-				}
-				
-				String encryptedName = name + "Encrypted";
-				String encryptedGetterName = getGetterName(encryptedName);
-				String encryptedSetterName = getSetterName(encryptedName);
-
-				String encryptionConversionFunction = determineEncryptionConversionFunction(type);
-				String decryptionConversionFunction = determineDecryptionConversionFunction(type);
-
-				encryptInvokationStringTemplate.setAttribute("getterName", getterName);
-				encryptInvokationStringTemplate.setAttribute("setterName", setterName);
-				encryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
-				encryptInvokationStringTemplate.setAttribute("conversionFunction", encryptionConversionFunction);
-
-				setDataObjectEncryptedFieldStringTemplate.setAttribute("encryptedName", encryptedName);
-
-				decryptInvokationStringTemplate.setAttribute("setterName", setterName);
-				decryptInvokationStringTemplate.setAttribute("encryptedName", encryptedName);
-				decryptInvokationStringTemplate.setAttribute("conversionFunction", decryptionConversionFunction);
-			}
 		}
-
-		if (processedEncryptionHeader == true)
-		{
-			activeRecordStringTemplate.setAttribute("setDataObjectEncryptedField", setDataObjectEncryptedFieldStringTemplate.toString());
-			activeRecordStringTemplate.setAttribute("encryptedAttribute", encryptInvokationStringTemplate.toString());
-			activeRecordStringTemplate.setAttribute("decryptToActiveRecordAttribute", decryptInvokationStringTemplate.toString());
-		}
-
+		
 		activeRecordStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
 		
 		return activeRecordStringTemplate.toString();

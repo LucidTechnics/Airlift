@@ -36,14 +36,14 @@ public class JavaGenerator
 		String fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Impl";
 		writeJavaFile(fileName, generatedString, _element);
 
-		generatedString = generateDoDomainObject(_domainObjectModel);
+/*		generatedString = generateDoDomainObject(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "Do";
 		writeJavaFile(fileName, generatedString, _element);
 
 		generatedString = generateDoDomainIndexObject(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName() + "IndexDo";
 		writeJavaFile(fileName, generatedString, _element);
-
+*/
 		generatedString = generateDomainSubInterface(_domainObjectModel);
 		fileName =  _directory + "." + _domainObjectModel.getRootPackageName() + ".airlift.domain." + _domainObjectModel.getClassName();
 		writeJavaFile(fileName, generatedString, _element);
@@ -68,8 +68,9 @@ public class JavaGenerator
 
 				}
 
-				template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "Do.class);");
-				template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "IndexDo.class);");
+				//This is not needed anymore ...
+				//template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "Do.class);");
+				//template.setAttribute("registerDao", "com.googlecode.objectify.ObjectifyService.register(" + domainObjectModel.getRootPackageName() + ".airlift.domain." + domainObjectModel.getClassName() + "IndexDo.class);");
 
 				String domainAttributeListName = lowerTheFirstCharacter(domainObjectModel.getClassName()) + "AttributeList";
 				

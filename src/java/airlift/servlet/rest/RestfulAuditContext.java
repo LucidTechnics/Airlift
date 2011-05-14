@@ -19,34 +19,88 @@ import java.util.logging.Logger;
 import com.google.appengine.api.users.User;
 
 public class RestfulAuditContext
-{
-	static
-	{
-		com.googlecode.objectify.ObjectifyService.register(AuditTrail.class);	
-	}
-	
+{	
 	private static final Logger log = Logger.getLogger(RestfulAuditContext.class.getName());
 	
 	public RestfulAuditContext() {}
 
+	public AuditTrail copyEntityToAuditTrail(com.google.appengine.api.datastore.Entity _entity)
+	{
+		AuditTrail auditTrail = new AuditTrail();
+		
+		auditTrail.setId(_entity.getKey().getName());
+		auditTrail.setDomainId((String) _entity.getProperty("domainId"));
+		auditTrail.setAction((String) _entity.getProperty("action"));
+		auditTrail.setMethod((String) _entity.getProperty("method"));
+		auditTrail.setDomain((String) _entity.getProperty("domain"));
+		auditTrail.setUri((String) _entity.getProperty("uri"));
+		auditTrail.setHandlerName((String) _entity.getProperty("handlerName"));
+		auditTrail.setData((com.google.appengine.api.datastore.Text) _entity.getProperty("data"));
+		auditTrail.setUserId((String) _entity.getProperty("userId"));
+		auditTrail.setActionDate((java.util.Date)_entity.getProperty("actionDate"));
+		auditTrail.setRecordDate((java.util.Date) _entity.getProperty("recordDate"));
+
+		return auditTrail;
+	}
+
+	public com.google.appengine.api.datastore.Entity copyAuditTrailToEntity(AuditTrail _auditTrail)
+	{
+		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AuditTrail", _auditTrail.getId());
+		
+		entity.setUnindexedProperty("domainId", _auditTrail.getDomainId());
+		entity.setUnindexedProperty("action", _auditTrail.getAction());
+		entity.setUnindexedProperty("method", _auditTrail.getMethod());
+		entity.setUnindexedProperty("domain", _auditTrail.getDomain());
+		entity.setUnindexedProperty("uri", _auditTrail.getUri());
+		entity.setUnindexedProperty("handlerName", _auditTrail.getHandlerName());
+		entity.setUnindexedProperty("data", _auditTrail.getData());
+		entity.setUnindexedProperty("userId", _auditTrail.getUserId());
+		entity.setUnindexedProperty("actionDate", _auditTrail.getActionDate());
+		entity.setUnindexedProperty("recordDate", _auditTrail.getRecordDate());
+
+		return entity;
+	}
+
 	public java.util.List<AuditTrail> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = _orderBy;
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort);
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		if (_asc == false) { orderBy = "-" + _orderBy; }
+		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
 
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy);
-		return query.list();
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
+
+			results.add(auditTrail);
+		}
+
+		return results;
 	}
 
 	public String insert(AuditTrail _auditTrail)
 	{
-		_auditTrail.setId(airlift.util.IdGenerator.generate(12));
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Transaction transaction = null;
 		
-		com.googlecode.objectify.ObjectifyService.begin().async().put(_auditTrail);
+		try
+		{
+			transaction = datastore.beginTransaction().get();
+			_auditTrail.setId(airlift.util.IdGenerator.generate(12));
+			_auditTrail.setRecordDate(new java.util.Date());
+			com.google.appengine.api.datastore.Entity entity = copyAuditTrailToEntity(_auditTrail);
+			datastore.put(entity);
+
+			transaction.commitAsync();
+		}
+		catch(Throwable t)
+		{
+			if (transaction != null) { transaction.rollbackAsync(); }
+			throw new RuntimeException(t);
+		}
 
 		return _auditTrail.getId();
 	}
@@ -58,7 +112,21 @@ public class RestfulAuditContext
 
 	public AuditTrail get(String _id)
 	{
-		return com.googlecode.objectify.ObjectifyService.begin().get(AuditTrail.class, _id);
+		AuditTrail auditTrail = new AuditTrail();
+
+		try
+		{			
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AuditTrail", _id);
+			com.google.appengine.api.datastore.Entity entity = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().get(key).get();
+
+			auditTrail = copyEntityToAuditTrail(entity);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return auditTrail;
 	}
 
 	public void update(AuditTrail _auditTrail)
@@ -68,131 +136,76 @@ public class RestfulAuditContext
 			throw new RuntimeException("Cannot update. Null id found for object: " + _auditTrail);
 		}
 
-		com.googlecode.objectify.ObjectifyService.begin().async().put(_auditTrail);
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Transaction transaction = null;
+		
+		try
+		{
+			transaction = datastore.beginTransaction().get();
+			_auditTrail.setRecordDate(new java.util.Date());
+			com.google.appengine.api.datastore.Entity entity = copyAuditTrailToEntity(_auditTrail);
+			datastore.put(entity);
+			transaction.commitAsync();
+		}
+		catch(Throwable t)
+		{
+			if (transaction != null) { transaction.rollbackAsync(); }
+			throw new RuntimeException(t);
+		}
+
+
 	}
 
 	public void delete(AuditTrail _auditTrail)
 	{
-		com.googlecode.objectify.ObjectifyService.begin().async().delete(_auditTrail);
+		try
+		{			
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AuditTrail", _auditTrail.getId());
+			com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().delete(key);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
 	}
 
 	public java.util.List<AuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = _orderBy;
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort).addFilter("domainId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		if (_asc == false) { orderBy = "-" + _orderBy; }
+		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
 
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("domainId ==", _value);
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
-		return query.list();
+			results.add(auditTrail);
+		}
+
+		return results;
 	}
 
-	public java.util.List<AuditTrail> collectByAction(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AuditTrail> collectByUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = _orderBy;
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort).addFilter("userId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		if (_asc == false) { orderBy = "-" + _orderBy; }
+		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
 
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("action ==", _value);
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
-		return query.list();
-	}
+			results.add(auditTrail);
+		}
 
-	public java.util.List<AuditTrail> collectByEmail(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("email ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AuditTrail> collectByDomain(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("domain ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AuditTrail> collectByUri(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("uri ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AuditTrail> collectByHandlerName(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("handlerName ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AuditTrail> collectByActionDate(java.util.Date _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("actionDate ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AuditTrail> collectByRecordDate(java.util.Date _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AuditTrail.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy).
-											   filter("recordDate ==", _value);
-
-		return query.list();
+		return results;
 	}
 }

@@ -1,3 +1,14 @@
+/**
+ * _value is the value the attribute must have in order to be returned.
+ * _config can optionally have as attributes ...
+ * 
+ * offset: starting point for returned objects
+ * limit: total number of returned objects
+ * asc: the direction ordering should be performed
+ * orderBy: the attribute on which ordering should be performed.
+ * 
+ */
+
 dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 {
 	var config = _config||{};
@@ -10,14 +21,15 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
 	var query = new Query("$className$").addSort(orderBy, sort).addFilter("$attribute$", Query.FilterOperator.EQUAL, token);
-	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).withOffset(offset));
+	var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	var results = [];
 
-	for (var result in queryResults)
+	for (var result in Iterator(queryResults))
 	{
+		dao.decrypt(result);
 		var activeRecord = airlift.ar("$lowerCaseClassName$");
-		dao.copyTo(activeRecord, result);
+		dao.copyFromEntity(activeRecord, result);
 		results.push(activeRecord);
 	}
 

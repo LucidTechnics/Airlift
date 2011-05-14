@@ -14,8 +14,6 @@
 
 package airlift.servlet.rest; 
 
-@javax.persistence.Entity(name="AirliftUser")
-@com.googlecode.objectify.annotation.Unindexed
 public class AirliftUser
 {
 	public AirliftUser() {}

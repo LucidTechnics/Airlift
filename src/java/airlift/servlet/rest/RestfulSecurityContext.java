@@ -19,11 +19,6 @@ import java.util.logging.Logger;
 public class RestfulSecurityContext
    implements airlift.SecurityContext
 {
-	static
-	{
-		com.googlecode.objectify.ObjectifyService.register(AirliftUser.class);	
-	}
-
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 	
 	public RestfulSecurityContext() {}
@@ -187,27 +182,84 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
+	public AirliftUser copyEntityToAirliftUser(com.google.appengine.api.datastore.Entity _entity)
+	{
+		AirliftUser airliftUser = new AirliftUser();
+		
+		airliftUser.setId((String) _entity.getKey().getName());
+		airliftUser.setFullName((String) _entity.getProperty("fullName"));
+		airliftUser.setShortName((String) _entity.getProperty("shortName"));
+		airliftUser.setExternalUserId((String) _entity.getProperty("externalUserId"));
+		airliftUser.setEmail((String) _entity.getProperty("email"));
+		airliftUser.setRoleSet((java.util.Set<String>) _entity.getProperty("roleSet"));
+		airliftUser.setActive((Boolean) _entity.getProperty("active"));
+		airliftUser.setAuditPostDate((java.util.Date) _entity.getProperty("auditPostDate"));
+		airliftUser.setAuditPutDate((java.util.Date) _entity.getProperty("auditPutDate"));
+		airliftUser.setTimeOutDate((java.util.Date) _entity.getProperty("timeOutDate"));
+
+		return airliftUser;
+	}
+
+	public com.google.appengine.api.datastore.Entity copyAirliftUserToEntity(AirliftUser _airliftUser)
+	{
+		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AirliftUser", _airliftUser.getId());
+		
+		entity.setUnindexedProperty("fullName", _airliftUser.getFullName());
+		entity.setUnindexedProperty("shortName", _airliftUser.getShortName());
+		entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
+		entity.setProperty("email", _airliftUser.getEmail());
+		entity.setUnindexedProperty("roleSet", _airliftUser.getRoleSet());
+		entity.setUnindexedProperty("active", _airliftUser.getActive());
+		entity.setUnindexedProperty("auditPostDate", _airliftUser.getAuditPostDate());
+		entity.setUnindexedProperty("auditPutDate", _airliftUser.getAuditPutDate());
+		entity.setUnindexedProperty("timeOutDate", _airliftUser.getTimeOutDate());
+
+		return entity;
+	}
+
 	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)
-	{ 
-		String orderBy = _orderBy;
+	{
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort);
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		if (_asc == false) { orderBy = "-" + _orderBy; }
+		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
 
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
-											   limit(_limit).
-											   offset(_offset).
-											   order(orderBy);
-		return query.list();
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AirliftUser airliftUser = copyEntityToAirliftUser(entity);
+
+			results.add(airliftUser);
+		}
+
+		return results;
 	}
 
 	public String insert(AirliftUser _airliftUser)
 	{
-		_airliftUser.setId(airlift.util.IdGenerator.generate(12));
-		_airliftUser.setAuditPostDate(new java.util.Date());
-		_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Transaction transaction = null;
 
-		com.googlecode.objectify.ObjectifyService.begin().async().put(_airliftUser);
-		
+		try
+		{
+			transaction = datastore.beginTransaction().get();
+			_airliftUser.setId(airlift.util.IdGenerator.generate(12));
+			_airliftUser.setAuditPostDate(new java.util.Date());
+			_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
+			
+			com.google.appengine.api.datastore.Entity entity = copyAirliftUserToEntity(_airliftUser);
+			datastore.put(entity);
+
+			transaction.commitAsync();
+		}
+		catch(Throwable t)
+		{
+			if (transaction != null) { transaction.rollbackAsync(); }
+			throw new RuntimeException(t);
+		}
+
 		return _airliftUser.getId();
 	}
 
@@ -218,7 +270,21 @@ public class RestfulSecurityContext
 
 	public AirliftUser get(String _id)
 	{
-		return com.googlecode.objectify.ObjectifyService.begin().get(AirliftUser.class, _id);
+		AirliftUser airliftUser = new AirliftUser();
+		
+		try
+		{			
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftUser", _id);
+			com.google.appengine.api.datastore.Entity entity = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().get(key).get();
+
+			airliftUser = copyEntityToAirliftUser(entity);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return airliftUser;
 	}
 
 	public void update(AirliftUser _airliftUser)
@@ -228,88 +294,75 @@ public class RestfulSecurityContext
 			throw new RuntimeException("Cannot update. Null id found for object: " + _airliftUser);
 		}
 
-		_airliftUser.setAuditPutDate(new java.util.Date());
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Transaction transaction = null;
 
-		com.googlecode.objectify.ObjectifyService.begin().async().put(_airliftUser);
+		try
+		{
+			transaction = datastore.beginTransaction().get();
+			_airliftUser.setAuditPutDate(new java.util.Date());
+			com.google.appengine.api.datastore.Entity entity = copyAirliftUserToEntity(_airliftUser);
+			datastore.put(entity);
+
+			transaction.commitAsync();
+		}
+		catch(Throwable t)
+		{
+			if (transaction != null) { transaction.rollbackAsync(); }
+			throw new RuntimeException(t);
+		}
 	}
 
 	public void delete(AirliftUser _airliftUser)
 	{
-		com.googlecode.objectify.ObjectifyService.begin().async().delete(_airliftUser);
+		try
+		{			
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftUser", _airliftUser.getId());
+			com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().delete(key);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
 	}
 
 	public java.util.List<AirliftUser> collectByExternalUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = _orderBy;
-		
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-		
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
-					limit(_limit).
-					offset(_offset).
-					order(orderBy).
-					filter("externalUserId ==", _value);
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort).addFilter("externalUserId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		return query.list();
+		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
+
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AirliftUser airliftUser = copyEntityToAirliftUser(entity);
+
+			results.add(airliftUser);
+		}
+
+		return results;
 	}
 
 	public java.util.List<AirliftUser> collectByEmail(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		String orderBy = _orderBy;
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort).addFilter("email", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		if (_asc == false) { orderBy = "-" + _orderBy; }
+		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
 
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
-					limit(_limit).
-					offset(_offset).
-					order(orderBy).
-					filter("email ==", _value);
+		while (queryResults.hasNext())
+		{
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			AirliftUser airliftUser = copyEntityToAirliftUser(entity);
 
-		return query.list();
-	}
+			results.add(airliftUser);
+		}
 
-	public java.util.List<AirliftUser> collectByActive(boolean _value, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).					limit(_limit).
-					offset(_offset).
-					order(orderBy).
-					filter("active ==", _value);
-
-		return query.list();
-	}
-
-	public java.util.List<AirliftUser> collectByAuditPostDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).					limit(_limit).
-					offset(_offset).
-					order(orderBy).
-					filter("auditPostDateRange >=", _begin).
-					filter("auditPostDateRange <", _end);
-
-		return query.list();
-	}
-
-	public java.util.List<AirliftUser> collectByAuditPutDateRange(java.util.Date _begin, java.util.Date _end, int _offset, int _limit, String _orderBy, boolean _asc)
-	{
-		String orderBy = _orderBy;
-
-		if (_asc == false) { orderBy = "-" + _orderBy; }
-
-		com.googlecode.objectify.Query query = com.googlecode.objectify.ObjectifyService.begin().query(AirliftUser.class).
-					limit(_limit).
-					offset(_offset).
-					order(orderBy).
-					filter("auditPutDateRange >=", _begin).
-					filter("auditPutDateRange <", _end);
-
-		return query.list();
+		return results;
 	}
 }

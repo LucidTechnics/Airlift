@@ -14,21 +14,19 @@
 
 package airlift.servlet.rest; 
 
-@javax.persistence.Entity(name="AuditTrail")
-@com.googlecode.objectify.annotation.Unindexed
 public class AuditTrail
 {
 	public AuditTrail() {}
 
-	@javax.persistence.Id private String id;
-	@com.googlecode.objectify.annotation.Indexed private String domainId;
+	private String id;
+	private String domainId;
 	private String action;
 	private String method;
 	private String domain;
 	private String uri;
 	private String handlerName;
 	private com.google.appengine.api.datastore.Text data;
-	@com.googlecode.objectify.annotation.Indexed private String email;
+	private String userId;
 	private java.util.Date actionDate;
 	private java.util.Date recordDate;
 	
@@ -40,7 +38,7 @@ public class AuditTrail
 	public String getUri() { return uri; }
 	public String getHandlerName() { return handlerName; }
 	public com.google.appengine.api.datastore.Text getData() { return data; }
-	public String getEmail() { return email; }
+	public String getUserId() { return userId; }
 	public java.util.Date getActionDate() { return actionDate; }
 	public java.util.Date getRecordDate() { return recordDate; }
 
@@ -52,7 +50,7 @@ public class AuditTrail
 	public void setUri(String _uri) { uri = _uri; }
 	public void setHandlerName(String _handlerName) { handlerName = _handlerName; }
 	public void setData(com.google.appengine.api.datastore.Text _data) { data = _data; }
-	public void setEmail(String _email) { email = _email; }
+	public void setUserId(String _userId) { userId = _userId; }
 	public void setActionDate(java.util.Date _actionDate) { actionDate = _actionDate; }
 	public void setRecordDate(java.util.Date _recordDate) { recordDate = _recordDate; }
 }
