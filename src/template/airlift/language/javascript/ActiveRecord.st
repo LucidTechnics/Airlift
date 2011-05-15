@@ -383,23 +383,30 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.messageManager.getMessageMap();
 	}
 
-	activeRecord.populateFromRestContext = function(_restContext)
+	activeRecord.populateFromRestContext = function(_restContext, _method)
 	{
 		$assignForeignKeyFromRestContext; separator="\n"$
-		
-		this.id = _restContext.getIdValue("$allLowerCaseClassName$.id");
+
+		var errorList = [];
+
+		$validateForeignKey; separator="\n"$
+
+		errorList.forEach(function(_error) { this.addError(_error.name, _error.message, _error.category); });
+
+		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
+
+		if ("POST".equalsIgnoreCase(_method) === false)
+		{
+			this.id = _restContext.getIdValue("$allLowerCaseClassName$.id");
+		}
+
+		return this.messageManager.getMessageMap();
 	}
 	
 	activeRecord.populate = function(_attributeMap, _restContext, _method)
 	{
-		var errorMap = this.populateFromRequestMap(_attributeMap);
-
-		if ("POST".equalsIgnoreCase(_method) === false)
-		{
-			this.populateFromRestContext(_restContext);
-		}
-
-		return errorMap;
+		this.populateFromRequestMap(_attributeMap);
+		return this.populateFromRestContext(_restContext, _method);
 	}
 
 	activeRecord.toString = function()

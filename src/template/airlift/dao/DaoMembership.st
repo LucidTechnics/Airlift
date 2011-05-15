@@ -9,7 +9,7 @@
  * 
  */
 
-dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
+dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _config)
 {
 	var config = _config||{};
 	var offset = config.offset||0;
@@ -34,7 +34,7 @@ dao.collectBy$uppercaseAttribute$Membership = function(_membershipList, _config)
 	for (var result in Iterator(queryResults))
 	{
 		dao.decrypt(result);
-		var activeRecord = airlift.ar("$lowerCaseClassName$");
+		var activeRecord = airlift.ar("$className$");
 		dao.copyFromEntity(activeRecord, result);
 		results.push(activeRecord);
 	}

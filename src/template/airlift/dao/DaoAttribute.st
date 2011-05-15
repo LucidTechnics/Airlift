@@ -28,7 +28,7 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 	for (var result in Iterator(queryResults))
 	{
 		dao.decrypt(result);
-		var activeRecord = airlift.ar("$lowerCaseClassName$");
+		var activeRecord = airlift.ar("$className$");
 		dao.copyFromEntity(activeRecord, result);
 		results.push(activeRecord);
 	}

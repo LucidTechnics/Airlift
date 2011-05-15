@@ -97,6 +97,7 @@ public class JavaScriptGenerator
 				String fieldName = attribute.getName();
 				String name = attribute.getName();
 				String isPrimaryKey = findValue(persist, "isPrimaryKey()");
+				String isForeignKey = findValue(persist, "isForeignKey()");
 				String rangeable = findValue(persist, "rangeable()");
 				String isImmutable = findValue(persist, "immutable()");
 
@@ -124,7 +125,7 @@ public class JavaScriptGenerator
 				
 				hasPrimaryKey = true;
 
-				if ("true".equalsIgnoreCase(isIndexable) == true)
+				if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true)
 				{
 
 					if (type.endsWith("[]") == true ||
@@ -136,22 +137,18 @@ public class JavaScriptGenerator
 					{
 						StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
 
-						daoMembershipStringTemplate.setAttribute("uppercaseAttribute", upperTheFirstCharacter(name));
-						daoMembershipStringTemplate.setAttribute("lowercaseAttribute", lowerTheFirstCharacter(name));
+						daoMembershipStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
 						daoMembershipStringTemplate.setAttribute("attribute", name);
 						daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-						daoMembershipStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
+
 						daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
 					}
 					
 					StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");
 
-					daoAttributeStringTemplate.setAttribute("attributeName", name);
-					daoAttributeStringTemplate.setAttribute("attributeType", type);
 					daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+					daoAttributeStringTemplate.setAttribute("attribute", name);
 					daoAttributeStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-					daoAttributeStringTemplate.setAttribute("buildPackage", _domainObjectModel.getBuildPackageName());				
-					daoAttributeStringTemplate.setAttribute("lowercaseAttributeName", lowerTheFirstCharacter(name));
 
 					daoStringTemplate.setAttribute("collectByAttribute", daoAttributeStringTemplate.toString());	
 				}
@@ -171,7 +168,7 @@ public class JavaScriptGenerator
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null;");
 					}
 
-					if ("true".equalsIgnoreCase(isIndexable) == true)
+					if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true )
 					{
 						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", _activeRecord." + name + ");");
 					}
@@ -229,6 +226,11 @@ public class JavaScriptGenerator
 				updateMethodStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index update\", function() { transaction.rollbackAsync(); });");
 				updateMethodStringTemplate.setAttribute("indexWritten", "indexWritten && ");
 			}
+			else
+			{
+				//This makes the dao javascript file look better. :)
+				updateMethodStringTemplate.setAttribute("indexWritten", "");
+			}
 
 			primaryKeyMethodsStringTemplate.setAttribute("updateMethod", updateMethodStringTemplate.toString());
 			primaryKeyMethodsStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
@@ -251,6 +253,11 @@ public class JavaScriptGenerator
 			daoStringTemplate.setAttribute("index", "var indexList = this.index(_activeRecord), index = new Packages.com.google.appengine.api.datastore.Entity(\"" + _domainObjectModel.getClassName() + "Index\", id, parentKey); index.setProperty(\"index\", indexList);");
 			daoStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index insert\", function() { transaction.rollbackAsync(); });");
 			daoStringTemplate.setAttribute("indexWritten", "indexWritten && ");
+		}
+		else
+		{
+			//This makes the dao javascript file look better. :)
+			updateMethodStringTemplate.setAttribute("indexWritten", "");
 		}
 		
 		daoStringTemplate.setAttribute("generatorComment", comment);
@@ -296,8 +303,8 @@ public class JavaScriptGenerator
 			String requestDatable = findValue(datable, "isDatable()");
 			String isForeignKey = findValue(persist, "mapTo()");
 
-			String isSearchable = "false";
-			isSearchable = findValue(persist, "isSearchable()");
+			String isIndexable = "false";
+			isIndexable = findValue(persist, "isIndexable()");
 
 			if (processedDatable == false)
 			{
@@ -314,14 +321,15 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("restifyForeignKey", "impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this." + name + ");");
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
-				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\");");
+				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
+				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
 			}
 
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
 
-			if ("true".equalsIgnoreCase(isSearchable) == true)
+			if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true)
 			{
 				if (type.endsWith("[]") == true ||
 					  type.startsWith("java.util.List") == true ||
@@ -340,7 +348,7 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("copyPropertyToImpl", "_impl.set" + upperTheFirstCharacter(name) + "(this." + name + ");");
 			activeRecordStringTemplate.setAttribute("propertyListEntry", "\"" + name + "\"");
 			
-			if ("id".equalsIgnoreCase(name) == false && "false".equals(isForeignKey) == true)
+			if ("id".equalsIgnoreCase(name) == false)
 			{
 				if (type.startsWith("java.util.List") == true)  
 				{
@@ -353,7 +361,11 @@ public class JavaScriptGenerator
 				else
 				{
 					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.org.apache.commons.beanutils.ConvertUtils.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
-					activeRecordStringTemplate.setAttribute("validateProperty", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
+
+					if ("false".equals(isForeignKey) == true)
+					{
+						activeRecordStringTemplate.setAttribute("validateProperty", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
+					}
 				}
 			}
 			
