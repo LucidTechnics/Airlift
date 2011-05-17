@@ -117,7 +117,7 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("OUT", System.out);
 			scriptingUtil.bind("LOG", log);
 			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
-			scriptingUtil.bind("SECURITY_CONTEXT", new airlift.servlet.rest.RestfulSecurityContext());
+			scriptingUtil.bind("SECURITY_CONTEXT", _restContext.getSecurityContext());
 			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext());
 			scriptingUtil.bind("BASE", base);
 			scriptingUtil.bind("PATH", path);

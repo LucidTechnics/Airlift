@@ -20,8 +20,23 @@ public class RestfulSecurityContext
    implements airlift.SecurityContext
 {
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
-	
-	public RestfulSecurityContext() {}
+		
+	private String kind;
+	private airlift.CachingContext cachingContext;
+
+	private airlift.CachingContext getCachingContext() { return cachingContext; }
+	public String getKind() { return kind; }
+
+	protected void setCachingContext(airlift.CachingContext _cachingContext) { cachingContext = _cachingContext; }
+	protected void setKind(String _kind) { kind = _kind; }
+
+	private RestfulSecurityContext() {}
+
+	protected RestfulSecurityContext(String _kind, airlift.CachingContext _cachingContext)
+	{
+		setKind(_kind);
+		setCachingContext(_cachingContext);
+	}
 
 	public boolean allowed(AirliftUser _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
@@ -82,17 +97,15 @@ public class RestfulSecurityContext
 				}
 			}
 
-			String email = (_user != null) ? _user.getEmail() : "null";
+			String userId = (_user != null) ? _user.getId() : "null";
 			
 			if (allowed == false)
 			{
-				log.warning("User: " + email + " is not allowed method: " + _method +
-						 " access to this domain: " + _domainName);
+				log.warning("User: " + userId + " is not allowed method: " + _method + " access to this domain: " + _domainName);
 			}
 			else
 			{
-				log.info("User: " + email + " is allowed method: " + _method +
-						 " access to this domain: " + _domainName);
+				log.info("User: " + userId + " is allowed method: " + _method + " access to this domain: " + _domainName);
 			}
 		}
 		catch(Throwable t)
@@ -146,15 +159,11 @@ public class RestfulSecurityContext
 	{
 		if (_user != null)
 		{
-			java.util.List<AirliftUser> userList = collectByExternalUserId(_user.getExternalUserId(), 0, 10, "externalUserId", true);
-
-			if (userList.size() > 1) { throw new RuntimeException("Multiple users for external user id: " + _user.getExternalUserId() + " found."); }
+			AirliftUser user = getUser(_user.getExternalUserId());
 
 			//Only return active users ...
-			if (userList.isEmpty() != true && userList.get(0).getActive() == true)
+			if (user != null && user.getActive() == true)
 			{
-				AirliftUser user = userList.get(0);
-
 				_user.setId(user.getId());
 				_user.setFullName(user.getFullName());
 				_user.setShortName(user.getShortName());
@@ -182,6 +191,39 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
+	public AirliftUser getUser(String _id)
+	{
+		AirliftUser user = null;
+		
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), _id);
+
+		com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) getCachingContext().get(key);
+
+		if (entity == null)
+		{
+			try
+			{
+				entity = datastore.get(key).get();
+			}
+			catch(Throwable t)
+			{
+				log.warning("unable to get entity of kind: " + getKind() + " from the datastore");
+			}
+		}
+		else
+		{
+			log.info("Cache hit on user entity of kind: " + getKind() + ".");
+		}
+
+		if (entity != null)
+		{
+			user = copyEntityToAirliftUser(entity);
+		}
+
+		return user;
+	}
+	
 	public AirliftUser copyEntityToAirliftUser(com.google.appengine.api.datastore.Entity _entity)
 	{
 
@@ -212,7 +254,7 @@ public class RestfulSecurityContext
 
 	public com.google.appengine.api.datastore.Entity copyAirliftUserToEntity(AirliftUser _airliftUser)
 	{
-		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AirliftUser", _airliftUser.getId());
+		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(getKind(), _airliftUser.getId());
 		
 		entity.setUnindexedProperty("fullName", _airliftUser.getFullName());
 		entity.setUnindexedProperty("shortName", _airliftUser.getShortName());
@@ -231,7 +273,7 @@ public class RestfulSecurityContext
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort);
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).setKeysOnly();
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
@@ -255,12 +297,15 @@ public class RestfulSecurityContext
 		try
 		{
 			transaction = datastore.beginTransaction().get();
-			_airliftUser.setId(airlift.util.IdGenerator.generate(12));
+			_airliftUser.setId(_airliftUser.getExternalUserId());
 			_airliftUser.setAuditPostDate(new java.util.Date());
 			_airliftUser.setAuditPutDate(_airliftUser.getAuditPostDate());
 			
 			com.google.appengine.api.datastore.Entity entity = copyAirliftUserToEntity(_airliftUser);
 			datastore.put(entity);
+
+			getCachingContext().remove(entity.getKey());
+			getCachingContext().put(entity.getKey(), entity);
 
 			transaction.commitAsync();
 		}
@@ -269,7 +314,7 @@ public class RestfulSecurityContext
 			if (transaction != null) { transaction.rollbackAsync(); }
 			throw new RuntimeException(t);
 		}
-
+		
 		return _airliftUser.getId();
 	}
 
@@ -284,7 +329,7 @@ public class RestfulSecurityContext
 		
 		try
 		{			
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftUser", _id);
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), _id);
 			com.google.appengine.api.datastore.Entity entity = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().get(key).get();
 
 			airliftUser = copyEntityToAirliftUser(entity);
@@ -314,6 +359,9 @@ public class RestfulSecurityContext
 			com.google.appengine.api.datastore.Entity entity = copyAirliftUserToEntity(_airliftUser);
 			datastore.put(entity);
 
+			getCachingContext().remove(entity.getKey());
+			getCachingContext().put(entity.getKey(), entity);
+
 			transaction.commitAsync();
 		}
 		catch(Throwable t)
@@ -327,7 +375,7 @@ public class RestfulSecurityContext
 	{
 		try
 		{			
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftUser", _airliftUser.getId());
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), _airliftUser.getId());
 			com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().delete(key);
 		}
 		catch(Throwable t)
@@ -340,7 +388,7 @@ public class RestfulSecurityContext
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort).addFilter("externalUserId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("externalUserId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
@@ -360,7 +408,7 @@ public class RestfulSecurityContext
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftUser").addSort(_orderBy, sort).addFilter("email", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("email", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();

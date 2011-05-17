@@ -36,9 +36,9 @@ public class RestContext
 	private String appName;
 	private AbstractUser user;
 	private Map<String, airlift.CachingContext> cachingContextMap;
+	private airlift.SecurityContext securityContext;
 	
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
-	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
 	public String getMethod() { return method; }
 	public boolean getIsUriACollection() { return isUriACollection; }
 	public boolean getIsUriANewDomain() { return isUriANewDomain; }
@@ -46,10 +46,10 @@ public class RestContext
 	public String getAppName() { return appName; }
 	public AbstractUser getUser() { return user; }
 	public Map<String, airlift.CachingContext> getCachingContextMap() { return cachingContextMap; }
-	
+	public airlift.SecurityContext getSecurityContext() { return securityContext; }
 	public java.util.List<String> getHandlerPathList() { return handlerPathList; }
-	public void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
-	
+
+	protected void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
 	protected void setMethod(String _method) { method = _method; }
 	protected void setIsUriACollection(boolean _isUriACollection) { isUriACollection = _isUriACollection; }
 	protected void setIsUriANewDomain(boolean _isUriANewDomain) { isUriANewDomain = _isUriANewDomain; }
@@ -57,7 +57,9 @@ public class RestContext
 	protected void setAppName(String _appName) { appName = _appName; }
 	protected void setUser(AbstractUser _user) { user = _user; }
 	protected void setCachingContextMap(Map<String, airlift.CachingContext> _cachingContextMap) { cachingContextMap = _cachingContextMap; }
-	
+	protected void setSecurityContext(airlift.SecurityContext _securityContext) { securityContext = _securityContext; }
+	protected void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
+
 	public RestContext()
 	{
 		setUriParameterMap(new HashMap());

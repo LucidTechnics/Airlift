@@ -26,7 +26,16 @@ public interface UserService
 	//Returns true if there is a user logged in, false otherwise.
 	public boolean isUserLoggedIn();
 
-	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
+	//If you store your user in the App Engine datastore this should return the
+	//name of the Kind used by your user's entity.  This would allow you to add additional
+	//information to your user for your own purposes, while at the same
+	//time allow us to retrieve your user to get the AbstractUser
+	//information.
+	//
+	//NB: Your user must at least have all the properties of an
+	//airlift.servlet.rest.AbstractUser including those properties from
+	//the airlift.servlet.rest.AirliftUser.
+	public String getUserKind();
 
-	public void setRestfulSecurityContext(airlift.servlet.rest.RestfulSecurityContext _restfulSecurityContext);
+	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
 }

@@ -49,7 +49,14 @@ public class RestServlet
 	public void initCache() 
 	{
 		//On init create cached response for 404s
-		cachingContextMap.put("airlift.404.cache", new RestfulCachingContext("airlift.404.cache", true, 3600000, true));
+		cachingContextMap.put("airlift.404.cache", new RestfulCachingContext("airlift.404.cache", true, 300, true));
+
+		//Create cache for user sessions ...
+		String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
+		//set cache timeout to be twice as long as the user's timeout.
+		int duration = (durationString == null) ? (20 * 60 * 2) : Integer.parseInt(durationString);
+
+		cachingContextMap.put("user.session", new RestfulCachingContext("user.session", true, duration, true));
 
 		//For each domain create the relevant caching context.
 		for (String domainName: getAppProfile().getValidDomains())
@@ -107,35 +114,53 @@ public class RestServlet
 		return timedOut;
 	}
 
-	protected void requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
+	protected boolean requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
 	{
+		boolean loginRequestSuccessful = false;
+		
 		try
 		{
-			_response.sendRedirect(_userService.createLoginURL(_request.getRequestURI()));
+			String uri = _userService.createLoginURL(_request.getRequestURI());
+
+			if (uri != null)
+			{
+				loginRequestSuccessful = true;
+				_response.sendRedirect(uri);
+			}
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
+
+		return loginRequestSuccessful;
 	}
 
-	protected void logUserOut(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
+	protected boolean logUserOut(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
 	{
+		boolean logoutSuccessful = false;
 		try
 		{
-			_response.sendRedirect(_userService.createLogoutURL(_request.getRequestURI()));
+			String userLogoutUri = _userService.createLogoutURL(_request.getRequestURI());
+
+			if (userLogoutUri != null)
+			{
+				logoutSuccessful = true;
+				_response.sendRedirect(_userService.createLogoutURL(_request.getRequestURI()));
+			}
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
+
+		return logoutSuccessful;
 	}
 
 	private java.util.Date calculateNextTimeOutDate()
 	{
 		String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
-
-		long duration = (durationString == null) ? (20 * 60 * 1000) : Long.parseLong(durationString);
+		long duration = (durationString == null) ? (20 * 60 * 1000) : Long.parseLong(durationString) * 1000;
 
 		//If you set duration to 0 then you are always
 		//required to provide credentials.
@@ -185,10 +210,11 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 
-		RestfulSecurityContext securityContext = new RestfulSecurityContext();
-
-		UserService userService = getUserService(_request, securityContext);
+		UserService userService = getUserService(_request);
 		AbstractUser user = userService.getCurrentUser();
+
+		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"));
+		restContext.setSecurityContext(securityContext);
 
 		securityContext.populate(user);
 		restContext.setUser(user);
@@ -197,7 +223,12 @@ public class RestServlet
 
 		if (!success && user == null)
 		{
-			requestLogin(_request, _response, userService);
+			boolean loginSuccessful = requestLogin(_request, _response, userService);
+
+			if (loginSuccessful == false)
+			{
+				sendCodedPage("401", "UnAuthorized", _response);
+			}
 		}
 		else if (!success && user != null)
 		{
@@ -214,7 +245,12 @@ public class RestServlet
 		{
 			user.setTimeOutDate(null); // A user with a null time out date cannot be time out.
 			securityContext.update(user);
-			logUserOut(_request, _response, userService);
+			boolean logoutSuccessful = logUserOut(_request, _response, userService);
+
+			if (logoutSuccessful == false)
+			{
+				sendCodedPage("408", "Request Timeout", _response);
+			}
 		}
 		else if (success)	
 		{
@@ -681,7 +717,7 @@ public class RestServlet
 		return appProfile;
 	}
 
-	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest, RestfulSecurityContext _securityContext)
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
 	{
 		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
 
@@ -691,7 +727,6 @@ public class RestServlet
 		{
 			userService = (userServiceClassName != null) ? (UserService) Class.forName(userServiceClassName).newInstance() : new GoogleUserService();
 			userService.setHttpServletRequest(_httpServletRequest);
-			userService.setRestfulSecurityContext(_securityContext);
 		}
 		catch(Throwable t)
 		{

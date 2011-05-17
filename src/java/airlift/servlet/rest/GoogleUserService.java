@@ -3,15 +3,12 @@ package airlift.servlet.rest;
 public class GoogleUserService
    implements UserService
 {
-	private airlift.servlet.rest.RestfulSecurityContext restfulSecurityContext;
 	private javax.servlet.http.HttpServletRequest httpServletRequest;
 	private com.google.appengine.api.users.UserService userService;
 
-	private airlift.servlet.rest.RestfulSecurityContext getRestfulSecurityContext() { return restfulSecurityContext; }
 	private javax.servlet.http.HttpServletRequest getHttpServletRequest() { return httpServletRequest; }
 	private com.google.appengine.api.users.UserService getUserService() { return userService; }
 
-	public void setRestfulSecurityContext(airlift.servlet.rest.RestfulSecurityContext _restfulSecurityContext) { restfulSecurityContext = _restfulSecurityContext; }
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest) { httpServletRequest = _httpServletRequest; }
 	private void setUserService(com.google.appengine.api.users.UserService _userService) { userService = _userService; }
 
@@ -71,5 +68,10 @@ public class GoogleUserService
 	public boolean isUserLoggedIn()
 	{
 		return getUserService().isUserLoggedIn();
+	}
+
+	public String getUserKind()
+	{
+		return "GoogleUser";
 	}
 }
