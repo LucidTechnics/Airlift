@@ -35,6 +35,7 @@ public class RestContext
 	private String uri;
 	private String appName;
 	private AbstractUser user;
+	private Map<String, airlift.CachingContext> cachingContextMap;
 	
 	public Map<String, Object> getUriParameterMap() { return uriParameterMap; }
 	public void setUriParameterMap(Map _uriParameterMap) { uriParameterMap = _uriParameterMap; }
@@ -44,6 +45,7 @@ public class RestContext
 	public String getUri() { return uri; }
 	public String getAppName() { return appName; }
 	public AbstractUser getUser() { return user; }
+	public Map<String, airlift.CachingContext> getCachingContextMap() { return cachingContextMap; }
 	
 	public java.util.List<String> getHandlerPathList() { return handlerPathList; }
 	public void setHandlerPathList(java.util.List<String> _handlerPathList) { handlerPathList = _handlerPathList; }
@@ -54,15 +56,17 @@ public class RestContext
 	protected void setUri(String _uri) { uri = _uri; }
 	protected void setAppName(String _appName) { appName = _appName; }
 	protected void setUser(AbstractUser _user) { user = _user; }
+	protected void setCachingContextMap(Map<String, airlift.CachingContext> _cachingContextMap) { cachingContextMap = _cachingContextMap; }
 	
 	public RestContext()
 	{
 		setUriParameterMap(new HashMap());
 	}
 
-	public RestContext(Map _uriParameterMap)
+	public RestContext(Map _uriParameterMap, Map<String, airlift.CachingContext> _cachingContextMap)
 	{
 		setUriParameterMap(_uriParameterMap);
+		setCachingContextMap(_cachingContextMap);
 	}
 
 	public boolean uriIsACollection()

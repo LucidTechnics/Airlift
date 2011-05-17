@@ -30,7 +30,7 @@ public class RestServlet
    extends HttpServlet
 {
 	private static Logger log = Logger.getLogger(RestServlet.class.getName());
-	private java.util.Map<String, RestfulCachingContext> cachingContextMap = new java.util.HashMap<String, RestfulCachingContext>();
+	private java.util.Map<String, airlift.CachingContext> cachingContextMap = new java.util.HashMap<String, airlift.CachingContext>();
 	// 
 	protected Map<String, Object> redirectContextMap;
 	protected static airlift.AppProfile appProfile;
@@ -43,7 +43,7 @@ public class RestServlet
 	    throws ServletException
 	{		
 		setRedirectContextMap(new HashMap<String, Object>());
-		//initCache();
+		initCache();
     }
 
 	public void initCache() 
@@ -51,16 +51,15 @@ public class RestServlet
 		//On init create cached response for 404s
 		cachingContextMap.put("airlift.404.cache", new RestfulCachingContext("airlift.404.cache", true, 3600000, true));
 
-		//For each domain that is cacheable create the relevant caching
-		//context.
-/*		for (String domainName: getAppProfile().getValidDomains())
+		//For each domain create the relevant caching context.
+		for (String domainName: getAppProfile().getValidDomains())
 		{
 			if (cachingContextMap.containsKey(domainName) != true)
 			{
 				airlift.generator.Cacheable cacheableAnnotation = (airlift.generator.Cacheable) getAppProfile().getAnnotation(domainName, airlift.generator.Cacheable.class);
 				cachingContextMap.put(domainName, new RestfulCachingContext(domainName, cacheableAnnotation.isCacheable(), cacheableAnnotation.life(), cacheableAnnotation.cacheCollections()));
 			}
-		}*/
+		}
 	}
 	
     @Override
@@ -257,6 +256,8 @@ public class RestServlet
 					String _method, RestContext _restContext, Map _uriParameterMap)
 	    throws ServletException, IOException
 	{
+		String userId = (_restContext.getUser() != null) ? _restContext.getUser().getUserId() : "";
+
 		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
 
 		log.info("RestServlet 1: " + quotaService.getCpuTimeInMegaCycles());
@@ -303,17 +304,16 @@ public class RestServlet
 				}
 
 				log.info("RestServlet 6: " + quotaService.getCpuTimeInMegaCycles());
-				//Invalidate the cache if necessary
-				//invalidateCache(domainName, _method, _httpServletRequest);
 				int responseCode = Integer.parseInt(contentContext.getResponseCode());
+
 				_httpServletResponse.setStatus(responseCode);
 
 				log.info("RestServlet 7: " + quotaService.getCpuTimeInMegaCycles());
 				if (responseCode == 301 || responseCode == 302 || responseCode == 303)
 					//TODO this should be checking to see if the method
 					//call is a POST PUT or DELETE.  At this point the
-					//cache is then invalidated.
 				{
+
 					_httpServletResponse.sendRedirect(contentContext.getRedirectUri());
 					log.info("RestServlet 7a: " + quotaService.getCpuTimeInMegaCycles());
 				}
@@ -336,7 +336,6 @@ public class RestServlet
 						byteArrayOutputStream.flush();
 						_httpServletResponse.getOutputStream().flush();
 						log.info("RestServlet 7b-1: " + quotaService.getCpuTimeInMegaCycles());
-						//populateCache(domainName, _method, _httpServletRequest, contentContext.getContent());
 					}
 					else
 					{
@@ -400,103 +399,6 @@ public class RestServlet
 		try { _response.sendError(Integer.parseInt(_code), _message); } catch (Throwable t) { log.severe(t.getMessage()); throw new RuntimeException(t); }
 	}
 	
-	public airlift.CachingContext isCacheable(javax.servlet.http.HttpServletRequest _request, String _domainName)
-	{
-		airlift.CachingContext cachingContext = null;
-		String rootPackageName = this.getServletConfig().getInitParameter("a.root.package.name");
-		String uri = reconstructUri(getServletName(), _request);
-
-		airlift.CachingContext tempCachingContext = this.cachingContextMap.get(_domainName);
-		
-		if (tempCachingContext != null &&
-			"yes".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.production.mode")) == true &&
-			  tempCachingContext.isCacheable() == true)
-		{
-			boolean isUriACollection = isUriACollection(uri);
-			
-			if (isUriACollection == false)
-			{
-				cachingContext = tempCachingContext;
-			}
-			else if (tempCachingContext.cacheCollections() == true)
-			{
-				cachingContext = tempCachingContext;
-			}
-		}
-		else if ("airlift.404.cache".equalsIgnoreCase(_domainName) == true)
-		{
-			cachingContext = tempCachingContext;
-		}
-			
-		return cachingContext;
-	}
-	
-	public String getFromCache(String _cacheName, javax.servlet.http.HttpServletRequest _request)
-	{
-		String content = null;
-		
-		airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
-
-		if (cachingContext != null) { content = cachingContext.get(_request); }
-
-		return content;
-	}
-
-	private void populateCache(String _cacheName, String _method, HttpServletRequest _request, String _content)
-	{
-		if ("GET".equalsIgnoreCase(_method) == true || "COLLECT".equalsIgnoreCase(_method) == true)
-		{
-			try
-			{
-				airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
-				
-				if (cachingContext != null) { cachingContext.put(_request, _content); }
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
-		}
-	}
-
-	private void populateCache(String _cacheName, String _method, HttpServletRequest _request, byte[] _content)
-	{
-		if ("GET".equalsIgnoreCase(_method) == true || "COLLECT".equalsIgnoreCase(_method) == true)
-		{
-			try
-			{
-				airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
-
-				if (cachingContext != null) { cachingContext.put(_request, _content); }
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
-		}
-	}
-
-	private void invalidateCache(String _cacheName, String _method, HttpServletRequest _request)
-	{
-		airlift.CachingContext cachingContext = isCacheable(_request, _cacheName);
-
-		
-		if (cachingContext != null &&
-			  ("POST".equalsIgnoreCase(_method) == true ||
-			  "PUT".equalsIgnoreCase(_method) == true ||
-			  "DELETE".equalsIgnoreCase(_method) == true))
-		{
-			try
-			{
-				cachingContext.remove(_request);
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
-		}
-	}
-
 	private void set404NotFound(ContentContext _contentContext)
 	{
 		_contentContext.setContent("404 Not Found");
@@ -586,7 +488,7 @@ public class RestServlet
 
 		populateDomainInformation(uri, _uriParameterMap);
 		
-		RestContext restContext = new RestContext(_uriParameterMap);
+		RestContext restContext = new RestContext(_uriParameterMap, this.cachingContextMap);
 		restContext.setIsUriACollection(isUriACollection(uri));
 		restContext.setIsUriANewDomain(isUriANewDomain(uri));
 		restContext.setMethod(_method);

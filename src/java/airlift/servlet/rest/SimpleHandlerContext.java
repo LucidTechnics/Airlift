@@ -71,12 +71,10 @@ public class SimpleHandlerContext
 		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
 
 		String queryString = _httpServletRequest.getQueryString();
-		
-		RestContext restContext = new RestContext(_uriParameterMap);
-		
-		String domainName = restContext.getThisDomain();
-		Boolean domainHasId = restContext.hasIdentifier();
-		String id = restContext.constructDomainId();
+				
+		String domainName = _restContext.getThisDomain();
+		Boolean domainHasId = _restContext.hasIdentifier();
+		String id = _restContext.constructDomainId();
 		String persistPath = domainName;
 		
 		if ("POST".equals(_method) == false &&
@@ -92,7 +90,7 @@ public class SimpleHandlerContext
 			title = domainName + "-" + id;
 		}
 
-		Map<String, String> domainPathMap = restContext.extractDomainObjectPaths(path);
+		Map<String, String> domainPathMap = _restContext.extractDomainObjectPaths(path);
 
 		AbstractUser user = _restContext.getUser();
 		String userName = (user != null) ? user.getFullName() : null;
@@ -137,7 +135,7 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("RESPONSE", _httpServletResponse);
 			scriptingUtil.bind("REQUEST", _httpServletRequest);
 			scriptingUtil.bind("LOCALE", _httpServletRequest.getLocale());
-			scriptingUtil.bind("REST_CONTEXT", restContext);
+			scriptingUtil.bind("REST_CONTEXT", _restContext);
 			scriptingUtil.bind("SCRIPTING", scriptingUtil);
 			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
 			scriptingUtil.bind("USER", user);
@@ -149,15 +147,16 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("AUDITING_GET", auditingGet);
 			scriptingUtil.bind("AUDITING_UPDATE", auditingUpdate);
 			scriptingUtil.bind("AUDITING_DELETE", auditingDelete);
+			scriptingUtil.bind("CACHING_CONTEXT", _restContext.getCachingContextMap());
 
-			log.info("URI Parameter map is: " + restContext.getUriParameterMap());
-			log.info("Domain ids are:" + restContext.getDomainIds());
+			log.info("URI Parameter map is: " + _restContext.getUriParameterMap());
+			log.info("Domain ids are:" + _restContext.getDomainIds());
 			
-			for (String restContextDomainName: restContext.getDomainIds())
+			for (String restContextDomainName: _restContext.getDomainIds())
 			{
 				String key = restContextDomainName.replaceAll("\\.", "_").toUpperCase();
 				log.info("binding this: " + key);
-				scriptingUtil.bind(key, restContext.getIdValue(restContextDomainName));
+				scriptingUtil.bind(key, _restContext.getIdValue(restContextDomainName));
 			}
 
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : _httpServlet.getServletConfig().getInitParameter("a.timezone");

@@ -16,11 +16,15 @@ package airlift;
 
 public interface CachingContext
 {
-	public String get(javax.servlet.http.HttpServletRequest _request);
-	public void put(javax.servlet.http.HttpServletRequest _request, String _content);
-	public void put(javax.servlet.http.HttpServletRequest _request, byte[] _content);
-	public void remove(javax.servlet.http.HttpServletRequest _request);
+	public java.io.Serializable get(java.io.Serializable _key);
+	public java.util.Map<java.io.Serializable, Object> getAll(java.util.Collection<java.io.Serializable> _keyCollection);
+	public com.google.appengine.api.memcache.MemcacheService.IdentifiableValue getIdentifiable(java.io.Serializable _key);
+	public void put(java.io.Serializable _key, java.io.Serializable _value);
+	public void putAll(java.util.Map<java.io.Serializable, Object> _valueMap);
+	public boolean putIfUntouched(java.io.Serializable _key,
+							   com.google.appengine.api.memcache.MemcacheService.IdentifiableValue _oldValue,
+							   java.io.Serializable _newValue);
+	public void remove(java.io.Serializable _key);
 	public boolean isCacheable();
 	public int life();
-	public boolean cacheCollections();
 }

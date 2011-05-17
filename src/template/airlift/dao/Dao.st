@@ -42,6 +42,43 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		$setDataObjectEncryptedField$
 	}
 
+	dao.getFromCache = function(_key)
+	{
+		return CACHING_CONTEXT.get("$lowerCaseClassName$").get(_key);
+	}
+
+	dao.getAllFromCache = function(_keyCollection)
+	{
+		return CACHING_CONTEXT.get("$lowerCaseClassName$").getAll(_keyCollection);
+	}
+
+	dao.populateCache = function(_key, _value)
+	{
+		CACHING_CONTEXT.get("$lowerCaseClassName$").put(_key, _value);
+		return _value;
+	}
+
+	dao.populateCacheFromMap = function(_valueMap)
+	{
+		CACHING_CONTEXT.get("$lowerCaseClassName$").putAll(_valueMap);
+		return _valueMap;
+	}
+
+	dao.getIdentifiableValue = function(_key)
+	{
+		return CACHING_CONTEXT.get("$lowerCaseClassName$").getIdentifiable(_key);
+	}
+	
+	dao.populateCacheIfUntouched = function(_key, _oldValueIdentifier, _newValue)
+	{
+		return CACHING_CONTEXT.get("$lowerCaseClassName$").putIfUntouched(_key, _oldValueIdentifier, _newValue);
+	}
+
+	dao.invalidateCache = function(_key)
+	{
+		CACHING_CONTEXT.get("$lowerCaseClassName$").remove(_key);
+	}
+	
 	dao.copyFromEntity = function(_activeRecord, _entity, _config)
 	{
 		var config = _config||{};
@@ -117,30 +154,86 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		return result;
 	};
 
+	dao.asIterator = function(_queryResultIterator, _config)
+	{
+		var iterator = {};
+		var mark = 0;
+		var nextResults = [];
+		var bufferSize = 100;
+		
+		iterator.fetchNextResults = function(_queryResultIterator)
+		{
+			var nextKeys = new java.util.HashSet();
+			
+			for (var i = 0; i < bufferSize && _queryResultIterator.hasNext() === true; i++)
+			{
+				nextKeys.add(_queryResultIterator.next().getKey());
+			}
+
+			return dao.getAll(nextKeys);
+		}
+				
+		iterator.hasNext = function()
+		{
+			return (nextResults.length > 0) || _queryResultIterator.hasNext();
+		}
+
+		iterator.next = function()
+		{
+			nextResults = ((nextResults.length === 0) && iterator.fetchNextResults(_queryResultIterator)) || nextResults;
+			mark++;
+			
+			return nextResults.pop();
+		}
+
+		iterator.remove = function()
+		{
+			_queryResultIterator.remove();
+		}
+
+		return new java.util.Iterator(iterator);
+	}
+
+	dao.asIterable = function(_queryResultIterable, _config)
+	{
+		var iterable = {};
+
+		iterable.iterator = function()
+		{
+			return dao.asIterator(_queryResultIterable.iterator(), _config);
+		}
+
+		return iterable;
+	}
+
+	dao.asList = function(_queryResultList, _config)
+	{
+		var results = [], iterator = dao.asIterator(_queryResultList.iterator(), _config);
+		
+		for (activeRecord in Iterator(iterator))
+		{
+			results.push(activeRecord);
+		}
+
+		return results;
+	}
+	
 	dao.collect = function(_config)
 	{
-		var offset = (_config && _config.offset) ? _config.offset : 0;
-		var limit = (_config && _config.limit) ? _config.limit : 20;
-		var asc = (_config && _config.asc) ? _config.asc : true;
-		var orderBy = (_config && _config.orderBy) ? _config.orderBy : "auditPutDate";
+		var config = _config||{};
+		var offset = config.offset||0;
+		var limit = config.limit||20;
+		var asc = config.asc||true;
+		var orderBy = config.orderBy||"auditPutDate";
+		var returnType = config.returnType||"asIterator";
 
 		var Query = Packages.com.google.appengine.api.datastore.Query;
 		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-		var query = new Query("$className$").addSort(orderBy, sort);
-		var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
+		var query = new Query("$className$").addSort(orderBy, sort).setKeysOnly();
+		var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
-		var results = [];
-
-		for (var result in Iterator(queryResults))
-		{
-			var activeRecord = airlift.ar("$lowerCaseClassName$");
-			dao.copyFromEntity(activeRecord, result);
-			dao.decrypt(activeRecord, result);
-			results.push(activeRecord);
-		}
-		
-		return results;
+		return dao[returnType] && dao[returnType](queryResults, config);
 	};
 
 	dao.provideUniqueId = function()
@@ -167,11 +260,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			return id;
 		}
 		
-		return dao.multiTry(test, 100, "After 100 tries, we were unable to generate a random unique id for creation of resource: $lowerCaseClassName$.  Are ids saturated?");
+		return dao.multiTry(test, 100, "After 100 tries, we were unable to generate a random unique id for creation of resource: $className$.  Are ids saturated?");
 	};
 	
-	dao.insert = function(_activeRecord)
+	dao.insert = function(_activeRecord, _config)
 	{
+		var config = _config||{};
+
 		dao.postAudit(_activeRecord);
 		
 		var id = this.provideUniqueId();
@@ -180,8 +275,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var parent = new Packages.com.google.appengine.api.datastore.Entity(parentKey);
 		dao.copyToEntity(_activeRecord, parent);
 		dao.encrypt(parent);
-		
-		//indexing
+
 		$index$
 
 		var datastore = this.datastore;
@@ -191,6 +285,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		$writeIndex$
 
 		$indexWritten$parentWritten && transaction.commitAsync();
+
+		dao.invalidateCache(parentKey);
+		dao.populateCache(parentKey, parent);
 		
 		return id;
 	};

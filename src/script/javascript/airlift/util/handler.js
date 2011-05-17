@@ -406,17 +406,17 @@ airlift.mm = function()
 	return new Packages.airlift.MessageManager();
 };
 
-airlift.populate = function(_domainName, _appName)
+airlift.populate = function(_domainName)
 {
-	var activeRecord = airlift.ar(_domainName, _appName);
+	var activeRecord = airlift.ar(_domainName, APP_NAME);
 	var errorMap = activeRecord.populate(REQUEST.getParameterMap(), REST_CONTEXT, METHOD);
 	
 	return [activeRecord, errorMap];
 };
 
-airlift.get = function(_id, _domainName, _appName)
+airlift.get = function(_id, _domainName)
 {
-	var activeRecord = airlift.ar(_domainName, _appName);
+	var activeRecord = airlift.ar(_domainName);
 
 	var id = _id||ID;
 	
@@ -426,11 +426,11 @@ airlift.get = function(_id, _domainName, _appName)
 	return [activeRecord, foundRecord];
 };
 
-airlift.collect = function(_domainName, _request, _appName)
+airlift.collect = function(_domainName, _request)
 {
 	var activeRecord, limit, offset, orderBy, list;
 
-	activeRecord = airlift.ar(_domainName, _appName);
+	activeRecord = airlift.ar(_domainName, APP_NAME);
 
 	var request = (airlift.isDefined(_request) === true) ? _request : REQUEST;
 	
@@ -450,18 +450,18 @@ airlift.collect = function(_domainName, _request, _appName)
 //post - post an active record based on domain URI and rest context.
 //Post accepts function that runs after syntactic validation but before
 //insert into persistent store.
-airlift.post = function(_domainName, _appName)
+airlift.post = function(_domainName)
 {
-	var [activeRecord, errorMap] = airlift.populate(_domainName, _appName);
+	var [activeRecord, errorMap] = airlift.populate(_domainName);
 
 	if (activeRecord.error === true)
 	{
 		activeRecord["id"] =  airlift.g();
 	}
 	
-	if (arguments.length > 2)
+	if (arguments.length > 1)
 	{
-		for (var i = 2; i < arguments.length; i++)
+		for (var i = 1; i < arguments.length; i++)
 		{
 			arguments[i](activeRecord, errorMap);
 		}
@@ -475,13 +475,13 @@ airlift.post = function(_domainName, _appName)
 	return [activeRecord, errorMap, activeRecord["id"]];
 };
 
-airlift.put = function(_domainName, _appName)
+airlift.put = function(_domainName)
 {
-	var [activeRecord, errorMap] = airlift.populate(_domainName, _appName);
+	var [activeRecord, errorMap] = airlift.populate(_domainName);
 	
-	if (arguments.length > 2)
+	if (arguments.length > 1)
 	{
-		for (var i = 2; i < arguments.length; i++)
+		for (var i = 1; i < arguments.length; i++)
 		{
 			arguments[i](activeRecord, errorMap);
 		}
@@ -495,18 +495,18 @@ airlift.put = function(_domainName, _appName)
 	return [activeRecord, errorMap];
 };
 
-airlift.del = function(_domainName, _id, _appName)
+airlift.del = function(_domainName, _id)
 {
-	var activeRecord = airlift.ar(_domainName, _appName);
+	var activeRecord = airlift.ar(_domainName);
 
 	activeRecord.id = (airlift.isDefined(_id) === true) ? _id : ID;
  
 	activeRecord.del();
 };
 
-airlift["delete"] = function(_domainName, _id, _appName)
+airlift["delete"] = function(_domainName, _id)
 {
-	airlift.del(_domainName, _id, _appName);
+	airlift.del(_domainName, _id);
 };
 
 airlift.isDefined = function(_variable)
@@ -1228,8 +1228,6 @@ airlift.filterContains = function(_filter, _propertyName)
 			contains = true;
 		}
 	});
-
-	LOG.info("returning contains ===  " + contains);
 	
 	return contains;
 }

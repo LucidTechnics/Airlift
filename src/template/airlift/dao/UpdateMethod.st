@@ -1,5 +1,7 @@
-dao.update = function(_activeRecord)
+dao.update = function(_activeRecord, _config)
 {
+	var config = _config||{};
+
 	if (airlift.isDefined(_activeRecord.getId()) !== true) { throw {name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + _activeRecord }; }
 
 	dao.putAudit(_activeRecord);
@@ -18,6 +20,9 @@ dao.update = function(_activeRecord)
 	$writeIndex$
 
 	$indexWritten$parentWritten && transaction.commitAsync();
+
+	dao.invalidateCache(parentKey);
+	dao.populateCache(parentKey, parent);
 	
 	return _activeRecord.id;
 }

@@ -233,6 +233,41 @@ public class JavaGenerator
 			domainInterfaceStringTemplate.setAttribute("annotatedInterfaceAttributeGetters", getterStringTemplate);
 		}
 
+		Annotation cacheable = new airlift.generator.Annotation();
+		cacheable.setName("airlift.generator.Cacheable");
+
+		//TODO ... We should really inspect the annotation and get the
+		//live value instead of just hard coding it to 600 seconds.
+		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
+		{
+			//This means the domain is reference data so cache info for
+			//30 minutes.  Reference data is often used and rarely ever
+			//changed information.  In these cases it makes sense to
+			//cache it for long periods of time.
+			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.Cacheable(life=3600)");
+		}
+		else
+		{
+			//this means that we just want to cache for relatively
+			//short periods of time.  Most domain data fits this bill
+			//...
+			//Remember that all data is invalidated whenever a mutating
+			//method is executed, so this should work just fine.
+			//Also remember that the intention is to not always cache
+			//but to certainly start caching information when the app
+			//is under load.  In this scenario, one minute is most
+			//certainly enough.
+			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.Cacheable(life=600)");
+		}
+
+		Annotation auditable = new airlift.generator.Annotation();
+		auditable.setName("airlift.generator.Auditable");
+
+		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
+		{
+			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.Auditable()");
+		}
+
 		domainInterfaceStringTemplate.setAttribute("generatorComment", comment);
 		domainInterfaceStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		domainInterfaceStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
@@ -474,26 +509,6 @@ public class JavaGenerator
 				setterStringTemplate.setAttribute("setterName", encryptedSetterName);
 				setterStringTemplate.setAttribute("name", encryptedName);
 			}
-		}
-
-		Annotation cacheable = new airlift.generator.Annotation();
-		cacheable.setName("airlift.generator.Cacheable");
-
-		//TODO ... We should really inspect the annotation and get the
-		//live value instead of just hard coding it to 600 seconds.
-		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
-		{
-			domainObjectStringTemplate.setAttribute("cacheable", "@airlift.generator.Cacheable()");
-		}
-
-		Annotation auditable = new airlift.generator.Annotation();
-		auditable.setName("airlift.generator.Auditable");
-
-		//TODO ... We should really inspect the annotation and get the
-		//live value instead of just hard coding it to 600 seconds.
-		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
-		{
-			domainObjectStringTemplate.setAttribute("auditable", "@airlift.generator.Auditable()");
 		}
 
 		domainObjectStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));

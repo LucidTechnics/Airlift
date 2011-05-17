@@ -63,47 +63,111 @@ public class RestfulCachingContext
 		return getLife();
 	}
 	
-	public boolean cacheCollections()
-	{
-		return getCacheCollections();
-	}
-
 	public boolean isCacheable()
 	{
 		return getIsCacheable();
 	}
 
-	public void put(javax.servlet.http.HttpServletRequest _request, String _content)
+	public void put(java.io.Serializable _key, java.io.Serializable _content)
 	{
-		getCache().put(constructCacheKey(_request), _content, Expiration.byDeltaSeconds(life()));
+		try
+		{
+			getCache().put(_key, _content, Expiration.byDeltaSeconds(life()));
+		}
+		catch(Throwable t)
+		{
+			log.warning("Unable to place key: " + _key + " with its value: " + _content + " in the cache.");
+		}
 	}
 
-	public void put(javax.servlet.http.HttpServletRequest _request, byte[] _content)
+	public com.google.appengine.api.memcache.MemcacheService.IdentifiableValue getIdentifiable(java.io.Serializable _key)
 	{
-		getCache().put(constructCacheKey(_request), _content, Expiration.byDeltaSeconds(life()));
-	}
-
-	public void remove(javax.servlet.http.HttpServletRequest _request)
-	{
-		getCache().delete(constructCacheKey(_request));
+		return getCache().getIdentifiable(_key);
 	}
 	
-	public String get(javax.servlet.http.HttpServletRequest _request)
+	public boolean putIfUntouched(java.io.Serializable _key,
+							   com.google.appengine.api.memcache.MemcacheService.IdentifiableValue _oldValue,
+							   java.io.Serializable _newValue)
 	{
-		String cacheKey = constructCacheKey(_request);
-		String content = (String) getCache().get(cacheKey);
-
-		if (log.isLoggable(java.util.logging.Level.INFO) == true && content != null)
+		boolean success = false;
+		
+		try
 		{
-			log.info("Cache hit for this entry: " + cacheKey);
+			success = getCache().putIfUntouched(_key, _oldValue, _newValue, Expiration.byDeltaSeconds(life()));
+		}
+		catch(Throwable t)
+		{
+			log.warning("Unable to replace key: " + _key + " with old value " + _oldValue + ", with its new value: " + _newValue + " in the cache.");
+		}
+
+		return success;
+	}
+
+	public void putAll(java.util.Map<java.io.Serializable, Object> _valueMap)
+	{
+		try
+		{
+			getCache().putAll(_valueMap, Expiration.byDeltaSeconds(life()));
+		}
+		catch (Throwable t)
+		{
+			log.warning("Unable to place keys for map of size: " + _valueMap.size());
+		}
+	}
+	
+	public void remove(java.io.Serializable _key)
+	{
+		try
+		{
+			getCache().delete(_key);
+		}
+		catch(Throwable t)
+		{
+			log.warning("Unable to remove key: " + _key + " from the cache.");
+		}
+			
+	}
+	
+	public java.io.Serializable get(java.io.Serializable _key)
+	{
+		java.io.Serializable content = null;
+
+		try
+		{
+			content = (java.io.Serializable) getCache().get(_key);
+
+			if (log.isLoggable(java.util.logging.Level.INFO) == true && content != null)
+			{
+				log.info("Cache hit for this entry: " + _key);
+			}
+		}
+		catch(Throwable t)
+		{
+			log.warning("Unable to get value for key: " + _key +  " from the cache");
 		}
 		
 		return content;
 	}
 
-	public String constructCacheKey(javax.servlet.http.HttpServletRequest _request)
+	public java.util.Map<java.io.Serializable, Object> getAll(java.util.Collection<java.io.Serializable> _keyCollection)
 	{
-		String queryString = (_request.getQueryString() != null) ? "?" + _request.getQueryString() : ""; 
-		return _request.getRequestURL() + queryString;
+		java.util.Map<java.io.Serializable, Object> content = null;
+
+		try
+		{
+			content = (java.util.Map<java.io.Serializable, Object>) getCache().getAll(_keyCollection);
+
+			if (log.isLoggable(java.util.logging.Level.INFO) == true && content != null && content.size() > 0)
+			{
+				log.info("Cache hit for collection of keys of size: " + _keyCollection.size());
+			}
+		}
+		catch(Throwable t)
+		{
+			log.warning("Unable to get values for multiple keys: " + _keyCollection +  " from the cache");
+		}
+
+		return content;
 	}
+
 }

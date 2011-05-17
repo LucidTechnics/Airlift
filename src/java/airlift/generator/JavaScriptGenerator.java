@@ -217,7 +217,6 @@ public class JavaScriptGenerator
 		if (hasPrimaryKey == true)
 		{
 			updateMethodStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-			updateMethodStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 			updateMethodStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 
 			if (thisDomainIsSearchable == true)
@@ -236,7 +235,6 @@ public class JavaScriptGenerator
 			primaryKeyMethodsStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 			primaryKeyMethodsStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
 			primaryKeyMethodsStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-			primaryKeyMethodsStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
 
 			daoStringTemplate.setAttribute("primaryKeyMethods", primaryKeyMethodsStringTemplate.toString());
 		}
@@ -265,7 +263,7 @@ public class JavaScriptGenerator
 		daoStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
 		daoStringTemplate.setAttribute("fullClassName", _domainObjectModel.getPackageName() + "." + _domainObjectModel.getClassName());
 		daoStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
-		daoStringTemplate.setAttribute("lowerCaseClassName", lowerTheFirstCharacter(_domainObjectModel.getClassName()));
+		daoStringTemplate.setAttribute("lowerCaseClassName", _domainObjectModel.getClassName().toLowerCase());
 		daoStringTemplate.setAttribute("selectAllSql", databaseGenerator.generateSelectSql(_domainObjectModel));
 		daoStringTemplate.setAttribute("findKeysSql", databaseGenerator.generateFindKeysSql(_domainObjectModel));
 		
@@ -380,16 +378,6 @@ public class JavaScriptGenerator
 
 			stringBufferStringTemplate.setAttribute("name", name);
 		}
-
-		/*Annotation cacheable = new airlift.generator.Annotation();
-		cacheable.setName("airlift.generator.Cacheable");
-
-		//TODO ... We should really inspect the annotation and get the
-		//live value instead of just hard coding it to 600 seconds.
-		if (_domainObjectModel.getDomainAnnotationSet().contains(cacheable) == true)
-		{
-			domainObjectStringTemplate.setAttribute("cacheable", "@airlift.generator.Cacheable()");
-		}*/
 
 		Annotation auditable = new airlift.generator.Annotation();
 		auditable.setName("airlift.generator.Auditable");
