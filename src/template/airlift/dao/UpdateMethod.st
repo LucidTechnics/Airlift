@@ -21,7 +21,6 @@ dao.update = function(_activeRecord, _config)
 
 	$indexWritten$parentWritten && transaction.commitAsync();
 
-	dao.invalidateCache(parentKey);
 	dao.populateCache(parentKey, parent);
 	
 	return _activeRecord.id;

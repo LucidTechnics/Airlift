@@ -236,7 +236,7 @@ public class RestServlet
 			//database.
 			if (user.getId() != null)
 			{
-				securityContext.update(user);
+				securityContext.update(user, false);
 			}
 
 			sendCodedPage("401", "UnAuthorized", _response);
@@ -265,10 +265,8 @@ public class RestServlet
 				//user.
 				if (user != null && user.getId() != null)
 				{
-					//TODO ... time outs should be put in memcache most
-					//of the time ...
 					user.setTimeOutDate(calculateNextTimeOutDate());
-					securityContext.update(user);
+					securityContext.update(user, false);
 				}
 				log.info("RestServlet 0b: " + quotaService.getCpuTimeInMegaCycles());
 				processRequest(_request, _response, method, restContext, uriParameterMap);

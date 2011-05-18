@@ -316,7 +316,7 @@ public class JavaScriptGenerator
 			{
 				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "activeRecord.foreignKeySet.add(\"" + name + "\");");
 				activeRecordStringTemplate.setAttribute("addForeignKeyName", "foreignKeyList.push(airlift.string(\"" + name + "\"));");
-				activeRecordStringTemplate.setAttribute("restifyForeignKey", "impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this." + name + ");");
+				activeRecordStringTemplate.setAttribute("restifyForeignKey", "this." + name + " && impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this." + name + ");");
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
 				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");

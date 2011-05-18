@@ -104,7 +104,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var impl = this.createImpl();
 		var base = _base||BASE;
 		
-		impl.setId(base + "a/$allLowerCaseClassName$/" + this.id);
+		this.id && impl.setId(base + "a/$allLowerCaseClassName$/" + this.id);
 		$restifyForeignKey; separator="\n"$
 						
 		return impl;
@@ -143,19 +143,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET"); }
 		
-		this.dao.get(this, _config);
+		var success = this.dao.get(this, _config);
 		$auditGet$
 
-		return this;
+		return success;
 	};
 
 	activeRecord.copy = function(_id, _config)
 	{
 		this.id = _id;
-		this.get(_config);
+		var success = this.get(_config);
 		this.id = null;
 
-		return this;
+		return success;
 	};
 		
 	activeRecord.update = function(_config)

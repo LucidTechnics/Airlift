@@ -344,6 +344,11 @@ public class RestfulSecurityContext
 
 	public void update(AirliftUser _airliftUser)
 	{
+		update(_airliftUser, true);
+	}
+	
+	public void update(AirliftUser _airliftUser, boolean _writeThrough)
+	{
 		if (_airliftUser.getId() == null)
 		{
 			throw new RuntimeException("Cannot update. Null id found for object: " + _airliftUser);
@@ -354,15 +359,23 @@ public class RestfulSecurityContext
 
 		try
 		{
-			transaction = datastore.beginTransaction().get();
 			_airliftUser.setAuditPutDate(new java.util.Date());
 			com.google.appengine.api.datastore.Entity entity = copyAirliftUserToEntity(_airliftUser);
-			datastore.put(entity);
 
-			getCachingContext().remove(entity.getKey());
+			if (_writeThrough == true)
+			{
+				log.info("Writing user record through to the datastore");
+				transaction = datastore.beginTransaction().get();
+				datastore.put(entity);
+			}
+			else
+			{
+				log.info("Writing user record to the cache only");
+			}
+
 			getCachingContext().put(entity.getKey(), entity);
 
-			transaction.commitAsync();
+			if (transaction != null)  { transaction.commitAsync(); }
 		}
 		catch(Throwable t)
 		{

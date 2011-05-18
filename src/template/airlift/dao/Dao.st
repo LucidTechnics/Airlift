@@ -286,7 +286,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		$indexWritten$parentWritten && transaction.commitAsync();
 
-		dao.invalidateCache(parentKey);
 		dao.populateCache(parentKey, parent);
 		
 		return id;
