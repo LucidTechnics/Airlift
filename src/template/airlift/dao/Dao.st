@@ -212,7 +212,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		
 		for (activeRecord in Iterator(iterator))
 		{
-			results.push(activeRecord);
+			activeRecord && results.push(activeRecord);
 		}
 
 		return results;

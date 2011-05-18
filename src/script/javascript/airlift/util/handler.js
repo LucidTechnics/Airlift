@@ -1198,10 +1198,23 @@ airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
 
 	if (airliftUser) { LOG.info("Airlift user role set:" + airliftUser.roleSet); }
 	if (_abstractUser) { LOG.info("Abstract user role set:" + _abstractUser.roleSet); }
-	
-	_abstractUser.copyTo(airliftUser, {filter: "id,roleSet"});
-	airliftUser.roleSet = new Packages.java.util.HashSet(_abstractUser.roleSet);
 
+	airliftUser.setFullName(_abstractUser.fullName);
+	airliftUser.setShortName(_abstractUser.shortName);
+	airliftUser.setExternalUserId(_abstractUser.externalUserId);
+	airliftUser.setEmail(_abstractUser.email);
+
+	if (_abstractUser.roleSet != null && (_abstractUser.roleSet instanceof Packages.java.util.Collection))
+	{
+		airliftUser.setRoleSet(new Packages.java.util.HashSet(_abstractUser.roleSet));
+	}
+	else
+	{
+		airliftUser.setRoleSet(new Packages.java.util.HashSet());
+	}
+
+	airliftUser.setActive(true);
+	
 	if (_syncFunction)
 	{
 		_syncFunction(airliftUser, _abstractUser);

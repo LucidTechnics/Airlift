@@ -165,29 +165,29 @@ public class JavaScriptGenerator
 				{
 					if (type.startsWith("java.util.List") == true)
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && new Packages.java.util.ArrayList(_entity.getProperty(\"" + name + "\")))||null;");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && new Packages.java.util.ArrayList(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.ArrayList()); }");
 					}
 					else if (type.startsWith("java.util.Set") == true)
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && new Packages.java.util.HashSet(_entity.getProperty(\"" + name + "\")))||null;");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && new Packages.java.util.HashSet(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.HashSet()); }");
 					}
 					else
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord." + name + " = ((airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null;");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null; }");
 					}
 
 					if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true )
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setProperty(\"" + name + "\", _activeRecord." + name + ");");
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", _activeRecord." + name + "); }");
 					}
 					else
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "(airlift.filterContains(filter, \"" + name + "\") === contains) && _entity.setUnindexedProperty(\"" + name + "\", _activeRecord." + name + ");");
+						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", _activeRecord." + name + "); }");
 					}
 				}
 				else
 				{
-					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "_activeRecord.id = (airlift.filterContains(filter, \"id\") === contains) && _entity.getKey().getName();");
+					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"id\") === contains) { _activeRecord.id = _entity.getKey().getName(); }");
 				}
 
 				if ("true".equalsIgnoreCase(encrypted) == true)
@@ -335,8 +335,8 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
 
-			activeRecordStringTemplate.setAttribute("copyToActiveRecord", "_activeRecord[\"" + name + "\"] = this[\"" + name + "\"];");
-			activeRecordStringTemplate.setAttribute("copyFromActiveRecord", "this[\"" + name + "\"] = _activeRecord[\"" + name + "\"];");
+			activeRecordStringTemplate.setAttribute("copyToActiveRecord", "if (airlift.isDefined(this." + name + ") === true && (airlift.filterContains(filter, \"" + name + "\") === contains)) { _activeRecord[\"" + name + "\"] = this[\"" + name + "\"]; }");
+			activeRecordStringTemplate.setAttribute("copyFromActiveRecord", "if (airlift.isDefined(_activeRecord." + name + ") === true && (airlift.filterContains(filter, \"" + name + "\") === contains)) { this[\"" + name + "\"] = _activeRecord[\"" + name + "\"]; }");
 			
 			if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true)
 			{
@@ -355,7 +355,7 @@ public class JavaScriptGenerator
 			}
 
 			activeRecordStringTemplate.setAttribute("addPropertyName", "propertyList.push(airlift.string(\"" + name + "\"));");
-			activeRecordStringTemplate.setAttribute("copyPropertyToImpl", "_impl.set" + upperTheFirstCharacter(name) + "(this." + name + ");");
+			activeRecordStringTemplate.setAttribute("copyPropertyToImpl", "this." + name + " && _impl.set" + upperTheFirstCharacter(name) + "(this." + name + ");");
 			activeRecordStringTemplate.setAttribute("propertyListEntry", "\"" + name + "\"");
 			
 			if ("id".equalsIgnoreCase(name) == false)
