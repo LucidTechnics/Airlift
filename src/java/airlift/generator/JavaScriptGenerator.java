@@ -316,7 +316,7 @@ public class JavaScriptGenerator
 			{
 				activeRecordStringTemplate.setAttribute("addNameToForeignKeySet", "activeRecord.foreignKeySet.add(\"" + name + "\");");
 				activeRecordStringTemplate.setAttribute("addForeignKeyName", "foreignKeyList.push(airlift.string(\"" + name + "\"));");
-				activeRecordStringTemplate.setAttribute("restifyForeignKey", "this." + name + " && impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this." + name + ");");
+				activeRecordStringTemplate.setAttribute("restifyForeignKey", "this[\"" + name + "\"] && impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this[\"" + name + "\"]);");
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
 				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
@@ -327,6 +327,9 @@ public class JavaScriptGenerator
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
 
+			activeRecordStringTemplate.setAttribute("copyToActiveRecord", "_activeRecord[\"" + name + "\"] = this[\"" + name + "\"];");
+			activeRecordStringTemplate.setAttribute("copyFromActiveRecord", "this[\"" + name + "\"] = _activeRecord[\"" + name + "\"];");
+			
 			if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true)
 			{
 				if (type.endsWith("[]") == true ||

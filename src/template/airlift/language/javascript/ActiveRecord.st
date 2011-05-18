@@ -319,7 +319,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		
 		var that = this;
 
-		$copyFromEntityToActiveRecord; separator="\n"$
+		$copyFromActiveRecord; separator="\n"$
 
 		return this;
 	}
@@ -332,7 +332,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var that = this;
 
-		$copyFromActiveRecordToEntity; separator="\n"$
+		$copyToActiveRecord; separator="\n"$
 
 		return this;
 	}
