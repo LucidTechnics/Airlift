@@ -52,7 +52,7 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 
 	filterList.forEach(function(_filter)
 	{
-		query.addFilter(filter.attribute, Query.FilterOperator[filter.operatorName], filter.value);
+		query.addFilter(_filter.attribute, Query.FilterOperator[_filter.operatorName], _filter.value);
 	});
 	
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));

@@ -73,8 +73,6 @@ public class JavascriptingUtil
 					throw new RuntimeException(t);
 				}
 			}
-
-			//sharedScope.sealObject();
 		}
 		finally
 		{
