@@ -135,15 +135,23 @@ public class JavaScriptGenerator
 						  type.startsWith("java.util.HashSet") == true)
 
 					{
-						StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
+						StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoIntersection");
 
 						daoMembershipStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
 						daoMembershipStringTemplate.setAttribute("attribute", name);
 						daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 
-						daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
+						daoStringTemplate.setAttribute("collectByIntersection", daoMembershipStringTemplate.toString());
 					}
-					
+
+					StringTemplate daoMembershipStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoMembership");
+
+					daoMembershipStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
+					daoMembershipStringTemplate.setAttribute("attribute", name);
+					daoMembershipStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
+
+					daoStringTemplate.setAttribute("collectByMembership", daoMembershipStringTemplate.toString());
+
 					StringTemplate daoAttributeStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/dao/DaoAttribute");
 
 					daoAttributeStringTemplate.setAttribute("uppercaseAttributeName", upperTheFirstCharacter(name));
@@ -339,9 +347,10 @@ public class JavaScriptGenerator
 					  type.startsWith("java.util.HashSet") == true)
 
 				{
-					activeRecordStringTemplate.setAttribute("collectByMembership", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Membership = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "Membership(_value, _config||{}); };");
+					activeRecordStringTemplate.setAttribute("collectByIntersection", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Intersection = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "Intersection(_value, _config||{}); };");
 				}
 
+				activeRecordStringTemplate.setAttribute("collectByMembership", "activeRecord.collectBy" + upperTheFirstCharacter(name) + "Membership = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "Membership(_value, _config||{}); };");
 				activeRecordStringTemplate.setAttribute("collectByAttribute", "activeRecord.collectBy" + upperTheFirstCharacter(name) + " = function(_value, _config) { if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), \"GET\", true); } return this.dao.collectBy" + upperTheFirstCharacter(name) + "(_value, _config||{}); };");
 			}
 

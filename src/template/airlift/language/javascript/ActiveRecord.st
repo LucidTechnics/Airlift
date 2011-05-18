@@ -222,6 +222,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	$collectByMembership; separator="\n\n"$
 
+	$collectByIntersection; separator="\n\n"$
+
 	activeRecord.addMessage = function(_name, _message, _category)
 	{
 		var message = (airlift.isDefined(_message) === true) ? _message: "";

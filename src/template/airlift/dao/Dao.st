@@ -346,7 +346,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	$collectByMembership; separator="\n\n"$
 
-	$collectByRange; separator="\n\n"$
+	$collectByIntersection; separator="\n\n"$
 
 	return dao;
 };
