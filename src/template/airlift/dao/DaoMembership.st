@@ -22,7 +22,7 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	var Query = Packages.com.google.appengine.api.datastore.Query;
 	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-	var query = new Query("$className$").addSort(orderBy, sort).setKeysOnly();
+	var query = new Query("$className$").addSort(orderBy, sort);
 
 	if (_membershipList.forEach)
 	{
@@ -42,5 +42,5 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
-	return dao[returnType] && dao[returnType](queryResults, config);
+	return queryResults;
 }
