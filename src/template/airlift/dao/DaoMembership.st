@@ -16,13 +16,23 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	var offset = config.offset||0;
 	var limit = config.limit||20;
 	var asc = config.asc||true;
-	var orderBy = config.orderBy||"$attribute$";
+	var orderBy = config.orderBy||false;
 	var returnType = config.returnType||"asIterator";
+	var filterList = config.filterList||[];
 	
 	var Query = Packages.com.google.appengine.api.datastore.Query;
-	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-	var query = new Query("$className$").addSort(orderBy, sort);
+	if (orderBy !== false)
+	{
+		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
+		var query = new Query("$className$").addSort(orderBy, sort);
+		config.keysOnly = false;
+	}
+	else
+	{
+		var query = new Query("$className$").setKeysOnly();
+		config.keysOnly = true;
+	}
 
 	if (_membershipList.forEach)
 	{
@@ -39,8 +49,13 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	}
 
 	query.addFilter("$attribute$", Query.FilterOperator.IN, membershipList);
+
+	filterList.forEach(function(_filter)
+	{
+		query.addFilter(filter.attribute, Query.FilterOperator[filter.operatorName], filter.value);
+	});
 	
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
-	return queryResults;
+	return dao[returnType] && dao[returnType](queryResults, config);
 }

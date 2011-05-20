@@ -154,12 +154,24 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		return result;
 	};
 
+	dao.convertEntity = function(_entity, _activeRecord)
+	{
+		var activeRecord = _activeRecord||airlift.ar("$className$");
+		dao.copyFromEntity(activeRecord, _entity);
+		dao.decrypt(activeRecord, _entity);
+
+		return activeRecord;
+	}
+
 	dao.asIterator = function(_queryResultIterator, _config)
 	{
 		var iterator = {};
 		var mark = 0;
 		var nextResults = [];
 		var bufferSize = 100;
+
+		var config = _config||{}
+		var keysOnly = config.keysOnly||true;
 		
 		iterator.fetchNextResults = function(_queryResultIterator)
 		{
@@ -180,8 +192,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		iterator.next = function()
 		{
-			nextResults = ((nextResults.length === 0) && iterator.fetchNextResults(_queryResultIterator)) || nextResults;
-			mark++;
+			if (keysOnly === true)
+			{
+				nextResults = ((nextResults.length === 0) && iterator.fetchNextResults(_queryResultIterator)) || nextResults;
+				mark++;
+			}
+			else
+			{
+				var result = _queryResultIterator.next();
+				var activeRecord = dao.convertEntity(result);
+				nextResults.push(activeRecord);
+			}
 			
 			return nextResults.pop();
 		}
@@ -328,10 +349,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		for (var entry in Iterator(queryResults.get().entrySet()))
 		{
 			var result = entry.getValue();
-			var activeRecord = airlift.ar("$lowerCaseClassName$");
-			dao.copyFromEntity(activeRecord, result);
-			dao.decrypt(activeRecord, result);
-			
+			var activeRecord = dao.convertEntity(result);			
 			results.push(activeRecord);
 		}
 

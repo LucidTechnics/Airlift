@@ -10,9 +10,8 @@ dao.get = function(_activeRecord)
 		{
 			var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey("$className$", _activeRecord.id);
 			var result = dao.getFromCache(key)||dao.populateCache(key, datastore.get(key).get());
-			
-			dao.copyFromEntity(_activeRecord, result);
-			dao.decrypt(_activeRecord, result);
+
+			dao.convertEntity(result, _activeRecord);
 			
 			success = true;
 		}
@@ -54,9 +53,7 @@ dao.getAll = function(_keySet)
 			for (var entry in Iterator(resultMap.entrySet()))
 			{
 				var result = entry.getValue();
-				var activeRecord = airlift.ar("$className$");
-				dao.copyFromEntity(activeRecord, result);
-				dao.decrypt(activeRecord, result);
+				var activeRecord = dao.convertEntity(result);
 				results.push(activeRecord);
 			}
 		}

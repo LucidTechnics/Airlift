@@ -17,10 +17,11 @@ dao.collectBy$uppercaseAttributeName$Intersection = function(_intersectionList, 
 {
 	var config = _config||{};
 	var offset = config.offset||0;
-	var limit = config.limit||20;
+	var limit = config.limit||1000;
 	var asc = config.asc||true;
 	var orderBy = config.orderBy||"$attribute$";
 	var returnType = config.returnType||"asIterator";
+	var filterList = config.filterList||[];
 	
 	var Query = Packages.com.google.appengine.api.datastore.Query;
 	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
@@ -41,6 +42,11 @@ dao.collectBy$uppercaseAttributeName$Intersection = function(_intersectionList, 
 			query.addFilter("$attribute$", Query.FilterOperator.EQUAL, member);
 		}
 	}
+
+	filterList.forEach(function(_filter)
+	{
+		query.addFilter(filter.attribute, Query.FilterOperator[filter.operatorName], filter.value);
+	});
 	
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 

@@ -17,11 +17,18 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 	var asc = config.asc||true;
 	var orderBy = config.orderBy||"auditPutDate";
 	var returnType = config.returnType||"asIterator";
+	var filterList = config.filterList||[];
 	
 	var Query = Packages.com.google.appengine.api.datastore.Query;
 	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
 	var query = new Query("$className$").addSort(orderBy, sort).addFilter("$attribute$", Query.FilterOperator.EQUAL, _value).setKeysOnly();
+
+	filterList.forEach(function(_filter)
+	{
+		query.addFilter(filter.attribute, Query.FilterOperator[filter.operatorName], filter.value);
+	});
+
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	return dao[returnType] && dao[returnType](queryResults, config);
