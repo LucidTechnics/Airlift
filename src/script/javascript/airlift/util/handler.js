@@ -414,14 +414,16 @@ airlift.populate = function(_domainName)
 	return [activeRecord, errorMap];
 };
 
-airlift.get = function(_id, _domainName)
+airlift.get = function(_id, _domainName, _config)
 {
 	var activeRecord = airlift.ar(_domainName);
-
 	var id = _id||ID;
 	
-	activeRecord.get(id);
-	var foundRecord = (airlift.isDefined(activeRecord.id) === true);
+	activeRecord.setId(id);
+
+	var config = _config||{};
+	
+	var foundRecord = activeRecord.get(config);
 	
 	return [activeRecord, foundRecord];
 };
