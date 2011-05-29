@@ -15,14 +15,14 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	var config = _config||{};
 	var offset = config.offset||0;
 	var limit = config.limit||20;
-	var asc = config.asc||true;
-	var orderBy = config.orderBy||false;
+	var asc = (airlift.isDefined(config.asc) === true) ? config.asc : true;
+	var orderBy = (airlift.isDefined(config.orderBy) === true) ? config.orderBy : false;
 	var returnType = config.returnType||"asIterator";
 	var filterList = config.filterList||[];
 	
 	var Query = Packages.com.google.appengine.api.datastore.Query;
 
-	if (orderBy !== false)
+	if (orderBy === true)
 	{
 		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 		var query = new Query("$className$").addSort(orderBy, sort);

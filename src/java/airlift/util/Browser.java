@@ -112,7 +112,7 @@ public final class Browser
 	{
 		StringBuffer queryString = new StringBuffer();
 
-		if (_parameterMap != null)
+		if (_parameterMap != null  && _parameterMap.isEmpty() == false)
 		{
 			int count = 0;
 			String prefix = "?";
@@ -121,7 +121,8 @@ public final class Browser
 			{
 				count++;
 				if (count > 1)	{ prefix = "&";	}
-				queryString.append(prefix).append(encode(name, "UTF-8")).append("=").append(encode(_parameterMap.get(name), "UTF-8"));
+				queryString.append(prefix).append(name).append("=").append(_parameterMap.get(name));
+				//queryString.append(prefix).append(encode(name, "UTF-8")).append("=").append(encode(_parameterMap.get(name), "UTF-8"));
 			}
 		}
 

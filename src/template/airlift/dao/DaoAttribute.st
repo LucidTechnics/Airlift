@@ -14,7 +14,7 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 	var config = _config||{};
 	var offset = config.offset||0;
 	var limit = config.limit||20;
-	var asc = config.asc||true;
+	var asc = (airlift.isDefined(config.asc) === true) ? config.asc : true;
 	var orderBy = config.orderBy||"auditPutDate";
 	var returnType = config.returnType||"asIterator";
 	var filterList = config.filterList||[];

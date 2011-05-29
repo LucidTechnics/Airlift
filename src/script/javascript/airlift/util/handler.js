@@ -1142,7 +1142,7 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.uri = URI;
 	auditTrail.handlerName = HANDLER_NAME;
 	auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(_data);
-	auditTrail.userId = USER_EMAIL;
+	auditTrail.userId = USER && USER.id;
 	auditTrail.actionDate = airlift.createDate();
 	auditTrail.recordDate = auditTrail.actionDate;
 

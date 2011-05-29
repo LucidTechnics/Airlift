@@ -18,7 +18,7 @@ dao.collectBy$uppercaseAttributeName$Intersection = function(_intersectionList, 
 	var config = _config||{};
 	var offset = config.offset||0;
 	var limit = config.limit||1000;
-	var asc = config.asc||true;
+	var asc = (airlift.isDefined(config.asc) === true) ? config.asc : true;
 	var orderBy = config.orderBy||"$attribute$";
 	var returnType = config.returnType||"asIterator";
 	var filterList = config.filterList||[];
