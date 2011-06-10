@@ -1,12 +1,16 @@
-var airlift;
-
 if (!airlift)
 {
-	airlift = {};
+	var airlift = {};
 }
 else if (typeof airlift != "object")
 {
 	throw new Error("airlift already exists and it is not an object");
+}
+
+//assign the $ object ... makes things handier.
+if (!$)
+{
+	var $ = airlift;
 }
 
 //sem - Serialize Error Map

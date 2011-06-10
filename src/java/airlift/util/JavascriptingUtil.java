@@ -53,11 +53,12 @@ public class JavascriptingUtil
 		{
 			sharedScope = context.initStandardObjects();
 
-			String[] scriptResources = new String[3];
+			String[] scriptResources = new String[4];
 
 			scriptResources[0] = "/airlift/util/douglasCrockford.js";
-			scriptResources[1] = "/airlift/util/validate.js";
-			scriptResources[2] = "/airlift/util/json2.js";
+			scriptResources[1] = "/airlift/util/json2.js";
+			scriptResources[2] = "/airlift/util/util.js";
+			scriptResources[3] = "/airlift/util/validate.js";
 
 			for (int i = 0; i < scriptResources.length; i++)
 			{
@@ -289,6 +290,14 @@ public class JavascriptingUtil
 		
 		try
 		{
+			//I do not think it is necessary to place the scripts in
+			//memcache because this will make it more difficult to
+			//manage with regards to cache expiration ...
+			//Instead place it in a static map that will be available
+			//on the instance level.  If a new instance is started the
+			//cache will be empty ... but this is OK because after
+			//running for a few seconds the cache will be full ... 
+			
 			if (getScriptResourceMap().containsKey(_scriptResource) == false)
 			{
 				log.info("Compiled script not cached: " + _scriptResource);
@@ -305,10 +314,12 @@ public class JavascriptingUtil
 
 				if (this.compileScript == true)
 				{
-	//				synchronized(getScriptResourceMap())
-//					{
+					log.info("Caching compiled script: " + _scriptResource);
+					
+					synchronized(getScriptResourceMap())
+					{
 						getScriptResourceMap().put(_scriptResource, script);
-		//			}
+					}
 				}
 			}
 			else

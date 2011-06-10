@@ -61,7 +61,7 @@ public final class Browser
 		Throwable throwable = null;
 		boolean success = false;
 		
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			log.info("Attempting to reach: " + _url + " after this many tries: " + tryCount);
 			

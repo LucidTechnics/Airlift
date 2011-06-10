@@ -5,14 +5,12 @@
  ** It also is derived from  mask logic from pengo works
  ** found here at http://www.pengoworks.com/workshop/js/mask/
  ** and is available for free download with no license.
- ** The team at Hannibal is grateful for these contributions.
+ ** The team at Airlift is grateful for these contributions.
  **/
-
-var airlift;
 
 if (!airlift)
 {
-	airlift = {};
+	var airlift = {};
 }
 else if (typeof airlift != "object")
 {

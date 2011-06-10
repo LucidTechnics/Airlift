@@ -74,7 +74,6 @@ dao.getAll = function(_keySet)
 	5, "Encountered this error while getting multiple $className$ resources identified by: " + _keySet);
 }
 
-
 $updateMethod$
 
 dao.del = function(_id)

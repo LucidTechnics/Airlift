@@ -40,7 +40,7 @@ public class ErrorHandlerContext
 							String _appName,
 							RestContext _restContext,
 							String _method,
-							HttpServlet _httpServlet,
+							RestServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
 							HttpServletResponse _httpServletResponse,
 							Map _uriParameterMap, DomainConfiguration _domainConfiguration)

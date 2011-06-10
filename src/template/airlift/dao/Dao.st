@@ -109,7 +109,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	{
 		_activeRecord.setAuditPostDate(airlift.createDate());
 		_activeRecord.setAuditPutDate(_activeRecord.getAuditPostDate());
-		_activeRecord.setAuditUserEmail(USER_EMAIL||null);
+		_activeRecord.setAuditUserId(USER && USER.id||null);
 
 		return this;
 	}
@@ -117,7 +117,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	dao.putAudit = function(_activeRecord)
 	{
 		_activeRecord.setAuditPutDate(airlift.createDate());
-		if (USER_EMAIL) { _activeRecord.setAuditUserEmail(USER_EMAIL); }
+		_activeRecord.setAuditUserId(USER && USER.id||null);
 
 		return this;
 	}
@@ -166,12 +166,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	dao.asIterator = function(_queryResultIterator, _config)
 	{
 		var iterator = {};
-		var mark = 0;
 		var nextResults = [];
 		var bufferSize = 100;
 
 		var config = _config||{}
-		var keysOnly = config.keysOnly||true;
+		var keysOnly = (airlift.isDefined(config.keysOnly) === true) ? config.keysOnly : true;
 		
 		iterator.fetchNextResults = function(_queryResultIterator)
 		{
@@ -195,7 +194,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			if (keysOnly === true)
 			{
 				nextResults = ((nextResults.length === 0) && iterator.fetchNextResults(_queryResultIterator)) || nextResults;
-				mark++;
 			}
 			else
 			{
@@ -212,7 +210,17 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			_queryResultIterator.remove();
 		}
 
-		return new java.util.Iterator(iterator);
+		iterator.forEach = function(_function)
+		{
+			var index = 0;
+			while (this.hasNext() === true)
+			{
+				_function(this.next(), index);
+				index++;
+			}
+		}
+
+		return new Packages.airlift.util.Iterator(iterator);
 	}
 
 	dao.asIterable = function(_queryResultIterable, _config)
@@ -229,7 +237,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 	dao.asList = function(_queryResultList, _config)
 	{
-		var results = [], iterator = dao.asIterator(_queryResultList.iterator(), _config);
+		var results = airlift.l(), iterator = dao.asIterator(_queryResultList.iterator(), _config);
 		
 		for (activeRecord in Iterator(iterator))
 		{

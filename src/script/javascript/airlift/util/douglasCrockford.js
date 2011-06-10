@@ -1,67 +1,66 @@
-var airlift;
+//This file started out as a file for augmenting JavaScript objects
+//with methods suggested by Mr. Crockford.  Now we add anything along
+//those lines to this file.
+function typeOf(value)
+{
+	var s = typeof value;
 
-if (!airlift)
-{
-	airlift = {};
-}
-else if (typeof airlift != "object")
-{
-	throw new Error("airlift already exists and it is not an object");
-}
-
-//redefine typeof
-if (typeof Object.typeOf !== 'function')
-{
-	Object.typeOf = function(value) {
-		var s = typeof value;
-		if (s === 'object') {
-			if (value) {
-				if (typeof value.length === 'number' &&
-					  !(value.propertyIsEnumerable('length')) &&
-					  typeof value.splice === 'function') {
-					s = 'array';
-				}
-			} else {
-				s = 'null';
+	if (s === 'object')
+	{
+		if (value)
+		{
+			if (typeof value.length === 'number' &&
+				  !(value.propertyIsEnumerable('length')) &&
+				  typeof value.splice === 'function')
+			{
+				s = 'array';
 			}
 		}
-		return s;
+		else
+		{
+			s = 'null';
+		}
 	}
+	
+	return s;
 }
 
-if (typeof Object.isEmpty !== 'function')
+function isEmpty(o)
 {
-	Object.isEmpty = function(o) {
-		var i, v;
-		if (airlifttypeOf(o) === 'object') {
-			for (i in o) {
-				v = o[i];
-				if (v !== undefined && airlifttypeOf(v) !== 'function') {
-					return false;
-				}
+	var i, v;
+	if (typeOf(o) === 'object')
+	{
+		for (i in o)
+		{
+			v = o[i];
+			if (v !== undefined && typeOf(v) !== 'function')
+			{
+				return false;
 			}
 		}
-		return true;
 	}
+	
+	return true;
 }
 
-//This function makes strings replaces &, <, and > with the appropriate
-//entities.  Great for XML and HTML embeddings.
-String.prototype.entityify = function () {
-	return this.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-};
-
-String.prototype.quote = function () {
+String.prototype.quote = function ()
+{
 	var c, i, l = this.length, o = '"';
-	for (i = 0; i < l; i += 1) {
+	for (i = 0; i < l; i += 1)
+	{
 		c = this.charAt(i);
-		if (c >= ' ') {
-			if (c === '\\' || c === '"') {
+		if (c >= ' ')
+		{
+			if (c === '\\' || c === '"')
+			{
 				o += '\\';
 			}
 			o += c;
-		} else {
-			switch (c) {
+		}
+		else
+		{
+			switch (c)
+			{
 				case '\b':
 					o += '\\b';
 					break;
@@ -87,22 +86,68 @@ String.prototype.quote = function () {
 	return o + '"';
 };
 
-String.prototype.supplant = function (o) {
+String.prototype.supplant = function (o)
+{
 	return this.replace(/{([^{}]*)}/g,
-						function (a, b) {
-		var r = o[b];
-		return typeof r === 'string' || typeof r === 'number' ? r : a;
-	}
+		function (a, b)
+		{
+			var r = o[b];
+			return typeof r === 'string' || typeof r === 'number' ? r : a;
+		}
 	);
 };
 
-String.prototype.trim = function () {
+String.prototype.trim = function ()
+{
 	return this.replace(/^\s+|\s+$/g, "");
 };
 
-String.prototype.replaceAll = function(_regex, _replacement) {
+String.prototype.replaceAll = function(_regex, _replacement)
+{
+	//I really want these to work regardless of JavaScript String or
+	//java.lang.String .. technically we could actually implement these
+	//methods in Javascript, but I am not sure that would actually
+	//accomplish anything performance wise ...
+
 	return new Packages.java.lang.String(this).replaceAll(_regex, _replacement);
 };
+
+String.prototype.equalsIgnoreCase = function(_string)
+{
+	return new Packages.java.lang.String(this).equalsIgnoreCase(_string);
+};
+
+//This function makes an array behave a little like a Java collection
+//... the purpose here is to make it so airlift methods like every,
+//partition, split and dao functions like iterator can work with a
+//java.util.Iterator, java.util.Iterable, and a Javascript array.
+//Convenient.
+Array.prototype.iterator = function()
+{
+	var iterator = {};
+	var counter = 0;
+	var that = this;
+
+	iterator.hasNext = function()
+	{
+		return (counter < that.length);
+	}
+
+	iterator.next = function()
+	{
+		var next = (this.hasNext() === true) ? that[counter] : function() { throw new Packages.java.util.NoSuchElementException()}();
+		counter++;
+		return next;
+	}
+
+	iterator.remove = function()
+	{
+		//you cannot remove something until after you called next().
+		(counter >= 1) && that.splice(counter - 1, 1);
+	}
+
+	return new java.util.Iterator(iterator);
+}
 
 if (typeof Object.beget !== 'function')
 {
@@ -114,26 +159,3 @@ if (typeof Object.beget !== 'function')
 		return new F();
 	};
 }
-
-Object.prototype.m = function()
-{
-	var map = Packages.java.util.HashMap();
-	var i, v;
-	var o = this;
-
-	for (i in o)
-	{
-		v = o[i];
-
-		if (v !== undefined && airlifttypeOf(v) !== 'function')
-		{
-			map.put(i, v);
-		}
-		else if (v === undefined)
-		{
-			map.put(i, null);
-		}
-	}
-
-	return map;
-};

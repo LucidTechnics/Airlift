@@ -38,6 +38,7 @@ public class SimpleHandlerContext
 
 	public SimpleHandlerContext(boolean _productionMode)
 	{
+		log.info("Starting simple handler context with production mode: " + _productionMode);
 		productionMode = _productionMode;
 	}
     
@@ -45,7 +46,7 @@ public class SimpleHandlerContext
 							String _appName,
 							RestContext _restContext,
 							String _method,
-							HttpServlet _httpServlet,
+							RestServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
 							HttpServletResponse _httpServletResponse,
 							Map _uriParameterMap, DomainConfiguration _domainConfiguration)
@@ -141,6 +142,7 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("USER", user);
 			scriptingUtil.bind("USER_NAME", userName);
 			scriptingUtil.bind("USER_EMAIL", userEmail);
+			scriptingUtil.bind("USER_SERVICE", _httpServlet.getUserService(_httpServletRequest));
 			scriptingUtil.bind("APP_PROFILE", appProfile);
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
 			scriptingUtil.bind("AUDITING_INSERT", auditingInsert);

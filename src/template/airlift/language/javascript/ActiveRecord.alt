@@ -126,41 +126,94 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.form = function(_config)
 	{
-		var config = _config||{};
-		var that = this;
-		var after = config.after||function() {};
-		var cacheTimeout = config.cacheTimeout||airlift.production(3600, 30);
-		var method = config.method||"POST";
-		var path = config.path||PATH;
-		var filter = config.filter||["id", "auditPostDate", "auditPutDate" , "auditUserId"];
-		var contains = (airlift.isDefined(config.contains) === true) ? config.contains: false;
-		var before = config.before||function(_activeRecord, _config) { return _activeRecord.formTemplate(_config); };
-		
-		var key = airlift.getCacheFormKey(this, method);
-
-		var formTemplateString = airlift.getCachedFormTemplate(key, this, config, before, cacheTimeout);
-
-		var groupName = this.retrieveDomainName();
-		var formTemplate = airlift.stringTemplate(formTemplateString);
-		airlift.setFormAction(formTemplate, path);
-
-		$populateFormTemplate; separator="\n"$
-
-		after(this, config, formTemplate);
-		
-		return formTemplate.toString();
-	}
-	
-	activeRecord.formTemplate = function(_config)
-	{
 		return airlift.toForm(_config, this);
 	};
 
 	activeRecord.table = function(_config)
 	{
-		_config.domainName = _config.domainName||this.retrieveDomainName();
+		var config = _config||{};
+
+		var path = (config.path && airlift.preparePath(config.path))||airlift.preparePath(PATH);
+		var tf = (airlift.isDefined(config.tf) === true) ? config.tf : false;
+		var anchorProperty = config.anchorProperty||"id";
+		var anchorClass = _config.anchorClass||"";
+		var filter = config.filter||["auditPostDate", "auditPutDate", "auditUserId"];
+		var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+		var collection = config.collection||[];
+		var domainName = config.domainName||(((collection.length > 0) && collection[0].retrieveDomainName())||DOMAIN_NAME);
+		var tableId = config.tableId||domainName + "Table";
+		var target = config.target||"";
+
+		var anchorTemplate = airlift.stringTemplate('$anchorTemplate$');
+		var trTemplate = airlift.stringTemplate('$trTemplate$');
+		var tableTemplate = airlift.stringTemplate('$tableTemplate$');
+
+		tableTemplate.setAttribute("id", domainName + "Table");
+		tableTemplate.setAttribute("class", "display");
 		
-		return airlift.toTable(_config);
+		$addTableHeaderEntry; separator="\n"$
+	
+		var prepareTableData = function(_config)
+		{
+			var config = _config||{};
+			var activeRecord = _config.activeRecord;
+			var name = config.name||"";
+			var value = config.value||"";
+			var foreignDomainName = config.foreignDomainName;
+			var path = config.path||PATH;
+			var anchorProperty = config.anchorProperty;
+			var target = config.target||"";
+			var id = config.id||"";
+			var trTemplate = config.trTemplate;
+
+			trTemplate.setAttribute("tda", "class=" + name);
+			
+			if (anchorProperty.equalsIgnoreCase(name) === true || foreignDomainName)
+			{
+				anchorTemplate.reset();
+				anchorTemplate.setAttribute("id", name + "Anchor");
+				anchorTemplate.setAttribute("href", path + "/" + id);
+				anchorTemplate.setAttribute("rel", foreignDomainName||activeRecord.retrieveDomainName());
+				anchorTemplate.setAttribute("target", target);
+				anchorTemplate.setAttribute("label", value);
+
+				trTemplate.setAttribute("td", anchorTemplate.toString());
+			}
+			else
+			{
+				trTemplate.setAttribute("td", value);
+			}
+
+			return trTemplate;
+		}
+	
+		var stringBuffer = airlift.sb();
+
+		var renderRow = function(_activeRecord)
+		{
+			trTemplate.reset();
+			trTemplate.setAttribute("trAttribute", "class=" + activeRecord.retrieveDomainName());
+
+			$addTableDataEntry; separator="\n"$
+			
+			tableTemplate.setAttribute("tr", trTemplate.toString());
+		};
+
+		if (airlift.isDefined(collection.hasNext) === true || airlift.isDefined(collection.iterator) === true)
+		{
+			//this is an iterable so iterate ...
+			for (var activeRecord in Iterator(collection))
+			{
+				renderRow(activeRecord);
+			}
+		}
+		else if (airlift.isDefined(collection.pop) === true)
+		{
+			//this is a Javascript array so forEach ... 
+			collection.forEach(renderRow);
+		}
+
+		return tableTemplate.toString();
 	};
 	
 	activeRecord.atom = function(_config)
@@ -397,11 +450,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return _collection;
 	};
 
-	activeRecord.describe = function()
-	{
-		return Packages.airlift.util.AirliftUtil.describe(this.createImpl(), this.retrieveDomainInterface());
-	}
-
 	activeRecord.populateFromRequestMap = function(_attributeMap)
 	{
 		var value;
@@ -412,8 +460,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 											   
 		$validateProperty; separator="\n"$
 
-		var that = this;
-		errorList.forEach(function(_error) { that.addError(_error.name, _error.message, _error.category); });
+		errorList.forEach(function(_error) { this.addError(_error.name, _error.message, _error.category); });
 
 		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
 		

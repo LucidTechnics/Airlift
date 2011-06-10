@@ -295,8 +295,22 @@ public class JavaScriptGenerator
 		
 		java.util.Iterator attributes = _domainObjectModel.getAttributes();
 
+		//table template parts
+		activeRecordStringTemplate.setAttribute("tableTemplate", "<table id=\"$id$\" class=\"$class$\"><thead><tr> $th, tha: {t,a | <th $a$> $t$ </th>}$ </tr></thead><tbody>$tr; separator=\"\\n\"$</tbody></table>");
+		activeRecordStringTemplate.setAttribute("trTemplate", "<tr $trAttribute$> $td, tda: {t,a | <td $a$> $t$ </td>}; separator=\"\\n\"$ </tr>");
+		activeRecordStringTemplate.setAttribute("anchorTemplate", "<a id=\"$id$\" class=\"$class; separator=\" \"$\" href=\"$href$\" hreflang=\"$hreflang$\" rel=\"$rel$\" rev=\"$rev$\" target=\"$target$\">$label$</a>");
+
+		//form template parts
+		activeRecordStringTemplate.setAttribute("formTemplate", "<form id=\"$formId$\" action=\"$formName$\" method=\"post\">$fieldSet:{f |$f$ $\\n$}$<fieldset id=\"$fieldSetId$\" class=\"submit\"><input id =\"$buttonId$\" value=\"$buttonName$\" class=\"submit\" type=\"submit\" onclick=\"$onclick$\" /></fieldset></form>");
+		activeRecordStringTemplate.setAttribute("fieldSetTemplate", "<fieldset id=\"$fieldSetId$\" class=\"$domainName$\"><legend><span>$groupName$</span></legend><ol>$formEntry:{f |$f$ $\n$}$</ol>$hiddenFormEntry:{f |$f$ $\n$}$</fieldset>");
+		activeRecordStringTemplate.setAttribute("formEntryTemplate", "<li id=\"$count$\"><label for=\"$name$\"> $label$  <em id=\"$emId$\" class=\"$emClass; separator=\" \"$\"> $message$</em></label> $input$ </li>");
+		activeRecordStringTemplate.setAttribute("hiddenFormEntryTemplate", "<input  type=\"hidden\" name=\"$name$\" value=\"$value$\" id=\"$id$\" />");
+		activeRecordStringTemplate.setAttribute("inputTemplate", "<input type=\"$type$\" name=\"$name$\" value=\"$value$\" maxlength=\"$maxLength$\" size=\"$displayLength$\" id=\"$id$\" class=\"$inputClass$\" />");
+		activeRecordStringTemplate.setAttribute("readOnlyInputTemplate", "<input type=\"$type$\" name=\"$name$\" value=\"$value$\" maxlength=\"$maxLength$\" size=\"$displayLength$\" id=\"$id$\" readonly=\"readonly\" class=\"$inputClass$\" />");
+		
 		while (attributes.hasNext() == true)
 		{
+			int count = 0;
 			Attribute attribute = (Attribute) attributes.next();
 			String name = attribute.getName();
 			String type = attribute.getType();
@@ -305,10 +319,17 @@ public class JavaScriptGenerator
 
 			Annotation datable = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Datable");
 			Annotation persist = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Persistable");
-			
+			Annotation present = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Presentable");
+
+			String label = findValue(present, "label()");
+			boolean nullable = Boolean.parseBoolean(findValue(persist, "nullable()"));
+			String fieldSetName = findValue(persist, "fieldSetName()");
+						
 			String requestDatable = findValue(datable, "isDatable()");
 			String isForeignKey = findValue(persist, "mapTo()");
 
+			activeRecordStringTemplate.setAttribute("populateFormTemplate", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { airlift.populateFormTemplate(formTemplate, groupName, \"" + name + "\", this); }");
+			
 			String isIndexable = "false";
 			isIndexable = findValue(persist, "isIndexable()");
 
@@ -331,6 +352,7 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
 			}
 
+			
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");
 			activeRecordStringTemplate.setAttribute("getMethod", "activeRecord.get" + upperTheFirstCharacter(name) + " = function() { return this." + name + "; };");
@@ -374,7 +396,7 @@ public class JavaScriptGenerator
 
 					if ("false".equals(isForeignKey) == true)
 					{
-						activeRecordStringTemplate.setAttribute("validateProperty", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
+						activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
 					}
 				}
 			}

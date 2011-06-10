@@ -1,647 +1,1153 @@
-SCRIPTING.loadScript("/hannibal/util/handler.js");
-SCRIPTING.loadScript("/hannibal/util/validate.js");
-SCRIPTING.loadScript("/hannibal/util/display.js");
-
-var h; //h is for HANNIBAL!!!
-
-if (!h)
+if (!airlift)
 {
-	h = {};
+	var airlift = {};
 }
-else if (typeof h != "object")
+else if (typeof airlift != "object")
 {
-	throw new Error("h already exists and it is not an object");
+	throw new Error("airlift already exists and it is not an object");
 }
 
-h.domainObject = function(_name)
+//Convenience method to create a Java class
+airlift.cc = function(_className)
 {
-	var domainObject = {};
+	return Packages.java.lang.Class.forName(_className);
+}
 
-	domainObject.name = _name;
-	var instanceOfName = "instanceof";
+//Convenience method for creating a blank StringTemplate object
+airlift.stringTemplate = function(_templateString)
+{
+	var stringTemplate  = (airlift.isDefined(_templateString) === true) ? new Packages.org.antlr.stringtemplate.StringTemplate(_templateString) : new Packages.org.antlr.stringtemplate.StringTemplate();
 
-	domainObject.xmlObject = <ul {instanceOfName}={_name}/>; //instanceof is a "reserved" word in JavaScript. Dumb really.
-	domainObject.xmlObject.@clock = 0;
-	domainObject.xmlObject.@oldClock = -1;
+	return stringTemplate;
+}
 
-	var creationDate = airlift.createDate().getTime();
-
-	domainObject.xmlObject.@creationDate = creationDate;
-	domainObject.xmlObject.@lastUpdateDate = creationDate;
-	
-	domainObject.addP = function(_name, _value)
-	{		
-		if (DOMAIN.isFieldEntry(domainObject.name, _name) == true)
+//every - execution function on every member of java.util.Collection
+airlift.every = function(_collection, _function)
+{
+	if (airlift.isDefined(_collection) === true)
+	{
+		var index = 0;
+		
+		for (var item in Iterator(_collection))
 		{
-			var value = (h.isDefined(_value) == true) ? _value : "";
-			var fieldEntry = DOMAIN.getFieldEntry(domainObject.name, _name);
-			var property = <li>{value}</li>;
-			property.@property = _name;
-			property.@datatype = fieldEntry.getType();
+			_function(item, index, _collection);
+			index++;
+		}
+	}
+};
 
-			this.xmlObject.ul += property;
+//split - separate java.util.Collection members by function evaluation of true
+//and false.
+airlift.split = function(_collection, _function)
+{
+	if (_collection && _function)
+	{
+		var first = (_collection.push && []) || airlift.l();
+		var second = (_collection.push && []) || airlift.l();
+
+		var add = (_collection.push && function(_item, _collection) { _collection.push(item); }) || function(_item, _collection) { _collection.add(item); }
+
+		if (airlift.isDefined(_collection) === true)
+		{
+			var index = 0;
+			for (var item in Iterator(_collection))
+			{
+				(_function(item, index, _collection) === true) ? add(item, first) : add(item, second);
+				index++;
+			}
+		}
+
+		return [first, second];
+	}
+};
+
+//partition - separate java.util.Collection into lists partitioned by _attribute
+//value
+airlift.partition = function(_collection, _attribute)
+{
+	if (_collection)
+	{
+		var partitionMap = (_collection.push && {}) || airlift.m();
+		var orderedKeys = (_collection.push && []) || airlift.l();
+
+		var get = (_collection.get && function(_item, _map) { _map.get(_item); }) || function(_item, _map) { _map[_item]; }
+		var put = (_collection.put && function(_key, _item, _map) { _map.put(_key, _item); }) || function(_key, _item, _map) { _map[_key] = _item; }
+		var add = (_collection.push && function(_item, _collection) { _collection.push(_item); }) || function(_item, _collection) { _collection.add(_item); }
+
+		for (var item in Iterator(_collection))
+		{
+			var value = item[_attribute];
+
+			if (airlift.isDefined(value) === true)
+			{
+				var list = get(value, partitionMap);
+
+				if (airlift.isDefined(list) === false)
+				{
+					list = (_collection.push && []) || airlift.l();
+					put(value, list, partitionMap);
+					add(value, orderedKeys);
+				}
+
+				add(item, list);
+			}
+		}
+
+		return [orderedKeys, partitionMap];
+	}
+};
+
+airlift.list = function(_collection)
+{
+	return (_collection && airlift.l(_collection)) || airlift.l();
+}
+
+//l - create an enhanced java.util.ArrayList
+airlift.l = function(_list)
+{
+	var list = {};
+
+	list.a = function(_value)
+	{
+		this.add(_value);
+		return list;
+	};
+
+	list.g = function(_index)
+	{
+		//Does this list return a active record or just a collection of
+		//Java adapters.
+		return this.get(_index);
+	};
+
+	list.forEach = function(_function)
+	{
+		airlift.every(list, _function);
+		return list;
+	}
+
+	list.pop = function()
+	{		
+		return (this.isEmpty() === false) ? this.remove(this.size() - 1) : undefined;
+	}
+
+	list.push = function(_item)
+	{		
+		this.add(_item);
+		return this.size();
+	}
+
+	list.reverse = function()
+	{
+		var leftToRightPointer = 0;
+		var rightToLeftPointer = (this.isEmpty() === false) ? this.size() - 1 : 0;
+
+		var swap = function(_list, _leftToRightPointer, _rightToLeftPointer)
+		{
+			var item = _list.get(_leftToRightPointer);
+			_list.set(_leftToRightPointer, _list.get(_rightToLeftPointer));
+			_list.set(_rightToLeftPointer, item);
+		}
+		
+		while (leftToRightPointer < rightToLeftPointer)
+		{
+			swap(this, leftToRightPointer, rightToLeftPointer);
+			leftToRightPointer++;
+			rightToLeftPointer--;
+		}
+	}
+
+	list.shift = function()
+	{
+		return this.remove(0);
+	}
+
+	list.slice = function(_start, _end)
+	{
+		var start = (_start < 0 && (_start + this.size()))||_start;
+		var end = (airlift.isDefined(_end) === true) ? (end < 0) ? end + this.size() : end : this.size();
+
+		var newList;
+		
+		if (start >= this.size())
+		{
+			newList = airlift.l();
 		}
 		else
 		{
-			throw new Error("No property: " + _name + " exists on domain object: "  + domainObject.name);
+			newList = airlift.l(this.subList(start, end));
 		}
-	};
 
-	domainObject.addDO = function(_name, _type, _href, _label)
-	{
-		if (DOMAIN.isDomainEntry(_type) != false)
-		{
-
-			var label = (h.isDefined(_label) == true) ? _label : _name;
-
-			var properType = (_type + "").charAt(0).toUpperCase() + (_type + "").substr(1).toLowerCase();
-			var a = <a>{label}</a>;
-			a.@href = _href;
-			a.@rel = properType;
-			var instanceOfName = "instanceof";
-			var li = <li {instanceOfName}={_name}>{a}</li>;
-			li.@datatype = properType;
-			this.xmlObject.ul += li;
-		}
-	};
-
-	domainObject.setAbout = function(_uriPath)
-	{
-		domainObject.xmlObject.@about = _uriPath;
+		return newList;
 	}
 
-	domainObject.validate = function()
+	list.sort = function(_comparator)
 	{
-		return h.validate(this);
-	}
-
-	domainObject.toString = function()
-	{
-		return this.xmlObject.toXMLString();
-	}
-
-	domainObject.incrementClock = function()
-	{
-		var clock = parseInt(this.xmlObject.@clock, 10);
-		oldClock = clock;
-		clock = clock + 1;
-		this.xmlObject.@clock = clock;
-		this.xmlObject.@oldClock = oldClock;
-								
-		return clock;
-	}
-
-	domainObject.setClock = function(_clock)
-	{
-		this.xmlObject.@clock = _clock;
-	}
-
-	domainObject.setOldClock = function(_oldClock)
-	{
-		this.xmlObject.@oldClock = _oldClock;
-	}
-
-	domainObject.setCreationDate = function(_creationDate)
-	{
-		this.xmlObject.@creationDate = _creationDate;
-	}
-
-	domainObject.setLastUpdateDate = function(_lastUpdateDate)
-	{
-		this.xmlObject.@lastUpdateDate = _lastUpdateDate;
-	}
-
-	domainObject.setPointer = function(_pointer)
-	{
-		this.xmlObject.@pointer = _pointer;
-	}
-
-	return domainObject;
-};
-
-h.convertErrorsToXml = function(errors)
-{
-	var instanceOfName = "instanceof";
-	errorXml = <ul {instanceOfName}={"Errors"} />;
-
-	for (name in errors)
-	{
-		var messageArray = errors[name];
-
-		for (i in messageArray)
-		{			
-			var entry = <li/>;
-			entry.@name = name;
-			entry.@message = messageArray[i];
-			errorXml.ul += li;
-		}
-	}
-
-	return errorXml.toString();	
-};
-
-h.cdo = function ()
-{
-	return h.cdo(DOMAIN_OBJECT);
-};
-
-h.cdo = function (p_domainName)
-{
-	var domainObject = h.domainObject(p_domainName);
-
-	var fieldList = DOMAIN.getFieldNames(p_domainName);
-	var fields = fieldList.iterator();
-
-	while (fields.hasNext() == true)
-	{
-		var fieldName = fields.next();
-		domainObject.addP(fieldName, REQUEST.getParameter(fieldName));
-	}
-
-	var domainNameSet = DOMAIN_OBJECT_PATHS.keySet();
-	var domainNames = domainNameSet.iterator();
-
-	while (domainNames.hasNext() == true)
-	{
-		var domainName = domainNames.next();
-
-		if (domainName.equalsIgnoreCase(p_domainName) == false)
-		{
-			domainObject.addDO(domainName, domainName, DOMAIN_OBJECT_PATHS.get(domainName), domainName);
-		}
-	}
-
-	var clock = (h.isDefined(REQUEST.getParameter("h.clock")) == true) ? REQUEST.getParameter("h.clock") : 0;
-	var oldClock = (h.isDefined(REQUEST.getParameter("h.oldClock")) == true) ? REQUEST.getParameter("h.oldClock") : 0;
-	var creationDate = (h.isDefined(REQUEST.getParameter("h.creationDate")) == true) ? REQUEST.getParameter("h.creationDate") : "";
-	var pointer = (h.isDefined(REQUEST.getParameter("h.pointer")) == true) ? REQUEST.getParameter("h.pointer") : "";
-
-	domainObject.setClock(clock);
-	domainObject.setOldClock(oldClock);
-	domainObject.setCreationDate(creationDate);
-	domainObject.setPointer(pointer);
-
-	return domainObject;
-};
-
-h.buildXhtmlFormView = function(_stringTemplateGroup, _domain, _formName,
-				_hannibalMethodOverride, _domainName, _readonly,
-				_buttonName, _errorMap)
-{	
-	var formTemplate = h.createFormTemplate(_stringTemplateGroup, _formName, DOMAIN.getDisplay(_domainName), _buttonName);
-
-	var fieldNameList = DOMAIN.getFieldNames(_domainName);
-	var fieldNames = fieldNameList.iterator();
-
-	while (fieldNames.hasNext() == true)
-	{
-		var fieldName = fieldNames.next();		
-		var fieldEntry = DOMAIN.getFieldEntry(_domainName, fieldName);
-		var type = fieldEntry.getType();
+		var comparator = { compare : _comparator };
+		var treeSet = new Packages.java.util.TreeSet(new Packages.java.util.Comparator(comparator));
+		var iterator = this.iterator();
 		
-		if (DOMAIN.isDomainEntry(type) == false && DOMAIN.isCollection(type) == false)
-		{			
-			if (DOMAIN.isFieldEntry(_domainName,  fieldName) == true)
+		while (iterator.hasNext() === true)
+		{
+			var item = iterator.next();
+			treeSet.add(item);
+			iterator.remove();
+		}
+
+		this.addAll(treeSet);
+	}
+	
+	list.splice = function(_start, _deleteCount)
+	{
+		var deleteCount = _deleteCount;
+		var deletedElements = airlift.l();
+		var insertCount = arguments.length - 2;
+
+		for (var i = 0; i < deleteCount; i++)
+		{
+			deletedElements.a(this.remove(_start));
+		}
+
+		for (var i = 0; i < insertCount; i++)
+		{
+			this.add(_start, arguments[i + 2]);
+		}
+
+		return deletedElements;
+	}
+
+	list.unshift = function(_item)
+	{
+		this.add(0, _item);
+		return this.size();
+	}
+
+	list.partition = function(_attribute)
+	{
+		return airlift.partition(list, _attribute);
+	};
+
+	list.split = function(_function)
+	{
+		return airlift.split(list, _function);
+	};
+
+	list.__iterator__ = function()
+	{
+		var myIterator = {};
+
+		myIterator.iterator = this.iterator();
+
+		myIterator.next = function()
+		{
+			var next;
+
+			if (myIterator.iterator.hasNext() === true)
 			{
-				var li = _domain.xmlObject.li.(@property == fieldName);
-
-				if (li == null)
-				{
-					li = <li/>;
-					li.@property = fieldName;
-					li.@datatype = fieldEntry.getType();
-				}
-
-				var type = li.@type;
-		
-				var display = h.display(fieldEntry);
-				var inputField = h.inputField(fieldEntry);
-				var displayLength = h.getDisplayLength(fieldEntry);
-				var maxLength = h.getMaxLength(fieldEntry);
-				
-				var buttonName = (h.isDefined(_buttonName) == true) ? _buttonName : "Submit";
-				
-				if (display === "hidden")
-				{
-					var hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, fieldName, li);
-					formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-				}
-				else
-				{				
-					if (inputField === "text")
-					{
-						var inputTemplate = (_readonly === false) ?	h.createInputTemplate(_stringTemplateGroup, display, li, maxLength, displayLength, fieldName) : h.createReadOnlyInputTemplate(_stringTemplateGroup, display, li, maxLength, displayLength, fieldName);
-					}
-					else if (inputField === "textarea")
-					{
-						var cols = 50;
-						var rows = parseInt(maxLength/50);
-
-						var inputTemplate = (_readonly === false) ?	h.createTextAreaTemplate(_stringTemplateGroup, li, rows, cols, fieldName) : h.createReadOnlyTextAreaTemplate(_stringTemplateGroup, li, rows, cols, fieldName);
-					}
-
-					if (DOMAIN.hasVRule(_domainName, fieldName, "isRequired") == true)
-					{
-						var message = "required";
-					}
-					
-					if (h.isDefined(_errorMap) == true && h.isDefined(_errorMap[fieldName]) == true)
-					{
-						var message = _errorMap[fieldName][0];
-						var formEntryTemplate = h.createErrorFormEntryTemplate(_stringTemplateGroup, fieldName, display, message, inputTemplate)
-					}
-					else
-					{
-						var formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, fieldName, display, message, inputTemplate);
-					}
-					
-					formTemplate.setAttribute("formEntry", formEntryTemplate);
-				}
+				next =  myIterator.iterator.next();
 			}
 			else
 			{
-				OUT.println("no property found for domain: "  + _domainName + " and property: " + fieldName);
+				throw new StopIteration();
 			}
+
+			return next;
 		}
-		else if (DOMAIN.isCollection(type) == true)
+
+		return myIterator;
+	};
+
+	list.i = function()
+	{
+		return Iterator(list);
+	}
+
+	list = new JavaAdapter(Packages.java.util.ArrayList, list);
+
+	if (airlift.isDefined(_list) === true)
+	{
+		list.addAll(_list);
+	}
+
+	return list;
+};
+
+airlift.set = function(_collection)
+{
+	return (_collection && airlift.s(_collection)) || airlift.s();
+}
+
+//s - create an enhanced java.util.HashSet
+airlift.s = function(_set)
+{
+	var set = {};
+
+	set.a = function(_value)
+	{
+		this.add(_value);
+		return this;
+	};
+
+	set.forEach = function(_function)
+	{
+		airlift.every(set, _function);
+		return this;
+	}
+
+	set.partition = function(_attribute)
+	{
+		return airlift.partition(set, _attribute);
+	};
+
+	set.split = function(_function)
+	{
+		return airlift.split(set, _function);
+	};
+
+	set.__iterator__ = function()
+	{
+		var myIterator = {};
+
+		myIterator.iterator = this.iterator();
+
+		myIterator.next = function()
 		{
-			throw new Error("Not handling collections yet!");
+			var next;
+
+			if (myIterator.iterator.hasNext() === true)
+			{
+				next =  myIterator.iterator.next();
+			}
+			else
+			{
+				throw new StopIteration();
+			}
+
+			return next;
 		}
-		else if (DOMAIN.isDomainEntry(type) == true) // this is a link to a domain object
+
+		return myIterator;
+	};
+
+	set.i = function()
+	{
+		return Iterator(set);
+	}
+
+	set = new JavaAdapter(Packages.java.util.HashSet, set);
+
+	if (airlift.isDefined(_set) === true)
+	{
+		set.addAll(_set);
+	}
+
+	return set;
+};
+
+airlift.map = function(_map)
+{
+	return (_map && airlift.m(_map)) || airlift.m();
+}
+
+//m - create an enhanced java.util.HashMap
+airlift.m = function(_map)
+{
+	var map = {};
+
+	map.p = function(_key, _value)
+	{
+		this.put(_key, _value);
+		return this;
+	};
+
+	map.forEachKey = function(_function)
+	{
+		airlift.every(this.keySet(), _function);
+		return this;
+	}
+
+	map.forEachValue = function(_function)
+	{
+		airlift.every(this.values(), _function);
+		return this;
+	}
+
+	map.partitionKeys = function(_attribute)
+	{
+		return airlift.partition(this.keySet(), _attribute);
+	};
+
+	map.splitKeys = function(_attribute)
+	{
+		return airlift.split(this.keySet(), _attribute);
+	};
+
+	map.partitionValues = function(_attribute)
+	{
+		return airlift.partition(this.values(), _attribute);
+	};
+
+	map.split = function(_attribute)
+	{
+		return airlift.split(this.values(), _attribute);
+	};
+
+	map.i = function()
+	{
+		return Iterator(this.entrySet().iterator());
+	}
+
+	map = new JavaAdapter(Packages.java.util.HashMap, map);
+
+	if (airlift.isDefined(_map) === true)
+	{
+		map.putAll(_map);
+	}
+
+	return map;
+};
+
+//a - Convenience method to create a new Java array of the specified type
+airlift.a = function(_javaType, _size)
+{
+	return Packages.java.lang.reflect.Array.newInstance(_javaType, _size);
+};
+
+//g - Convenience method to create an id generator
+airlift.g = function(_length)
+{
+	if (_length) { var id = Packages.airlift.util.IdGenerator.generate(_length); }
+	else { var id = Packages.airlift.util.IdGenerator.generate(); }
+
+	return id; 
+};
+
+//mm - Convenience method create a message manager
+airlift.mm = function()
+{
+	return new Packages.airlift.MessageManager();
+};
+
+//post - post an active record based on domain URI and rest context.
+//Post accepts function that runs after syntactic validation but before
+//insert into persistent store.
+airlift.post = function(_domainName)
+{
+	if (typeof _domainName ==='function')
+	{
+		var domainName = undefined;
+		var startingIndex = 0;
+	}
+	else
+	{
+		var domainName = _domainName;
+		var startingIndex = 1;
+	}
+	
+	var [activeRecord, errorMap] = airlift.populate(domainName);
+
+	if (activeRecord.error === true)
+	{
+		activeRecord["id"] =  airlift.g();
+	}
+
+	if (arguments.length > startingIndex)
+	{
+		for (var i = startingIndex; i < arguments.length; i++)
 		{
-			var hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, fieldName, li.a.@href);
-			formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
+			arguments[i](activeRecord, errorMap);
+		}
+	}
+
+	if (activeRecord.error === false)
+	{
+		activeRecord.insert();
+	}
+
+	return [activeRecord, errorMap, activeRecord["id"]];
+};
+
+airlift.put = function(_domainName)
+{
+	if (typeof _domainName === 'function')
+	{
+		var domainName;
+		var startingIndex = 0;
+	}
+	else
+	{
+		var domainName = _domainName;
+		var startingIndex = 1;
+	}
+
+	var [activeRecord, errorMap] = airlift.populate(domainName);
+
+	if (arguments.length > startingIndex)
+	{
+		for (var i = startingIndex; i < arguments.length; i++)
+		{
+			arguments[i](activeRecord, errorMap);
+		}
+	}
+
+	if (activeRecord.error === false)
+	{
+		activeRecord.update();
+	}
+
+	return [activeRecord, errorMap];
+};
+
+airlift.del = function(_id, _domainName)
+{
+	var activeRecord = airlift.ar(_domainName);
+
+	activeRecord.id = (airlift.isDefined(_id) === true) ? _id : ID;
+
+	activeRecord.del();
+};
+
+airlift["delete"] = function(_id, _domainName)
+{
+	airlift.del(_id, _domainName);
+};
+
+airlift.isDefined = function(_variable)
+{
+	var defined = (_variable !== null && _variable !== undefined);
+
+	return defined;
+};
+
+airlift.notDefined = function(_variable)
+{
+	var notDefined = (_variable === null || _variable === undefined);
+
+	return notDefined;
+};
+
+airlift.guid = function()
+{
+	return airlift.g();
+};
+
+airlift.hash = function(_hashAlgorithm, _string)
+{
+	return Packages.airlift.util.IdGenerator.hash(_hashAlgorithm||"SHA1", _string);
+}
+
+airlift.sb = function(_string)
+{
+	return (_string && new Packages.java.lang.StringBuffer(_string)) || new Packages.java.lang.StringBuffer(_string);
+}
+
+airlift.string = function(_string)
+{
+	return (airlift.isDefined(_string) === true) ? new Packages.java.lang.String(_string) : new Packages.java.lang.String();
+}
+
+airlift.integer = function(_integer)
+{
+	return (airlift.isDefined(_integer) === true) ? new Packages.java.lang.Integer(_integer) : new Packages.java.lang.Integer();
+}
+
+airlift.toJavaString = function(_string)
+{
+	return airlift.string(_string);
+};
+
+airlift.appender = function(_initialText, _delimiter)
+{
+	var delimiter = (airlift.isDefined(_delimiter) === true) ? _delimiter : ",";
+	var initialText = (airlift.isDefined(_initialText) === true) ? _initialText : "";
+
+	var appender = {
+text: initialText,
+delimiter: delimiter,	  
+
+append: function(_appendee)
+	  {
+		  this.text += this.delimiter + _appendee;
+	  },
+
+toString: function()
+	  {
+		  return this.text;
+	  },
+
+reset: function()
+	  {
+		  this.text = "";
+		  this.delimiter = "";
+		  this.firstAppend = true;
+	  }
+	};
+
+	return appender;
+};
+
+airlift.getPropertyValue = function(_resourceName, _propertyName)
+{
+	return Packages.airlift.util.PropertyUtil.getInstance().getProperty(_resourceName, _propertyName);
+};
+
+airlift.isWhitespace = function(_string)
+{
+	return Packages.airlift.util.AirliftUtil.isWhitespace(_string);
+};
+
+airlift.mergeCollections = function()
+{
+	var collection = airlift.l();
+
+	for (var i = 0; i < arguments.length; i++)
+	{
+		if (airlift.isDefined(arguments[i]) === true)
+		{
+			collection.addAll(arguments[i]);
+		}
+	}
+
+	return collection;
+};
+
+airlift.copy = function(_source, _destination, _propertyArray)
+{
+	_propertyArray.forEach(function (_e, _i, _a) { _destination[_e] = _source[_e]; });
+};
+
+airlift.tokenizeIntoNGrams = function(_string)
+{
+	//Make sure string is a string and make sure it is in all lowercase
+	//...
+	var string = (airlift.isDefined(_string) === true) ? _string.toString().toLowerCase() : "";
+
+	var indexList = airlift.l();
+	var standardTokenizer = new Packages.org.apache.lucene.analysis.standard.StandardTokenizer(org.apache.lucene.util.Version.LUCENE_30, new Packages.java.io.StringReader(string));
+	var standardTermAttribute = standardTokenizer.addAttribute(Packages.java.lang.Class.forName("org.apache.lucene.analysis.tokenattributes.TermAttribute"));
+
+	while (standardTokenizer.incrementToken() === true)
+	{
+		var term = standardTermAttribute.term();
+		indexList.add(term);
+
+		var tokenizer = new Packages.org.apache.lucene.analysis.ngram.EdgeNGramTokenizer(new Packages.java.io.StringReader(term), "front", 3, 15);
+		var termAttribute = tokenizer.addAttribute(Packages.java.lang.Class.forName("org.apache.lucene.analysis.tokenattributes.TermAttribute"));
+
+		tokenizer.reset();
+
+		while (tokenizer.incrementToken() === true)
+		{
+			indexList.add(termAttribute.term());
+		}
+	}
+
+	return indexList;
+}
+
+airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
+{
+	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName + "-") : "";
+
+	if ("month".equalsIgnoreCase(_datePart) === true )
+	{
+		var datePart = "month-";
+		var getter = "MONTH";
+	}
+	else if ("year".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "year-";
+		var getter = "YEAR";
+	}
+	else if ("date".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "date-";
+		var getter = "DAY_OF_MONTH";
+	}
+
+	return name + datePart + _calendar.get(_calendar[getter]);
+}
+
+airlift.tokenizeIntoDateParts = function(_date, _name)
+{
+	var indexList = airlift.l();
+
+	if (_date)
+	{
+		//works for java.util.Date and for Date
+		var calendar = airlift.createCalendar({date: _date});
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "year"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "month"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "date"));
+	}
+
+	return indexList;
+}
+
+airlift.getMonthIntervals = function(_date1, _date2)
+{
+	var monthList = airlift.l();
+
+	if (_date1 && _date2)
+	{
+		//works for java.util.Date and for Date
+		var date1 = airlift.createCalendar({date: _date1});
+		var date2 = airlift.createCalendar({date: _date2});
+
+		var startDate = (date1.getTimeInMillis() < date2.getTimeInMillis()) ? date1 : date2;
+		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
+
+		var interval = airlift.createCalendar({date: startDate.getTime()});
+		interval.set(interval.DAY_OF_MONTH, 1);
+
+		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
+		{
+			var month = interval.get(interval.MONTH);
+
+			var fullYear = interval.get(interval.YEAR);
+
+			monthList.add(interval);
+
+			interval = airlift.createCalendar({date: interval.getTime()});
+
+			var nextMonth = month + 1;
+
+			var nextYear = fullYear + 1;
+
+			interval.set(interval.MONTH, (((nextMonth) > 11) ? 0 : nextMonth));
+			interval.set(interval.YEAR, (interval.get(interval.MONTH) === 0) ? nextYear : fullYear);
+		}
+	}
+
+	return monthList;
+}
+
+airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFieldName, _startDate, _endDate)
+{
+	var hasFilterTokens = true;
+	var inInterval = true;
+	var filteredArray = [];
+
+	var filterTokens = airlift.tokenizeIntoNGrams(_filterString);
+
+	_resultArray.forEach(function(_item) {
+
+		if ((_startDate && _endDate && _dateFieldName) &&
+			  (
+			   _item[_dateFieldName].getTime() < _startDate.getTime() ||
+			   _item[_dateFieldName].getTime() > _endDate.getTime()
+			  )
+		   )
+		{
+			inInterval = false;
 		}
 		else
 		{
-			throw new Error("Invalid type: " + type + " encountered when processing domain object: " +
-							_domainName + " with property: " + fieldName);
+			inInterval = true;
+		}
+
+		if (filterTokens.isEmpty() === false)
+		{			
+			var indexSet = airlift.s();
+
+			_propertyArray.forEach(function(_property)
+			{
+				var newTokenSet = airlift.tokenizeIntoNGrams(_item[_property]);
+				indexSet.addAll(newTokenSet);
+			});
+
+			indexSet.retainAll(filterTokens);
+
+			hasFilterTokens = (indexSet.isEmpty() === false);
+		}
+
+		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }
+	});
+
+	return filteredArray;
+}
+
+airlift.getCacheService = function()
+{
+	return Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+}
+
+airlift.createTimeZone = function(_timeZoneString)
+{
+	return new Packages.java.util.TimeZone.getTimeZone(_timeZoneString);
+}
+
+airlift.createDate = function(_config)
+{
+	var calendar = airlift.createCalendar(_config);
+	return calendar.getTime();
+}
+
+airlift.cloneDate = function(_date)
+{
+	return new Packages.java.util.Date(_date.getTime());
+}
+
+airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
+{
+	var algorithm = _algorithm||{};
+	var provider = algorithm.provider||null;
+	var name = algorithm.name||null;
+	var mode = algorithm.mode||null;
+	var padding = algorithm.padding||null;
+	var revolutions = algorithm.revolutions||null;
+
+	return Packages.airlift.util.AirliftUtil.encrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
+}
+
+airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
+{
+	var algorithm = _algorithm||{};
+	var provider = algorithm.provider||null;
+	var name = algorithm.name||null;
+	var mode = algorithm.mode||null;
+	var padding = algorithm.padding||null;
+	var revolutions = algorithm.revolutions||null;
+
+	return Packages.airlift.util.AirliftUtil.decrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
+}
+
+airlift.createArray = function(_size, _type, _initializer)
+{
+	var size = _size||0;
+	var type = _type||Packages.java.lang.String;
+	initializer = _initializer||[];
+
+	var newArray = java.lang.reflect.Array.newInstance(type, size);
+	initializer.forEach(function(_item, _index) { newArray[_index] = _item; });
+
+	return newArray;
+}
+
+airlift.stringArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.String, _initializer);
+}
+
+airlift.byteArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Byte.TYPE, _initializer);
+}
+
+airlift.byteObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Byte, _initializer);
+}
+
+airlift.shortArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Short.TYPE, _initializer);
+}
+
+airlift.shortObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Short, _initializer);
+}
+
+airlift.charArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Character.TYPE, _initializer);
+}
+
+airlift.charObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Character, _initializer);
+}
+
+airlift.characterObjectArray = function(_size, _initializer)
+{
+	return airlift.charObjectArray(_size, _initializer);
+}
+
+airlift.intArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Integer.TYPE, _initializer);
+}
+
+airlift.intObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Integer, _initializer);
+}
+
+airlift.integerObjectArray = function(_size, _initializer)
+{
+	return airlift.intObjectArray(_size, _initializer);
+}
+
+airlift.longArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Long.TYPE, _initializer);
+}
+
+airlift.longObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Long, _initializer);
+}
+
+airlift.booleanArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Boolean.TYPE, _initializer);
+}
+
+airlift.booleanObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Boolean, _initializer);
+}
+
+airlift.floatArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Float.TYPE, _initializer);
+}
+
+airlift.floatObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Float, _initializer);
+}
+
+airlift.doubleArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Double.TYPE, _initializer);
+}
+
+airlift.doubleObjectArray = function(_size, _initializer)
+{
+	return airlift.createArray(_size, Packages.java.lang.Double, _initializer);
+}
+
+airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
+{
+	if (_sourceArray && _destinationArray)
+	{
+		var conversionFunction = _conversionFunction||function(_input) { return _input; };
+
+		for (var i = 0; i < _sourceArray.length; i++)
+		{
+			if (i === _destinationArray.length)
+			{
+				break;
+			}
+			else
+			{
+				_destinationArray[i] = conversionFunction(_sourceArray[i]);
+			}
 		}
 	}
+}
 
-	var hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.clock", _domain.xmlObject.@clock);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
+airlift.enqueueTask = function(_config)
+{
+	var url = _config.url;
+	var method = _config.method||"POST";
+	var parameters = _config.parameters||airlift.m();
+	var queueName = _config.queueName||"default";
+	var queue = ("default".equalsIgnoreCase(queueName) === true) ? Packages.com.google.appengine.api.taskqueue.QueueFactory.getDefaultQueue() : Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(queueName);
 
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.oldClock", _domain.xmlObject.@oldClock);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
+	var taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(url);
 
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.creationDate", _domain.xmlObject.@creationDate);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-	
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.lastUpdateDate", _domain.xmlObject.@lastUpdateDate);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.type", _domain.xmlObject.@type);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.pointer", _domain.xmlObject.@pointer);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-
-	if (_readonly === true)
+	switch (method)
 	{
-		hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.edit", "true");
-		formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
+		case "GET":
+		case "get":
+		case "Get":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.GET;
+			break;
+
+		case "POST":
+		case "post":
+		case "Post":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
+			break;
+
+		case "PUT":
+		case "put":
+		case "Put":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.PUT;
+			break;
+
+		case "DELETE":
+		case "delete":
+		case "Delete":
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.DELETE;
+			break;
+
+		default:
+			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
 	}
 
-	if (h.isDefined(_hannibalMethodOverride) == false)
+	taskOptions.method(taskMethod);
+
+	for (var parameterEntry in Iterator(parameters.entrySet()))
 	{
-		_hannibalMethodOverride = "put";
+		taskOptions.param(parameterEntry.getKey(), parameterEntry.getValue());
 	}
 
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.method.override", _hannibalMethodOverride);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
+	return queue.add(taskOptions); //returns TaskHandle
+}
 
-	return formTemplate.toString();
-};
-
-h.buildXhtmlDocument = function(_stringTemplateGroup, _body, _title, _base, _css)
+airlift.chat = function(_users, _message)
 {
-	var stringTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/HTMLDocumentTemplate");
+	var statusArray = [];
+	var xmppService = Packages.com.google.appengine.api.xmpp.XMPPServiceFactory.getXMPPService();
+	var users = _users||[];
 
-	stringTemplate.setAttribute("title", (_title !== undefined) ? _title : "");
-	stringTemplate.setAttribute("base", (_base !== undefined) ? _base : "");
-	stringTemplate.setAttribute("body", (_body !== undefined) ? _body : "");
-	stringTemplate.setAttribute("css", (_css !== undefined) ? _css : "css/app.css");
-
-	return stringTemplate.toString();
-};
-
-h.buildSearchView = function(_stringTemplateGroup, _path)
-{
-	var formTemplate = h.createFormTemplate(_stringTemplateGroup, _path, "Search", "Find");
-
-	hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.method.override", "get");
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-
-	var inputTemplate = h.createInputTemplate(_stringTemplateGroup, "text", "", 50, 25, "h.search");
-	var formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "Search", "Search", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	return formTemplate.toString();
-};
-
-h.buildLoginView = function(_stringTemplateGroup, _appName, _redirectUri)
-{
-	var formTemplate = h.createFormTemplate(_stringTemplateGroup, _appName + "/login", "Login", "Login");
-
-	var hiddenFormEntryTemplate = h.createHiddenFormEntryTemplate(_stringTemplateGroup, "h.redirect", _redirectUri);
-	formTemplate.setAttribute("formEntry", hiddenFormEntryTemplate);
-
-	var inputTemplate = h.createInputTemplate(_stringTemplateGroup, "text", "", 50, 25, "h.login.name");
-	var formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "Login", "Login", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	inputTemplate = h.createInputTemplate(_stringTemplateGroup, "password", "", 50, 25, "h.login.password");
-	formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "Password", "Password", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	return formTemplate.toString();
-};
-
-h.buildRegisterView = function(_stringTemplateGroup, _path)
-{
-	var formTemplate = h.createFormTemplate(_stringTemplateGroup, _appName + "/register", "Register", "Register");
-
-	var inputTemplate = h.createInputTemplate(_stringTemplateGroup, "text", "", 50, 25, "h.login.name");
-	var formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "Login", "Login", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	inputTemplate = h.createInputTemplate(_stringTemplateGroup, "password", "", 50, 25, "h.login.password");
-	formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "Password", "Password", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	inputTemplate = h.createInputTemplate(_stringTemplateGroup, "repeatPassword", "", 50, 25, "h.repeat.password");
-	formEntryTemplate = h.createFormEntryTemplate(_stringTemplateGroup, "RepeatPassword", "Repeat Password", "", inputTemplate);
-	formTemplate.setAttribute("formEntry", formEntryTemplate);
-
-	return formTemplate.toString();
-};
-
-h.buildXhtmlListView = function(_domainObjectArray, _path, _domainName)
-{
-	var listView = <ul/>;
-
-	listView.@type = "collection";
-
-	for (var i = 0; i < _domainObjectArray.length; i++)
+	users.forEach(function(_user)
 	{
-		var domainObject = _domainObjectArray[i];
+		var jid = new Packages.com.google.appengine.api.xmpp.JID(_user.email);
+		var message = new Packages.com.google.appengine.api.xmpp.MessageBuilder()
+					  .withRecipientJids(jid)
+					  .withBody(_message)
+					  .build();
 
-		var display = h.displayDO(domainObject, DOMAIN.getDomainEntry(domainObject.name));
+		var messageSent = false;
 
-		var listItem = <li><a>{display}</a></li>;
+		if (xmppService.getPresence(jid).isAvailable() === true)
+		{
+			var status = xmppService.sendMessage(message);
+			messageSent = (status.getStatusMap().get(jid) === Packages.com.google.appengine.api.xmpp.SendResponse.Status.SUCCESS);
+		}
 
-		listItem.a.@href = _path + "/" + domainObject.xmlObject.@pointer;
-		listItem.a.@rel = _domainName;
+		statusArray.push(messageSent);
+	});
 
-		listView.ul += listItem;
-	}
+	return statusArray;
+}
 
-	return listView;
-};
-
-h.addDeleteFormView = function(_stringTemplateGroup, _domainObjectArray, _path)
+airlift.email = function(_users, _message, _subject, _from)
 {
-	var form = <form method="post">
-							<button name="Add" value="submit" type="submit" > Add </button>
-		</form>;
-
-	form.@action = _path;
-
-	return form;
-};
-
-h.createSimpleBodyTemplate = function(_stringTemplateGroup, _header, _leftNav, _content, _footer)
-{
-	var template = _stringTemplateGroup.getInstanceOf("hannibal/html/SimpleBodyTemplate");
-
-	template.setAttribute("header", _header);
-	template.setAttribute("leftNav", _leftNav);
-	template.setAttribute("content", _content);
-	template.setAttribute("footer", _footer);
-
-	return template;
-};
-
-h.createFormTemplate = function(_stringTemplateGroup, _path, _groupName, _buttonName)
-{
-	var formTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/ViewHTMLTemplate");
-
-	formTemplate.setAttribute("formName", _path);
-	formTemplate.setAttribute("groupName", _groupName);
-	formTemplate.setAttribute("buttonName", _buttonName);
-
-	return formTemplate;
-};
-
-h.createHiddenFormEntryTemplate = function(_stringTemplateGroup, _name, _value)
-{
-	hiddenFormEntryTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/HiddenFormEntryTemplate");
-
-	hiddenFormEntryTemplate.setAttribute("name", _name);
-	hiddenFormEntryTemplate.setAttribute("value", _value);
-
-	return hiddenFormEntryTemplate;
-};
-
-h.createInputTemplate = function(_stringTemplateGroup, _type, _value, _maxLength, _displayLength, _name)
-{
-	var inputTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/InputTemplate");
-
-	inputTemplate.setAttribute("type", _type);
-	inputTemplate.setAttribute("value", _value);
-	inputTemplate.setAttribute("maxLength", _maxLength);
-	inputTemplate.setAttribute("displayLength", _displayLength);
-	inputTemplate.setAttribute("name", _name);
-
-	return inputTemplate;
-};
-
-h.createReadOnlyInputTemplate = function(_stringTemplateGroup, _type, _value, _maxLength, _displayLength, _name)
-{
-	var inputTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/ReadOnlyInputTemplate");
-
-	inputTemplate.setAttribute("type", _type);
-	inputTemplate.setAttribute("value", _value);
-	inputTemplate.setAttribute("maxLength", _maxLength);
-	inputTemplate.setAttribute("displayLength", _displayLength);
-	inputTemplate.setAttribute("name", _name);
-
-	return inputTemplate;
-};
-
-h.createTextAreaTemplate = function(_stringTemplateGroup, _value, _rows, _cols, _name)
-{
-	var textAreaTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/TextAreaTemplate");
-
-	textAreaTemplate.setAttribute("value", _value);
-	textAreaTemplate.setAttribute("rows", _rows);
-	textAreaTemplate.setAttribute("cols", _cols);
-	textAreaTemplate.setAttribute("name", _name);
-
-	return textAreaTemplate;
-};
-
-h.createReadOnlyTextAreaTemplate = function(_stringTemplateGroup, _value, _rows, _cols, _name)
-{
-	var textAreaTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/ReadOnlyTextAreaTemplate");
-
-	textAreaTemplate.setAttribute("value", _value);
-	textAreaTemplate.setAttribute("rows", _rows);
-	textAreaTemplate.setAttribute("cols", _cols);
-	textAreaTemplate.setAttribute("name", _name);
-
-	return textAreaTemplate;
-};
-
-h.createFormEntryTemplate = function(_stringTemplateGroup, _name, _label, _message, _inputTemplate)
-{
-	var formEntryTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/FormEntryTemplate");
-
-	formEntryTemplate.setAttribute("name", _name);
-	formEntryTemplate.setAttribute("label", _label);
-	formEntryTemplate.setAttribute("message", _message);
-	formEntryTemplate.setAttribute("input", _inputTemplate);
-
-	return formEntryTemplate;
-};
-
-h.createErrorFormEntryTemplate = function(_stringTemplateGroup, _name, _label, _message, _inputTemplate)
-{
-	var formEntryTemplate = _stringTemplateGroup.getInstanceOf("hannibal/html/ErrorFormEntryTemplate");
-
-	formEntryTemplate.setAttribute("name", _name);
-	formEntryTemplate.setAttribute("label", _label);
-	formEntryTemplate.setAttribute("message", _message);
-	formEntryTemplate.setAttribute("input", _inputTemplate);
-
-	return formEntryTemplate;
-};
-
-h.trim = function(_string)
-{
-	return _string.replace(/^\s+|\s+$/g,"");
-};
-
-h.ltrim = function(stringToTrim)
-{
-	return _string.replace(/^\s+/,"");
-};
-
-h.rtrim = function(stringToTrim)
-{
-	return _string.replace(/\s+$/,"");
-};
-
-h.generateUUID = function()
-{
-	return h.g();
-};
-
-h.leftPad = function(_string, _width, _char)
-{
-	var tokenArray = _string.split('');
-
-	for (var i = 0; i < _width - _string.length; i++)
+	if (_message &&
+		  "".equals(_message) === false &&
+		  airlift.isWhitespace(_message) === false)
 	{
-		tokenArray.unshift(_char);
+		var users = _users||[];
+		var adminEmail = APP_NAME.toLowerCase() + "@appspot.com";
+		var from = _from||{ email: adminEmail, fullName: "Admin" };
+		var subject = _subject||"From the " + APP_NAME + "application.";
+		var message = _message||"";
+
+		var properties = new Packages.java.util.Properties();
+		var session = Packages.javax.mail.Session.getDefaultInstance(properties, null);
+
+		users.forEach(function(_user)
+		{
+			if (_user && _user.email)
+			{
+				var mimeMessage = new Packages.javax.mail.internet.MimeMessage(session);
+
+				mimeMessage.setFrom(new Packages.javax.mail.internet.InternetAddress(from.email, from.fullName));
+				mimeMessage.addRecipient(
+										 Packages.javax.mail.Message.RecipientType.TO,
+										 new Packages.javax.mail.internet.InternetAddress(_user.email, _user.fullName||""));
+				mimeMessage.setSubject(subject);
+				mimeMessage.setText(message);
+
+				Packages.javax.mail.Transport.send(mimeMessage);
+			}
+		});
 	}
+}
 
-	return tokenArray.join('');
-};
-
-h.rightPad = function(_string, _width, _char)
+airlift.escapeXml = function(_value)
 {
-	var tokenArray = _string.split('');
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
+}
 
-	for (var i = 0; i < _width - _string.length; i++)
+airlift.unescapeXml = function(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeXml(_value);
+}
+
+airlift.escapeHtml = function(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
+}
+
+airlift.unescapeHtml = function(_value)
+{
+	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
+}
+
+airlift.browser = function()
+{
+	return new Packages.airlift.util.Browser();
+}
+
+airlift.isWhiteSpace = function(_string)
+{
+	return airlift.isWhitespace(_string);
+}
+
+airlift.isWhitespace = function(_string)
+{
+	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
+}
+
+airlift.rightPad = function(_string, _size, _character)
+{
+	var character = _character||'';
+
+	return Packages.org.apache.commons.lang.StringUtils.rightPad(_string, _size, character);
+}
+
+airlift.leftPad = function(_string, _size, _character)
+{
+	var character = _character||'';
+
+	return Packages.org.apache.commons.lang.StringUtils.leftPad(_string, _size, character);
+}
+
+airlift.trim = function(_string)
+{
+	return Packages.org.apache.commons.lang.StringUtils.trim(_string);
+}
+
+airlift.filterContains = function(_filter, _propertyName)
+{
+	var contains = false;
+
+	_filter.forEach(function(_item)
 	{
-		tokenArray.push(_char);
-	}
+		if (_item.equalsIgnoreCase(_propertyName) === true)
+		{
+			contains = true;
+		}
+	});
 
-	return tokenArray.join('');
-};
+	return contains;
+}
 
-h.httpService = function(_uri, _xml, _httpMethod, _responseFactory)
+//this will be replaced by memcache ...
+airlift.cache = {};
+
+//thank you John Resig ...
+airlift.tmpl = function tmpl(str, data)
 {
-	var httpClient = new Packages.org.apache.commons.httpclient.HttpClient();
+	// Figure out if we're getting a template, or if we need to
+	// load the template - and be sure to cache the result.
+	var fn = !/\W/.test(str) ? airlift.cache[str] = airlift.cache[str] || tmpl(document.getElementById(str).innerHTML) :
 
-	var uri = Packages.org.apache.commons.httpclient.URI(_uri, false);
-	var hostConfiguration = new Packages.org.apache.commons.httpclient.HostConfiguration();
-	hostConfiguration.setHost(uri);
-	var httpState = new Packages.org.apache.commons.httpclient.HttpState();
+  // Generate a reusable function that will serve as a template
+  // generator (and which will be cached).
+  new Function("obj",
+	"var p=[],print=function(){p.push.apply(p,arguments);};" +
+	// Introduce the data as local variables using with(){}
+	"with(obj){p.push('" +
 
-	httpClient.executeMethod(hostConfiguration, _httpMethod, httpState);
+	// Convert the template into pure JavaScript
+	str
+	.replace(/[\r\t\n]/g, " ")
+	.split("<%").join("\t")
+	.replace(/((^|%>)[^\t]*)'/g, "$1\r")
+	.replace(/\t=(.*?)%>/g, "',$1,'")
+	.split("\t").join("');")
+	.split("%>").join("p.push('")
+	.split("\r").join("\\'")
+	+ "');}return p.join('');");
 
-	return _responseFactory(_httpMethod);
-};
-
-h.httpGet = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.GetMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.httpPost = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.PostMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.httpPut = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.PutMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.httpDelete = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.DeleteMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.httpHead = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.HeadMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.httpOptions = function(_uri, _xml, _responseFactory)
-{
-	var httpMethod = new Packages.org.apache.commons.httpclient.methods.OptionsMethod();
-	return h.httpService(_uri, _xml, httpMethod, _responseFactory);
-};
-
-h.getResponseInBytes = function(_httpMethod)
-{
-	return _httpMethod.getResponseBody();
-};
-	
-h.getResponseAsString = function(_httpMethod)
-{
-	return _httpMethod.getResponseBodyAsString();
-};
-
-h.getResponseAsStream = function(_httpMethod)
-{
-	return _httpMethod.getResponseBodyAsStream();
-};
-
-h.getResponseHeader = function(_httpMethod)
-{
-	return _httpMethod.getResponseHeader();
-};
-
-h.getHttpMethod = function(_httpMethod)
-{
-	return _httpMethod;
-};
-
-h.reCreateUri = function()
-{
-	var path = (h.isDefined(PATH) == true) ? PATH : "";
-	var queryString = (h.isDefined(QUERY_STRING) == true) ? "?" + QUERY_STRING : "";
-	var uri =  BASE + path + queryString;
-
-	return uri;
+// Provide some basic currying to the user
+	return data ? fn( data ) : fn;
 };

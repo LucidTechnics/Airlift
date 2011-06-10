@@ -31,7 +31,7 @@ public abstract class HandlerContext
     public abstract ContentContext execute(String _appName,
 										   RestContext _restContext,
 										   String _method,
-										   HttpServlet _httpServlet,
+										   RestServlet _httpServlet,
 									HttpServletRequest _httpServletRequest,
 									HttpServletResponse _httpServletResponse,
 									Map restParameterMap, DomainConfiguration _domainConfiguration);

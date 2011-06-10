@@ -1,8 +1,6 @@
-var h; //h is for HANNIBAL!!!
-
 if (!h)
 {
-	h = {};
+	var h = {};
 }
 else if (typeof h != "object")
 {
