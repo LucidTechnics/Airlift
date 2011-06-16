@@ -68,13 +68,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			var list = new Packages.java.util.ArrayList();
 
-			_config.collection.forEach(function(_activeRecord) { list.add(_activeRecord.restify()); } );
+			_config.collection.forEach(function(_activeRecord)
+			{
+				var impl = (airlift.isDefined(_config.restify) && _config.restify && _activeRecord.restify())||_activeRecord.createImpl();
+				list.add(impl);
+			});
 
 			var json = Packages.airlift.util.AirliftUtil.toJson(list);
 		}
 		else
 		{
-			var json = Packages.airlift.util.AirliftUtil.toJson(this.restify());
+			var impl =  (airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
+			var json = Packages.airlift.util.AirliftUtil.toJson(impl);
 		}
 		LOG.info("Ending JSON");
 		
