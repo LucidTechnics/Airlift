@@ -58,4 +58,4 @@ dao.collectBy$uppercaseAttributeName$Membership = function(_membershipList, _con
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	return dao[returnType] && dao[returnType](queryResults, config);
-}
+};

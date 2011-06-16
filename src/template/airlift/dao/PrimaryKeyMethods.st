@@ -30,7 +30,7 @@ dao.get = function(_activeRecord)
 		return success;
 	},
 	5, "Encountered this error while getting $className$ identified by: " + _activeRecord.id);
-}
+};
 
 dao.getAll = function(_keySet)
 {
@@ -72,7 +72,7 @@ dao.getAll = function(_keySet)
 		return results;
 	},
 	5, "Encountered this error while getting multiple $className$ resources identified by: " + _keySet);
-}
+};
 
 $updateMethod$
 
@@ -82,9 +82,9 @@ dao.del = function(_id)
 	var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey("$className$", _id);
 	dao.multiTry(function() { datastore["delete"](key); }, 5, "Encountered this error while deleting $className$ identified by: " + _id);
 	dao.invalidateCache(key);
-}
+};
 
 dao["delete"] = function(_id)
 {
 	dao.del(_id);
-}
+};

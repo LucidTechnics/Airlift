@@ -2,7 +2,7 @@ if (!airlift)
 {
 	var airlift = {};
 }
-else if (typeof airlift != "object")
+else if (typeof airlift !== "object")
 {
 	throw new Error("airlift already exists and it is not an object");
 }
@@ -10,7 +10,7 @@ else if (typeof airlift != "object")
 airlift.preparePath = function(_path)
 {
 	return (airlift.string(_path)).replaceAll("/$", "");
-}
+};
 
 airlift.findValue = function(_annotation, _attributeName)
 {
@@ -30,7 +30,7 @@ airlift.findValue = function(_annotation, _attributeName)
 	}
 
 	return value;
-}
+};
 	
 airlift.determineForeignDomainName = function(_interfaceClass, _propertyName)
 {
@@ -44,29 +44,29 @@ airlift.determineForeignDomainName = function(_interfaceClass, _propertyName)
 	var tokenArray = mapTo.split("\\.");
 
 	return tokenArray[0].toLowerCase();
-}
+};
 
 airlift.isLinkArray = function(_propertyName, _domainName)
 {
 	return ("airlift.domain.Link[]".equals(APP_PROFILE.getAttributeType(_domainName, _propertyName)) === true);
-}
+};
 
 airlift.isLink = function(_propertyName, _domainName)
 {
 	return ("airlift.domain.Link".equals(APP_PROFILE.getAttributeType(_domainName, _propertyName)) === true);
-}
+};
 
 airlift.isHiddenClockProperty = function(_property)
 {
 	return ((airlift.string("clock")).equalsIgnoreCase(_property) === true || (airlift.string("hash")).equalsIgnoreCase(_property) === true);
-}
+};
 
 airlift.isClockProperty = function(_property)
 {
 	return (_property.equalsIgnoreCase("source") == true || _property.equalsIgnoreCase("clock") == true ||
 			_property.equalsIgnoreCase("hash") == true || _property.equalsIgnoreCase("updateDate") == true ||
 			_property.equalsIgnoreCase("createDate") == true);
-}
+};
 
 airlift.toRdfa = function(_config)
 {
@@ -142,7 +142,7 @@ airlift.toRdfa = function(_config)
 	}
 
 	return rdfa;
-}
+};
 
 airlift.toForm = function(_config)
 {
@@ -182,13 +182,13 @@ airlift.toForm = function(_config)
 	argumentArray.forEach(processFieldSet);
 
 	return formTemplate.toString();
-}
+};
 
 
 airlift.convertToClassName = function(_element, _index, _array)
 {
 	_array[_index] = (!_element) ? "" : Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_element.toLowerCase());
-}
+};
 
 airlift.join = function(_name, _function, _separator)
 {
@@ -197,17 +197,17 @@ airlift.join = function(_name, _function, _separator)
 	tokenArray.forEach(_function);
 	var joinedArray = tokenArray.join(separator);
 	return (!joinedArray || "undefined".equalsIgnoreCase(joinedArray)) ? null : joinedArray;
-}
+};
 
 airlift.createTemplateTarget = function(_groupName, _propertyName, _targetType)
 {
 	return "$" + _groupName + "_" + _propertyName + "_" + _targetType + "$";
-}
+};
 
 airlift.createTemplateTargetName = function(_groupName, _propertyName, _targetType)
 {
 	return airlift.createTemplateTarget(_groupName, _propertyName, _targetType).replace(/\$/g, "");
-}
+};
 
 airlift.toFieldSet = function(_config, _activeRecord)
 {
@@ -474,7 +474,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	}
 
 	return fieldSetArray;
-}
+};
 
 airlift.toTable = function(_config)
 {
@@ -610,7 +610,7 @@ airlift.toTable = function(_config)
 	}
 	
 	return tableTemplate.toString();
-}
+};
 
 airlift.toAtom = function(_config)
 {
@@ -685,7 +685,7 @@ airlift.toAtom = function(_config)
 	var output = new Packages.com.sun.syndication.io.SyndFeedOutput();
 
 	return output.outputString(feed);
-}
+};
 
 airlift.populateFormMessages = function(_formTemplate, _groupName, _propertyName, _activeRecord)
 {
@@ -714,7 +714,7 @@ airlift.populateFormMessages = function(_formTemplate, _groupName, _propertyName
 
 	_formTemplate.setAttribute(messageTarget, airlift.escapeHtml(messageString));
 	_formTemplate.setAttribute(emClassTarget, emClassString);
-}
+};
 
 airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)
 {
@@ -753,37 +753,37 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 			_formTemplate.setAttribute(valueTarget, value);
 		}
 	}
-}
+};
 
 airlift.setFormPath = function(_formTemplate, _path)
 {
 	airlift.setFormAction(_formTemplate, _path);
-}
+};
 
 airlift.setFormAction = function(_formTemplate, _path)
 {
 	_formTemplate.setAttribute("formTemplateAction", _path||PATH);
-}
+};
 
 airlift.escapeForStringTemplate = function(_name)
 {
 	return (new Packages.java.lang.String("" + _name)).replaceAll("[^a-zA-Z0-9]", "_");
-}
+};
 
 airlift.createCheckedTarget = function(_propertyName, _name)
 {
 	return "airlift_" + _propertyName + "_" + airlift.escapeForStringTemplate(_name) + "_checked";
-}
+};
 
 airlift.createSelectedTarget = function(_propertyName, _name)
 {
 	return "airlift_" + _propertyName + "_" + airlift.escapeForStringTemplate(_name) + "_selected";
-}
+};
 
 airlift.getCacheFormKey = function(_activeRecord, _method)
 {
 	return airlift.string(_method + "." + _activeRecord.retrieveDomainInterfaceClassName());
-}
+};
 
 //Requires user to provide a function that can populate the config
 //object AFTER the cache is found to be empty, i.e. if the cache does not have a form template already stored
@@ -802,4 +802,4 @@ airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _addi
 	}
 
 	return formTemplateString;
-}
+};

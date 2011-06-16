@@ -2,7 +2,7 @@ if (!html)
 {
 	var html = {};
 }
-else if (typeof html != "object")
+else if (typeof html !== "object")
 {
 	throw new Error("html already exists and it is not an object");
 }
@@ -10,7 +10,7 @@ else if (typeof html != "object")
 html.prepareValue = function(_value)
 {
 	return _value;
-}
+};
 
 html.table = function(_config)
 {
@@ -21,7 +21,7 @@ html.table = function(_config)
 	config.tbody = "<%=tbody%>";
 
 	return airlift.tmpl('<table id="<%=id%>" class="<%=className%>"><thead><%=thead%></thead><tbody><%=tbody%></tbody></table>', config);
-}
+};
 
 html.tr = function(_config)
 {
@@ -31,7 +31,7 @@ html.tr = function(_config)
 	config.tr = '<%=tr%>';
 
 	return airlift.tmpl('<tr id="<%=id%>" class="<%=className%>"><%=tr%></tr>', config);
-}
+};
 
 html.td = function(_config)
 {
@@ -41,7 +41,7 @@ html.td = function(_config)
 	config.value = html.prepareValue(config.value);
 
 	return airlift.tmpl('<td id="<%=id%>" class="<%=className%>"><%=value%></td>', config);
-}
+};
 
 html.th = function(_config)
 {
@@ -51,7 +51,7 @@ html.th = function(_config)
 	config.value = html.prepareValue(config.value);
 
 	return airlift.tmpl('<th id="<%=id%>" class="<%=className%>"><%=value%></th>', config);
-}
+};
 
 html.a = function(_config)
 {
@@ -67,4 +67,4 @@ html.a = function(_config)
 	config.value = html.prepareValue(config.value);
 	
 	return airlift.tmpl('<a id="<%=id%>" class="<%=className%>" href="<%=path%>" hreflang="<%=hrefLang%>" rel="<%=domainName%>" rev="<%=rev%>" target="<%=target%>"><%=value%></a>', config);
-}
+};

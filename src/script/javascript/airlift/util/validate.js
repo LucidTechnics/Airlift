@@ -12,7 +12,7 @@ if (!airlift)
 {
 	var airlift = {};
 }
-else if (typeof airlift != "object")
+else if (typeof airlift !== "object")
 {
 	throw new Error("airlift already exists and it is not an object");
 }

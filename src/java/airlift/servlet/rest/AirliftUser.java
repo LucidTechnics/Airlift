@@ -18,11 +18,11 @@ public class AirliftUser
 {
 	public AirliftUser() {}
 
-	@javax.persistence.Id private String id;
+	private String id;
 	private String fullName;
 	private String shortName;
-	@com.googlecode.objectify.annotation.Indexed private String externalUserId; //usually Google Id but could be another identifier
-	@com.googlecode.objectify.annotation.Indexed private String email;
+	private String externalUserId; //usually Google Id but could be another identifier
+	private String email;
 	private java.util.Set<String> roleSet = new java.util.HashSet<String>();
 	private boolean active;
 	private java.util.Date auditPostDate;

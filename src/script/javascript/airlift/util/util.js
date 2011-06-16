@@ -11,7 +11,7 @@ else if (typeof airlift != "object")
 airlift.cc = function(_className)
 {
 	return Packages.java.lang.Class.forName(_className);
-}
+};
 
 //Convenience method for creating a blank StringTemplate object
 airlift.stringTemplate = function(_templateString)
@@ -19,7 +19,7 @@ airlift.stringTemplate = function(_templateString)
 	var stringTemplate  = (airlift.isDefined(_templateString) === true) ? new Packages.org.antlr.stringtemplate.StringTemplate(_templateString) : new Packages.org.antlr.stringtemplate.StringTemplate();
 
 	return stringTemplate;
-}
+};
 
 //every - execution function on every member of java.util.Collection
 airlift.every = function(_collection, _function)
@@ -100,7 +100,7 @@ airlift.partition = function(_collection, _attribute)
 airlift.list = function(_collection)
 {
 	return (_collection && airlift.l(_collection)) || airlift.l();
-}
+};
 
 //l - create an enhanced java.util.ArrayList
 airlift.l = function(_list)
@@ -124,18 +124,18 @@ airlift.l = function(_list)
 	{
 		airlift.every(list, _function);
 		return list;
-	}
+	};
 
 	list.pop = function()
 	{		
 		return (this.isEmpty() === false) ? this.remove(this.size() - 1) : undefined;
-	}
+	};
 
 	list.push = function(_item)
 	{		
 		this.add(_item);
 		return this.size();
-	}
+	};
 
 	list.reverse = function()
 	{
@@ -155,12 +155,12 @@ airlift.l = function(_list)
 			leftToRightPointer++;
 			rightToLeftPointer--;
 		}
-	}
+	};
 
 	list.shift = function()
 	{
 		return this.remove(0);
-	}
+	};
 
 	list.slice = function(_start, _end)
 	{
@@ -179,7 +179,7 @@ airlift.l = function(_list)
 		}
 
 		return newList;
-	}
+	};
 
 	list.sort = function(_comparator)
 	{
@@ -195,7 +195,7 @@ airlift.l = function(_list)
 		}
 
 		this.addAll(treeSet);
-	}
+	};
 	
 	list.splice = function(_start, _deleteCount)
 	{
@@ -214,13 +214,13 @@ airlift.l = function(_list)
 		}
 
 		return deletedElements;
-	}
+	};
 
 	list.unshift = function(_item)
 	{
 		this.add(0, _item);
 		return this.size();
-	}
+	};
 
 	list.partition = function(_attribute)
 	{
@@ -260,7 +260,7 @@ airlift.l = function(_list)
 	list.i = function()
 	{
 		return Iterator(list);
-	}
+	};
 
 	list = new JavaAdapter(Packages.java.util.ArrayList, list);
 
@@ -275,7 +275,7 @@ airlift.l = function(_list)
 airlift.set = function(_collection)
 {
 	return (_collection && airlift.s(_collection)) || airlift.s();
-}
+};
 
 //s - create an enhanced java.util.HashSet
 airlift.s = function(_set)
@@ -292,7 +292,7 @@ airlift.s = function(_set)
 	{
 		airlift.every(set, _function);
 		return this;
-	}
+	};
 
 	set.partition = function(_attribute)
 	{
@@ -332,7 +332,7 @@ airlift.s = function(_set)
 	set.i = function()
 	{
 		return Iterator(set);
-	}
+	};
 
 	set = new JavaAdapter(Packages.java.util.HashSet, set);
 
@@ -347,7 +347,7 @@ airlift.s = function(_set)
 airlift.map = function(_map)
 {
 	return (_map && airlift.m(_map)) || airlift.m();
-}
+};
 
 //m - create an enhanced java.util.HashMap
 airlift.m = function(_map)
@@ -364,13 +364,13 @@ airlift.m = function(_map)
 	{
 		airlift.every(this.keySet(), _function);
 		return this;
-	}
+	};
 
 	map.forEachValue = function(_function)
 	{
 		airlift.every(this.values(), _function);
 		return this;
-	}
+	};
 
 	map.partitionKeys = function(_attribute)
 	{
@@ -395,7 +395,7 @@ airlift.m = function(_map)
 	map.i = function()
 	{
 		return Iterator(this.entrySet().iterator());
-	}
+	};
 
 	map = new JavaAdapter(Packages.java.util.HashMap, map);
 
@@ -534,22 +534,22 @@ airlift.guid = function()
 airlift.hash = function(_hashAlgorithm, _string)
 {
 	return Packages.airlift.util.IdGenerator.hash(_hashAlgorithm||"SHA1", _string);
-}
+};
 
 airlift.sb = function(_string)
 {
 	return (_string && new Packages.java.lang.StringBuffer(_string)) || new Packages.java.lang.StringBuffer(_string);
-}
+};
 
 airlift.string = function(_string)
 {
 	return (airlift.isDefined(_string) === true) ? new Packages.java.lang.String(_string) : new Packages.java.lang.String();
-}
+};
 
 airlift.integer = function(_integer)
 {
 	return (airlift.isDefined(_integer) === true) ? new Packages.java.lang.Integer(_integer) : new Packages.java.lang.Integer();
-}
+};
 
 airlift.toJavaString = function(_string)
 {
@@ -562,25 +562,25 @@ airlift.appender = function(_initialText, _delimiter)
 	var initialText = (airlift.isDefined(_initialText) === true) ? _initialText : "";
 
 	var appender = {
-text: initialText,
-delimiter: delimiter,	  
+		text: initialText,
+		delimiter: delimiter,	  
 
-append: function(_appendee)
-	  {
-		  this.text += this.delimiter + _appendee;
-	  },
+		append: function(_appendee)
+			  {
+				  this.text += this.delimiter + _appendee;
+			  },
 
-toString: function()
-	  {
-		  return this.text;
-	  },
+		toString: function()
+			  {
+				  return this.text;
+			  },
 
-reset: function()
-	  {
-		  this.text = "";
-		  this.delimiter = "";
-		  this.firstAppend = true;
-	  }
+		reset: function()
+			  {
+				  this.text = "";
+				  this.delimiter = "";
+				  this.firstAppend = true;
+			  }
 	};
 
 	return appender;
@@ -643,7 +643,7 @@ airlift.tokenizeIntoNGrams = function(_string)
 	}
 
 	return indexList;
-}
+};
 
 airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 {
@@ -666,7 +666,7 @@ airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 	}
 
 	return name + datePart + _calendar.get(_calendar[getter]);
-}
+};
 
 airlift.tokenizeIntoDateParts = function(_date, _name)
 {
@@ -682,7 +682,7 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 	}
 
 	return indexList;
-}
+};
 
 airlift.getMonthIntervals = function(_date1, _date2)
 {
@@ -720,22 +720,31 @@ airlift.getMonthIntervals = function(_date1, _date2)
 	}
 
 	return monthList;
-}
+};
 
-airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFieldName, _startDate, _endDate)
+airlift.filter = function(_config)
 {
+	var config = _config||{};
+	
+	var filterString = config.filterString;
+	var propertyArray = config.propertyArray;
+	var resultArray = config.resultArray||[];
+	var dateFieldName = config.dateFieldName||"auditPutDate";
+	var startDate = config.startDate;
+	var endDate = config.endDate||airlift.createDate();
+	
 	var hasFilterTokens = true;
 	var inInterval = true;
 	var filteredArray = [];
 
-	var filterTokens = airlift.tokenizeIntoNGrams(_filterString);
+	var filterTokens = airlift.tokenizeIntoNGrams(filterString);
 
-	_resultArray.forEach(function(_item) {
+	resultArray.forEach(function(_item) {
 
-		if ((_startDate && _endDate && _dateFieldName) &&
+		if ((startDate && endDate && dateFieldName) &&
 			  (
-			   _item[_dateFieldName].getTime() < _startDate.getTime() ||
-			   _item[_dateFieldName].getTime() > _endDate.getTime()
+			   _item[dateFieldName] && _item[dateFieldName].getTime() < startDate.getTime() ||
+			   _item[dateFieldName] && _item[dateFieldName].getTime() > endDate.getTime()
 			  )
 		   )
 		{
@@ -750,7 +759,7 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 		{			
 			var indexSet = airlift.s();
 
-			_propertyArray.forEach(function(_property)
+			propertyArray.forEach(function(_property)
 			{
 				var newTokenSet = airlift.tokenizeIntoNGrams(_item[_property]);
 				indexSet.addAll(newTokenSet);
@@ -765,28 +774,28 @@ airlift.filter = function(_filterString, _propertyArray, _resultArray, _dateFiel
 	});
 
 	return filteredArray;
-}
+};
 
 airlift.getCacheService = function()
 {
 	return Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
-}
+};
 
 airlift.createTimeZone = function(_timeZoneString)
 {
 	return new Packages.java.util.TimeZone.getTimeZone(_timeZoneString);
-}
+};
 
 airlift.createDate = function(_config)
 {
 	var calendar = airlift.createCalendar(_config);
 	return calendar.getTime();
-}
+};
 
 airlift.cloneDate = function(_date)
 {
 	return new Packages.java.util.Date(_date.getTime());
-}
+};
 
 airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 {
@@ -798,7 +807,7 @@ airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 	var revolutions = algorithm.revolutions||null;
 
 	return Packages.airlift.util.AirliftUtil.encrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
-}
+};
 
 airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 {
@@ -810,7 +819,7 @@ airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 	var revolutions = algorithm.revolutions||null;
 
 	return Packages.airlift.util.AirliftUtil.decrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
-}
+};
 
 airlift.createArray = function(_size, _type, _initializer)
 {
@@ -822,102 +831,102 @@ airlift.createArray = function(_size, _type, _initializer)
 	initializer.forEach(function(_item, _index) { newArray[_index] = _item; });
 
 	return newArray;
-}
+};
 
 airlift.stringArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.String, _initializer);
-}
+};
 
 airlift.byteArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Byte.TYPE, _initializer);
-}
+};
 
 airlift.byteObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Byte, _initializer);
-}
+};
 
 airlift.shortArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Short.TYPE, _initializer);
-}
+};
 
 airlift.shortObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Short, _initializer);
-}
+};
 
 airlift.charArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Character.TYPE, _initializer);
-}
+};
 
 airlift.charObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Character, _initializer);
-}
+};
 
 airlift.characterObjectArray = function(_size, _initializer)
 {
 	return airlift.charObjectArray(_size, _initializer);
-}
+};
 
 airlift.intArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Integer.TYPE, _initializer);
-}
+};
 
 airlift.intObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Integer, _initializer);
-}
+};
 
 airlift.integerObjectArray = function(_size, _initializer)
 {
 	return airlift.intObjectArray(_size, _initializer);
-}
+};
 
 airlift.longArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Long.TYPE, _initializer);
-}
+};
 
 airlift.longObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Long, _initializer);
-}
+};
 
 airlift.booleanArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Boolean.TYPE, _initializer);
-}
+};
 
 airlift.booleanObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Boolean, _initializer);
-}
+};
 
 airlift.floatArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Float.TYPE, _initializer);
-}
+};
 
 airlift.floatObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Float, _initializer);
-}
+};
 
 airlift.doubleArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Double.TYPE, _initializer);
-}
+};
 
 airlift.doubleObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Double, _initializer);
-}
+};
 
 airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
 {
@@ -937,7 +946,7 @@ airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunctio
 			}
 		}
 	}
-}
+};
 
 airlift.enqueueTask = function(_config)
 {
@@ -987,7 +996,7 @@ airlift.enqueueTask = function(_config)
 	}
 
 	return queue.add(taskOptions); //returns TaskHandle
-}
+};
 
 airlift.chat = function(_users, _message)
 {
@@ -1015,7 +1024,7 @@ airlift.chat = function(_users, _message)
 	});
 
 	return statusArray;
-}
+};
 
 airlift.email = function(_users, _message, _subject, _from)
 {
@@ -1049,61 +1058,61 @@ airlift.email = function(_users, _message, _subject, _from)
 			}
 		});
 	}
-}
+};
 
 airlift.escapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
-}
+};
 
 airlift.unescapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeXml(_value);
-}
+};
 
 airlift.escapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
-}
+};
 
 airlift.unescapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
-}
+};
 
 airlift.browser = function()
 {
 	return new Packages.airlift.util.Browser();
-}
+};
 
 airlift.isWhiteSpace = function(_string)
 {
 	return airlift.isWhitespace(_string);
-}
+};
 
 airlift.isWhitespace = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
-}
+};
 
 airlift.rightPad = function(_string, _size, _character)
 {
 	var character = _character||'';
 
 	return Packages.org.apache.commons.lang.StringUtils.rightPad(_string, _size, character);
-}
+};
 
 airlift.leftPad = function(_string, _size, _character)
 {
 	var character = _character||'';
 
 	return Packages.org.apache.commons.lang.StringUtils.leftPad(_string, _size, character);
-}
+};
 
 airlift.trim = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.trim(_string);
-}
+};
 
 airlift.filterContains = function(_filter, _propertyName)
 {
@@ -1118,7 +1127,7 @@ airlift.filterContains = function(_filter, _propertyName)
 	});
 
 	return contains;
-}
+};
 
 //this will be replaced by memcache ...
 airlift.cache = {};

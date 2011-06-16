@@ -208,6 +208,7 @@ public class RestfulSecurityContext
 			}
 			catch(Throwable t)
 			{
+				log.warning(t.toString());
 				log.warning("unable to get entity of kind: " + getKind() + " from the datastore");
 			}
 		}

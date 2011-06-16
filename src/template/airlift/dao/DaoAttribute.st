@@ -6,6 +6,9 @@
  * limit: total number of returned objects
  * asc: the direction ordering should be performed
  * orderBy: the attribute on which ordering should be performed.
+ *
+ * The property you are querying on may be a single value property or a
+ * list property.
  * 
  */
 
@@ -32,4 +35,4 @@ dao.collectBy$uppercaseAttributeName$ = function(_value, _config)
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	return dao[returnType] && dao[returnType](queryResults, config);
-}
+};

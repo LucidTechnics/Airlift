@@ -51,4 +51,4 @@ dao.collectBy$uppercaseAttributeName$Intersection = function(_intersectionList, 
 	var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	return dao[returnType] && dao[returnType](queryResults, config);
-}
+};

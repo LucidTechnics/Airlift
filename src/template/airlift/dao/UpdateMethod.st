@@ -37,4 +37,4 @@ dao.update = function(_activeRecord, _config)
 	dao.populateCache(parentKey, parent);
 	
 	return _activeRecord.id;
-}
+};

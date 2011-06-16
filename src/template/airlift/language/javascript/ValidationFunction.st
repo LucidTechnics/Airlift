@@ -15,4 +15,4 @@ validator.validate$propertyName$ = function(_value)
 	}
 
 	return errorArray;
-}
+};

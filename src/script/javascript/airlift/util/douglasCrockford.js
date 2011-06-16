@@ -147,7 +147,7 @@ Array.prototype.iterator = function()
 	}
 
 	return new java.util.Iterator(iterator);
-}
+};
 
 if (typeof Object.beget !== 'function')
 {

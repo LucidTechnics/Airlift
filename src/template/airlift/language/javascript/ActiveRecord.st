@@ -1,10 +1,8 @@
-var airlift;
-
 if (!airlift)
 {
-	airlift = {};
+	var airlift = {};
 }
-else if (typeof airlift != "object")
+else if (typeof airlift !== "object")
 {
 	throw new Error("airlift already exists and it is not an object");
 }
@@ -33,19 +31,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	var javaDateTimePatternArray = java.lang.reflect.Array.newInstance(Packages.java.lang.String, allowedDateTimePatterns.length);
 
-	allowedDateTimePatterns.forEach(function (_element, _index, _array) { javaDateTimePatternArray[_index] = new Packages.java.lang.String(_element); });
+	allowedDateTimePatterns.forEach(function (_element, _index) { javaDateTimePatternArray[_index] = new Packages.java.lang.String(_element); });
 	
 	activeRecord.beanUtilsBean = Packages.airlift.util.AirliftUtil.createBeanUtilsBean(javaDateTimePatternArray, TIMEZONE);
 
     activeRecord.getConverter = function() 
 	{ 
 		return activeRecord.beanUtilsBean.getConvertUtils(); 
-	}
+	};
 
 	activeRecord.isForeignKey = function(_propertyName)
 	{
 		return this.foreignKeySet.contains(_propertyName);
-	}
+	};
 	
 	activeRecord.rdfa = function(_config)
 	{
@@ -76,7 +74,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 		else
 		{
-			json = Packages.airlift.util.AirliftUtil.toJson(this.restify());
+			var json = Packages.airlift.util.AirliftUtil.toJson(this.restify());
 		}
 		LOG.info("Ending JSON");
 		
@@ -90,14 +88,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.copyToImpl(impl);
 
 		return impl;
-	}
+	};
 
 	activeRecord.copyToImpl = function(_impl)
 	{
 		$copyPropertyToImpl; separator="\n"$
 
 		return this;
-	}
+	};
 
 	activeRecord.restify = function(_base)
 	{
@@ -108,7 +106,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		$restifyForeignKey; separator="\n"$
 						
 		return impl;
-	}
+	};
 
 	activeRecord.join = function(_collectionOrArray)
 	{
@@ -122,12 +120,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		return this;
-	}
+	};
 
 	activeRecord.form = function(_config)
 	{
 		var config = _config||{};
-		var that = this;
 		var after = config.after||function() {};
 		var cacheTimeout = config.cacheTimeout||airlift.production(3600, 30);
 		var method = config.method||"POST";
@@ -149,7 +146,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		after(this, config, formTemplate);
 		
 		return formTemplate.toString();
-	}
+	};
 	
 	activeRecord.formTemplate = function(_config)
 	{
@@ -239,12 +236,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.retrieveDomainInterfaceClassName = function()
 	{
 		return "$fullyQualifiedDomainClassName$";
-	}
+	};
 
 	activeRecord.retrieveDomainInterface = function()
 	{
 		return Packages.java.lang.Class.forName("$fullyQualifiedDomainClassName$");
-	}
+	};
 
 	//For every collect method do the same.
 	$collectByAttribute; separator="\n\n"$
@@ -259,10 +256,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var category = (airlift.isDefined(_category) === true) ? _category: "$appName$";
 		var name = (airlift.isDefined(_name) === true) ? _name: "";
 		
-		this.messageManager.add(_name, _category, _message);
+		this.messageManager.add(name, category, message);
 
 		return this;
-	}
+	};
 
 	activeRecord.addError = function(_name, _message, _category)
 	{
@@ -270,7 +267,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.addMessage(_name, _message, _category);
 
 		return this;
-	}
+	};
 
 	activeRecord.addErrorMap = function(_errorMap)
 	{
@@ -281,52 +278,52 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		return this;
-	}
+	};
 
 	activeRecord.getMessageMap = function()
 	{
 		return this.messageManager.getMessageMap();
-	}
+	};
 
 	activeRecord.getMessageList = function(_name)
 	{
 		return this.messageManager.getMessageList(_name);
-	}
+	};
 
 	activeRecord.getAllMessageList = function()
 	{
 		return this.messageManager.getMessageList();
-	}
+	};
 
 	activeRecord.hasMessages = function()
 	{
 		return (this.getMessageMap().isEmpty() === false);
-	}
+	};
 
 	activeRecord.getAppProfile = function()
 	{
 		return this.appProfile;
-	}
+	};
 
 	activeRecord.getAttributeType = function(_attributeName)
 	{
 		return this.appProfile.getAttributeType("$allLowerCaseClassName$", _attributeName);
-	}
+	};
 
 	activeRecord.retrieveDomainName = function()
 	{
 		return "$allLowerCaseClassName$";
-	}
+	};
 
 	activeRecord.retrieveOrderedPropertyList = function()
 	{
 		return [$propertyListEntry; separator=", "$];
-	}
+	};
 
 	activeRecord.retrieveOrderedForeignKeyList = function()
 	{
-		var foreignKeyList = [$foreignKeyListEntry; separator=", "$];
-	}
+		return [$foreignKeyListEntry; separator=", "$];
+	};
 
 	/**
 	 * Copy the attributes of a $className$ DO to this one.
@@ -340,7 +337,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.auditUserId = null;
 		
 		return this;
-	}
+	};
 
 	activeRecord.copyFrom = function(_activeRecord, _config)
 	{
@@ -348,12 +345,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var filter = config.filter||[];
 		var contains = config.contains||false;
 		
-		var that = this;
-
 		$copyFromActiveRecord; separator="\n"$
 
 		return this;
-	}
+	};
 
 	activeRecord.copyTo = function(_activeRecord, _config)
 	{
@@ -361,12 +356,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var filter = config.filter||[];
 		var contains = config.contains||false;
 
-		var that = this;
-
 		$copyToActiveRecord; separator="\n"$
 
 		return this;
-	}
+	};
 
 	activeRecord.createEntity = function()
 	{
@@ -374,7 +367,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		this.copyTo(entity);
 
 		return entity;
-	}
+	};
 
 	activeRecord.getPresentableAnnotation = function(_propertyName)
 	{
@@ -382,7 +375,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var method = this.retrieveDomainInterface().getMethod(getter);
 
 		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
-	}
+	};
 	
 	activeRecord.copyValueArrayToCollection = function(_valueArray, _collection)
 	{
@@ -400,7 +393,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.describe = function()
 	{
 		return Packages.airlift.util.AirliftUtil.describe(this.createImpl(), this.retrieveDomainInterface());
-	}
+	};
 
 	activeRecord.populateFromRequestMap = function(_attributeMap)
 	{
@@ -418,7 +411,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
 		
 		return this.messageManager.getMessageMap();
-	}
+	};
 
 	activeRecord.populateFromRestContext = function(_restContext, _method)
 	{
@@ -438,13 +431,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 
 		return this.messageManager.getMessageMap();
-	}
+	};
 	
 	activeRecord.populate = function(_attributeMap, _restContext, _method)
 	{
 		this.populateFromRequestMap(_attributeMap);
 		return this.populateFromRestContext(_restContext, _method);
-	}
+	};
 	
 	activeRecord.toString = function()
 	{
@@ -455,7 +448,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 				stringBuffer.append("**]\n");
 
 		return stringBuffer.toString();
-	}
+	};
 
 	return activeRecord;
 };

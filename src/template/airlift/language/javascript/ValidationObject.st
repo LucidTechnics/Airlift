@@ -19,4 +19,4 @@ airlift.create$className$Validator = function()
 	$validationFunction; separator="\n\n"$
 
 	return validator;
-}
+};

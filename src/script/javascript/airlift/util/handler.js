@@ -20,7 +20,7 @@ airlift.d = function(_debugString)
 airlift.debug = function(_debugString)
 {
 	return airlift.d(_debugString);
-}
+};
 
 //ls - load JavaScript scripts 
 airlift.ls = function(_scriptName)
@@ -215,7 +215,7 @@ airlift.canonicalUri = function(_domainName, _id)
 airlift.production = function(_productionValue, _devValue)
 {
 	return (PRODUCTION_MODE === true) ? _productionValue : _devValue;
-}
+};
 
 airlift.createCalendar = function(_config)
 {
@@ -239,7 +239,7 @@ airlift.createCalendar = function(_config)
 	calendar.add(dateOffsetType, dateOffset);
 
 	return calendar;
-}
+};
 
 airlift.audit = function(_data, _action, _id)
 {
@@ -258,12 +258,12 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.recordDate = auditTrail.actionDate;
 
 	AUDIT_CONTEXT.insert(auditTrail);
-}
+};
 
 airlift.formatDate = function(_date, _mask, _timeZone)
 {
 	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy", _timeZone||TIMEZONE);
-}
+};
 
 airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
 {
@@ -307,4 +307,4 @@ airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
 	{
 		SECURITY_CONTEXT.insert(airliftUser);
 	}
-}
+};

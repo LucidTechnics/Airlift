@@ -72,6 +72,6 @@ public class GoogleUserService
 
 	public String getUserKind()
 	{
-		return "GoogleUser";
+		return "AirliftUser";
 	}
 }
