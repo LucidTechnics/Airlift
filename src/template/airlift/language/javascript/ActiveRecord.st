@@ -182,9 +182,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 	activeRecord.copy = function(_id, _config)
 	{
+		var oldId = this.id;
 		this.id = _id;
 		var success = this.get(_config);
-		this.id = null;
+		this.id = oldId;
 
 		return success;
 	};
