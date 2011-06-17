@@ -173,7 +173,7 @@ public class JavaScriptGenerator
 					}
 					else
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && Packages.org.apache.commons.beanutils.ConvertUtils.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null; }");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && converter.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null; }");
 					}
 
 					if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true )
@@ -322,6 +322,7 @@ public class JavaScriptGenerator
 			Annotation present = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Presentable");
 
 			String label = findValue(present, "label()");
+			String dateMask = findValue(present, "dateTimePattern()"); 
 			boolean nullable = Boolean.parseBoolean(findValue(persist, "nullable()"));
 			String fieldSetName = findValue(persist, "fieldSetName()");
 						
@@ -349,7 +350,7 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
 				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
-				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
+				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
 			}
 
 			
@@ -392,11 +393,20 @@ public class JavaScriptGenerator
 				}
 				else
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.org.apache.commons.beanutils.ConvertUtils.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 
 					if ("false".equals(isForeignKey) == true)
 					{
-						activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && this." + name + ".toString())||\"\") + \"\"));");
+						if (type.equalsIgnoreCase("java.util.Date") == true ||
+							  type.equalsIgnoreCase("java.sql.Date") == true ||
+							  type.equalsIgnoreCase("java.sql.Timestamp") == true)
+						{
+							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + ", \"" + dateMask + "\"))||\"\") + \"\"));");
+						}
+						else
+						{
+							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
+						}
 					}
 				}
 			}

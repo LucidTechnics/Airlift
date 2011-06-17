@@ -404,6 +404,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	activeRecord.populateFromRequestMap = function(_attributeMap)
 	{
 		var value;
+		var converter = this.getConverter();
 
 		$copyPropertyFromRequestMap; separator="\n"$
 

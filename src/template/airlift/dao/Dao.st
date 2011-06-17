@@ -84,6 +84,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var config = _config||{};
 		var filter = config.filter||[];
 		var contains = config.contains||false;
+		var converter = _activeRecord.getConverter();
 
 		var that = this;
 
