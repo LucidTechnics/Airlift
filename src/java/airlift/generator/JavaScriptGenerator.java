@@ -393,7 +393,15 @@ public class JavaScriptGenerator
 				}
 				else
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+					if (type.equalsIgnoreCase("java.lang.String") == true ||
+						  type.equalsIgnoreCase("java.lang.Character") == true)
+					{
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+					}
+					else
+					{
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0] && (airlift.isWhitespace(_attributeMap.get(\"" + name + "\")[0]) === false) && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+					}
 
 					if ("false".equals(isForeignKey) == true)
 					{

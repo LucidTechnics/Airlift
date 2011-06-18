@@ -308,3 +308,37 @@ airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
 		SECURITY_CONTEXT.insert(airliftUser);
 	}
 };
+
+airlift.email = function(_users, _message, _subject, _from)
+{
+	if (_message &&
+		  "".equals(_message) === false &&
+		  airlift.isWhitespace(_message) === false)
+	{
+		var users = _users||[];
+		var adminEmail = APP_NAME.toLowerCase() + "@appspot.com";
+		var from = _from||{ email: adminEmail, fullName: "Admin" };
+		var subject = _subject||"For your information";
+		var message = _message||"";
+
+		var properties = new Packages.java.util.Properties();
+		var session = Packages.javax.mail.Session.getDefaultInstance(properties, null);
+
+		users.forEach(function(_user)
+		{
+			if (_user && _user.email)
+			{
+				var mimeMessage = new Packages.javax.mail.internet.MimeMessage(session);
+
+				mimeMessage.setFrom(new Packages.javax.mail.internet.InternetAddress(from.email, from.fullName));
+				mimeMessage.addRecipient(
+										 Packages.javax.mail.Message.RecipientType.TO,
+										 new Packages.javax.mail.internet.InternetAddress(_user.email, _user.fullName||""));
+				mimeMessage.setSubject(subject);
+				mimeMessage.setText(message);
+
+				Packages.javax.mail.Transport.send(mimeMessage);
+			}
+		});
+	}
+};

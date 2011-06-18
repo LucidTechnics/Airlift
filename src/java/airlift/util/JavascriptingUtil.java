@@ -268,18 +268,18 @@ public class JavascriptingUtil
 
 	public Context createContext()
 	{
-		Context context = null;
+		//Do not try to manage the context ... as it is managed by
+		//Rhino already.  Trying to check to see is the current context
+		//is used and using that instead will circumvent Rhino context
+		//context counting mechanism.  This could lead to strange issues
+		//popping up like disappearing object references and staying up
+		//late at night :) ... Bediako 06/18/2011 5:49 am.
 		
-		if (Context.getCurrentContext() != null)
-		{
-			context = Context.getCurrentContext();
-		}
-		else
-		{
-			context = (new ContextFactory()).enterContext();
-			context.setLanguageVersion(170);
-		}
+		Context context = (new ContextFactory()).enterContext();
+		context.setLanguageVersion(170);
 
+		log.info("Using context: " + context); 
+		
 		return context;
 	}
 
@@ -341,5 +341,6 @@ public class JavascriptingUtil
 		scriptable.setPrototype(sharedScope);
 		scriptable.setParentScope(null);
 		setScope(scriptable);
+		log.info("Resetting scope to this scope: " + scriptable); 
 	}
 }
