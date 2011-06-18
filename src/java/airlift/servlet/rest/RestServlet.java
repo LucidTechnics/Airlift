@@ -729,4 +729,9 @@ public class RestServlet
 
 		return userService;
 	}
+
+	public static final void throwRuntimeException()
+	{
+		throw new RuntimeException();
+	}
 }

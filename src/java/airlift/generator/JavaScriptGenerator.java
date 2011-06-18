@@ -409,11 +409,11 @@ public class JavaScriptGenerator
 							  type.equalsIgnoreCase("java.sql.Date") == true ||
 							  type.equalsIgnoreCase("java.sql.Timestamp") == true)
 						{
-							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + ", \"" + dateMask + "\"))||\"\") + \"\"));");
+							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + ", \"" + dateMask + "\") + \"\")||\"\")));");
 						}
 						else
 						{
-							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
+							activeRecordStringTemplate.setAttribute("validateProperty", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + ") + \"\")||\"\")));");
 						}
 					}
 				}

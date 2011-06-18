@@ -44,6 +44,8 @@ public class JavascriptingUtil
 	public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 	public void setScope(Scriptable _scope) { scope = _scope; }
 
+	public java.util.List scriptStack = new java.util.ArrayList();
+
 	static
 	{
 		log.info("running static");
@@ -52,28 +54,10 @@ public class JavascriptingUtil
 		try
 		{
 			sharedScope = context.initStandardObjects();
-
-			String[] scriptResources = new String[4];
-
-			scriptResources[0] = "/airlift/util/douglasCrockford.js";
-			scriptResources[1] = "/airlift/util/json2.js";
-			scriptResources[2] = "/airlift/util/util.js";
-			scriptResources[3] = "/airlift/util/validate.js";
-
-			for (int i = 0; i < scriptResources.length; i++)
-			{
-				try
-				{
-					InputStream inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream(scriptResources[i]);
-					java.io.InputStreamReader reader = new InputStreamReader(inputStream);
-					Script script = Context.getCurrentContext().compileReader(reader, scriptResources[i], 0, null);
-					script.exec(Context.getCurrentContext(), sharedScope);
-				}
-				catch(Throwable t)
-				{
-					throw new RuntimeException(t);
-				}
-			}
+			//Cannot seem to safely execute scripts to be made available at the
+			//shared scope level. :(   Never mind ... eliminating the
+			//initStandardObjects call over and over saves quite a bit
+			//of time on its own ...
 		}
 		finally
 		{
@@ -107,8 +91,10 @@ public class JavascriptingUtil
 			{
 				throw new RuntimeException("Cannot use loadScript outside of the scope of a call to executeScript.  A context must be present.");
 			}
-
+			
+			scriptStack.add(_scriptResource);
 			compileScript(_scriptResource).exec(Context.getCurrentContext(), getScope());
+
 		}
 		catch(Throwable t)
 		{
@@ -178,6 +164,7 @@ public class JavascriptingUtil
 				startTime = System.currentTimeMillis();
 			}
 
+			scriptStack.add(_scriptResource);
 			result = compileScript(_scriptResource).exec(context, getScope());
 
 			if (_timeScript == true)
@@ -239,9 +226,10 @@ public class JavascriptingUtil
 				{
 					startTime = System.currentTimeMillis();
 				}
-				
-				result = compileScript(_scriptResources[i]).exec(context, getScope());
 
+				scriptStack.add(_scriptResources[i]);
+				result = compileScript(_scriptResources[i]).exec(context, getScope());
+				
 				if (_timeScripts)
 				{
 					long total = System.currentTimeMillis() - startTime;
@@ -300,7 +288,7 @@ public class JavascriptingUtil
 			
 			if (getScriptResourceMap().containsKey(_scriptResource) == false)
 			{
-				log.info("Compiled script not cached: " + _scriptResource);
+				log.info("Script not compiled and cached: " + _scriptResource);
 				reader = new InputStreamReader(findScript(_scriptResource));
 
 				try

@@ -1075,9 +1075,15 @@ airlift.leftPad = function(_string, _size, _character)
 	return Packages.org.apache.commons.lang.StringUtils.leftPad(_string, _size, character);
 };
 
+airlift.typeOf = function(_value)
+{
+	return typeOf(_value);
+}
+
 airlift.trim = function(_string)
 {
-	return Packages.org.apache.commons.lang.StringUtils.trim(_string);
+	var trimmed = Packages.org.apache.commons.lang.StringUtils.trim(_string);
+	return (airlift.typeOf(_string) === 'string') ? trimmed + "" : trimmed;
 };
 
 airlift.filterContains = function(_filter, _propertyName)

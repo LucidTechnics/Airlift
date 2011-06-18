@@ -109,6 +109,7 @@ public class SimpleHandlerContext
 		}
 
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
+
 		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
 		
 		try
@@ -166,12 +167,16 @@ public class SimpleHandlerContext
 			
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 			
-			String[] scriptResources = new String[4];
+			String[] scriptResources = new String[8];
 
-			scriptResources[0] = "/airlift/util/error.js";
-			scriptResources[1] = "/airlift/util/handler.js";
-			scriptResources[2] = "/airlift/util/HtmlUtil.js";
-			scriptResources[3] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
+			scriptResources[0] = "/airlift/util/douglasCrockford.js";
+			scriptResources[1] = "/airlift/util/json2.js";
+			scriptResources[2] = "/airlift/util/validate.js";
+			scriptResources[3] = "/airlift/util/util.js";
+			scriptResources[4] = "/airlift/util/error.js";
+			scriptResources[5] = "/airlift/util/handler.js";
+			scriptResources[6] = "/airlift/util/HtmlUtil.js";
+			scriptResources[7] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
 			
 			try
 			{

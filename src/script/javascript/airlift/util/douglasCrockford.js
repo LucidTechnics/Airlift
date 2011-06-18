@@ -121,7 +121,7 @@ String.prototype.equalsIgnoreCase = function(_string)
 //... the purpose here is to make it so airlift methods like every,
 //partition, split and dao functions like iterator can work with a
 //java.util.Iterator, java.util.Iterable, and a Javascript array.
-//Convenient.
+//Convenient. :)
 Array.prototype.iterator = function()
 {
 	var iterator = {};

@@ -23,7 +23,8 @@ airlift.trim = function (_trim)
 
 	if (_trim !== null && _trim !== undefined)
 	{
-		trimmed = _trim.replace(/^\s+|\s+$/g, "");
+		return this.replace(/^\s+|\s+$/g, "");
+		trimmed = _trim.replace(/^\s+|\s+$/g, "") + "";
 	}
 	else
 	{
@@ -43,11 +44,11 @@ airlift.trim = function (_trim)
  *	failureMessage {String} - the message to show when the field fails validation 
  *  (DEFAULT: "Can't be empty!")
  */
-airlift.isRequired = function(value, paramsObj)
+airlift.isRequired = function(_value, paramsObj)
 {
-	value = airlift.trim(value);
+	var value = airlift.trim(_value);
 	
-	var error;    
+	var error;
 	var paramsObj = paramsObj || {};
 	var message = paramsObj.failureMessage || "This is a required field - ";
 
@@ -186,9 +187,9 @@ airlift.isEmail = function(value, paramsObj)
  *	failureMessage {String} - the message to show when the field fails validation
  * (DEFAULT: "Must be a number!" or "Must be an integer!")
  */
-airlift.isZipCode = function(value, paramsObj)
+airlift.isZipCode = function(_value, paramsObj)
 {
-	value = airlift.trim(value);
+	var value = airlift.trim(_value);
 	
 	var error;
 	var paramsObj = paramsObj || {};
@@ -208,10 +209,10 @@ airlift.isZipCode = function(value, paramsObj)
  *	failureMessage {String} - the message to show when the field fails validation
  * (DEFAULT: "Must be a number!" or "Must be an integer!")
  */
-airlift.isDate = function(value, paramsObj)
+airlift.isDate = function(_value, paramsObj)
 {
-	value = airlift.trim(value);
-	
+	var value = airlift.trim(_value);
+
 	var error;
 	var paramsObj = paramsObj || {};
 
@@ -219,7 +220,7 @@ airlift.isDate = function(value, paramsObj)
 
 	if (result.substring(0, 5) === "Error")
 	{
-		var error = paramsObj.failureMessage || result + " with value: " + value + " for mask: " + paramsObj.mask + "-  ";
+		var error = paramsObj.failureMessage || result + " with value: " + value + " for mask: " + paramsObj.mask + ".";
 	}
 	
 	return error;
@@ -666,10 +667,12 @@ airlift.setDate = function (_m, _v)
 		yy = 2000 + yy;
 		if( (new Date()).getFullYear()+5 < yy ) yy = yy - 100;
 	}
-
+	
 	// create date object	
 	var d = new Date(yy, mm, dd);
 
+	var testDate = new Date();
+	
 	if( d.getDate() != dd ) return "Error: An invalid day was entered - ";
 	else if( d.getMonth() != mm ) return "Error: An invalid month was entered - ";
 
