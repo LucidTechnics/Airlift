@@ -7,13 +7,43 @@ else if (typeof airlift != "object")
 	throw new Error("airlift already exists and it is not an object");
 }
 
-//Convenience method to create a Java class
+/**
+ *
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * 
+ * @param _className - a Java class name 
+ *
+ * @returns - a class 
+ *
+ * @example
+ * 
+ * var stringClass = airlift.cc("java.lang.String");
+ *
+ */
 airlift.cc = function(_className)
 {
 	return Packages.java.lang.Class.forName(_className);
 };
 
-//Convenience method for creating a blank StringTemplate object
+/**
+ *
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ * * 
+ * @param _templateString - an optional legal stringTemplate template string 
+ *
+ * @returns a stringTemplate object.  If _templateString is provided
+ * the stringTemplate object will use this as its template, otherwise
+ * the stringTemplate object returned will not yet have a template.
+ * You may later associate a template with this object using the
+ * setTemplate method.
+ *
+ * @example
+ * var template = airlift.stringTemplate("<$tag$>$value$</$tag$>");
+ */
+
 airlift.stringTemplate = function(_templateString)
 {
 	var stringTemplate  = (airlift.isDefined(_templateString) === true) ? new Packages.org.antlr.stringtemplate.StringTemplate(_templateString) : new Packages.org.antlr.stringtemplate.StringTemplate();
@@ -21,21 +51,211 @@ airlift.stringTemplate = function(_templateString)
 	return stringTemplate;
 };
 
-//every - execution function on every member of java.util.Collection
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
+ *
+ * The iteration will stop once the all the members of the _collection
+ * has been visited OR if the _function ever returns false.
+ *
+ * @example
+ * var users =
+ * var users = ["Bediako", "Dave", "Loki"];
+ *
+ * airlift.
+ */
 airlift.every = function(_collection, _function)
 {
-	if (airlift.isDefined(_collection) === true)
+	var success = true;
+	
+	if (_collection && (_collection.push || _collection.add))
 	{
 		var index = 0;
 		
 		for (var item in Iterator(_collection))
 		{
-			_function(item, index, _collection);
+			success = _function(item, index, _collection);
+			if (success === false) { break; } else { index++; }
+		}
+	}
+	else if (_collection)
+	{
+		var collection = _collection + ""; //convert to Javascript string
+		success = Array.every(collection, _function);
+	}
+
+	return success;
+};
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _function
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
+airlift.forEach = function(_collection, _function)
+{
+	if (_collection && (_collection.push || _collection.add))
+	{
+		var index = 0;
+
+		for (var item in Iterator(_collection))
+		{
+			_function && _function(item, index, _collection);
 			index++;
 		}
 	}
+	else if (_collection)
+	{
+		var collection = _collection + ""; //convert to Javascript string
+		Array.forEach(collection, _function);
+	}
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _function
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
+airlift.filter = function(_collection, _function)
+{
+	if (_collection && (_collection.push || _collection.add))
+	{
+		var results = (_collection.push && []) || (_collection.add && airlift.l()) || '';
+
+		var add = (_collection.push && function(_item, _collection) { _collection.push(item); return _collection }) || (_collection.add && function(_item, _collection) { _collection.add(item); return _collection}) || function(_item, _collection) { return _collection + _item; };
+
+		if (airlift.isDefined(_collection) === true)
+		{
+			var index = 0;
+			for (var item in Iterator(_collection))
+			{
+				first = _function && (_function(item, index, _collection) === true) && add(item, first);
+				index++;
+			}
+		}
+	}
+	else if (_collection)
+	{
+		var collection = _collection + ""; //convert to Javascript string
+		var first = Array.filter(collection, _function);
+	}
+
+	return first;
+};
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _function
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
+airlift.map = function(_collection, _function)
+{
+	if (_collection && (_collection.push || _collection.add))
+	{
+		var results = (_collection.push && []) || (_collection.add && airlift.l()) || '';
+		
+		var add = (_collection.push && function(_item, _collection) { _collection.push(item); return _collection }) || (_collection.add && function(_item, _collection) { _collection.add(item); return _collection}) || function(_item, _collection) { return _collection + _item; };
+
+		if (airlift.isDefined(_collection) === true)
+		{
+			var index = 0;
+			for (var item in Iterator(_collection))
+			{
+				results = add(_function && _function(item, index, _collection), results);
+				index++;
+			}
+		}
+	}
+	else if (_collection)
+	{
+		var collection = _collection + ""; //convert to Javascript string
+		var first = Array.map(collection, _function);
+	}
+	
+	return results;
+};
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _function
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
+airlift.some = function(_collection, _function)
+{
+	var success = false;
+
+	if (_collection && (_collection.push || _collection.add))
+	{
+		var index = 0;
+
+		for (var item in Iterator(_collection))
+		{
+			success = _function(item, index, _collection);
+			if (success === true) { break; } else { index++; }
+		}
+	}
+	else if (_collection)
+	{
+		var collection = _collection + ""; //convert to Javascript string
+		success = Array.some(collection, _function);
+	}
+
+	return success;
+};
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _function
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
 //split - separate java.util.Collection members by function evaluation of true
 //and false.
 airlift.split = function(_collection, _function)
@@ -61,6 +281,19 @@ airlift.split = function(_collection, _function)
 	}
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _collection, _attribute
+ *
+ * @returns
+ *
+ * @example
+ *
+ */
 //partition - separate java.util.Collection into lists partitioned by _attribute
 //value
 airlift.partition = function(_collection, _attribute)
