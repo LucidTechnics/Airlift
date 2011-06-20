@@ -329,7 +329,7 @@ public class JavaScriptGenerator
 			String requestDatable = findValue(datable, "isDatable()");
 			String isForeignKey = findValue(persist, "mapTo()");
 
-			activeRecordStringTemplate.setAttribute("populateFormTemplate", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { airlift.populateFormTemplate(formTemplate, groupName, \"" + name + "\", this); }");
+			activeRecordStringTemplate.setAttribute("populateFormTemplate", "if ((airlift.filterContains(orderedPropertyList, \"" + name + "\") === true) || (airlift.filterContains(filter, \"" + name + "\") === contains)) { airlift.populateFormTemplate(formTemplate, groupName, \"" + name + "\", this); }");
 			
 			String isIndexable = "false";
 			isIndexable = findValue(persist, "isIndexable()");

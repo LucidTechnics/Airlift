@@ -131,12 +131,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		var config = _config||{};
 		var after = config.after||function() {};
-		var cacheTimeout = config.cacheTimeout||airlift.production(3600, 30);
+		var cacheTimeout = config.cacheTimeout||airlift.production(3600, 15);
 		var method = config.method||"POST";
 		var path = config.path||PATH;
 		var filter = config.filter||["id", "auditPostDate", "auditPutDate" , "auditUserId"];
 		var contains = (airlift.isDefined(config.contains) === true) ? config.contains: false;
 		var before = config.before||function(_activeRecord, _config) { return _activeRecord.formTemplate(_config); };
+		var orderedPropertyList = config.displayOrder||[];
 		
 		var key = airlift.getCacheFormKey(this, method);
 

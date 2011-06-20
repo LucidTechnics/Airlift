@@ -70,23 +70,24 @@ airlift.isClockProperty = function(_property)
 
 airlift.toRdfa = function(_config)
 {
+	var config = _config||{};
 	var rdfa = null;
-	var path = (airlift.isDefined(_config.path) === true) ? airlift.preparePath(_config.path) : airlift.preparePath(PATH);
-	var appName = (airlift.isDefined(_config.appName) === true) ? _config.path : APP_NAME;
-	var anchorProperty = (airlift.isDefined(_config.anchorProperty) === true) ? _config.anchorProperty : "id";
-	var anchorClass = (airlift.isDefined(_config.anchorClass) === true) ? _config.anchorClass : "";
-	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : [];
-	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
-	var activeRecord = _config.activeRecord;
-	var domainName = (airlift.isDefined(_config.domainName) === true) ? _config.domainName : activeRecord.retrieveDomainName();
-	var anchorTarget = (airlift.isDefined(_config.anchorTarget) === true) ? _config.anchorTarget : "";
+	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : airlift.preparePath(PATH);
+	var appName = config.appName||APP_NAME;
+	var anchorProperty = config.anchorProperty||"id";
+	var anchorClass = config.anchorClass||"";
+	var filter = config.filter||[];
+	var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
+	var activeRecord = config.activeRecord;
+	var domainName = config.domainName||activeRecord.retrieveDomainName();
+	var anchorTarget = config.anchorTarget||"";
+	var orderedPropertyList = config.displayOrder||activeRecord.retrieveOrderedPropertyList();
 
 	if (airlift.isDefined(activeRecord) === true)
 	{
 		var stringBuffer = airlift.sb();
 		stringBuffer.append("<ul class=\"" + appName + ":" + domainName + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase()) + "\" >").append("\n");
 
-		var orderedPropertyList = activeRecord.retrieveOrderedPropertyList();
 		var dataObject = activeRecord.createImpl();
 		var interfaceObject = activeRecord.retrieveDomainInterface();
 		var propertyMap = Packages.airlift.util.AirliftUtil.describe(dataObject, interfaceObject);
@@ -218,6 +219,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var error = (airlift.isDefined(_config.error) === true) ? _config.error : false;
 	var domainInterfaceClass = 	_activeRecord.retrieveDomainInterface();
+	var orderedPropertyList = _config.displayOrder||_activeRecord.retrieveOrderedPropertyList();
 	
 	var stringTemplateGroup = new Packages.org.antlr.stringtemplate.StringTemplateGroup("airlift");
 
@@ -239,7 +241,6 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	if (domainInterfaceClass.isAnnotationPresent(Packages.java.lang.Class.forName("airlift.generator.Presentable")) === true)
 	{
 		var propertyMap = _activeRecord.describe();
-		var orderedPropertyList = _activeRecord.retrieveOrderedPropertyList();
 
 		if (dataObject instanceof Packages.airlift.Clockable)
 		{
@@ -492,6 +493,7 @@ airlift.toTable = function(_config)
 	var tableId = (airlift.isDefined(config.tableId) === true) ? config.tableId : domainName + "Table";
 	var anchorTarget = (airlift.isDefined(config.anchorTarget) === true) ? config.anchorTarget : "";
 	var augmentFunction = config.augmentFunction||undefined;
+	var orderedPropertyList = config.displayOrder;
 	
 	//If you do not specify a class the table class will be display to
 	//work with JQuery's datatable.
@@ -509,7 +511,7 @@ airlift.toTable = function(_config)
 		//record is excluded from the table ...
 		if (airlift.isDefined(include) === false || include)
 		{
-			var orderedPropertyList = _activeRecord.retrieveOrderedPropertyList();
+			orderedPropertyList = orderedPropertyList||_activeRecord.retrieveOrderedPropertyList();
 			var propertyMap = _activeRecord.describe();
 
 			var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + _activeRecord.retrieveDomainName() + "\"");
@@ -623,7 +625,7 @@ airlift.toAtom = function(_config)
 	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains : false;
 	var collection = config.collection||[];
 	var domainName = config.domainName||DOMAIN_NAME;
-	var augmentFunction = config.augmentFunction||undefined;
+	var augmentFunction = config.augmentFunction;
 	
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 	
@@ -646,7 +648,7 @@ airlift.toAtom = function(_config)
 		{
 			var description = new Packages.com.sun.syndication.feed.synd.SyndContentImpl();
 			description.setType("application/xhtml+xml");
-			description.setValue(_activeRecord.rdfa({path: path, filter: filter, contains: contains}));
+			description.setValue(_activeRecord.rdfa({path: path, filter: filter, contains: contains, displayOrder: config.displayOrder}));
 
 			var entry = new Packages.com.sun.syndication.feed.synd.SyndEntryImpl();
 
