@@ -58,6 +58,7 @@ airlift.stringTemplate = function(_templateString)
  *
  * @param _collection - a java.util.Collection, a java.lang.String, a
  * Javascript array, or a Javascript string to iterate over.
+ * 
  * @param _function - a function that will be applied to every member
  * of that collection or array, OR every character of the
  * java.lang.String or Javascript string.  The function can expect the
@@ -66,17 +67,20 @@ airlift.stringTemplate = function(_templateString)
  * The iteration will stop once the all the members of the _collection
  * has been visited OR if the _function ever returns false.
  *
+ * @returns returns true if the function returned true for every item
+ * it visited.
+ * 
  * @example
- * var users =
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * airlift.
+ * var success = airlift.every(users, function(_item, _index,
+ * _collection) { return true; });
  */
 airlift.every = function(_collection, _function)
 {
 	var success = true;
 	
-	if (_collection && (_collection.push || _collection.add))
+	if (_collection && _collection.add)
 	{
 		var index = 0;
 		
@@ -86,10 +90,13 @@ airlift.every = function(_collection, _function)
 			if (success === false) { break; } else { index++; }
 		}
 	}
+	else if (_collection && _collection.push)
+	{
+		success = _collection.every(_function);
+	}
 	else if (_collection)
 	{
-		var collection = _collection + ""; //convert to Javascript string
-		success = Array.every(collection, _function);
+		success = Array.every(_collection + "", _function);
 	}
 
 	return success;
@@ -99,18 +106,24 @@ airlift.every = function(_collection, _function)
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
- *
- * @param _collection, _function
- *
- * @returns
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
  *
  * @example
+ * var users = ["Bediako", "Dave", "Loki"];
  *
+ * airlift.forEach(users, function(_item, _index,
+ * _collection) { LOG.info("Hello " + _item); });
+ * //this writes "Hello <item>" to the logs.
  */
 airlift.forEach = function(_collection, _function)
 {
-	if (_collection && (_collection.push || _collection.add))
+	if (_collection && _collection.add)
 	{
 		var index = 0;
 
@@ -120,10 +133,13 @@ airlift.forEach = function(_collection, _function)
 			index++;
 		}
 	}
+	else if (_collection && _collection.push)
+	{
+		_collection.forEach(_function);
+	}
 	else if (_collection)
 	{
-		var collection = _collection + ""; //convert to Javascript string
-		Array.forEach(collection, _function);
+		Array.forEach(_collection + "", _function);
 	}
 };
 
@@ -131,77 +147,102 @@ airlift.forEach = function(_collection, _function)
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
  *
- * @param _collection, _function
- *
- * @returns
+ * @returns a java.util.List or a Javascript array that contains every
+ * item/character in the Javascript array or java.util.Collection
+ * or string for which _function returned
+ * true.
  *
  * @example
+ * var users = ["Bediako", "Dave", "Loki"];
+ *
+ * var results = airlift.filter(users, function(_item, _index,
+ * _collection) { return true; });  //this returns every item in users.
  *
  */
 airlift.filter = function(_collection, _function)
 {
-	if (_collection && (_collection.push || _collection.add))
+	if (_collection && _collection.add)
 	{
-		var results = (_collection.push && []) || (_collection.add && airlift.l()) || '';
-
-		var add = (_collection.push && function(_item, _collection) { _collection.push(item); return _collection }) || (_collection.add && function(_item, _collection) { _collection.add(item); return _collection}) || function(_item, _collection) { return _collection + _item; };
+		var result = airlift.l();
 
 		if (airlift.isDefined(_collection) === true)
 		{
 			var index = 0;
 			for (var item in Iterator(_collection))
 			{
-				first = _function && (_function(item, index, _collection) === true) && add(item, first);
+				_function && (_function(item, index, _collection) === true) && result.add(item);
 				index++;
 			}
 		}
 	}
+	else if (_collection && _collection.push)
+	{
+		var result = _collection.filter(_function);
+	}
 	else if (_collection)
 	{
-		var collection = _collection + ""; //convert to Javascript string
-		var first = Array.filter(collection, _function);
+		var result = Array.filter(_collection + "", _function);
 	}
 
-	return first;
+	return result;
 };
 
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
  *
- * @param _collection, _function
- *
- * @returns
+ * @returns a java.util.List or a Javascript array that contains every
+ * result returned by _function's execution against every item in the
+ * collection or array OR every character in the java.lang.String or
+ * Javascript string.
  *
  * @example
+ * var users = ["Bediako", "Dave", "Loki"];
+ *
+ * var results = airlift.map(users, function(_item, _index,
+ * _collection) { return "Hello " + _item; });  //this returns a list
+ * of "Hello <item>" for every item in users.
  *
  */
 airlift.map = function(_collection, _function)
 {
-	if (_collection && (_collection.push || _collection.add))
+	if (_collection && _collection.add)
 	{
-		var results = (_collection.push && []) || (_collection.add && airlift.l()) || '';
-		
-		var add = (_collection.push && function(_item, _collection) { _collection.push(item); return _collection }) || (_collection.add && function(_item, _collection) { _collection.add(item); return _collection}) || function(_item, _collection) { return _collection + _item; };
+		var results = airlift.l();
 
 		if (airlift.isDefined(_collection) === true)
 		{
 			var index = 0;
 			for (var item in Iterator(_collection))
 			{
-				results = add(_function && _function(item, index, _collection), results);
+				results = results.add(_function && _function(item, index, _collection));
 				index++;
 			}
 		}
 	}
+	else if (_collection && _collection.push)
+	{
+		var results = _collection.map(_function);
+	}
 	else if (_collection)
 	{
-		var collection = _collection + ""; //convert to Javascript string
-		var first = Array.map(collection, _function);
+		var results = Array.map(_collection + "", _function);
 	}
 	
 	return results;
@@ -211,20 +252,31 @@ airlift.map = function(_collection, _function)
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
  *
- * @param _collection, _function
+ * The iteration will stop once the all the members of the _collection
+ * has been visited OR if the _function ever returns true.
  *
- * @returns
- *
+ * @returns returns true if the function returned true for any item
+ * it visited.
+ * 
  * @example
+ * var users = ["Bediako", "Dave", "Loki"];
  *
+ * var success = airlift.every(users, function(_item, _index,
+ * _collection) { return true; });
  */
 airlift.some = function(_collection, _function)
 {
 	var success = false;
 
-	if (_collection && (_collection.push || _collection.add))
+	if (_collection && _collection.add)
 	{
 		var index = 0;
 
@@ -234,10 +286,13 @@ airlift.some = function(_collection, _function)
 			if (success === true) { break; } else { index++; }
 		}
 	}
+	else if (_collection && _collection.push)
+	{
+		success = _collection.some(_function);
+	}
 	else if (_collection)
 	{
-		var collection = _collection + ""; //convert to Javascript string
-		success = Array.some(collection, _function);
+		success = Array.some(_collection + "", _function);
 	}
 
 	return success;
@@ -247,96 +302,202 @@ airlift.some = function(_collection, _function)
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _function - a function that will be applied to every member
+ * of that collection or array, OR every character of the
+ * java.lang.String or Javascript string.  The function can expect the
+ * item/character, index, and collection/string to be passed to it at runtime.
  *
- * @param _collection, _function
- *
- * @returns
- *
+ * @returns two collections.  The first collection contains the items
+ * for which _function returned true, the second collection contains
+ * the items for which the function returned false.
+ * 
  * @example
+ * var users = ["Bediako", "Dave", "Loki"];
  *
+ * var [successList, failList] = airlift.every(users, function(_item, _index,
+ * _collection) { return (_item.length > 4); });  //this returns
+ * [["Bediako"], ["Dave", "Loki"]].
  */
-//split - separate java.util.Collection members by function evaluation of true
-//and false.
 airlift.split = function(_collection, _function)
 {
-	if (_collection && _function)
+	if (_collection && _function && _collection.add)
 	{
-		var first = (_collection.push && []) || airlift.l();
-		var second = (_collection.push && []) || airlift.l();
+		var success = airlift.l();
+		var fail = airlift.l();
 
-		var add = (_collection.push && function(_item, _collection) { _collection.push(item); }) || function(_item, _collection) { _collection.add(item); }
-
-		if (airlift.isDefined(_collection) === true)
+		var index = 0;
+		for (var item in Iterator(_collection))
 		{
-			var index = 0;
-			for (var item in Iterator(_collection))
-			{
-				(_function(item, index, _collection) === true) ? add(item, first) : add(item, second);
-				index++;
-			}
+			(_function(item, index, _collection) === true) ? success.add(item) : fail.add(item);
+			index++;
 		}
-
-		return [first, second];
 	}
+	else if (_collection && _collection.push)
+	{
+		var success = [];
+		var fail = [];
+		
+		for (var i = 0; i < _collection.length; i++)
+		{
+			(_function(_collection[i], i, _collection) === true) ? success.push(item) : fail.push(item);
+		}
+	}
+	else
+	{
+		var success = [];
+		var fail = [];
+
+		Array.forEach(_collection + "", function(_item, _index, _string)
+		{
+			(_function(_item, _index, _string) === true) ? success.push(_item) : fail.push(_item);
+		});
+	}
+
+	return [success, fail];
 };
 
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
  *
- * @requires
+ * @param _collection - a java.util.Collection, a java.lang.String, a
+ * Javascript array, or a Javascript string to iterate over.
+ * 
+ * @param _attribute - the name of the attribute to be examined on the items in 
+ * _collection.
  *
- * @param _collection, _attribute
- *
- * @returns
- *
+ * @returns a value list (java.util.List or Javascript array) and a
+ * map (java.util.Map or Javascript object).  The value list contains
+ * the set of values that each item in the _collection had on its
+ * property _attribute.  The map contains all the values found in the
+ * value list and a list of items that had that value on its property
+ * named attribute.
+ * 
  * @example
+ * var users = [{name: "Bediako"}, {name: "Dave"}, {name: "Loki"}
+ * {name: "Bediako"}];
  *
+ * var [valueList, valueMap] = airlift.every(users, function(_item, _index,
+ * _collection) { return (_item.length > 4); });  //this returns
+ * [["Bediako", "Dave", "Loki"], {"Bediako" : [{name: "Bediako"}, {name:
+ * Bediako}], "Dave": [{name: "Dave"}], "Loki": [{name: Loki}]}].
  */
-//partition - separate java.util.Collection into lists partitioned by _attribute
-//value
 airlift.partition = function(_collection, _attribute)
 {
-	if (_collection)
+	if (_collection && _collection.add)
 	{
-		var partitionMap = (_collection.push && {}) || airlift.m();
-		var orderedKeys = (_collection.push && []) || airlift.l();
-
-		var get = (_collection.get && function(_item, _map) { _map.get(_item); }) || function(_item, _map) { _map[_item]; }
-		var put = (_collection.put && function(_key, _item, _map) { _map.put(_key, _item); }) || function(_key, _item, _map) { _map[_key] = _item; }
-		var add = (_collection.push && function(_item, _collection) { _collection.push(_item); }) || function(_item, _collection) { _collection.add(_item); }
+		var partitionMap = airlift.m();
+		var orderedKeys = airlift.l();
 
 		for (var item in Iterator(_collection))
 		{
 			var value = item[_attribute];
 
-			if (airlift.isDefined(value) === true)
+			if (value)
 			{
-				var list = get(value, partitionMap);
+				var list = partition.get(value);
 
-				if (airlift.isDefined(list) === false)
+				if (list)
 				{
-					list = (_collection.push && []) || airlift.l();
-					put(value, list, partitionMap);
-					add(value, orderedKeys);
+					list = airlift.l();
+					partitionMap.put(value, list);
+					orderedKeys.add(value);
 				}
 
-				add(item, list);
+				list.add(item);
 			}
 		}
-
-		return [orderedKeys, partitionMap];
 	}
+	else if (_collection && _collection.add)
+	{
+		var partitionMap = {};
+		var orderedKeys = [];
+
+		for (var i =0; i < _collection.length; i++)
+		{
+			var value = item[_attribute];
+
+			if (value)
+			{
+				var list = partition[value];
+
+				if (list)
+				{
+					list = [];
+					partitionMap[value] = list;
+					orderedKeys.push(value);
+				}
+
+				list.push(item);
+			}
+		}
+	}
+
+	return [orderedKeys, partitionMap];
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.l()
+ *
+ */
 airlift.list = function(_collection)
 {
 	return (_collection && airlift.l(_collection)) || airlift.l();
 };
 
-//l - create an enhanced java.util.ArrayList
-airlift.l = function(_list)
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _list - java.util.Collection
+ *
+ * @returns an enhanced java.util.List
+ * Enhanced java.util.List has Javascript array iterative functions
+ * every, filter, forEach, map, and some, as well as other array
+ * methods like pop, push, reverse, shift, unshift, slice,
+ * splice, sort
+ *
+ * They also support @see airlift.split and @see airlift.partition
+ *
+ * They also have shortcut functions g() for get(), and chainable a() for add().
+ *
+ * Finally enhanced lists have the function i() which returns a
+ * Javascript Iterator.
+ *
+ * @example
+ * var list = airlift.l();
+ *
+ * //or
+ * var list = airlift.l(new Packages.java.util.ArrayList());
+ * 
+ * //or
+ * var list = airlift.l(new Packages.java.util.HashSet());
+ * 
+ * //or
+ * var arrayList = new Packages.java.util.ArrayList();
+ * arrayList.add("Bediako");
+ *
+ * var list = airlift.l(arrayList);
+ * var bediako = list.g(0) //now bediako is "Bediako"
+ *
+ * //adding things to a list
+ * var list = airlift.l().a("Bediako").a("George");
+ * //list now contains ["Bediako", "George"];
+ *
+ * //iterating over an enhanced list
+ * for (var name in Iterator(list)) { LOG.info(name); }
+ *
+ * //or
+ * for (var name in list.i()) { LOG.info(name); }
+ *
+ */
+airlift.l = function(_collection)
 {
 	var list = {};
 
@@ -455,6 +616,26 @@ airlift.l = function(_list)
 		return this.size();
 	};
 
+	list.every = function(_function)
+	{
+		return airlift.every(list, _function);
+	}
+
+	list.filter = function(_function)
+	{
+		return airlift.filter(list, _function);
+	}
+
+	list.map = function(_function)
+	{
+		return airlift.map(list, _function);
+	}
+
+	list.some = function(_function)
+	{
+		return airlift.some(list, _function);
+	}
+	
 	list.partition = function(_attribute)
 	{
 		return airlift.partition(list, _attribute);
@@ -497,20 +678,66 @@ airlift.l = function(_list)
 
 	list = new JavaAdapter(Packages.java.util.ArrayList, list);
 
-	if (airlift.isDefined(_list) === true)
+	if (airlift.isDefined(_collection) === true)
 	{
-		list.addAll(_list);
+		list.addAll(_collection);
 	}
 
 	return list;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.s
+ *
+ */
 airlift.set = function(_collection)
 {
 	return (_collection && airlift.s(_collection)) || airlift.s();
 };
 
-//s - create an enhanced java.util.HashSet
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _collection - java.util.Collection
+ *
+ * @returns an enhanced java.util.Set
+ * Enhanced java.util.Set has Javascript array iterative functions
+ * every, filter, forEach, map, and some.
+ *
+ * They also support @see airlift.split and @see airlift.partition
+ *
+ * They also have chainable shortcut functions a() for add().
+ *
+ * Finally enhanced lists have the function i() which returns a
+ * Javascript Iterator.
+ *
+ * @example
+ * var set = airlift.s();
+ *
+ * //or
+ * var set = airlift.s(new Packages.java.util.ArrayList());
+ * 
+ * //or
+ * var hashSet = new Packages.java.util.HashSet();
+ * hashSet.add("Bediako");
+ *
+ * var set = airlift.s(hashSet); //set now has "Bediako"
+ *
+ * //adding things to a set
+ * var set = airlift.s().a("Bediako").a("George");
+ * //set now contains ["Bediako", "George"]
+ *
+ * //iterating over an enhanced set
+ * for (var name in Iterator(set)) { LOG.info(name); }
+ *
+ * //or
+ * for (var name in set.i()) { LOG.info(name); }
+ *
+ */
 airlift.s = function(_set)
 {
 	var set = {};
@@ -524,8 +751,27 @@ airlift.s = function(_set)
 	set.forEach = function(_function)
 	{
 		airlift.every(set, _function);
-		return this;
 	};
+
+	set.every = function(_function)
+	{
+		return airlift.every(set, _function);
+	}
+
+	set.filter = function(_function)
+	{
+		return airlift.filter(set, _function);
+	}
+
+	set.map = function(_function)
+	{
+		return airlift.map(set, _function);
+	}
+
+	set.some = function(_function)
+	{
+		return airlift.some(set, _function);
+	}
 
 	set.partition = function(_attribute)
 	{
@@ -577,12 +823,51 @@ airlift.s = function(_set)
 	return set;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.m
+ *
+ */
 airlift.map = function(_map)
 {
 	return (_map && airlift.m(_map)) || airlift.m();
 };
 
-//m - create an enhanced java.util.HashMap
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _map - java.util.Map
+ *
+ * @returns an enhanced java.util.Map
+ *
+ * Enhanced maps contain chainable shorthand method p(_key, _value) for
+ * put(_key, _value) and shorthand method g(_key) for get(_key);
+ *
+ * Finally enhanced maps have the function i() which returns a
+ * Javascript Iterator.
+ *
+ * @example
+ * var map = airlift.m();
+ *
+ * //or
+ * var map = airlift.m(new Packages.java.util.HashMap());
+ * 
+ * //or
+ * var hashMap = new Packages.java.util.HashMap();
+ * hashMap.put("Bediako", "42");
+ *
+ * var map = airlift.m(hashMap); //map now has {"Bediako", "42"}
+ *
+ * //iterating over an enhanced map
+ * for (var entry in Iterator(map.entrySet())) { LOG.info(name); }
+ *
+ * //or this is the same as above
+ * for (var name in map.i()) { LOG.info(name); }
+ *
+ */
 airlift.m = function(_map)
 {
 	var map = {};
@@ -593,36 +878,9 @@ airlift.m = function(_map)
 		return this;
 	};
 
-	map.forEachKey = function(_function)
+	map.g = function(_key)
 	{
-		airlift.every(this.keySet(), _function);
-		return this;
-	};
-
-	map.forEachValue = function(_function)
-	{
-		airlift.every(this.values(), _function);
-		return this;
-	};
-
-	map.partitionKeys = function(_attribute)
-	{
-		return airlift.partition(this.keySet(), _attribute);
-	};
-
-	map.splitKeys = function(_attribute)
-	{
-		return airlift.split(this.keySet(), _attribute);
-	};
-
-	map.partitionValues = function(_attribute)
-	{
-		return airlift.partition(this.values(), _attribute);
-	};
-
-	map.split = function(_attribute)
-	{
-		return airlift.split(this.values(), _attribute);
+		return this.get(_key);
 	};
 
 	map.i = function()
@@ -640,13 +898,35 @@ airlift.m = function(_map)
 	return map;
 };
 
-//a - Convenience method to create a new Java array of the specified type
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _javaType - the java class name or type for this array
+ * @param _size - the number of slots allocated for this array
+ *
+ * @returns a Java array of type _javaType and length _size.
+ *
+ * @example
+ * var stringArray = airlift.a("java.lang.String", 10);
+ *
+ */
 airlift.a = function(_javaType, _size)
 {
 	return Packages.java.lang.reflect.Array.newInstance(_javaType, _size);
 };
 
-//g - Convenience method to create an id generator
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _length - the length of the unique id to be generated
+ *
+ * @returns a randomly generated string of length _length
+ *
+ * @example
+ * var guid = airlift.g(10); //might return "12a34bf77a"
+ */
 airlift.g = function(_length)
 {
 	if (_length) { var id = Packages.airlift.util.IdGenerator.generate(_length); }
@@ -655,15 +935,49 @@ airlift.g = function(_length)
 	return id; 
 };
 
-//mm - Convenience method create a message manager
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @returns a new Packages.airlift.MessageManager()
+ *
+ * @example
+ * var messageManager = airlift.mm();
+ */
 airlift.mm = function()
 {
 	return new Packages.airlift.MessageManager();
 };
 
-//post - post an active record based on domain URI and rest context.
-//Post accepts function that runs after syntactic validation but before
-//insert into persistent store.
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * Post an active record based on domain URI and rest context.
+ * post accepts functions in its argument list that are run after
+ * syntactic validation but before insertion into the persistent store.
+ * 
+ * @param _domainName is an optional parameter. If not provided post
+ * will use the GLOBAL context variable DOMAIN_NAME provided by the
+ * handler context.  DOMAIN_NAME is derived from the URI.
+ *
+ * @returns a newly created activerecord for the resource identified by
+ * _domainName (or DOMAIN_NAME is _domainName is not defined)
+ * @returns a map of validation and conversion errors discovered while
+ * processing the parameter values from the request map and/or the URI
+ * @returns the newly created id for the persisted active record.
+ *
+ * @example
+ * var setName = function(_activeRecord, _errorMap) { if (_errorMap.isEmpty() ===
+ * true) { _activeRecord.name = "Bediako"; }
+ *
+ * var [activeRecord, errorMap, id] = airlift.post("user", setName);
+ *
+ * //or
+ *
+ * var [activeRecord, errorMap, id] = airlift.post(setName);
+ */
 airlift.post = function(_domainName)
 {
 	if (typeof _domainName ==='function')
@@ -700,6 +1014,33 @@ airlift.post = function(_domainName)
 	return [activeRecord, errorMap, activeRecord["id"]];
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * Put an active record based on domain URI and rest context.
+ * put accepts functions in its argument list that are run after
+ * syntactic validation but before update into the persistent store.
+ * 
+ * @param _domainName is an optional parameter. If not provided post
+ * will use the GLOBAL context variable DOMAIN_NAME provided by the
+ * handler context.  DOMAIN_NAME is derived from the URI.
+ *
+ * @returns a newly created activerecord for the resource identified by
+ * _domainName (or DOMAIN_NAME is _domainName is not defined)
+ * @returns a map of validation and conversion errors discovered while
+ * processing the parameter values from the request map and/or the URI
+ *
+ * @example
+ * var setName = function(_activeRecord, _errorMap) { if (_errorMap.isEmpty() ===
+ * true) { _activeRecord.name = "Bediako"; }
+ *
+ * var [activeRecord, errorMap] = airlift.put("user", setName);
+ *
+ * //or
+ *
+ * var [activeRecord, errorMap] = airlift.put(setName);
+ */
 airlift.put = function(_domainName)
 {
 	if (typeof _domainName === 'function')
@@ -731,6 +1072,26 @@ airlift.put = function(_domainName)
 	return [activeRecord, errorMap];
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * Delete an active record based on domain URI and rest context.
+ * delete accepts functions in its argument list that are run after
+ * syntactic validation but before insertion into the persistent store.
+ * 
+ * @param _id is the identifier of the active record to be deleted from
+ * the persistent store.
+ *
+ * @param _domainName is an optional parameter. If not provided post
+ * will use the GLOBAL context variable DOMAIN_NAME provided by the
+ * handler context.  DOMAIN_NAME is derived from the URI.
+ *
+ * @example
+ *
+ * airlift.del("12hgh23", "user");
+ *
+ */
 airlift.del = function(_id, _domainName)
 {
 	var activeRecord = airlift.ar(_domainName);
@@ -740,17 +1101,53 @@ airlift.del = function(_id, _domainName)
 	activeRecord.del();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.del()
+ *
+ */
 airlift["delete"] = function(_id, _domainName)
 {
 	airlift.del(_id, _domainName);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _variable - the variable to check to see if it is defined
+ *
+ * @returns true if defined false otherwise
+ *
+ * @example
+ * var test;
+ * if (airlift.isDefined(test) === true) { LOG.info("test is defined"); else {
+ * LOG.info("test is not defined"); } will log that "test is not
+ * defined".
+ */
 airlift.isDefined = function(_variable)
 {
 	var defined = (_variable !== null && _variable !== undefined);
 
 	return defined;
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _variable - the variable to check to see if it is not defined
+ *
+ * @returns false if defined true otherwise
+ *
+ * @example
+ * var test;
+ * if (airlift.notDefined(test) === true) { LOG.info("test is not defined"); else {
+ * LOG.info("test is defined"); } will log that "test is not
+ * defined".
+ */
 
 airlift.notDefined = function(_variable)
 {
@@ -759,14 +1156,32 @@ airlift.notDefined = function(_variable)
 	return notDefined;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.g()
+ */
+
 airlift.guid = function()
 {
 	return airlift.g();
 };
 
-airlift.hash = function(_hashAlgorithm, _string)
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _string is the string to provide a SHA1 has for.
+ *
+ * @returns SHA1 hash of _string
+ *
+ * @example
+ * var hash = airlift.hash("Bediako");
+ */
+airlift.hash = function(_string)
 {
-	return Packages.airlift.util.IdGenerator.hash(_hashAlgorithm||"SHA1", _string);
+	return Packages.airlift.util.IdGenerator.hash("SHA1", _string);
 };
 
 airlift.sb = function(_string)

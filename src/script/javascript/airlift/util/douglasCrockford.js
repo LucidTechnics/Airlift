@@ -117,38 +117,6 @@ String.prototype.equalsIgnoreCase = function(_string)
 	return new Packages.java.lang.String(this).equalsIgnoreCase(_string);
 };
 
-//This function makes an array behave a little like a Java collection
-//... the purpose here is to make it so airlift methods like every,
-//partition, split and dao functions like iterator can work with a
-//java.util.Iterator, java.util.Iterable, and a Javascript array.
-//Convenient. :)
-Array.prototype.iterator = function()
-{
-	var iterator = {};
-	var counter = 0;
-	var that = this;
-
-	iterator.hasNext = function()
-	{
-		return (counter < that.length);
-	}
-
-	iterator.next = function()
-	{
-		var next = (this.hasNext() === true) ? that[counter] : function() { throw new Packages.java.util.NoSuchElementException()}();
-		counter++;
-		return next;
-	}
-
-	iterator.remove = function()
-	{
-		//you cannot remove something until after you called next().
-		(counter >= 1) && that.splice(counter - 1, 1);
-	}
-
-	return new java.util.Iterator(iterator);
-};
-
 if (typeof Object.beget !== 'function')
 {
 	Object.beget = function(_prototype)
