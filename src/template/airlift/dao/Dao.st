@@ -256,11 +256,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		var asc = config.asc||true;
 		var orderBy = config.orderBy||"auditPutDate";
 		var returnType = config.returnType||"asIterator";
-
+		var filterList = config.filterList||[];
+		
 		var Query = Packages.com.google.appengine.api.datastore.Query;
 		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
 		var query = new Query("$className$").addSort(orderBy, sort).setKeysOnly();
+
+		filterList.forEach(function(_filter)
+		{
+			query.addFilter(_filter.attribute, Query.FilterOperator[_filter.operatorName], _filter.value);
+		});
+
 		var queryResults = this.datastore.prepare(query)[returnType](Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 		return dao[returnType] && dao[returnType](queryResults, config);
