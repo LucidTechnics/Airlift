@@ -273,6 +273,7 @@ public class RestServlet
 					user.setTimeOutDate(calculateNextTimeOutDate());
 					securityContext.update(user, false);
 				}
+				
 				processRequest(_request, _response, method, restContext, uriParameterMap);
 			}
 			catch(Throwable t)

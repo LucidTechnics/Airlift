@@ -790,14 +790,50 @@ airlift.getCacheFormKey = function(_activeRecord, _method)
 //Requires user to provide a function that can populate the config
 //object AFTER the cache is found to be empty, i.e. if the cache does not have a form template already stored
 //for the provided form key.
-airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _additionalConfigInfo, _expirationInSeconds)
+airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _expirationInSeconds)
 {
 	var cache = airlift.getCacheService();
 	var formTemplateString = cache.get(_formKey);
-
+	var orderedPropertyList = _config.displayOrder||[];
+	var filter = _config.filter||["id", "auditPostDate", "auditPutDate" , "auditUserId"];
+	var contains = (airlift.isDefined(_config.contains) === true) ? _config.contains: false;
+	
 	if (airlift.isDefined(formTemplateString) === false)
 	{
-		_additionalConfigInfo(_activeRecord, _config);
+		var foreignKeyArray = _activeRecord.retrieveOrderedForeignKeyList();
+
+		var processForeignKeys = function(_foreignKey)
+		{
+			if ((airlift.filterContains(orderedPropertyList, _foreignKey) === true) || (airlift.filterContains(filter, _foreignKey) === contains))
+			{
+				var config = (_config.collections && _config.collections[_foreignKey])||{};
+				config.limit = config.limit||2000;
+				config.displayName = config.displayName||"id";
+				config.orderBy = config.orderBy||config.displayName||"auditPostDate";
+
+				var foreignKeyActiveRecord = airlift.ar(_foreignKey.replaceAll("Id$", ""));
+				var array = foreignKeyActiveRecord.collect(config);
+				var displayArray = [];
+
+				//Sometimes the developer will want to derive the
+				//display based on one or more  properties in the activerecord.
+				if (airlift.typeOf(config.displayName) === 'function')
+				{
+					var displayName = config.displayName(_activeRecord);
+				}
+				else
+				{
+					var displayName = config.displayName;
+				}
+				
+				array.forEach(function(_foreignKeyActiveRecord) { var allowedValue = {}; allowedValue.displayValue = _foreignKeyActiveRecord[displayName]; allowedValue.selectId = _foreignKeyActiveRecord.id; displayArray.push(allowedValue)});
+
+				_config[_foreignKey] = { allowedValues: displayArray }
+			}
+		};
+
+		foreignKeyArray.forEach(processForeignKeys);
+		
 		formTemplateString = _activeRecord.formTemplate(_config);
 		var expirationInSeconds = (airlift.isDefined(_expirationInSeconds) === true) ? _expirationInSeconds : 60;
 		cache.put(_formKey, formTemplateString, Packages.com.google.appengine.api.memcache.Expiration.byDeltaSeconds(expirationInSeconds));

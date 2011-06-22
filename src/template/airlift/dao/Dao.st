@@ -175,7 +175,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		
 		iterator.fetchNextResults = function(_queryResultIterator)
 		{
-			var nextKeys = new java.util.HashSet();
+			var nextKeys = airlift.l();
 			
 			for (var i = 0; i < bufferSize && _queryResultIterator.hasNext() === true; i++)
 			{
@@ -203,7 +203,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 				nextResults.push(activeRecord);
 			}
 			
-			return nextResults.pop();
+			return nextResults.shift();
 		}
 
 		iterator.remove = function()

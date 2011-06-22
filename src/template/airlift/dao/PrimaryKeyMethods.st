@@ -32,8 +32,9 @@ dao.get = function(_activeRecord)
 	5, "Encountered this error while getting $className$ identified by: " + _activeRecord.id);
 };
 
-dao.getAll = function(_keySet)
+dao.getAll = function(_keyList)
 {
+	var copyKeyList = airlift.l(_keyList);
 	var datastore = this.datastore;
 
 	return dao.multiTry(function()
@@ -42,17 +43,17 @@ dao.getAll = function(_keySet)
 
 		try
 		{
-			var resultMap = dao.getAllFromCache(_keySet);
-			_keySet.removeAll(resultMap.keySet());
+			var resultMap = dao.getAllFromCache(_keyList);
+			_keyList.removeAll(resultMap.keySet());
 
-			if (_keySet.size() > 0)
+			if (_keyList.size() > 0)
 			{
-				resultMap.putAll(dao.populateCacheFromMap(datastore.get(_keySet).get()));
+				resultMap.putAll(dao.populateCacheFromMap(datastore.get(_keyList).get()));
 			}
 
-			for (var entry in Iterator(resultMap.entrySet()))
+			for (var key in Iterator(copyKeyList))
 			{
-				var result = entry.getValue();
+				var result = resultMap.get(key);
 				var activeRecord = dao.convertEntity(result);
 				results.push(activeRecord);
 			}
@@ -61,7 +62,7 @@ dao.getAll = function(_keySet)
 		{
 			if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 			{
-				LOG.warning("No resources of type: $className$ exists for at least some of the provided keys: " + _keySet);
+				LOG.warning("No resources of type: $className$ exists for at least some of the provided keys: " + copyKeyList);
 			}
 			else
 			{
@@ -71,7 +72,7 @@ dao.getAll = function(_keySet)
 
 		return results;
 	},
-	5, "Encountered this error while getting multiple $className$ resources identified by: " + _keySet);
+	5, "Encountered this error while getting multiple $className$ resources identified by: " + copyKeyList);
 };
 
 $updateMethod$

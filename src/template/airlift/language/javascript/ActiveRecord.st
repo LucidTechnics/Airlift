@@ -138,10 +138,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var contains = (airlift.isDefined(config.contains) === true) ? config.contains: false;
 		var before = config.before||function(_activeRecord, _config) { return _activeRecord.formTemplate(_config); };
 		var orderedPropertyList = config.displayOrder||[];
+		var collections = config.collections||{}
 		
 		var key = airlift.getCacheFormKey(this, method);
 
-		var formTemplateString = airlift.getCachedFormTemplate(key, this, config, before, cacheTimeout);
+		var formTemplateString = airlift.getCachedFormTemplate(key, this, config, cacheTimeout);
 
 		var groupName = this.retrieveDomainName();
 		var formTemplate = airlift.stringTemplate(formTemplateString);
@@ -149,7 +150,20 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		$populateFormTemplate; separator="\n"$
 
-		after(this, config, formTemplate);
+		var foreignKeyArray = this.retrieveOrderedForeignKeyList();
+
+		var processForeignKeys = function(_foreignKey)
+		{
+			if ((airlift.filterContains(orderedPropertyList, _foreignKey) === true) || (airlift.filterContains(filter, _foreignKey) === contains))
+			{
+				var foreignKeyActiveRecord = airlift.ar(_foreignKey.replaceAll("Id\$", ""));
+				var displayName = config.collections && config.collections[_foreignKey] && config.collections[_foreignKey].displayName||"id";
+				var name = (this[_foreignKey] && foreignKeyActiveRecord.setId(this[_foreignKey]).get() && foreignKeyActiveRecord[displayName])||"";
+				formTemplate.setAttribute(airlift.createSelectedTarget(_foreignKey, name), "selected=selected");
+			}
+		};
+
+		foreignKeyArray.forEach(processForeignKeys);
 		
 		return formTemplate.toString();
 	};
