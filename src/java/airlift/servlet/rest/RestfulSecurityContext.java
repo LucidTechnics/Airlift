@@ -171,7 +171,7 @@ public class RestfulSecurityContext
 				_user.setRoleSet(user.getRoleSet());
 				_user.setAuditPostDate(user.getAuditPostDate());
 				_user.setAuditPutDate(user.getAuditPutDate());
-				_user.setActive(user.getActive());
+				_user.setActive(user.getActive());				
 				_user.setTimeOutDate(user.getTimeOutDate());
 			}
 		}
@@ -224,7 +224,7 @@ public class RestfulSecurityContext
 
 		return user;
 	}
-	
+
 	public AirliftUser copyEntityToAirliftUser(com.google.appengine.api.datastore.Entity _entity)
 	{
 
@@ -321,26 +321,7 @@ public class RestfulSecurityContext
 
 	public boolean exists(String _id)
 	{
-		return (this.get(_id) != null);
-	}
-
-	public AirliftUser get(String _id)
-	{
-		AirliftUser airliftUser = new AirliftUser();
-		
-		try
-		{			
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), _id);
-			com.google.appengine.api.datastore.Entity entity = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().get(key).get();
-
-			airliftUser = copyEntityToAirliftUser(entity);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-
-		return airliftUser;
+		return (this.getUser(_id) != null);
 	}
 
 	public void update(AirliftUser _airliftUser)

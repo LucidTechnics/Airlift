@@ -105,10 +105,11 @@ public class RestServlet
 	protected boolean timedOut(AirliftUser _user)
 	{
 		boolean timedOut = false;
+		long currentTimeMillis = System.currentTimeMillis();
 
 		if (_user != null && _user.getTimeOutDate() != null)
 		{
-			timedOut = (System.currentTimeMillis() >= _user.getTimeOutDate().getTime());
+			timedOut = (currentTimeMillis >= _user.getTimeOutDate().getTime());
 		}
 		
 		return timedOut;
@@ -182,7 +183,6 @@ public class RestServlet
 		
 		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
 		log.info("RestServlet START " + quotaService.getCpuTimeInMegaCycles());
-		log.info("Starting security checks ... ");
 		
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
 		java.util.Enumeration<String> acceptHeaderValues = _request.getHeaders("Accept");
@@ -271,7 +271,7 @@ public class RestServlet
 				if (user != null && user.getId() != null)
 				{
 					user.setTimeOutDate(calculateNextTimeOutDate());
-					securityContext.update(user, false);
+					securityContext.update(user, true);
 				}
 				
 				processRequest(_request, _response, method, restContext, uriParameterMap);
