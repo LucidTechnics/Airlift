@@ -1184,26 +1184,99 @@ airlift.hash = function(_string)
 	return Packages.airlift.util.IdGenerator.hash("SHA1", _string);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _string - the initial string the java.lang.StringBuffer
+ * should optionally be based on.
+ *
+ * @returns a java.lang.StringBuffer based on _string if it is defined, otherwise
+ * a blank java.lang.StringBuffer.
+ *
+ * @example
+ * var javaStringBuffer = airlift.stringBuffer("Hello Bediako");
+ * 
+ */
 airlift.sb = function(_string)
 {
-	return (_string && new Packages.java.lang.StringBuffer(_string)) || new Packages.java.lang.StringBuffer(_string);
+	return (_string && new Packages.java.lang.StringBuffer(_string)) || new Packages.java.lang.StringBuffer();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _string - the initial string the java.lang.String
+ * should optionally be based on.
+ *
+ * @returns a java.lang.String based on _string if it is defined, otherwise
+ * a blank java.lang.String.
+ *
+ * @example
+ * var javaString = airlift.string("Hello Bediako");
+ *
+ */
 airlift.string = function(_string)
 {
 	return (airlift.isDefined(_string) === true) ? new Packages.java.lang.String(_string) : new Packages.java.lang.String();
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _integer - the initial integer the java.lang.Integer
+ * should optionally be based on.
+ *
+ * @returns a java.lang.Integer based on _integer if it is defined, otherwise
+ * a java.lang.Integer of value 0.
+ *
+ * @example
+ * var result = airlift.integer(42);
+ *
+ */
 
 airlift.integer = function(_integer)
 {
 	return (airlift.isDefined(_integer) === true) ? new Packages.java.lang.Integer(_integer) : new Packages.java.lang.Integer();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.string
+ *
+ */
 airlift.toJavaString = function(_string)
 {
 	return airlift.string(_string);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * An appender makes it easy to create delimited lists ... Its use help
+ * avoid the trailing delimiter problem.
+ * 
+ * @param _initialText - the first text to be applied.
+ * @param _delimiter - the delimiter to be used to separate parts of
+ * the text string
+ *
+ * @returns a string delimited by _delimiter 
+ *
+ * @example
+ *
+ * var record = airlift.appender("Bediako", ",");
+ *
+ * record.append("42");
+ * record.append("6'1\"");
+ *
+ * var record = record.toString() //"Bediako, 42, 6'1\""
+ *
+ */
 airlift.appender = function(_initialText, _delimiter)
 {
 	var delimiter = (airlift.isDefined(_delimiter) === true) ? _delimiter : ",";
@@ -1234,16 +1307,61 @@ airlift.appender = function(_initialText, _delimiter)
 	return appender;
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _resourceName - name of the Java property file resource,
+ * @param _propertyName - name of the property whose value is to be
+ * retrieved.
+ *
+ * @returns the value of referred to by property name _propertyName in
+ * resource _resourceName
+ *
+ * @example
+ * var cacheTimeOut = airlift.getPropertyValue("startup.properties,
+ * "cacheTimeOut");
+ *
+ */
 airlift.getPropertyValue = function(_resourceName, _propertyName)
 {
 	return Packages.airlift.util.PropertyUtil.getInstance().getProperty(_resourceName, _propertyName);
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _string to check for whitespace
+ *
+ * @returns true is string is whitespace, false otherwise.
+ *
+ * @example
+ *
+ */
 airlift.isWhitespace = function(_string)
 {
 	return Packages.airlift.util.AirliftUtil.isWhitespace(_string);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param an argument list of collections
+ *
+ * @returns a new collection that has all the members of the passed in
+ * collections as its members.
+ *
+ * @example
+ * var customerList = airlift.l().a("Bediako").a("Connor").a("Loki");
+ * var storeSet = airlift.s().a("Amazon").a("Zappos").a("Macy's");
+ * var customersAndStores = airlift.mergeCollections(customerList,
+ * storeSet);
+ *
+ */
 airlift.mergeCollections = function()
 {
 	var collection = airlift.l();
@@ -1259,11 +1377,40 @@ airlift.mergeCollections = function()
 	return collection;
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @param _source - the source object to copy from.
+ * @param _destination - the destination object to copy to
+ * @param _propertyArray - the enhanced list or Javascript array of
+ * properties that should be copied from the source to the destination
+ * object.
+ *
+ * @example
+ * airlift.copy(person, employee, ["firstName", "lastName", "age"]);
+ *
+ */
 airlift.copy = function(_source, _destination, _propertyArray)
 {
 	_propertyArray.forEach(function (_e, _i, _a) { _destination[_e] = _source[_e]; });
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @requires
+ *
+ * @param _string - the string to be tokenized into NGrams
+ *
+ * @returns a list of ngrams of the given string
+ *
+ * @example
+ * var ngramTokenList = airlift.tokenizeIntoNGrams("Bediako");
+ *
+ */
 airlift.tokenizeIntoNGrams = function(_string)
 {
 	//Make sure string is a string and make sure it is in all lowercase
