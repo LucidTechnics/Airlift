@@ -62,7 +62,7 @@ public class FormatUtil
 
 		if (_string != null)
 		{
-			string = _string;
+			string = org.apache.commons.lang.StringUtils.trim(_string);
 		}
 		
 		return string;

@@ -794,8 +794,8 @@ airlift.getCacheFormKey = function(_activeRecord, _method, _suffix)
 
 airlift.invalidateForm = function(_domainName, _method, _suffix)
 {
-	LOG.info("Invalidating form with key: " + key);	
 	var key = airlift.getCacheFormKey(airlift.ar(_domainName), _method, _suffix);
+	LOG.info("Invalidating form with key: " + key);	
 	airlift.getCacheService()["delete"](key);
 };
 
@@ -846,7 +846,12 @@ airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _expi
 					var displayName = config.displayName;
 				}
 				
-				array.forEach(function(_foreignKeyActiveRecord) { var allowedValue = {}; allowedValue.displayValue = _foreignKeyActiveRecord[displayName]; allowedValue.selectId = _foreignKeyActiveRecord.id; displayArray.push(allowedValue)});
+				array.forEach(function(_foreignKeyActiveRecord) {
+					var allowedValue = {};
+					allowedValue.displayValue = _foreignKeyActiveRecord[displayName];
+					allowedValue.selectId = _foreignKeyActiveRecord.id;
+					displayArray.push(allowedValue);
+				});
 
 				_config[_foreignKey] = { allowedValues: displayArray }
 			}
@@ -858,6 +863,6 @@ airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _expi
 		var expirationInSeconds = (airlift.isDefined(_expirationInSeconds) === true) ? _expirationInSeconds : 60;
 		cache.put(_formKey, formTemplateString, Packages.com.google.appengine.api.memcache.Expiration.byDeltaSeconds(expirationInSeconds));
 	}
-
+	
 	return formTemplateString;
 };

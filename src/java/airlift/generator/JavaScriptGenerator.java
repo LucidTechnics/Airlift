@@ -396,7 +396,7 @@ public class JavaScriptGenerator
 					if (type.equalsIgnoreCase("java.lang.String") == true ||
 						  type.equalsIgnoreCase("java.lang.Character") == true)
 					{
-						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.airlift.util.FormatUtil.format(converter.convert(value, airlift.cc(\"" + type + "\"))))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 					}
 					else
 					{
