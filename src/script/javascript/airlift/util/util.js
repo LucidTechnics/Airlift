@@ -1575,6 +1575,56 @@ airlift.getMonthIntervals = function(_date1, _date2)
 	return monthList;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - This function compares properties of each active
+ * record in an array of active records with a search string and a
+ * date interval. If the properties match the search criteria and a
+ * specified date property falls in between the provide date interval,
+ * the active record is returned along with other matching active
+ * records in an array.  Useful for performing natural language like
+ * searches against an array, an Iterable, an Iterator, or an enhanced
+ * list or set of active records.
+ *
+ * @param _config - a config object that provides the following
+ * properties ...
+ * @param _config.filterString - the string of tokens to filter this
+ * result on.
+ * @param - _config.resultArray the list of active records.
+ * @param _config.propertyArray - An array of properties of the array of
+ * objects the search is to be performed on.
+ * @param _config.startDate - a JavaScript Date or java.util.Date that
+ * marks the beginning of the date interval.
+ * @param _config.endDate - a JavaScript Date or java.util.Date that
+ * marks the end of the date interval.
+ * @param - _config.dateFieldName the optional name of the property that
+ * contains the date that should fall between the _config.startDate and
+ * the _config.endDate.  If not provided this defaults to the
+ * auditPutDate of the active record.
+ *
+ * @returns an array of active records that have properties that match
+ * at least partially the words in the filter string and have the
+ * specified date field property that falls in between the provided
+ * date interval
+ *
+ * @example
+ * var resultArray = [{firstName: "Bediako", lastName: "George", recordDate:
+ * new Date(10-14-2011")}, {firstName: "Loki", lastName:
+ * "George", recordDate: new Date(10-14-2010")}, {firstName:
+ * "Connor", lastName: "George", recordDate:
+ * new Date(12-14-2011")}];
+ *
+ * var resultArray = airlift.filter({filterString: "George",
+ * propertyArray: ["firstName", "lastName"], resultArray: resultArray,
+ * dateFieldName: "recordDate", startDate: new Date("11-01-2011"),
+ * endDate: new Date("01-01-2012")});
+ *
+ * //this should return {firstName: "Connor", lastName: "George",
+ * //recordDate:  new Date(12-14-2011")}
+ *
+ */
 airlift.filter = function(_config)
 {
 	var config = _config||{};
@@ -1592,7 +1642,7 @@ airlift.filter = function(_config)
 
 	var filterTokens = airlift.tokenizeIntoNGrams(filterString);
 
-	resultArray.forEach(function(_item) {
+	var filterFunction = function(_item) {
 
 		if ((startDate && endDate && dateFieldName) &&
 			  (
@@ -1624,32 +1674,141 @@ airlift.filter = function(_config)
 		}
 
 		if (hasFilterTokens === true && inInterval === true) { filteredArray.push(_item); }
-	});
+	}
+
+	if (resultArray.hasNext || resultArray.iterator)
+	{
+		//This is an java.util.Iterator, java.util.Iterable
+		for (var item in Iterator(resultArray))
+		{
+			filterFunction(item);
+		}
+	}
+	else
+	//Javascript array.
+	{
+		resultArray.forEach(filterFunction);
+	}
 
 	return filteredArray;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description Returns the Google memcache service object.
+ *
+ * @returns com.google.appengine.api.memcache.MemcacheService
+ *
+ * @example
+ * var cache = airlift.getCacheService();
+ *
+ */
 airlift.getCacheService = function()
 {
 	return Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description returns the corresponding java.util.TimeZone object for
+ * a given _timeZoneString
+ *
+ * @param _timeZoneString - a valid time zone string
+ *
+ * @returns java.util.TimeZone
+ *
+ * @example
+ * var timezone = airlift.createTimeZone("EST");
+ *
+ * @see java.util.TimeZone
+ */
 airlift.createTimeZone = function(_timeZoneString)
 {
 	return new Packages.java.util.TimeZone.getTimeZone(_timeZoneString);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description creates a java.util.Date object
+ *
+ * @param _config - the config parameters as expected by
+ * airlift.createCalendar()
+ *
+ * @returns java.util.Date
+ *
+ * @example
+ * var date = airlift.createDate();
+ *
+ * @see airlift.createCalendar();
+ *
+ */
 airlift.createDate = function(_config)
 {
 	var calendar = airlift.createCalendar(_config);
 	return calendar.getTime();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description Creates a new java.util.Date object from another
+ * java.util.Date or Javascript Date object.
+ *
+ * @param _date - the java.util.Date or Javascript Date object to be
+ * cloned.
+ *
+ * @returns a java.util.Date object that is the same time as the passed
+ * in date.
+ *
+ * @example
+ * var date = new Date();
+ * var clonedDate = airlift.cloneDate(date);
+ *
+ * var date = airlift.createDate();
+ * var clonedDate = airlift.cloneDate(date); 
+ */
 airlift.cloneDate = function(_date)
 {
 	return new Packages.java.util.Date(_date.getTime());
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - a function for encrypting an array of bytes.  This
+ * function is not really expected to be used by developers.  Instead
+ * the encryption of a field is specified using the encryption
+ * attribute on airlift's Persistable annotation.
+ *
+ * @param _initialBytes - the byte array to encrypt
+ * @param _password - the password to be used to decrypt these bytes
+ * @param _initialVector - the encryption vector
+ * @param _algorithm - the object holding information on the  encryption
+ * algorithm to be used.  This maps to any of the Java 6 packaged standard
+ * encyption algorithms.  The following options can be set ...
+ * @param _algorithm.provider - the name of the encryption algorithm
+ * provider
+ * @param _algorithm.name - the name of the alogirthm
+ * @param _algorithm.mode
+ * @param _algorithm.padding
+ * @param _algorithm.revolutions - the number of times this encryption
+ * algorithm should be repeated. 
+ *
+ * @returns an encrypted byte array.
+ *
+ * @example
+ * var fullNameEncrypted =
+ * airlift.encrypt(airlift.string("Bediako").toBytes(), "password123", "Batman and Robin", "SunJCE", "AES", "PCBC", "PKCS5PADDING", 20);
+ *
+ */
 airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 {
 	var algorithm = _algorithm||{};
@@ -1662,6 +1821,34 @@ airlift.encrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 	return Packages.airlift.util.AirliftUtil.encrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - a function for decrypting an array of bytes.  This
+ * function is not really expected to be used by developers.  Instead
+ * the decryption of a field is specified using the encryption
+ * attribute on airlift's Persistable annotation.
+ *
+ * @param _initialBytes - the byte array to encrypt
+ * @param _password - the password to be used to decrypt these bytes
+ * @param _initialVector - the encryption vector
+ * @param _algorithm - the object holding information on the  encryption
+ * algorithm to be used.  This maps to any of the Java 6 packaged standard
+ * encyption algorithms.  The following options can be set ...
+ * @param _algorithm.provider - the name of the encryption algorithm
+ * provider
+ * @param _algorithm.name - the name of the algorithm
+ * @param _algorithm.mode
+ * @param _algorithm.padding
+ * @param _algorithm.revolutions - the number of times this encryption
+ * algorithm should be repeated. 
+ *
+ * @returns the unencrypted byte array
+ *
+ * @example
+ * airlift.decrypt(byteArray, "password123", "Batman and Robin", "SunJCE", "AES", "PCBC", "PKCS5PADDING", 20);
+ */
 airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 {
 	var algorithm = _algorithm||{};
@@ -1674,6 +1861,26 @@ airlift.decrypt = function(_initialBytes, _password, _initialVector, _algorithm)
 	return Packages.airlift.util.AirliftUtil.decrypt(_initialBytes, _password, _initialVector, provider, name, mode, padding, revolutions)
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of the specified size and type.
+ * If an initialization array is provided tht contents of that array
+ * are copied to the Java array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _type - the Java type of the array
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns a Java type array
+ *
+ * @example
+ * var stringArray = airlift.createArray(3, "java.lang.String",
+ * ["Bediako", "Loki"]); //should return java.lang.String[] of size 3
+ * with the first two slots containing "Bediako" and "Loki".
+ */
 airlift.createArray = function(_size, _type, _initializer)
 {
 	var size = _size||0;
@@ -1686,101 +1893,466 @@ airlift.createArray = function(_size, _type, _initializer)
 	return newArray;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.String.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.String
+ *
+ * @see airlift.createArray();
+ *
+ */
 airlift.stringArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.String, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type byte.
+ * If an initialization array is provided the contents of that array
+ * are copied to the array.
+ * 
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type byte
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.byteArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Byte.TYPE, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Byte.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Byte
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.byteObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Byte, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * short.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type short
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.shortArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Short.TYPE, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Byte.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Byte
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.shortObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Short, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * char.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type char
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.charArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Character.TYPE, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Character.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Character
+ *
+ * @see airlift.createArray();
+ *
+ */
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Character.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Character
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.charObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Character, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.charObjectArray();
+ *
+ */
 
 airlift.characterObjectArray = function(_size, _initializer)
 {
 	return airlift.charObjectArray(_size, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * int.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type int
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.intArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Integer.TYPE, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Integer.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Integer
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.intObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Integer, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.intObjectArray();
+ *
+ */
+
 airlift.integerObjectArray = function(_size, _initializer)
 {
 	return airlift.intObjectArray(_size, _initializer);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * long.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type long
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.longArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Long.TYPE, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Long.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Long
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.longObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Long, _initializer);
 };
+
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * boolean.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type boolean
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.booleanArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Boolean.TYPE, _initializer);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Boolean.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Boolean
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.booleanObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Boolean, _initializer);
 };
+
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * float.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type float
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.floatArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Float.TYPE, _initializer);
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Float.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Float
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.floatObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Float, _initializer);
 };
+
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * double.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Double
+ *
+ * @see airlift.createArray();
+ *
+ */
 
 airlift.doubleArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Double.TYPE, _initializer);
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Creates a Java array of specified size and type
+ * java.lang.Double.  If an initialization array is provided the contents of that array
+ * are copied to the array.
+ *
+ * @param _size - the initial size of the array.
+ * @param _initializer - an array of values that should be copied to
+ * the array.
+ *
+ * @returns an array of type java.lang.Double
+ *
+ * @see airlift.createArray();
+ *
+ */
+
 airlift.doubleObjectArray = function(_size, _initializer)
 {
 	return airlift.createArray(_size, Packages.java.lang.Double, _initializer);
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description Copies on array to another.  If a conversion function
+ * is provided, it is applied to each element in the source array with
+ * the result of that application placed in the destination array. 
+ *
+ * @param _sourceArray - the array to copy from. Could be a Javascript
+ * or Java type array.
+ * @param _destinationArray the array to copy to. Could be a Javascript
+ * or Java type array.
+ * @param _conversionFunction - the optional element level conversion function
+ *
+ * @example
+ * var destination = [];
+ * @airlift.arrayCopy(["Bediako", "Connor", "Loki"], destination,
+ * function(_item) { _item.toLowerCase()});
+ * //destination array should contain ["bediako", "connor", "loki"]
+ */
 airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunction)
 {
 	if (_sourceArray && _destinationArray)
@@ -1801,6 +2373,29 @@ airlift.arrayCopy = function(_sourceArray, _destinationArray, _conversionFunctio
 	}
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - Place a serilizable object in a Google App Engine
+ * task queue.
+ *
+ * @param _config - the task queue configuration object that contains the
+ * following options.
+ *
+ * @param _config.url - the URI this task will be sent to.
+ * @param _config.method - the optional HTTP method used to send this
+ * task.  This defaults to "POST".
+ * @param _config.parameters a java.util.Map or a Javascript object
+ * detailing the config parameters that are to be sent with this task.
+ * @param _queueName - The Google App Engine task queue that will hold
+ * this task.
+ *
+ * @example
+ * var params = {"name: Bediako", "gender: male" }
+ * airlift.enqueueTask({url: "http://example.com/a/person", "POST",
+ * params, "addPersonQueue"});
+ */
 airlift.enqueueTask = function(_config)
 {
 	var url = _config.url;
@@ -1810,54 +2405,49 @@ airlift.enqueueTask = function(_config)
 	var queue = ("default".equalsIgnoreCase(queueName) === true) ? Packages.com.google.appengine.api.taskqueue.QueueFactory.getDefaultQueue() : Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(queueName);
 
 	var taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(url);
+	taskOptions.method(Packages.com.google.appengine.api.taskqueue.TaskOptions.Method[method.toUpperCase()]);
 
-	switch (method)
+	if (parameters.entrySet)
 	{
-		case "GET":
-		case "get":
-		case "Get":
-			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.GET;
-			break;
-
-		case "POST":
-		case "post":
-		case "Post":
-			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
-			break;
-
-		case "PUT":
-		case "put":
-		case "Put":
-			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.PUT;
-			break;
-
-		case "DELETE":
-		case "delete":
-		case "Delete":
-			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.DELETE;
-			break;
-
-		default:
-			var taskMethod = Packages.com.google.appengine.api.taskqueue.TaskOptions.Method.POST;
+		for (var parameterEntry in Iterator(parameters.entrySet()))
+		{
+			taskOptions.param(parameterEntry.getKey(), parameterEntry.getValue());
+		}
 	}
-
-	taskOptions.method(taskMethod);
-
-	for (var parameterEntry in Iterator(parameters.entrySet()))
+	else
 	{
-		taskOptions.param(parameterEntry.getKey(), parameterEntry.getValue());
+		for (var i in params)
+		{
+			taskOptions.param(i, params[i]);
+		}
 	}
 
 	return queue.add(taskOptions); //returns TaskHandle
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - send a message to a collection of Google users via Google
+ * Talk.
+ *
+ * @param _users - a JavaScript array or a java.util.Iterator or
+ * java.util.Iterable
+ * @param _message - a string containing the message.
+ *
+ * @returns a Javascript array that has the status of each message sent.
+ *
+ * @example
+ *
+ */
 airlift.chat = function(_users, _message)
 {
 	var statusArray = [];
 	var xmppService = Packages.com.google.appengine.api.xmpp.XMPPServiceFactory.getXMPPService();
 	var users = _users||[];
 
-	users.forEach(function(_user)
+	var sendMessage = function(_user)
 	{
 		var jid = new Packages.com.google.appengine.api.xmpp.JID(_user.email);
 		var message = new Packages.com.google.appengine.api.xmpp.MessageBuilder()
@@ -1874,52 +2464,198 @@ airlift.chat = function(_users, _message)
 		}
 
 		statusArray.push(messageSent);
-	});
+	};
+
+	if (users.iterator)
+	{
+		for (var _user in Iterator(users))
+		{
+			sendMessage(_user);
+		}
+	}
+	else
+	{
+		users.forEach(sendMessage);
+	}
 
 	return statusArray;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - escapes a string to prepare it for adding it to an
+ * XML fragment
+ *
+ * @param _value - the string to escaped
+ *
+ * @returns - the escaped string
+ *
+ * @example
+ * var escapedXml = airlift.escapeXml("Bediako");
+ * 
+ */
 airlift.escapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - unescapes a string that was prepared for adding to an
+ * XML fragment
+ *
+ * @param _value - the string to unescaped
+ *
+ * @returns - the unescaped string
+ *
+ * @example
+ * var unescapedXml = airlift.unescapeXml("Bediako");
+ * 
+ */
 
 airlift.unescapeXml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeXml(_value);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - escapes a string for adding to an
+ * HTML fragment
+ *
+ * @param _value - the string to escaped
+ *
+ * @returns - the escaped string
+ *
+ * @example
+ * var escapedHtml = airlift.escapeHtml("Bediako");
+ * 
+ */
+
 airlift.escapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - unescapes a string that was prepared for adding to an
+ * HTML fragment
+ *
+ * @param _value - the string to unescaped
+ *
+ * @returns - the unescaped string
+ *
+ * @example
+ * var unescapedHtml = airlift.unescapeHtml("Bediako");
+ * 
+ */
 
 airlift.unescapeHtml = function(_value)
 {
 	return Packages.org.apache.commons.lang.StringEscapeUtils.unescapeHtml(_value);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description Airlift browser object can be used to call other URIs
+ *
+ * @returns airlift.util.Browser
+ *
+ * @example
+ * var browser = airlift.browser();
+ * 
+ */
 airlift.browser = function()
 {
 	return new Packages.airlift.util.Browser();
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @see airlift.isWhitespace
+ *
+ */
 airlift.isWhiteSpace = function(_string)
 {
 	return airlift.isWhitespace(_string);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - check a string and returns true if it is white space.
+ *
+ * @param _string - the string to check for white space.
+ *
+ * @returns true if string is whitespace, false otherwise.
+ *
+ * @example
+ * if (airlift.isWhiteSpace(_string) === true)
+ * {
+ *	LOG.info("String is white space");
+ * }
+ *
+ */
 airlift.isWhitespace = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - right pad a string with the specified number of
+ * characters
+ *
+ * @param _string - the string to be right padded
+ * @param _size - the final size of the string
+ * @param _character - the character to be used for padding
+ *
+ * @returns the right padded string
+ *
+ * @example
+ * var paddedString = airlift.rightPad("Bediako", 10, " ");
+ * //paddedString is now "Bediako   ";
+ */
 airlift.rightPad = function(_string, _size, _character)
 {
 	var character = _character||'';
 
 	return Packages.org.apache.commons.lang.StringUtils.rightPad(_string, _size, character);
 };
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - left pad a string with the specified number of
+ * characters
+ *
+ * @param _string - the string to be left padded
+ * @param _size - the final size of the string
+ * @param _character - the character to be used for padding
+ *
+ * @returns the left padded string
+ *
+ * @example
+ * var paddedString = airlift.leftPad("Bediako   ", 13, " ");
+ * //paddedString is now "   Bediako   ";
+ */
 
 airlift.leftPad = function(_string, _size, _character)
 {
@@ -1928,17 +2664,51 @@ airlift.leftPad = function(_string, _size, _character)
 	return Packages.org.apache.commons.lang.StringUtils.leftPad(_string, _size, character);
 };
 
+
 airlift.typeOf = function(_value)
 {
 	return typeOf(_value);
 }
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - remove white space from the left and right of a string
+ *
+ * @param _string - the string to be trimmed
+ *
+ * @returns a trimmed string
+ *
+ * @example
+ * var trimmedString = airlift.trim("   Bediako   "); //trimmedString
+ * is now "Bediako";
+ *
+ */
 airlift.trim = function(_string)
 {
 	var trimmed = Packages.org.apache.commons.lang.StringUtils.trim(_string);
 	return (airlift.typeOf(_string) === 'string') ? trimmed + "" : trimmed;
 };
 
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description - returns true is the array of strings contains
+ * _propertyName
+ *
+ * @param _filter - the array of strings to check against
+ * @param _propertyName - the name of the property to look for.
+ *
+ * @returns - true if _filter contains _propertyName, false otherwise.
+ *
+ * @example
+ * if (airlift.filterContains(["Bediako", "George"], "Loki") === false)
+ * {
+ *	LOG,info("Loki is not found in the list");
+ * }
+ */
 airlift.filterContains = function(_filter, _propertyName)
 {
 	var contains = false;
@@ -1952,36 +2722,4 @@ airlift.filterContains = function(_filter, _propertyName)
 	});
 
 	return contains;
-};
-
-//this will be replaced by memcache ...
-airlift.cache = {};
-
-//thank you John Resig ...
-airlift.tmpl = function tmpl(str, data)
-{
-	// Figure out if we're getting a template, or if we need to
-	// load the template - and be sure to cache the result.
-	var fn = !/\W/.test(str) ? airlift.cache[str] = airlift.cache[str] || tmpl(document.getElementById(str).innerHTML) :
-
-  // Generate a reusable function that will serve as a template
-  // generator (and which will be cached).
-  new Function("obj",
-	"var p=[],print=function(){p.push.apply(p,arguments);};" +
-	// Introduce the data as local variables using with(){}
-	"with(obj){p.push('" +
-
-	// Convert the template into pure JavaScript
-	str
-	.replace(/[\r\t\n]/g, " ")
-	.split("<%").join("\t")
-	.replace(/((^|%>)[^\t]*)'/g, "$1\r")
-	.replace(/\t=(.*?)%>/g, "',$1,'")
-	.split("\t").join("');")
-	.split("%>").join("p.push('")
-	.split("\r").join("\\'")
-	+ "');}return p.join('');");
-
-// Provide some basic currying to the user
-	return data ? fn( data ) : fn;
 };
