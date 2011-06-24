@@ -260,13 +260,13 @@ public class JavaGenerator
 			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.Cacheable(life=600)");
 		}
 
-		Annotation auditable = new airlift.generator.Annotation();
+		/*Annotation auditable = new airlift.generator.Annotation();
 		auditable.setName("airlift.generator.Auditable");
 
 		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
 		{
-			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.Auditable()");
-		}
+			domainInterfaceStringTemplate.setAttribute("annotation", "@airlift.generator.getAuditable() { return Auditable()")()"); }
+ 		}*/
 
 		domainInterfaceStringTemplate.setAttribute("generatorComment", comment);
 		domainInterfaceStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());

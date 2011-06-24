@@ -782,9 +782,29 @@ airlift.createSelectedTarget = function(_propertyName, _name)
 	return "airlift_" + _propertyName + "_" + airlift.escapeForStringTemplate(_name) + "_selected";
 };
 
-airlift.getCacheFormKey = function(_activeRecord, _method)
+airlift.getCacheFormKey = function(_activeRecord, _method, _suffix)
 {
-	return airlift.string(_method + "." + _activeRecord.retrieveDomainInterfaceClassName());
+	var suffix = (_suffix && "." + _suffix)||"";
+	var key = airlift.string(_method.toLowerCase() + "." + _activeRecord.retrieveDomainInterfaceClassName() + suffix);
+
+	LOG.info("Created form key: " + key);
+
+	return key;
+};
+
+airlift.invalidateForm = function(_domainName, _method, _suffix)
+{
+	LOG.info("Invalidating form with key: " + key);	
+	var key = airlift.getCacheFormKey(airlift.ar(_domainName), _method, _suffix);
+	airlift.getCacheService()["delete"](key);
+};
+
+airlift.invalidateForms = function(_domainName, _suffix)
+{
+	airlift.invalidateForm(_domainName, "POST", _suffix);
+	airlift.invalidateForm(_domainName, "PUT", _suffix);
+	airlift.invalidateForm(_domainName, "GET", _suffix);
+	airlift.invalidateForm(_domainName, "DELETE", _suffix);
 };
 
 //Requires user to provide a function that can populate the config

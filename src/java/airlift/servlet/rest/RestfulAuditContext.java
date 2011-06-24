@@ -47,16 +47,16 @@ public class RestfulAuditContext
 	{
 		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AuditTrail", _auditTrail.getId());
 		
-		entity.setUnindexedProperty("domainId", _auditTrail.getDomainId());
-		entity.setUnindexedProperty("action", _auditTrail.getAction());
-		entity.setUnindexedProperty("method", _auditTrail.getMethod());
-		entity.setUnindexedProperty("domain", _auditTrail.getDomain());
+		entity.setProperty("domainId", _auditTrail.getDomainId());
+		entity.setProperty("action", _auditTrail.getAction());
+		entity.setProperty("method", _auditTrail.getMethod());
+		entity.setProperty("domain", _auditTrail.getDomain());
 		entity.setUnindexedProperty("uri", _auditTrail.getUri());
 		entity.setUnindexedProperty("handlerName", _auditTrail.getHandlerName());
 		entity.setUnindexedProperty("data", _auditTrail.getData());
-		entity.setUnindexedProperty("userId", _auditTrail.getUserId());
-		entity.setUnindexedProperty("actionDate", _auditTrail.getActionDate());
-		entity.setUnindexedProperty("recordDate", _auditTrail.getRecordDate());
+		entity.setProperty("userId", _auditTrail.getUserId());
+		entity.setProperty("actionDate", _auditTrail.getActionDate());
+		entity.setProperty("recordDate", _auditTrail.getRecordDate());
 
 		return entity;
 	}

@@ -78,7 +78,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 		else
 		{
-			var impl =  (airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
+			var impl =  (_config && airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
 			var json = Packages.airlift.util.AirliftUtil.toJson(impl);
 		}
 		LOG.info("Ending JSON");
@@ -94,6 +94,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return impl;
 	};
+
+	activeRecord.retrieveImplClassName = function()
+	{
+		return "$package$.airlift.domain.$className$Impl";
+	}
 
 	activeRecord.copyToImpl = function(_impl)
 	{
@@ -140,7 +145,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		var orderedPropertyList = config.displayOrder||[];
 		var collections = config.collections||{}
 		
-		var key = airlift.getCacheFormKey(this, method);
+		var key = airlift.getCacheFormKey(this, method, config.formKeySuffix);
 
 		var formTemplateString = airlift.getCachedFormTemplate(key, this, config, cacheTimeout);
 
@@ -242,6 +247,75 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.del(_config);
 	};
 
+	activeRecord.undo = function (_config)
+	{
+		var auditTrail;
+		var newActiveRecord;
+		var success = true;
+		var config = _config||{};
+		var securityFunction = config.securityFunction||function() {};
+		var filterList = config.filterList||[];
+		var id = config.id||ID;
+
+		var previousRecordList = AUDIT_CONTEXT.collectByDomainId(id, 0, 2, "actionDate", false);
+		
+		if (previousRecordList.isEmpty() === false)
+		{
+			var retrievePreviousActiveRecordFromList = function(_recordNumber)
+			{
+				//populate the auditTrail and create the active record
+				//from JSON ...
+				auditTrail = previousRecordList.get(_recordNumber);			
+				var resource = Packages.airlift.util.AirliftUtil.fromJson(auditTrail.data.toString(), airlift.cc(this.retrieveImplClassName()));
+				var previousActiveRecord = airlift.ar(this.retrieveDomainName()).copyFromImpl(resource);
+
+				return [previousActiveRecord, auditTrail];
+			}
+
+			var [previousActiveRecord, auditTrail] = retrievePreviousActiveRecordFromList(0);
+
+			if  (_function(previousActiveRecord) === true)
+			{
+				switch(auditTrail.action.toUpperCase())
+				{
+					case "DELETE":
+						previousActiveRecord.insert();
+						newActiveRecord = previousActiveRecord;
+						break;
+					case "INSERT":
+						previousActiveRecord["delete"]();
+						newActiveRecord = previousActiveRecord;
+						break;
+					case "UPDATE":
+						if (previousRecordList.size() === 2)
+						{
+							var [secondPreviousActiveRecord, secondPreviousAuditTrail] = retrievePreviousActiveRecordFromList(1);
+							secondPreviousActiveRecord.update();
+							newActiveRecord = secondPreviousActiveRecord;
+							auditTrail = secondPreviousAuditTrail;
+						}
+						else
+						{
+							success = false;
+						}
+						break;
+					default:
+						break;
+				}
+			}
+			else
+			{
+				success = false;
+			}
+		}
+		else
+		{
+			success = false;
+		}
+
+		return [success, secondPreviousActiveRecord, auditTrail];
+	}
+	
 	activeRecord.search = function(_tokenList, _config)
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "GET", true); }
@@ -473,6 +547,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		return stringBuffer.toString();
 	};
-
+												
 	return activeRecord;
 };

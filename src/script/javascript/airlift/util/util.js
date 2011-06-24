@@ -1,6 +1,11 @@
+/**
+    @namespace Airlift context object.
+*/
+var airlift;
+
 if (!airlift)
 {
-	var airlift = {};
+	airlift = {};
 }
 else if (typeof airlift != "object")
 {
@@ -73,8 +78,7 @@ airlift.stringTemplate = function(_templateString)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var success = airlift.every(users, function(_item, _index,
- * _collection) { return true; });
+ * var success = airlift.every(users, function(_item, _index, _collection) { return true; });
  */
 airlift.every = function(_collection, _function)
 {
@@ -117,8 +121,7 @@ airlift.every = function(_collection, _function)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * airlift.forEach(users, function(_item, _index,
- * _collection) { LOG.info("Hello " + _item); });
+ * airlift.forEach(users, function(_item, _index, _collection) { LOG.info("Hello " + _item); });
  * //this writes "Hello <item>" to the logs.
  */
 airlift.forEach = function(_collection, _function)
@@ -163,8 +166,7 @@ airlift.forEach = function(_collection, _function)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var results = airlift.filter(users, function(_item, _index,
- * _collection) { return true; });  //this returns every item in users.
+ * var results = airlift.filter(users, function(_item, _index, _collection) { return true; });  //this returns every item in users.
  *
  */
 airlift.filter = function(_collection, _function)
@@ -215,8 +217,7 @@ airlift.filter = function(_collection, _function)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var results = airlift.map(users, function(_item, _index,
- * _collection) { return "Hello " + _item; });  //this returns a list
+ * var results = airlift.map(users, function(_item, _index, _collection) { return "Hello " + _item; });  //this returns a list
  * of "Hello <item>" for every item in users.
  *
  */
@@ -269,8 +270,7 @@ airlift.map = function(_collection, _function)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var success = airlift.every(users, function(_item, _index,
- * _collection) { return true; });
+ * var success = airlift.every(users, function(_item, _index, _collection) { return true; });
  */
 airlift.some = function(_collection, _function)
 {
@@ -317,9 +317,10 @@ airlift.some = function(_collection, _function)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var [successList, failList] = airlift.every(users, function(_item, _index,
- * _collection) { return (_item.length > 4); });  //this returns
- * [["Bediako"], ["Dave", "Loki"]].
+ * var [successList, failList] = airlift.every(users, function(_item, _index, _collection)
+ * {
+ *	return (_item.length > 4);
+ * });  //this returns [["Bediako"], ["Dave", "Loki"]].
  */
 airlift.split = function(_collection, _function)
 {
@@ -380,10 +381,11 @@ airlift.split = function(_collection, _function)
  * var users = [{name: "Bediako"}, {name: "Dave"}, {name: "Loki"}
  * {name: "Bediako"}];
  *
- * var [valueList, valueMap] = airlift.every(users, function(_item, _index,
- * _collection) { return (_item.length > 4); });  //this returns
- * [["Bediako", "Dave", "Loki"], {"Bediako" : [{name: "Bediako"}, {name:
- * Bediako}], "Dave": [{name: "Dave"}], "Loki": [{name: Loki}]}].
+ * var [valueList, valueMap] = airlift.every(users, function(_item, _index, _collection)
+ * {
+ *	return (_item.length > 4);
+ * });  //this returns [["Bediako", "Dave", "Loki"], {"Bediako" : [{name: "Bediako"}, {name: Bediako}], "Dave": [{name: "Dave"}], "Loki": [{name: Loki}]}]
+ * 
  */
 airlift.partition = function(_collection, _attribute)
 {
@@ -446,7 +448,7 @@ airlift.partition = function(_collection, _attribute)
  * @see airlift.l()
  *
  */
-airlift.list = function(_collection)
+airlift.arrayList = function(_collection)
 {
 	return (_collection && airlift.l(_collection)) || airlift.l();
 };
@@ -458,7 +460,8 @@ airlift.list = function(_collection)
  * @param _list - java.util.Collection
  *
  * @returns an enhanced java.util.List
- * Enhanced java.util.List has Javascript array iterative functions
+ *
+ * @description Enhanced java.util.List has Javascript array iterative functions
  * every, filter, forEach, map, and some, as well as other array
  * methods like pop, push, reverse, shift, unshift, slice,
  * splice, sort
@@ -469,7 +472,7 @@ airlift.list = function(_collection)
  *
  * Finally enhanced lists have the function i() which returns a
  * Javascript Iterator.
- *
+ * 
  * @example
  * var list = airlift.l();
  *
@@ -693,7 +696,7 @@ airlift.l = function(_collection)
  * @see airlift.s
  *
  */
-airlift.set = function(_collection)
+airlift.hashSet = function(_collection)
 {
 	return (_collection && airlift.s(_collection)) || airlift.s();
 };
@@ -830,7 +833,7 @@ airlift.s = function(_set)
  * @see airlift.m
  *
  */
-airlift.map = function(_map)
+airlift.hashMap = function(_map)
 {
 	return (_map && airlift.m(_map)) || airlift.m();
 };

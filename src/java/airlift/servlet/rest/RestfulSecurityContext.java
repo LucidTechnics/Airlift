@@ -257,15 +257,15 @@ public class RestfulSecurityContext
 	{
 		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(getKind(), _airliftUser.getId());
 		
-		entity.setUnindexedProperty("fullName", _airliftUser.getFullName());
-		entity.setUnindexedProperty("shortName", _airliftUser.getShortName());
+		entity.setProperty("fullName", _airliftUser.getFullName());
+		entity.setProperty("shortName", _airliftUser.getShortName());
 		entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 		entity.setProperty("email", _airliftUser.getEmail());
-		entity.setUnindexedProperty("roleSet", _airliftUser.getRoleSet());
-		entity.setUnindexedProperty("active", _airliftUser.getActive());
-		entity.setUnindexedProperty("auditPostDate", _airliftUser.getAuditPostDate());
-		entity.setUnindexedProperty("auditPutDate", _airliftUser.getAuditPutDate());
-		entity.setUnindexedProperty("timeOutDate", _airliftUser.getTimeOutDate());
+		entity.setProperty("roleSet", _airliftUser.getRoleSet());
+		entity.setProperty("active", _airliftUser.getActive());
+		entity.setProperty("auditPostDate", _airliftUser.getAuditPostDate());
+		entity.setProperty("auditPutDate", _airliftUser.getAuditPutDate());
+		entity.setProperty("timeOutDate", _airliftUser.getTimeOutDate());
 
 		return entity;
 	}

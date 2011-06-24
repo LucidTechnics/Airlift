@@ -436,10 +436,10 @@ public class JavaScriptGenerator
 
 		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
 		{
-			activeRecordStringTemplate.setAttribute("auditGet", "if (\"on\".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), \"GET\"); }");
-			activeRecordStringTemplate.setAttribute("auditPut", "if (\"on\".equalsIgnoreCase(AUDITING_UPDATE) === true) { airlift.audit(this.json(), \"UPDATE\"); }");
-			activeRecordStringTemplate.setAttribute("auditPost", "if (\"on\".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), \"INSERT\"); }");
-			activeRecordStringTemplate.setAttribute("auditDelete", "if (\"on\".equalsIgnoreCase(AUDITING_DELETE) === true) { airlift.audit(this.json(), \"DELETE\"); }");
+			activeRecordStringTemplate.setAttribute("auditGet", "if (\"on\".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), \"GET\", this.id); }");
+			activeRecordStringTemplate.setAttribute("auditPut", "if (\"on\".equalsIgnoreCase(AUDITING_UPDATE) === true) { airlift.audit(this.json(), \"UPDATE\", this.id); }");
+			activeRecordStringTemplate.setAttribute("auditPost", "if (\"on\".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), \"INSERT\", this.id); }");
+			activeRecordStringTemplate.setAttribute("auditDelete", "if (\"on\".equalsIgnoreCase(AUDITING_DELETE) === true) { airlift.audit(this.json(), \"DELETE\", this.id); }");
 		}
 		
 		activeRecordStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);
