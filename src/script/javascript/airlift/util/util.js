@@ -1443,6 +1443,25 @@ airlift.tokenizeIntoNGrams = function(_string)
 	return indexList;
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description  This function prepares a calendar object for indexing
+ *
+ * @param _calendar - the date that is to be indexed
+ * @param _attributeName - the name of the active record attribute this
+ * calendar came from.
+ * @param _datePart - the name of the calendar part that is to be index
+ *
+ * @returns a string which could be added to the list of tokens to be
+ * indexed into the domain index field.
+ *
+ * @example
+ * var indexedToken = airlift.prepareForDateSearch(calendar, "auditPutDate", "year");
+ *
+ */
 airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 {
 	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName + "-") : "";
@@ -1466,6 +1485,23 @@ airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 	return name + datePart + _calendar.get(_calendar[getter]);
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description This method relies on airlift.prepareForDateSearch to
+ * tokenize a date into month, day, and year tokens.
+ *
+ * @param _date - the date to be tokenized
+ * @param _name - the property name this token is associated with.
+ *
+ * @returns tokenized date parts of the month, year, and day.
+ *
+ * @example
+ * var tokenizedDateParts = airlift.tokenizeIntoDateParts(date, "auditPutDate");
+ *
+ */
 airlift.tokenizeIntoDateParts = function(_date, _name)
 {
 	var indexList = airlift.l();
@@ -1482,6 +1518,25 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 	return indexList;
 };
 
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description This function returns the enumeration of months that
+ * occur between two dates
+ *
+ * @param _date1 - start date
+ * @param _date2 - end date
+ *
+ * @returns the months in numeric format between two dates
+ *
+ * @example
+ * var monthIntervals = airlift.getMonthIntervals(date1, date2); //if
+ * date1 is in December 2010 and date2 is March 2011 the month
+ * intervals is [12, 1, 2, 3]  
+ *
+ */
 airlift.getMonthIntervals = function(_date1, _date2)
 {
 	var monthList = airlift.l();
