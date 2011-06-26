@@ -156,14 +156,14 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		$populateFormTemplate; separator="\n"$
 
 		var foreignKeyArray = this.retrieveOrderedForeignKeyList();
-
+		var that = this;
 		var processForeignKeys = function(_foreignKey)
 		{
 			if ((airlift.filterContains(orderedPropertyList, _foreignKey) === true) || (airlift.filterContains(filter, _foreignKey) === contains))
 			{
 				var foreignKeyActiveRecord = airlift.ar(_foreignKey.replaceAll("Id\$", ""));
 				var displayName = config.collections && config.collections[_foreignKey] && config.collections[_foreignKey].displayName||"id";
-				var name = (this[_foreignKey] && foreignKeyActiveRecord.setId(this[_foreignKey]).get() && foreignKeyActiveRecord[displayName])||"";
+				var name = (that[_foreignKey] && foreignKeyActiveRecord.setId(that[_foreignKey]).get() && foreignKeyActiveRecord[displayName])||"";
 
 				//this is a foreign key so the only viable option is selected ...
 				formTemplate.setAttribute(airlift.createSelectedTarget(_foreignKey, name), "selected=selected");
