@@ -564,6 +564,20 @@ airlift.toTable = function(_config)
 					else if (_activeRecord.isForeignKey(_property) === true &&
 							 _property.equalsIgnoreCase(anchorProperty) === false)
 					{
+						var foreignKeyDisplayName;
+
+						if (_config[_property])
+						{
+							//Get the actually display name value from
+							//the record this foreign key points to ...
+							var foreignDomainName = _property.replaceAll("Id$", "");
+							var foreignActiveRecord = airlift.ar(foreignDomainName).setId(propertyValue);
+							if (foreignActiveRecord.get() === true)
+							{
+								foreignKeyDisplayName = foreignActiveRecord[_config[_property]];
+							}
+						}
+						
 						var mapTo = methodPersistable.mapTo();
 						var foreignDomainName = (mapTo != null) ? mapTo.split("\\.")[0].toLowerCase() : null;
 
@@ -571,8 +585,8 @@ airlift.toTable = function(_config)
 											 replaceAll(_activeRecord.retrieveDomainName().toLowerCase() + "$", foreignDomainName);
 
 						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(
-							foreignPath + "/" + propertyMap.get(_property),
-							foreignDomainName, "", anchorTarget, propertyValue, _property + "Anchor", anchorClass);
+							foreignPath + "/" + propertyValue,
+							foreignDomainName, "", anchorTarget, foreignKeyDisplayName||propertyValue, _property + "Anchor", anchorClass);
 						trTemplate.setAttribute("td", anchorTemplate.toString());
 					}
 					else
@@ -581,10 +595,6 @@ airlift.toTable = function(_config)
 					}
 
 					trTemplate.setAttribute("tda", "class=\"" + _property + "\"");
-				}
-				else
-				{
-					LOG.info("Not processing property: " + _property);
 				}
 			}
 

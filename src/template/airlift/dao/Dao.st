@@ -125,15 +125,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	
 	dao.multiTry = function(_executable, _tryCount, _message, _completeFailure)
 	{
-		LOG.info("START multi try");
-
 		var result, success = false;
 		
 		for (var i = 0; i < _tryCount && success === false; i++)
 		{
 			try
 			{
-				LOG.info("Try number: " + i);
 				result = _executable(i);
 				success = true;
 			}
@@ -149,8 +146,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 				}
 			}
 		}
-
-		LOG.info("END multi try");
 		
 		return result;
 	};

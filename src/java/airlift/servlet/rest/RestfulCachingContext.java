@@ -136,9 +136,9 @@ public class RestfulCachingContext
 		{
 			content = (java.io.Serializable) getCache().get(_key);
 
-			if (log.isLoggable(java.util.logging.Level.INFO) == true && content != null)
+			if (content == null)
 			{
-				log.info("Cache hit for this entry: " + _key);
+				log.info("Cache miss for this entry: " + _key);
 			}
 		}
 		catch(Throwable t)
