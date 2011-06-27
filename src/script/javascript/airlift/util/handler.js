@@ -74,10 +74,6 @@ airlift.validator = function(_domainName)
 	{
 		airlift.ls("airlift/validation/domain/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js");
 	}
-	else
-	{
-		LOG.info("script airlift/validation/domain/" + APP_PROFILE.getDomainShortClassName(domainName) + ".js is already executed.");
-	}
 
 	return airlift["create" + APP_PROFILE.getDomainShortClassName(domainName) + "Validator"]();
 };
