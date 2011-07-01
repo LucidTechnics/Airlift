@@ -23,7 +23,6 @@ airlift.trim = function (_trim)
 
 	if (_trim !== null && _trim !== undefined)
 	{
-		return this.replace(/^\s+|\s+$/g, "");
 		trimmed = _trim.replace(/^\s+|\s+$/g, "") + "";
 	}
 	else
@@ -409,8 +408,6 @@ airlift.isAssigned = function(value, paramsObj)
  *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
  */
 
-//TODO this function seems to be clobbered by a later declaration!!! Do
-//not use this until I figure out what is going on - Bediako
 airlift.validate = function(validationFunction, value, validationParamsObj)
 {
 	value = airlift.trim(value);
@@ -709,67 +706,6 @@ airlift.setDate = function (_m, _v)
 	}
 
 	return nv;
-};
-
-
-/**
- * An error object looks like this
- * propertyName -> {name, validationMessage[], isValid}
- */
-
-airlift.validate = function(_domainObject, _bindingSet)
-{
-	var errors = {};
-	var domainEntry = DOMAIN.getDomainEntry(_domainObject.name);
-
-	if (domainEntry === undefined || domainEntry === null)
-	{
-		throw new Error("No domain defined for object named: " + _domainObject.name);
-	}
-
-	for each (li in _domainObject.xmlObject.li)
-	{
-		var tempErrors = airlift.validateP(li.@property, li, domainEntry, _domainObject);
-
-		if (tempErrors.length > 0)
-		{
-			errors[li.@property] = tempErrors;
-		}
-	}
-
-	return errors;
-};
-
-airlift.validateP = function(_name, _value, _domainEntry, _domainObject)
-{
-	var errors = [];
-	var fieldEntry = _domainEntry.getFieldEntry(_name);
-	
-	if (fieldEntry !== undefined && fieldEntry !== null)
-	{
-		var ruleMap = fieldEntry.getVRuleMap();
-		var rules = ruleMap.keySet().iterator();
-
-		while (rules.hasNext() === true)
-		{
-			var rule = rules.next();
-			var parameters = ruleMap.get(rule);
-			var validationRule = H[rule];
-			
-			var error = validationRule(_value, parameters);
-
-			if (error !== undefined && error != null)
-			{
-				errors.push(error);
-			}
-		}
-	}
-	else if (_domainEntry.getValidateAllFields() === true)
-	{
-		throw new Error("Field identified by name: " + _name + " is not defined on domain object: " + _domainEntry.getName()); 
-	}
-	
-	return errors;
 };
 
 airlift.noop = function(_value, _parameters)
