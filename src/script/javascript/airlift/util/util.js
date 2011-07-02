@@ -169,7 +169,7 @@ airlift.forEach = function(_collection, _function)
  * var results = airlift.filter(users, function(_item, _index, _collection) { return true; });  //this returns every item in users.
  *
  */
-airlift.filter = function(_collection, _function)
+airlift.filterCollection = function(_collection, _function)
 {
 	if (_collection && _collection.add)
 	{
@@ -626,7 +626,7 @@ airlift.l = function(_collection)
 
 	list.filter = function(_function)
 	{
-		return airlift.filter(list, _function);
+		return airlift.filterCollection(list, _function);
 	}
 
 	list.map = function(_function)
@@ -763,7 +763,7 @@ airlift.s = function(_set)
 
 	set.filter = function(_function)
 	{
-		return airlift.filter(set, _function);
+		return airlift.filterCollection(set, _function);
 	}
 
 	set.map = function(_function)
@@ -1332,22 +1332,6 @@ airlift.getPropertyValue = function(_resourceName, _propertyName)
 	return Packages.airlift.util.PropertyUtil.getInstance().getProperty(_resourceName, _propertyName);
 };
 
-
-/**
- * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
- * George</a>
- *
- * @param _string to check for whitespace
- *
- * @returns true is string is whitespace, false otherwise.
- *
- * @example
- *
- */
-airlift.isWhitespace = function(_string)
-{
-	return Packages.airlift.util.AirliftUtil.isWhitespace(_string);
-};
 
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako

@@ -25,7 +25,7 @@ airlift.debug = function(_debugString)
 //ls - load JavaScript scripts 
 airlift.ls = function(_scriptName)
 {
-	var scriptName = _scriptName.replaceAll("^\\\/", "");
+	var scriptName = _scriptName.replaceAll("^\\\/", "").replaceAll("\\.js$","") + ".js";
 	SCRIPTING.loadScript(APP_NAME + "/" + scriptName);
 };
 
@@ -81,7 +81,7 @@ airlift.validator = function(_domainName)
 //t - create StringTemplate object for a given locale.
 airlift.t = function(_templateName, _locale)
 {
-	var templateName = APP_NAME + "/" + _templateName.replaceAll("^\\\/", "");
+	var templateName = APP_NAME + "/" + _templateName.replaceAll("^\\\/", "").replaceAll("\\.st$", "");
 	var template = (airlift.isDefined(_templateName) === true) ? TEMPLATE.getInstanceOf(templateName) : airlift.stringTemplate();
 
 	//TODO figure how this would work using AppEngine.
@@ -124,6 +124,105 @@ airlift.get = function(_id, _domainName)
 	return [activeRecord, foundRecord];
 };
 
+/**
+ * @author Bediako George
+ * 
+ * @description This method will collect active records for a domain.
+ * It may accept a config object that contains configuration
+ * information for executing the request for the collection.  The
+ * following may be specified in the config object.
+ *
+ * 		<p>offset - Optional. Indicates the start index of the collection.
+ * 		0 is the default value.</p>
+ *
+ * 		<p>limit - Optional. Indicates the maximum amount that should be returned by
+ * 		this query. 10 is the default value.</p>
+ *
+ * 		<p>asc - Optional. Set to true for sorting records in ascending order, false
+ * 		for descending order.  True is the default value.</p>
+ *
+ * 		<p>orderBy - Optional. Name of the property on this domain by
+ * 		which this collection should be sorted.  Set to "auditPutDate"
+ * 		as the default value.</p>
+ *
+ * 		<p>returnType- Optional. Determine the type of object that will
+ * 		hold the collection returned.  Could be "asList" for an
+ * 		enhanced list, "asIterator" for an enhanced iterator, or
+ * 		"asIterable" for an enhanced list.  This is set to "asIterator"
+ * 		by default.</p>
+ * 		
+ * 		<p>filterList - Optional. A list of filter objects that will allow
+ * 		the developer to further refine the results in the collection.
+ * 		A filter object has three required properties, namely ...
+ *
+ *			<p>(i)"attribute" which is the name of the property on a member
+ *			entity of the domain collection,</p>
+ *
+ *			<p>(ii)"operatorName" which is the
+ *			name of the comparison operator to be used to compare this
+ *			attribute as defined by the Java enum
+ *			com.google.appengine.api.datastore.Query.FilterOperator</p>
+ *
+ *			<p>(iii)"value" the value that the attribute value must be
+ *			compared with via the operation specified by
+ *			"operatorName".</p>
+ *		</p>
+ *
+ * @param _arg1 - Optional. If this is a string it will be taken to be the name
+ * of the domain that should be collected.  If it is not a string it
+ * must be a config object.
+ *
+ * @param _arg2 - Optional, If arg1 is defined then _arg2 is the config
+ * object.
+ *
+ * @return - the active record used to collect the domain results.
+ * @return - either an enhanced list, a java.util.Iterable, or an enhanced
+ * java.util.Iterator.  This depends on what was specified in the
+ * config object.
+ *
+ * @example
+ * if the URI is www.example.com/a/runner
+ *
+ * then one could write
+ * 
+ * var [runner, runners] = airlift.collect();
+ *
+ * and this will retrieve at most ten runners ordered by "auditPutDate"
+ * in the runners enhanced iterator.
+ *
+ * To get the runners
+ *
+ * for (var runner in Iterator(runners))
+ * {
+ *		LOG.info(runner.json());
+ * }
+ *
+ * or this works as well
+ *
+ * runners.forEach(function(_runner) { LOG.info(_runner.json()); });
+ *
+ * Also one could do this ...
+ *
+ * var [runner, runnersList] = airlift.collect(
+ * "prorunner",
+ * {
+ *	returnType: "asList",
+ *	orderBy: "firstName",
+ *	limit:200,
+ *	offset:100,
+ *	filterList:[
+ *	{attribute:"lastName", operatorName:"EQUAL", value:"George"},
+ *	{attribute:"age", operatorName:"LESS_THAN" value:20}
+ *	]
+ * };
+ *
+ * and this will return an enhanced list that contains "prorunner"
+ * active records that have last name "George" and age less than 20
+ * years old, paginated from 100 to 200, and ordered by the first name.
+ *
+ * One may get the runners as shown above.
+ *
+ */
 airlift.collect = function(_arg1, _arg2)
 {
 	if (_arg1 && _arg2)
@@ -177,6 +276,19 @@ airlift.collect = function(_arg1, _arg2)
 	return [activeRecord, result];
 };
 
+/**
+ * @author Bediako George
+ * @description
+ *
+ * @param _errorMap
+ *
+ *
+ * @return
+ *
+ * @example
+ *
+ *
+ */
 airlift.renderError = function(_errorMap)
 {	
 	var stringBuffer = java.lang.StringBuffer(); 

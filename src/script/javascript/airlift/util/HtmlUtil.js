@@ -86,7 +86,7 @@ airlift.toRdfa = function(_config)
 	if (airlift.isDefined(activeRecord) === true)
 	{
 		var stringBuffer = airlift.sb();
-		stringBuffer.append("<ul class=\"" + appName + ":" + domainName + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase()) + "\" >").append("\n");
+		stringBuffer.append("<ul class=\"" + domainName + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase()) + "\" >").append("\n");
 
 		var dataObject = activeRecord.createImpl();
 		var interfaceObject = activeRecord.retrieveDomainInterface();
@@ -119,18 +119,18 @@ airlift.toRdfa = function(_config)
 							value = anchorTemplate.toString();
 						}
 
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"").append(type).append("\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
+						stringBuffer.append("<li ").append(" class=\"").append(type).append(" " + _property).append("\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
 					}
 					else if (_property.equalsIgnoreCase("id") === true)
 					{
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(path).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
+						stringBuffer.append("<li ").append(_property).append(" class=\"link " + _property + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(path).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
 					}
 					else if (activeRecord.isForeignKey(_property) === true)
 					{
 						var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
 						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
 						var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
-						stringBuffer.append("<li property=\"").append(_property).append("\" class=\"link\" concept=\"" + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
+						stringBuffer.append("<li ").append(" class=\"link " + _property + "\" concept=\"" + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 					}
 				}
 			}
