@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,10 @@
 
 package airlift.generator; 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface Datable.
+ */
 @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 
 public @interface Datable
@@ -23,6 +27,17 @@ public @interface Datable
 	//by this annotation.  As such should only appear at the class
 	//level.  Method level Datable annotations will give unpredictable results.
 	
+	/**
+	 * Checks if is datable.
+	 *
+	 * @return true, if is datable
+	 */
 	public boolean isDatable() default true;
+	
+	/**
+	 * Date time patterns.
+	 *
+	 * @return the string[]
+	 */
 	public String[] dateTimePatterns() default { "MM-dd-yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "yyyy/MM/dd", "MM-dd-yyyy HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "yyyy/MM/dd HH:mm:ss" };
 }

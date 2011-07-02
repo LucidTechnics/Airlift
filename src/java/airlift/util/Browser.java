@@ -1,3 +1,16 @@
+/*
+ Copyright 2011, Lucid Technics, LLC.
+
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ except in compliance with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in
+ writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations under the License.
+*/
 package airlift.util;
 
 import java.util.Map;
@@ -9,27 +22,66 @@ import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Browser.
+ */
 public final class Browser
 {
+    
+    /** The log. */
     private static Logger log = Logger.getLogger(Browser.class.getName());
 
+	/**
+	 * Instantiates a new browser.
+	 */
 	public Browser() {}
 
+	/**
+	 * Execute request.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse executeRequest(String _url)
 	{
 		return executeRequest(_url, HTTPMethod.GET);
 	}
 
+	/**
+	 * Execute request.
+	 *
+	 * @param _url the _url
+	 * @param _method the _method
+	 * @return the hTTP response
+	 */
 	public HTTPResponse executeRequest(String _url, HTTPMethod _method)
 	{
 		return executeRequest(_url, _method, null);
 	}
 
+	/**
+	 * Execute request.
+	 *
+	 * @param _url the _url
+	 * @param _method the _method
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse executeRequest(String _url, HTTPMethod _method, Map<String, String> _parameterMap)
 	{
 		return executeRequest(_url, _method, _parameterMap, null);
 	}
 
+	/**
+	 * Execute request.
+	 *
+	 * @param _url the _url
+	 * @param _method the _method
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse executeRequest(String _url, HTTPMethod _method, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		HTTPRequest httpRequest = null;
@@ -92,6 +144,12 @@ public final class Browser
 		return response;
 	}
 
+	/**
+	 * Execute request.
+	 *
+	 * @param _httpRequest the _http request
+	 * @return the hTTP response
+	 */
 	public HTTPResponse executeRequest(HTTPRequest _httpRequest)
 	{
 		HTTPResponse httpResponse = null;
@@ -108,6 +166,12 @@ public final class Browser
 		return httpResponse;
 	}
 
+	/**
+	 * Creates the query string.
+	 *
+	 * @param _parameterMap the _parameter map
+	 * @return the string
+	 */
 	public String createQueryString(Map<String, String> _parameterMap)
 	{
 		StringBuffer queryString = new StringBuffer();
@@ -129,6 +193,12 @@ public final class Browser
 		return queryString.toString();
 	}
 
+	/**
+	 * Adds the headers.
+	 *
+	 * @param _httpRequest the _http request
+	 * @param _headerMap the _header map
+	 */
 	public void addHeaders(HTTPRequest _httpRequest, Map<String, String> _headerMap)
 	{
 		if (_headerMap != null)
@@ -140,111 +210,265 @@ public final class Browser
 		}
 	}
 
+	/**
+	 * Gets the.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse get(String _url)
 	{
 		return get(_url, null);
 	}
 
+	/**
+	 * Gets the.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse get(String _url, Map<String, String> _parameterMap)
 	{
 		return get(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Gets the.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse get(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		return executeRequest(_url, HTTPMethod.GET, _parameterMap, _headerMap);
 	}
 
+	/**
+	 * Post.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse post(String _url)
 	{
 		return post(_url, null);
 	}
 
+	/**
+	 * Post.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse post(String _url, Map<String, String> _parameterMap)
 	{
 		return post(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Post.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse post(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		return executeRequest(_url, HTTPMethod.POST, _parameterMap, _headerMap);
 	}
 
+	/**
+	 * Put.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse put(String _url)
 	{
 		return put(_url, null);
 	}
 
+	/**
+	 * Put.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse put(String _url, Map<String, String> _parameterMap)
 	{
 		return put(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Put.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse put(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		return executeRequest(_url, HTTPMethod.PUT, _parameterMap, _headerMap);
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse delete(String _url)
 	{
 		return delete(_url, null);
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse delete(String _url, Map<String, String> _parameterMap)
 	{
 		return delete(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse delete(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		return executeRequest(_url, HTTPMethod.DELETE, _parameterMap, _headerMap);
 	}
 
+	/**
+	 * Head.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse head(String _url)
 	{
 		return head(_url, null);
 	}
 
+	/**
+	 * Head.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse head(String _url, Map<String, String> _parameterMap)
 	{
 		return head(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Head.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse head(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		return executeRequest(_url, HTTPMethod.HEAD, _parameterMap, _headerMap);
 	}
 
+	/**
+	 * Options.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse options(String _url)
 	{
 		return options(_url, null);
 	}
 
+	/**
+	 * Options.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse options(String _url, Map<String, String> _parameterMap)
 	{
 		return options(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Options.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse options(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		throw new RuntimeException("OPTIONS method is not supported by Google appEngine");
 	}
 
+	/**
+	 * Trace.
+	 *
+	 * @param _url the _url
+	 * @return the hTTP response
+	 */
 	public HTTPResponse trace(String _url)
 	{
 		return trace(_url, null);
 	}
 
+	/**
+	 * Trace.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse trace(String _url, Map<String, String> _parameterMap)
 	{
 		return trace(_url, _parameterMap, null);
 	}
 
+	/**
+	 * Trace.
+	 *
+	 * @param _url the _url
+	 * @param _parameterMap the _parameter map
+	 * @param _headerMap the _header map
+	 * @return the hTTP response
+	 */
 	public HTTPResponse trace(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
 		throw new RuntimeException("TRACE method is not supported by Google appEngine");
 	}
 
+	/**
+	 * Encode.
+	 *
+	 * @param _uri the _uri
+	 * @param _encoding the _encoding
+	 * @return the string
+	 */
 	public String encode(String _uri, String _encoding)
 	{
 		String encode = _uri;

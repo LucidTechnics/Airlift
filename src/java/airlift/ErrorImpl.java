@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -14,18 +14,39 @@
 
 package airlift; 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ErrorImpl.
+ */
 public class ErrorImpl
    extends MessageImpl
    implements airlift.Error
 {
+	
+	/**
+	 * Instantiates a new error impl.
+	 */
 	private ErrorImpl() { super(); }
 
+	/**
+	 * Instantiates a new error impl.
+	 *
+	 * @param _name the _name
+	 * @param _message the _message
+	 */
 	public ErrorImpl(String _name, String _message)
 	{
 		super.name = _name;
 		super.message = _message;
 	}
 
+	/**
+	 * Instantiates a new error impl.
+	 *
+	 * @param _name the _name
+	 * @param _category the _category
+	 * @param _message the _message
+	 */
 	public ErrorImpl(String _name, String _category, String _message)
 	{
 		this(_name, _message);

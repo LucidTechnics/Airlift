@@ -2,10 +2,21 @@ package airlift.util;
 
 import java.util.logging.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class IdGenerator.
+ */
 public class IdGenerator
 {
+	
+	/** The Constant log. */
 	private static final Logger log = Logger.getLogger(IdGenerator.class.getName());
 
+	/**
+	 * Generate.
+	 *
+	 * @return the string
+	 */
 	public static String generate()
 	{
 		airlift.util.PropertyUtil.getInstance().loadProperties("/airlift/airlift.properties", "airlift.cfg");
@@ -17,6 +28,12 @@ public class IdGenerator
 		return generate(length);
 	}
 
+	/**
+	 * Generate.
+	 *
+	 * @param _length the _length
+	 * @return the string
+	 */
 	public static String generate(int _length)
 	{
 		java.util.UUID uuid = java.util.UUID.randomUUID();
@@ -29,6 +46,13 @@ public class IdGenerator
 		return hash.substring(hash.length() - length, hash.length());
 	}
 
+	/**
+	 * Hash.
+	 *
+	 * @param _hashAlgorithm the _hash algorithm
+	 * @param _message the _message
+	 * @return the string
+	 */
 	public static String hash(String _hashAlgorithm, String _message)
 	{
 		byte[] digest = null;
@@ -48,6 +72,12 @@ public class IdGenerator
 		return bytesToHex(digest);
 	}
 
+	/**
+	 * Bytes to hex.
+	 *
+	 * @param b the b
+	 * @return the string
+	 */
 	public static String bytesToHex(byte[] b)
 	{
 		char hexDigit[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};

@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -14,15 +14,29 @@
 
 package airlift; 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MessageManager.
+ */
 public class MessageManager
 {
+	
+	/** The message map. */
 	java.util.Map<String, java.util.List<Message>> messageMap;
 
+	/**
+	 * Instantiates a new message manager.
+	 */
 	public MessageManager()
 	{
 		this.messageMap = new java.util.HashMap<String, java.util.List<Message>>();
 	}
 	
+	/**
+	 * Instantiates a new message manager.
+	 *
+	 * @param _messageMap the _message map
+	 */
 	public MessageManager(java.util.Map<String, java.util.List<Message>> _messageMap)
 	{
 		if (_messageMap != null)
@@ -35,16 +49,33 @@ public class MessageManager
 		}
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param _messageManager the _message manager
+	 */
 	public void add(MessageManager _messageManager)
 	{
 		add(_messageManager.getMessageMap());
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param _name the _name
+	 * @param _category the _category
+	 * @param _message the _message
+	 */
 	public void add(String _name, String _category, String _message)
 	{
 		add(new MessageImpl(_name, _category, _message));
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param _message the _message
+	 */
 	public void add(Message _message)
 	{
 		if (_message != null)
@@ -55,6 +86,11 @@ public class MessageManager
 		}
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param _list the _list
+	 */
 	public void add(java.util.List<Message> _list)
 	{
 		if (_list != null && _list.isEmpty() == false)
@@ -66,6 +102,12 @@ public class MessageManager
 		}
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param _name the _name
+	 * @param _list the _list
+	 */
 	public void add(String _name, java.util.List<Message> _list)
 	{
 		if (_list != null && _list.isEmpty() == false)
@@ -76,6 +118,11 @@ public class MessageManager
 		}
 	}
 	
+	/**
+	 * Adds the.
+	 *
+	 * @param _map the _map
+	 */
 	public void add(java.util.Map<String, java.util.List<Message>> _map)
 	{
 		if (_map != null && _map.isEmpty() == false)
@@ -94,11 +141,22 @@ public class MessageManager
 		}
 	}
 	
+	/**
+	 * Property set.
+	 *
+	 * @return the java.util. iterator
+	 */
 	public java.util.Iterator propertySet()
 	{
 		return this.messageMap.keySet().iterator();
 	}
 
+	/**
+	 * Gets the message.
+	 *
+	 * @param _name the _name
+	 * @return the message
+	 */
 	public Message getMessage(String _name)
 	{
 		Message message = null;
@@ -116,6 +174,12 @@ public class MessageManager
 		return message;
 	}
 
+	/**
+	 * Gets the message list.
+	 *
+	 * @param _name the _name
+	 * @return the message list
+	 */
 	public java.util.List<Message> getMessageList(String _name)
 	{
 		java.util.List<Message> list = new java.util.ArrayList<Message>();
@@ -128,6 +192,11 @@ public class MessageManager
 		return list;
 	}
 
+	/**
+	 * Gets the message list.
+	 *
+	 * @return the message list
+	 */
 	public java.util.List<Message> getMessageList()
 	{
 		java.util.List<Message> messageList = new java.util.ArrayList<Message>();
@@ -140,11 +209,21 @@ public class MessageManager
 		return messageList;
 	}
 
+	/**
+	 * Gets the message map.
+	 *
+	 * @return the message map
+	 */
 	public java.util.Map<String, java.util.List<Message>> getMessageMap()
 	{
 		return new java.util.HashMap<String, java.util.List<Message>>(this.messageMap);
 	}
 
+	/**
+	 * Checks if is empty.
+	 *
+	 * @return true, if is empty
+	 */
 	public boolean isEmpty()
 	{
 		return getMessageMap().isEmpty();

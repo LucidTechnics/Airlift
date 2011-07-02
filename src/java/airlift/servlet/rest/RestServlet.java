@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -26,18 +26,43 @@ import javax.servlet.http.HttpServletResponse;
 
 import airlift.rest.Method;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RestServlet.
+ */
 public class RestServlet
    extends HttpServlet
 {
+	
+	/** The log. */
 	private static Logger log = Logger.getLogger(RestServlet.class.getName());
+	
+	/** The caching context map. */
 	private java.util.Map<String, airlift.CachingContext> cachingContextMap = new java.util.HashMap<String, airlift.CachingContext>();
 	// 
+	/** The redirect context map. */
 	protected Map<String, Object> redirectContextMap;
+	
+	/** The app profile. */
 	protected static airlift.AppProfile appProfile;
 
+	/**
+	 * Gets the redirect context map.
+	 *
+	 * @return the redirect context map
+	 */
 	public Map<String, Object> getRedirectContextMap() { return redirectContextMap; }
+	
+	/**
+	 * Sets the redirect context map.
+	 *
+	 * @param _redirectContextMap the _redirect context map
+	 */
 	public void setRedirectContextMap(Map<String, Object> _redirectContextMap) { redirectContextMap = _redirectContextMap; }
 	
+    /* (non-Javadoc)
+     * @see javax.servlet.GenericServlet#init()
+     */
     @Override
     public void init()
 	    throws ServletException
@@ -46,6 +71,9 @@ public class RestServlet
 		initCache();
     }
 
+	/**
+	 * Inits the cache.
+	 */
 	public void initCache() 
 	{
 		//On init create cached response for 404s
@@ -69,6 +97,9 @@ public class RestServlet
 		}
 	}
 	
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected final void doGet(HttpServletRequest _httpServletRequest,
 			       HttpServletResponse _httpServletResponse)
@@ -77,6 +108,9 @@ public class RestServlet
 		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.GET);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected final void doPost(HttpServletRequest _httpServletRequest,
 				HttpServletResponse _httpServletResponse)
@@ -85,6 +119,9 @@ public class RestServlet
 		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.POST);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doPut(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected final void doPut(HttpServletRequest _httpServletRequest,
 			       HttpServletResponse _httpServletResponse)
@@ -93,6 +130,9 @@ public class RestServlet
 		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.PUT);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected final void doDelete(HttpServletRequest _httpServletRequest,
 				  HttpServletResponse _httpServletResponse)
@@ -102,6 +142,12 @@ public class RestServlet
 
 	}
 
+	/**
+	 * Timed out.
+	 *
+	 * @param _user the _user
+	 * @return true, if successful
+	 */
 	protected boolean timedOut(AirliftUser _user)
 	{
 		boolean timedOut = false;
@@ -115,6 +161,14 @@ public class RestServlet
 		return timedOut;
 	}
 
+	/**
+	 * Request login.
+	 *
+	 * @param _request the _request
+	 * @param _response the _response
+	 * @param _userService the _user service
+	 * @return true, if successful
+	 */
 	protected boolean requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
 	{
 		boolean loginRequestSuccessful = false;
@@ -137,6 +191,14 @@ public class RestServlet
 		return loginRequestSuccessful;
 	}
 
+	/**
+	 * Log user out.
+	 *
+	 * @param _request the _request
+	 * @param _response the _response
+	 * @param _userService the _user service
+	 * @return true, if successful
+	 */
 	protected boolean logUserOut(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
 	{
 		boolean logoutSuccessful = false;
@@ -158,6 +220,11 @@ public class RestServlet
 		return logoutSuccessful;
 	}
 
+	/**
+	 * Calculate next time out date.
+	 *
+	 * @return the java.util. date
+	 */
 	private java.util.Date calculateNextTimeOutDate()
 	{
 		String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
@@ -172,6 +239,14 @@ public class RestServlet
 		return new java.util.Date(timeOutTime);
 	}
 
+	/**
+	 * Apply security checks.
+	 *
+	 * @param _request the _request
+	 * @param _response the _response
+	 * @param _method the _method
+	 * @return the rest context
+	 */
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
 		String namespace = this.getServletConfig().getInitParameter("a.namespace");
@@ -289,6 +364,17 @@ public class RestServlet
 		return restContext;
 	}
 
+	/**
+	 * Process request.
+	 *
+	 * @param _httpServletRequest the _http servlet request
+	 * @param _httpServletResponse the _http servlet response
+	 * @param _method the _method
+	 * @param _restContext the _rest context
+	 * @param _uriParameterMap the _uri parameter map
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected final void processRequest(HttpServletRequest _httpServletRequest,
 					HttpServletResponse _httpServletResponse,
 					String _method, RestContext _restContext, Map _uriParameterMap)
@@ -402,6 +488,13 @@ public class RestServlet
 		}
     }
 
+	/**
+	 * Determine method.
+	 *
+	 * @param _method the _method
+	 * @param _request the _request
+	 * @return the string
+	 */
 	private String determineMethod(Method _method, HttpServletRequest _request)
 	{
 		String method = _method.name();
@@ -416,23 +509,46 @@ public class RestServlet
 		return method;
 	}
 
+	/**
+	 * Send coded page.
+	 *
+	 * @param _code the _code
+	 * @param _message the _message
+	 * @param _response the _response
+	 */
 	public void sendCodedPage(String _code, String _message, HttpServletResponse _response)
 	{
 		try { _response.sendError(Integer.parseInt(_code), _message); } catch (Throwable t) { log.severe(t.getMessage()); throw new RuntimeException(t); }
 	}
 	
+	/**
+	 * Sets the 404 not found.
+	 *
+	 * @param _contentContext the new 404 not found
+	 */
 	private void set404NotFound(ContentContext _contentContext)
 	{
 		_contentContext.setContent("404 Not Found");
 		_contentContext.setType("text/html");
 	}
 
+	/**
+	 * Sets the 500 internal server error.
+	 *
+	 * @param _contentContext the new 500 internal server error
+	 */
 	private void set500InternalServerError(ContentContext _contentContext)
 	{
 		_contentContext.setContent("500 Internal Server Error");
 		_contentContext.setType("text/html");
 	}
 
+    /**
+     * Checks if is valid method.
+     *
+     * @param _method the _method
+     * @return true, if is valid method
+     */
     private boolean isValidMethod(String _method)
     {
 		boolean isValidMethod = false;
@@ -452,6 +568,12 @@ public class RestServlet
 		return isValidMethod;
     }
 
+    /**
+     * Prepare method.
+     *
+     * @param _method the _method
+     * @return the string
+     */
     private String prepareMethod(String _method)
     {
 		String method = null;
@@ -464,16 +586,33 @@ public class RestServlet
 		return method;
 	}
 
+	/**
+	 * Gets the redirect value.
+	 *
+	 * @param _key the _key
+	 * @return the redirect value
+	 */
 	public Object getRedirectValue(String _key)
 	{
 		return getRedirectContextMap().get(_key);
 	}
 	
+    /**
+     * Gets the handler context.
+     *
+     * @return the handler context
+     */
     protected HandlerContext getHandlerContext()
 	{
 		return new SimpleHandlerContext(productionModeIsOn());
 	}
 
+	/**
+	 * Determine primary key name.
+	 *
+	 * @param _domainName the _domain name
+	 * @return the string
+	 */
 	public String determinePrimaryKeyName(String _domainName)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
@@ -481,12 +620,24 @@ public class RestServlet
 		return airlift.util.AirliftUtil.determinePrimaryKeyName(_domainName, rootPackageName);
 	}
 
+	/**
+	 * Checks if is domain name.
+	 *
+	 * @param _domainName the _domain name
+	 * @return true, if is domain name
+	 */
 	public boolean isDomainName(String _domainName)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
 		return airlift.util.AirliftUtil.isDomainName(_domainName, rootPackageName);
 	}
 
+	/**
+	 * Checks if is uri a collection.
+	 *
+	 * @param _uri the _uri
+	 * @return true, if is uri a collection
+	 */
 	public boolean isUriACollection(String _uri)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
@@ -494,6 +645,12 @@ public class RestServlet
 		return airlift.util.AirliftUtil.isUriACollection(_uri, rootPackageName);
 	}
 
+	/**
+	 * Checks if is uri a new domain.
+	 *
+	 * @param _uri the _uri
+	 * @return true, if is uri a new domain
+	 */
 	public boolean isUriANewDomain(String _uri)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
@@ -501,6 +658,16 @@ public class RestServlet
 		return airlift.util.AirliftUtil.isUriANewDomain(_uri, rootPackageName);
 	}
 
+	/**
+	 * Prepare rest context.
+	 *
+	 * @param _method the _method
+	 * @param _acceptValueList the _accept value list
+	 * @param _httpServletRequest the _http servlet request
+	 * @param _uriParameterMap the _uri parameter map
+	 * @param _appName the _app name
+	 * @return the rest context
+	 */
 	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
@@ -596,6 +763,14 @@ public class RestServlet
 		return restContext;
 	}
 
+	/**
+	 * Allowed.
+	 *
+	 * @param _user the _user
+	 * @param _restContext the _rest context
+	 * @param _securityContext the _security context
+	 * @return true, if successful
+	 */
 	public boolean allowed(AirliftUser _user, RestContext _restContext, RestfulSecurityContext _securityContext)
 	{
 		boolean allowed = true;
@@ -633,6 +808,12 @@ public class RestServlet
 		return allowed;
 	}
 
+	/**
+	 * Gets the error handler name.
+	 *
+	 * @param _errorCode the _error code
+	 * @return the error handler name
+	 */
 	public String getErrorHandlerName(String _errorCode)
 	{
 		String errorHandlerProperty = "a." + _errorCode + ".handler.name";
@@ -646,21 +827,42 @@ public class RestServlet
 		return handlerName;
 	}
 
+	/**
+	 * Production mode is on.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean productionModeIsOn()
 	{
 		return 	("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.production.mode")) == true) ? true : false;
 	}
 
+	/**
+	 * Dev user security is on.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean devUserSecurityIsOn()
 	{
 		return 	("yes".equalsIgnoreCase(getServletConfig().getInitParameter("a.dev.user.security")) == true) ? true : false;
 	}
 
+	/**
+	 * Gets the error handler context.
+	 *
+	 * @return the error handler context
+	 */
 	public ErrorHandlerContext getErrorHandlerContext()
 	{
 		return new airlift.servlet.rest.ErrorHandlerContext(productionModeIsOn());
 	}
 
+	/**
+	 * Populate domain information.
+	 *
+	 * @param _uri the _uri
+	 * @param _uriParameterMap the _uri parameter map
+	 */
 	public void populateDomainInformation(String _uri, java.util.Map _uriParameterMap)
 	{
 		String rootPackageName = getServletConfig().getInitParameter("a.root.package.name");
@@ -668,6 +870,13 @@ public class RestServlet
 		airlift.util.AirliftUtil.populateDomainInformation(_uri, _uriParameterMap, rootPackageName);
 	}
 
+	/**
+	 * Reconstruct uri.
+	 *
+	 * @param _appName the _app name
+	 * @param _request the _request
+	 * @return the string
+	 */
 	public String reconstructUri(String _appName, HttpServletRequest _request)
 	{
 		String pathInfo = (_request.getPathInfo() == null) ? "" : _request.getPathInfo();
@@ -677,6 +886,16 @@ public class RestServlet
 		return _appName + "/" + path;
 	}
 	
+	/**
+	 * Determine prefix.
+	 *
+	 * @param _uri the _uri
+	 * @param _appName the _app name
+	 * @param _method the _method
+	 * @param _httpServletRequest the _http servlet request
+	 * @param _uriParameterMap the _uri parameter map
+	 * @return the string
+	 */
 	public String determinePrefix(String _uri, String _appName, String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap)
 	{
 		_uriParameterMap.clear();
@@ -695,6 +914,11 @@ public class RestServlet
 		return prefix;
 	}
 
+	/**
+	 * Gets the app profile.
+	 *
+	 * @return the app profile
+	 */
 	public airlift.AppProfile getAppProfile()
 	{
 		try
@@ -712,6 +936,12 @@ public class RestServlet
 		return appProfile;
 	}
 
+	/**
+	 * Gets the user service.
+	 *
+	 * @param _httpServletRequest the _http servlet request
+	 * @return the user service
+	 */
 	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
 	{
 		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
@@ -731,6 +961,9 @@ public class RestServlet
 		return userService;
 	}
 
+	/**
+	 * Throw runtime exception.
+	 */
 	public static final void throwRuntimeException()
 	{
 		throw new RuntimeException();

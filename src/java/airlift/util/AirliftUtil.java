@@ -1,3 +1,16 @@
+/*
+ Copyright 2011, Lucid Technics, LLC.
+
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ except in compliance with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in
+ writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations under the License.
+*/
 package airlift.util;
 
 import java.lang.annotation.Annotation;
@@ -11,10 +24,23 @@ import airlift.rest.Route;
 import com.google.gson.GsonBuilder;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AirliftUtil.
+ */
 public class AirliftUtil
 {
+	
+	/** The log. */
 	private static Logger log = Logger.getLogger(AirliftUtil.class.getName());
 
+	/**
+	 * Creates the bean utils bean.
+	 *
+	 * @param _allowedDateTimePatterns the _allowed date time patterns
+	 * @param _timeZone the _time zone
+	 * @return the org.apache.commons.beanutils. bean utils bean
+	 */
 	public static org.apache.commons.beanutils.BeanUtilsBean createBeanUtilsBean(String[] _allowedDateTimePatterns, java.util.TimeZone _timeZone)
 	{
 		org.apache.commons.beanutils.converters.SqlDateConverter sqlDateConverter = new org.apache.commons.beanutils.converters.SqlDateConverter();
@@ -48,6 +74,12 @@ public class AirliftUtil
 		return new org.apache.commons.beanutils.BeanUtilsBean(convertUtilsBean);
 	}
 
+	/**
+	 * Serialize stack trace.
+	 *
+	 * @param _t the _t
+	 * @return the string
+	 */
 	public static String serializeStackTrace(Throwable _t)
 	{				
 		java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
@@ -68,21 +100,46 @@ public class AirliftUtil
 		return errorString;
 	}
 
+	/**
+	 * To json.
+	 *
+	 * @param _list the _list
+	 * @return the string
+	 */
 	public static String toJson(java.util.List _list)
 	{
 		return new GsonBuilder().create().toJson(_list);
 	}
 
+	/**
+	 * To json.
+	 *
+	 * @param _object the _object
+	 * @return the string
+	 */
 	public static String toJson(Object _object)
 	{
 		return new GsonBuilder().create().toJson(_object);
 	}
 
+	/**
+	 * From json.
+	 *
+	 * @param _json the _json
+	 * @param _class the _class
+	 * @return the object
+	 */
 	public static Object fromJson(String _json, Class _class)
 	{
 		return new GsonBuilder().create().fromJson(_json, _class);
 	}
 
+	/**
+	 * Creates the airlift type.
+	 *
+	 * @param _javaType the _java type
+	 * @return the string
+	 */
 	public static String createAirliftType(String _javaType)
 	{
 		String airliftType = "airlift:string";
@@ -106,21 +163,48 @@ public class AirliftUtil
 		return airliftType;
 	}
 
+	/**
+	 * Checks if is whitespace.
+	 *
+	 * @param _string the _string
+	 * @return true, if is whitespace
+	 */
 	public static boolean isWhitespace(String _string)
 	{
 		return StringUtils.isWhitespace(_string);
 	}
 
+	/**
+	 * Upper the first character.
+	 *
+	 * @param _string the _string
+	 * @return the string
+	 */
 	public static String upperTheFirstCharacter(String _string)
 	{
  		return StringUtils.capitalize(_string);
 	}
 
+	/**
+	 * Lower the first character.
+	 *
+	 * @param _string the _string
+	 * @return the string
+	 */
 	public static String lowerTheFirstCharacter(String _string)
 	{
 		return StringUtils.uncapitalize(_string);
 	}
 
+	/**
+	 * Gets the method annotation.
+	 *
+	 * @param <T> the generic type
+	 * @param _class the _class
+	 * @param _attributeName the _attribute name
+	 * @param _annotationClass the _annotation class
+	 * @return the method annotation
+	 */
 	public static <T extends Annotation> T getMethodAnnotation(Class _class, String _attributeName, Class<T> _annotationClass)
 	{
 		try
@@ -136,6 +220,13 @@ public class AirliftUtil
 		}
 	}
 
+	/**
+	 * Gets the attribute type.
+	 *
+	 * @param _object the _object
+	 * @param _attributeName the _attribute name
+	 * @return the attribute type
+	 */
 	public static String getAttributeType(Object _object, String _attributeName)
 	{
 		try
@@ -152,6 +243,13 @@ public class AirliftUtil
 		}
 	}
 
+	/**
+	 * Checks if is domain name.
+	 *
+	 * @param _domainName the _domain name
+	 * @param _rootPackageName the _root package name
+	 * @return true, if is domain name
+	 */
 	public static boolean isDomainName(String _domainName, String _rootPackageName)
 	{
 		boolean isDomainName = false;
@@ -170,6 +268,13 @@ public class AirliftUtil
 		return isDomainName;
 	}
 	
+	/**
+	 * Checks if is new domain name.
+	 *
+	 * @param _domainName the _domain name
+	 * @param _rootPackageName the _root package name
+	 * @return true, if is new domain name
+	 */
 	public static boolean isNewDomainName(String _domainName, String _rootPackageName)
 	{
 		boolean isNewDomainName = false;
@@ -183,6 +288,13 @@ public class AirliftUtil
 		return isNewDomainName;
 	}
 
+	/**
+	 * Checks if is uri a collection.
+	 *
+	 * @param _uri the _uri
+	 * @param _rootPackageName the _root package name
+	 * @return true, if is uri a collection
+	 */
 	public static boolean isUriACollection(String _uri, String _rootPackageName)
 	{
 		boolean isUriACollection = false;
@@ -205,6 +317,13 @@ public class AirliftUtil
 		return isUriACollection;
 	}
 
+	/**
+	 * Checks if is uri a new domain.
+	 *
+	 * @param _uri the _uri
+	 * @param _rootPackageName the _root package name
+	 * @return true, if is uri a new domain
+	 */
 	public static boolean isUriANewDomain(String _uri, String _rootPackageName)
 	{
 		boolean isUriANewDomain = false;
@@ -227,11 +346,25 @@ public class AirliftUtil
 		return isUriANewDomain;
 	}
 
+	/**
+	 * Determine primary key name.
+	 *
+	 * @param _domainName the _domain name
+	 * @param _rootPackageName the _root package name
+	 * @return the string
+	 */
 	public static String determinePrimaryKeyName(String _domainName, String _rootPackageName)
 	{
 		return "id";
 	}
 
+	/**
+	 * Populate domain information.
+	 *
+	 * @param _uri the _uri
+	 * @param _uriParameterMap the _uri parameter map
+	 * @param _rootPackageName the _root package name
+	 */
 	public static void populateDomainInformation(String _uri, java.util.Map _uriParameterMap, String _rootPackageName)
 	{
 		String[] tokenArray = _uri.split("\\/");
@@ -266,6 +399,12 @@ public class AirliftUtil
 		}
 	}
 
+	/**
+	 * Checks for suffix.
+	 *
+	 * @param _token the _token
+	 * @return the java.util. list
+	 */
 	public static java.util.List<String> hasSuffix(String _token)
 	{
 		java.util.List<String> list = new java.util.ArrayList<String>();
@@ -281,6 +420,12 @@ public class AirliftUtil
 		return list;
 	}
 	
+	/**
+	 * Generate string from array.
+	 *
+	 * @param _object the _object
+	 * @return the string
+	 */
 	public static String generateStringFromArray(Object[] _object)
 	{
 		StringBuffer stringBuffer = new StringBuffer();
@@ -305,6 +450,20 @@ public class AirliftUtil
 		return stringBuffer.toString().replaceAll(",$", "") + "]";
 	}
 
+	/**
+	 * Do cipher.
+	 *
+	 * @param _message the _message
+	 * @param _password the _password
+	 * @param _initialVector the _initial vector
+	 * @param _provider the _provider
+	 * @param _name the _name
+	 * @param _mode the _mode
+	 * @param _padding the _padding
+	 * @param _revolutions the _revolutions
+	 * @param _cipherMode the _cipher mode
+	 * @return the byte[]
+	 */
 	public static byte[] doCipher(byte[] _message, String _password, String _initialVector,
 								String _provider, String _name, String _mode, String _padding,
 								int _revolutions, String _cipherMode)
@@ -345,6 +504,19 @@ public class AirliftUtil
 		return initialBytes;
 	}
 
+	/**
+	 * Encrypt.
+	 *
+	 * @param _initialBytes the _initial bytes
+	 * @param _password the _password
+	 * @param _initialVector the _initial vector
+	 * @param _provider the _provider
+	 * @param _name the _name
+	 * @param _mode the _mode
+	 * @param _padding the _padding
+	 * @param _revolutions the _revolutions
+	 * @return the byte[]
+	 */
 	public static byte[] encrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider,
 					  String _name, String _mode, String _padding, int _revolutions)
 	{
@@ -362,6 +534,19 @@ public class AirliftUtil
 		return initialBytes;
 	}
 
+	/**
+	 * Decrypt.
+	 *
+	 * @param _initialBytes the _initial bytes
+	 * @param _password the _password
+	 * @param _initialVector the _initial vector
+	 * @param _provider the _provider
+	 * @param _name the _name
+	 * @param _mode the _mode
+	 * @param _padding the _padding
+	 * @param _revolutions the _revolutions
+	 * @return the byte[]
+	 */
 	public static byte[] decrypt(byte[] _initialBytes, String _password, String _initialVector, String _provider,
 						  String _name, String _mode, String _padding, int _revolutions)
 	{
@@ -379,92 +564,195 @@ public class AirliftUtil
 		return initialBytes;
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the byte[]
+	 */
 	public static byte[] convert(byte[] _byteArray)
 	{
 		return _byteArray;
 	}
 	
+	/**
+	 * Convert.
+	 *
+	 * @param _string the _string
+	 * @return the byte[]
+	 */
 	public static byte[] convert(String _string)
 	{
 		return (_string == null) ? null : convert(_string.getBytes());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _number the _number
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.lang.Long _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _number the _number
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.lang.Short _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _number the _number
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.lang.Integer _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _number the _number
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.lang.Double _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _number the _number
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.lang.Float _number)
 	{
 		return (_number == null) ? null : convert(_number.toString());
 	}
 
+	/**
+	 * Convert.
+	 *
+	 * @param _date the _date
+	 * @return the byte[]
+	 */
 	public static byte[] convert(java.util.Date _date)
 	{
 		return (_date == null) ? null : convert(_date.getTime());
 	}
 
+	/**
+	 * Convert to byte array.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the byte[]
+	 */
 	public static byte[] convertToByteArray(byte[] _byteArray)
 	{
 		return _byteArray;
 	}
 
+	/**
+	 * Convert to string.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the string
+	 */
 	public static String convertToString(byte[] _byteArray)
 	{
 		return (_byteArray == null) ? null : new String(convertToByteArray(_byteArray));
 	}
 
+	/**
+	 * Convert to short.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the short
+	 */
 	public static Short convertToShort(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Short.parseShort(convertedBytes) : null;
 	}
 
+	/**
+	 * Convert to long.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the long
+	 */
 	public static Long convertToLong(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Long.parseLong(convertedBytes) : null;
 	}
 
+	/**
+	 * Convert to integer.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the integer
+	 */
 	public static Integer convertToInteger(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Integer.parseInt(convertedBytes) : null;
 	}
 
+	/**
+	 * Convert to double.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the double
+	 */
 	public static Double convertToDouble(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Double.parseDouble(convertedBytes) : null;
 	}
 
+	/**
+	 * Convert to float.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the float
+	 */
 	public static Float convertToFloat(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? Float.parseFloat(convertedBytes) : null;
 	}
 
+	/**
+	 * Convert to date.
+	 *
+	 * @param _byteArray the _byte array
+	 * @return the java.util. date
+	 */
 	public static java.util.Date convertToDate(byte[] _byteArray)
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? new java.util.Date(Long.parseLong(convertedBytes)) : null;
 	}
 	
+	/**
+	 * Describe.
+	 *
+	 * @param _do the _do
+	 * @param _interfaceClass the _interface class
+	 * @return the java.util. map
+	 */
 	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
 	{
 		java.util.Map<String, Object> descriptionMap = new java.util.HashMap<String, Object>();
@@ -561,15 +849,29 @@ public class AirliftUtil
 		}
 	}
 
+	/**
+	 * The Class SqlDateInstanceCreator.
+	 */
 	protected static class SqlDateInstanceCreator
 			implements com.google.gson.InstanceCreator<java.sql.Date> {
+		
+		/* (non-Javadoc)
+		 * @see com.google.gson.InstanceCreator#createInstance(java.lang.reflect.Type)
+		 */
 		public java.sql.Date createInstance(Type type) {
 			return new java.sql.Date(1L);
 		}
 	}
 
+	/**
+	 * The Class SqlTimestampInstanceCreator.
+	 */
 	protected static class SqlTimestampInstanceCreator
 			implements com.google.gson.InstanceCreator<java.sql.Timestamp> {
+		
+		/* (non-Javadoc)
+		 * @see com.google.gson.InstanceCreator#createInstance(java.lang.reflect.Type)
+		 */
 		public java.sql.Timestamp createInstance(Type type) {
 			return new java.sql.Timestamp(1L);
 		}

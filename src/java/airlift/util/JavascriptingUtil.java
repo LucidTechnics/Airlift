@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -27,23 +27,67 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JavascriptingUtil.
+ */
 public class JavascriptingUtil
 {
+	
+	/** The log. */
 	private static Logger log = Logger.getLogger(JavascriptingUtil.class.getName());
 
+	/** The Constant scriptResourceMap. */
 	private static final Map<String, Script> scriptResourceMap = new HashMap<String, Script>();
+	
+	/** The bindings map. */
 	private Map<String, Object> bindingsMap;
+	
+	/** The scope. */
 	private Scriptable scope;
+	
+	/** The Constant sharedScope. */
 	private static final ScriptableObject sharedScope;
+	
+	/** The compile script. */
 	private boolean compileScript = true;
 
+	/**
+	 * Gets the script resource map.
+	 *
+	 * @return the script resource map
+	 */
 	private Map<String, Script> getScriptResourceMap() { return scriptResourceMap; }
+	
+	/**
+	 * Gets the bindings map.
+	 *
+	 * @return the bindings map
+	 */
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
+	
+	/**
+	 * Gets the scope.
+	 *
+	 * @return the scope
+	 */
 	private Scriptable getScope() { return scope; }
 
+	/**
+	 * Sets the bindings map.
+	 *
+	 * @param _bindingsMap the _bindings map
+	 */
 	public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
+	
+	/**
+	 * Sets the scope.
+	 *
+	 * @param _scope the new scope
+	 */
 	public void setScope(Scriptable _scope) { scope = _scope; }
 
+	/** The script stack. */
 	public java.util.List scriptStack = new java.util.ArrayList();
 
 	static
@@ -67,22 +111,41 @@ public class JavascriptingUtil
 		}
 	}
 	
+    /**
+     * Instantiates a new javascripting util.
+     */
     public JavascriptingUtil()
 	{
 		setBindingsMap(new HashMap<String, Object>());
     }
 
+	/**
+	 * Instantiates a new javascripting util.
+	 *
+	 * @param _compileScript the _compile script
+	 */
 	public JavascriptingUtil(boolean _compileScript)
 	{
 		this();
 		compileScript = _compileScript;
 	}
 
+    /**
+     * Bind.
+     *
+     * @param _name the _name
+     * @param _value the _value
+     */
     public void bind(String _name, Object _value)
     {
 		getBindingsMap().put(_name, _value);
 	}
 
+	/**
+	 * Load script.
+	 *
+	 * @param _scriptResource the _script resource
+	 */
 	public void loadScript(String _scriptResource)
 	{
 		try
@@ -104,6 +167,12 @@ public class JavascriptingUtil
 		}
 	}
 
+	/**
+	 * Find script.
+	 *
+	 * @param _scriptResource the _script resource
+	 * @return the input stream
+	 */
 	private InputStream findScript(String _scriptResource)
 	{
 		InputStream inputStream = null;
@@ -129,16 +198,37 @@ public class JavascriptingUtil
 		return inputStream;
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResource the _script resource
+	 * @return the object
+	 */
 	public Object executeScript(String _scriptResource)
 	{
 		return executeScript(_scriptResource, false, null);
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResource the _script resource
+	 * @param _timeScript the _time script
+	 * @return the object
+	 */
 	public Object executeScript(String _scriptResource, boolean _timeScript)
 	{
 		return executeScript(_scriptResource, _timeScript, null);
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResource the _script resource
+	 * @param _timeScript the _time script
+	 * @param _context the _context
+	 * @return the object
+	 */
 	public Object executeScript(String _scriptResource, boolean _timeScript, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
@@ -189,16 +279,37 @@ public class JavascriptingUtil
 		return result;
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResources the _script resources
+	 * @return the object
+	 */
 	public Object executeScript(String[] _scriptResources)
 	{
 		return executeScript(_scriptResources, false, null);
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResources the _script resources
+	 * @param _timeScript the _time script
+	 * @return the object
+	 */
 	public Object executeScript(String[] _scriptResources, boolean _timeScript)
 	{
 		return executeScript(_scriptResources, _timeScript, null);
 	}
 
+	/**
+	 * Execute script.
+	 *
+	 * @param _scriptResources the _script resources
+	 * @param _timeScripts the _time scripts
+	 * @param _context the _context
+	 * @return the object
+	 */
 	public Object executeScript(String[] _scriptResources, boolean _timeScripts, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
@@ -254,6 +365,11 @@ public class JavascriptingUtil
 		return result;
 	}
 
+	/**
+	 * Creates the context.
+	 *
+	 * @return the context
+	 */
 	public Context createContext()
 	{
 		//Do not try to manage the context ... as it is managed by
@@ -271,6 +387,12 @@ public class JavascriptingUtil
 		return context;
 	}
 
+	/**
+	 * Compile script.
+	 *
+	 * @param _scriptResource the _script resource
+	 * @return the script
+	 */
 	public Script compileScript(String _scriptResource)
 	{
 		Script script = null;
@@ -323,6 +445,11 @@ public class JavascriptingUtil
 		return script;
 	}
 
+	/**
+	 * Reset scope.
+	 *
+	 * @param _context the _context
+	 */
 	public void resetScope(Context _context)
 	{
 		Scriptable scriptable = _context.newObject(sharedScope);

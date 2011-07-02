@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -14,12 +14,40 @@
 
 package airlift.generator; 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface Searchable.
+ */
 @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 
 public @interface Searchable
 {
+	
+	/**
+	 * Checks if is searchable.
+	 *
+	 * @return true, if is searchable
+	 */
 	public boolean isSearchable() default true;
+	
+	/**
+	 * Indexable.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean indexable() default true;
+	
+	/**
+	 * Storable.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean storable() default false;
+	
+	/**
+	 * Tokenizable.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean tokenizable() default true;  //only really applies to domain attributes of type String.
 }

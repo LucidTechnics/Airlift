@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -28,20 +28,39 @@ import airlift.util.JavascriptingUtil;
 
 import com.google.appengine.api.users.User;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SimpleHandlerContext.
+ */
 public class SimpleHandlerContext
    extends HandlerContext
 {
+	
+	/** The log. */
 	private Logger log = Logger.getLogger(SimpleHandlerContext.class.getName());
+	
+	/** The production mode. */
 	private boolean productionMode = true;
 	
+	/**
+	 * Instantiates a new simple handler context.
+	 */
 	public SimpleHandlerContext() {}
 
+	/**
+	 * Instantiates a new simple handler context.
+	 *
+	 * @param _productionMode the _production mode
+	 */
 	public SimpleHandlerContext(boolean _productionMode)
 	{
 		log.info("Starting simple handler context with production mode: " + _productionMode);
 		productionMode = _productionMode;
 	}
     
+	/* (non-Javadoc)
+	 * @see airlift.servlet.rest.HandlerContext#execute(java.lang.String, airlift.servlet.rest.RestContext, java.lang.String, airlift.servlet.rest.RestServlet, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, java.util.Map, airlift.domain.DomainConfiguration)
+	 */
 	public ContentContext execute(
 							String _appName,
 							RestContext _restContext,

@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -16,28 +16,71 @@ package airlift.servlet.rest;
 
 import java.util.logging.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RestfulSecurityContext.
+ */
 public class RestfulSecurityContext
    implements airlift.SecurityContext
 {
+	
+	/** The Constant log. */
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 		
+	/** The kind. */
 	private String kind;
+	
+	/** The caching context. */
 	private airlift.CachingContext cachingContext;
 
+	/**
+	 * Gets the caching context.
+	 *
+	 * @return the caching context
+	 */
 	private airlift.CachingContext getCachingContext() { return cachingContext; }
+	
+	/**
+	 * Gets the kind.
+	 *
+	 * @return the kind
+	 */
 	public String getKind() { return kind; }
 
+	/**
+	 * Sets the caching context.
+	 *
+	 * @param _cachingContext the new caching context
+	 */
 	protected void setCachingContext(airlift.CachingContext _cachingContext) { cachingContext = _cachingContext; }
+	
+	/**
+	 * Sets the kind.
+	 *
+	 * @param _kind the new kind
+	 */
 	protected void setKind(String _kind) { kind = _kind; }
 
+	/**
+	 * Instantiates a new restful security context.
+	 */
 	private RestfulSecurityContext() {}
 
+	/**
+	 * Instantiates a new restful security context.
+	 *
+	 * @param _kind the _kind
+	 * @param _cachingContext the _caching context
+	 */
 	protected RestfulSecurityContext(String _kind, airlift.CachingContext _cachingContext)
 	{
 		setKind(_kind);
 		setCachingContext(_cachingContext);
 	}
 
+	/* (non-Javadoc)
+	 * @see airlift.SecurityContext#allowed(airlift.servlet.rest.AirliftUser, airlift.servlet.rest.RestContext, airlift.AppProfile)
+	 */
 	public boolean allowed(AirliftUser _user, RestContext _restContext, airlift.AppProfile _appProfile)
 	{
 		String domainName = _restContext.getThisDomain();
@@ -50,6 +93,16 @@ public class RestfulSecurityContext
 		return allowed(_user, _restContext.getMethod(), _appProfile, domainName, _restContext.uriIsACollection());
 	}
 
+	/**
+	 * Allowed.
+	 *
+	 * @param _user the _user
+	 * @param _method the _method
+	 * @param _appProfile the _app profile
+	 * @param _domainName the _domain name
+	 * @param _uriIsACollection the _uri is a collection
+	 * @return true, if successful
+	 */
 	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
 	{
 		boolean allowed = true;
@@ -116,6 +169,12 @@ public class RestfulSecurityContext
 		return allowed;
 	}
 
+	/**
+	 * Creates the role set.
+	 *
+	 * @param _rolesString the _roles string
+	 * @return the java.util. set
+	 */
 	private java.util.Set<String> createRoleSet(String _rolesString)
 	{
 		java.util.Set<String> roleSet = new java.util.HashSet<String>();
@@ -130,6 +189,13 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
+	/**
+	 * Check allowed.
+	 *
+	 * @param _roleSet the _role set
+	 * @param _user the _user
+	 * @return true, if successful
+	 */
 	private boolean checkAllowed(java.util.Set<String> _roleSet, AirliftUser _user)
 	{
 		boolean allowed = false;
@@ -155,6 +221,12 @@ public class RestfulSecurityContext
 		return allowed;
 	}
 
+	/**
+	 * Populate.
+	 *
+	 * @param _user the _user
+	 * @return the airlift user
+	 */
 	public AirliftUser populate(AirliftUser _user)
 	{
 		if (_user != null)
@@ -179,6 +251,12 @@ public class RestfulSecurityContext
 		return _user;
 	}
 
+	/**
+	 * Fetch user role set.
+	 *
+	 * @param _user the _user
+	 * @return the java.util. set
+	 */
 	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user)
 	{
 		java.util.Set<String> roleSet = new java.util.HashSet<String>();
@@ -191,6 +269,12 @@ public class RestfulSecurityContext
 		return roleSet;
 	}
 
+	/**
+	 * Gets the user.
+	 *
+	 * @param _id the _id
+	 * @return the user
+	 */
 	public AirliftUser getUser(String _id)
 	{
 		AirliftUser user = null;
@@ -225,6 +309,12 @@ public class RestfulSecurityContext
 		return user;
 	}
 
+	/**
+	 * Copy entity to airlift user.
+	 *
+	 * @param _entity the _entity
+	 * @return the airlift user
+	 */
 	public AirliftUser copyEntityToAirliftUser(com.google.appengine.api.datastore.Entity _entity)
 	{
 
@@ -253,6 +343,12 @@ public class RestfulSecurityContext
 		return airliftUser;
 	}
 
+	/**
+	 * Copy airlift user to entity.
+	 *
+	 * @param _airliftUser the _airlift user
+	 * @return the com.google.appengine.api.datastore. entity
+	 */
 	public com.google.appengine.api.datastore.Entity copyAirliftUserToEntity(AirliftUser _airliftUser)
 	{
 		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(getKind(), _airliftUser.getId());
@@ -270,6 +366,15 @@ public class RestfulSecurityContext
 		return entity;
 	}
 
+	/**
+	 * Collect.
+	 *
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AirliftUser> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -290,6 +395,12 @@ public class RestfulSecurityContext
 		return results;
 	}
 
+	/**
+	 * Insert.
+	 *
+	 * @param _airliftUser the _airlift user
+	 * @return the string
+	 */
 	public String insert(AirliftUser _airliftUser)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -319,16 +430,33 @@ public class RestfulSecurityContext
 		return _airliftUser.getId();
 	}
 
+	/**
+	 * Exists.
+	 *
+	 * @param _id the _id
+	 * @return true, if successful
+	 */
 	public boolean exists(String _id)
 	{
 		return (this.getUser(_id) != null);
 	}
 
+	/**
+	 * Update.
+	 *
+	 * @param _airliftUser the _airlift user
+	 */
 	public void update(AirliftUser _airliftUser)
 	{
 		update(_airliftUser, true);
 	}
 	
+	/**
+	 * Update.
+	 *
+	 * @param _airliftUser the _airlift user
+	 * @param _writeThrough the _write through
+	 */
 	public void update(AirliftUser _airliftUser, boolean _writeThrough)
 	{
 		if (_airliftUser.getId() == null)
@@ -366,6 +494,11 @@ public class RestfulSecurityContext
 		}
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param _airliftUser the _airlift user
+	 */
 	public void delete(AirliftUser _airliftUser)
 	{
 		try
@@ -379,6 +512,16 @@ public class RestfulSecurityContext
 		}
 	}
 
+	/**
+	 * Collect by external user id.
+	 *
+	 * @param _value the _value
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AirliftUser> collectByExternalUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -399,6 +542,16 @@ public class RestfulSecurityContext
 		return results;
 	}
 
+	/**
+	 * Collect by email.
+	 *
+	 * @param _value the _value
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AirliftUser> collectByEmail(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();

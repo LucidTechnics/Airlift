@@ -1,5 +1,5 @@
 /*
- Copyright 2010, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -20,22 +20,26 @@ import com.google.appengine.api.xmpp.SendResponse;
 import com.google.appengine.api.xmpp.XMPPService;
 import com.google.appengine.api.xmpp.XMPPServiceFactory;
 
+// TODO: Auto-generated Javadoc
 /**
- * XMPP Utility Class
- *
+ * XMPP Utility Class.
  */
 public class XMPPUtil 
 {
 	// Suppress default constructor so it cannot be instantiated.
+	/**
+	 * Instantiates a new xMPP util.
+	 */
 	private XMPPUtil()
 	{
 		throw new AssertionError();
 	}
 	
 	/**
-	 * Sends an XMPP message to given recipient
-	 * @param receiver
-	 * @param message
+	 * Sends an XMPP message to given recipient.
+	 *
+	 * @param receiver the receiver
+	 * @param message the message
 	 * @return boolean whether message sent
 	 */
 	public static boolean sendMessage(final String receiver, final String message)

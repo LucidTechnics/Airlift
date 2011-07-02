@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -18,10 +18,23 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.apache.commons.lang.StringUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class XhtmlTemplateUtil.
+ */
 public class XhtmlTemplateUtil
 {
+	
+	/** The Constant stringTemplateGroup. */
 	public static final StringTemplateGroup stringTemplateGroup = new StringTemplateGroup("Airlift");
 
+	/**
+	 * Creates the form template.
+	 *
+	 * @param _groupName the _group name
+	 * @param _buttonName the _button name
+	 * @return the string template
+	 */
 	public static StringTemplate createFormTemplate(String _groupName, String _buttonName)
 	{
 		StringTemplate formTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ViewHTMLTemplate");
@@ -36,6 +49,13 @@ public class XhtmlTemplateUtil
 		return formTemplate;
 	}
 
+	/**
+	 * Creates the field set template.
+	 *
+	 * @param _groupName the _group name
+	 * @param _domainName the _domain name
+	 * @return the string template
+	 */
 	public static StringTemplate createFieldSetTemplate(String _groupName, String _domainName)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/FieldSetTemplate");
@@ -46,6 +66,19 @@ public class XhtmlTemplateUtil
 		return template;
 	}
 
+	/**
+	 * Creates the input template.
+	 *
+	 * @param _type the _type
+	 * @param _value the _value
+	 * @param _maxLength the _max length
+	 * @param _displayLength the _display length
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _readOnly the _read only
+	 * @param _inputClass the _input class
+	 * @return the string template
+	 */
 	public static StringTemplate createInputTemplate(String _type, String _value, Integer _maxLength, Integer _displayLength, String _name, String _groupName, boolean _readOnly, String _inputClass)
 	{
 		StringTemplate inputTemplate = null;
@@ -62,6 +95,16 @@ public class XhtmlTemplateUtil
 		return inputTemplate;
 	}
 
+	/**
+	 * Creates the select template.
+	 *
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _size the _size
+	 * @param _multiple the _multiple
+	 * @param _disabled the _disabled
+	 * @return the string template
+	 */
 	public static StringTemplate createSelectTemplate(String _name, String _groupName, Integer _size, boolean _multiple, boolean _disabled)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/SelectListTemplate");
@@ -75,11 +118,28 @@ public class XhtmlTemplateUtil
 		return template;
 	}
 
+	/**
+	 * Creates the select option template.
+	 *
+	 * @return the string template
+	 */
 	public static StringTemplate createSelectOptionTemplate()
 	{
 		return stringTemplateGroup.getInstanceOf("airlift/html/SelectOptionTemplate");
 	}
 
+	/**
+	 * Creates the input template.
+	 *
+	 * @param _type the _type
+	 * @param _value the _value
+	 * @param _maxLength the _max length
+	 * @param _displayLength the _display length
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _inputClass the _input class
+	 * @return the string template
+	 */
 	public static StringTemplate createInputTemplate(String _type, String _value, Integer _maxLength, Integer _displayLength, String _name, String _groupName, String _inputClass)
 	{
 		StringTemplate inputTemplate = stringTemplateGroup.getInstanceOf("airlift/html/InputTemplate");
@@ -95,6 +155,18 @@ public class XhtmlTemplateUtil
 		return inputTemplate;
 	}
 
+	/**
+	 * Creates the read only input template.
+	 *
+	 * @param _type the _type
+	 * @param _value the _value
+	 * @param _maxLength the _max length
+	 * @param _displayLength the _display length
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _inputClass the _input class
+	 * @return the string template
+	 */
 	public static StringTemplate createReadOnlyInputTemplate(String _type, String _value, Integer _maxLength, Integer _displayLength, String _name, String _groupName, String _inputClass)
 	{
 		StringTemplate inputTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ReadOnlyInputTemplate");
@@ -110,6 +182,17 @@ public class XhtmlTemplateUtil
 		return inputTemplate;
 	}
 
+	/**
+	 * Creates the text area template.
+	 *
+	 * @param _value the _value
+	 * @param _rows the _rows
+	 * @param _cols the _cols
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _readOnly the _read only
+	 * @return the string template
+	 */
 	public static StringTemplate createTextAreaTemplate(String _value, Integer _rows, Integer _cols, String _name, String _groupName, boolean _readOnly)
 	{
 		StringTemplate textAreaTemplate = null;
@@ -126,6 +209,16 @@ public class XhtmlTemplateUtil
 		return textAreaTemplate;
 	}
 
+	/**
+	 * Creates the text area template.
+	 *
+	 * @param _value the _value
+	 * @param _rows the _rows
+	 * @param _cols the _cols
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @return the string template
+	 */
 	public static StringTemplate createTextAreaTemplate(String _value, Integer _rows, Integer _cols, String _name, String _groupName)
 	{
 		StringTemplate textAreaTemplate = stringTemplateGroup.getInstanceOf("airlift/html/TextAreaTemplate");
@@ -139,6 +232,16 @@ public class XhtmlTemplateUtil
 		return textAreaTemplate;
 	}
 
+	/**
+	 * Creates the read only text area template.
+	 *
+	 * @param _value the _value
+	 * @param _rows the _rows
+	 * @param _cols the _cols
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @return the string template
+	 */
 	public static StringTemplate createReadOnlyTextAreaTemplate(String _value, Integer _rows, Integer _cols, String _name, String _groupName)
 	{
 		StringTemplate textAreaTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ReadOnlyTextAreaTemplate");
@@ -152,6 +255,17 @@ public class XhtmlTemplateUtil
 		return textAreaTemplate;
 	}
 
+	/**
+	 * Creates the form entry template.
+	 *
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _label the _label
+	 * @param _message the _message
+	 * @param _inputTemplate the _input template
+	 * @param _error the _error
+	 * @return the string template
+	 */
 	public static StringTemplate createFormEntryTemplate(String _name, String _groupName, String _label, String _message, StringTemplate _inputTemplate, boolean _error)
 	{
 		StringTemplate formEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/FormEntryTemplate");
@@ -168,6 +282,15 @@ public class XhtmlTemplateUtil
 		return formEntryTemplate;
 	}
 
+	/**
+	 * Creates the error form entry template.
+	 *
+	 * @param _name the _name
+	 * @param _label the _label
+	 * @param _message the _message
+	 * @param _inputTemplate the _input template
+	 * @return the string template
+	 */
 	public static StringTemplate createErrorFormEntryTemplate(String _name, String _label, String _message, StringTemplate _inputTemplate)
 	{
 		StringTemplate formEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ErrorFormEntryTemplate");
@@ -180,6 +303,13 @@ public class XhtmlTemplateUtil
 		return formEntryTemplate;
 	}
 
+	/**
+	 * Creates the hidden form entry template.
+	 *
+	 * @param _name the _name
+	 * @param _value the _value
+	 * @return the string template
+	 */
 	public static StringTemplate createHiddenFormEntryTemplate(String _name, String _value)
 	{
 		StringTemplate hiddenFormEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/HiddenFormEntryTemplate");
@@ -190,6 +320,14 @@ public class XhtmlTemplateUtil
 		return hiddenFormEntryTemplate;
 	}
 
+	/**
+	 * Creates the hidden form entry template.
+	 *
+	 * @param _name the _name
+	 * @param _groupName the _group name
+	 * @param _value the _value
+	 * @return the string template
+	 */
 	public static StringTemplate createHiddenFormEntryTemplate(String _name, String _groupName, String _value)
 	{
 		StringTemplate hiddenFormEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/HiddenFormEntryTemplate");
@@ -201,6 +339,18 @@ public class XhtmlTemplateUtil
 		return hiddenFormEntryTemplate;
 	}
 
+	/**
+	 * Creates the anchor template.
+	 *
+	 * @param _href the _href
+	 * @param _rel the _rel
+	 * @param _rev the _rev
+	 * @param _target the _target
+	 * @param _label the _label
+	 * @param _id the _id
+	 * @param _class the _class
+	 * @return the string template
+	 */
 	public static StringTemplate createAnchorTemplate(String _href, String _rel, String _rev, String _target, String _label, String _id, String _class)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/AnchorTemplate");
@@ -216,6 +366,16 @@ public class XhtmlTemplateUtil
 		return template;
 	}
 
+	/**
+	 * Creates the table template.
+	 *
+	 * @param _theadAttribute the _thead attribute
+	 * @param _th the _th
+	 * @param _tbodyAttribute the _tbody attribute
+	 * @param _tfootAttribute the _tfoot attribute
+	 * @param _tf the _tf
+	 * @return the string template
+	 */
 	public static StringTemplate createTableTemplate(String _theadAttribute, StringTemplate _th, String _tbodyAttribute, String _tfootAttribute, String _tf)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/TableHTMLTemplate");
@@ -229,6 +389,12 @@ public class XhtmlTemplateUtil
 		return template;		
 	}
 
+	/**
+	 * Creates the table template.
+	 *
+	 * @param _tf the _tf
+	 * @return the string template
+	 */
 	public static StringTemplate createTableTemplate(String _tf)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/TableHTMLTemplate");
@@ -238,11 +404,22 @@ public class XhtmlTemplateUtil
 		return template;		
 	}
 
+	/**
+	 * Creates the th template.
+	 *
+	 * @return the string template
+	 */
 	public static StringTemplate createThTemplate()
 	{
 		return stringTemplateGroup.getInstanceOf("airlift/html/ThHTMLTemplate");
 	}
 
+	/**
+	 * Creates the tr template.
+	 *
+	 * @param _thAttribute the _th attribute
+	 * @return the string template
+	 */
 	public static StringTemplate createTrTemplate(String _thAttribute)
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/TrHTMLTemplate");
@@ -252,6 +429,11 @@ public class XhtmlTemplateUtil
 		return template;		
 	}
 
+	/**
+	 * Creates the multi input template.
+	 *
+	 * @return the string template
+	 */
 	public static StringTemplate createMultiInputTemplate()
 	{
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/MultiInputTemplate");

@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -39,6 +39,10 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Compiler.
+ */
 @SupportedAnnotationTypes("airlift.generator.*")
 @SupportedOptions({"appName", "package"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
@@ -46,24 +50,95 @@ import javax.tools.Diagnostic;
 public class Compiler
    extends AbstractProcessor
 {
+	
+	/** The annotation name set. */
 	private Set<String> annotationNameSet;
+	
+	/** The element set. */
 	private Set<Element> elementSet;
+	
+	/** The domain class name set. */
 	private Set<String> domainClassNameSet;
+	
+	/** The pre generation map. */
 	private Map<String, DomainObjectModel> preGenerationMap;
+	
+	/** The element name to domain object model map. */
 	private Map<String, DomainObjectModel> elementNameToDomainObjectModelMap;
 
+	/**
+	 * Gets the annotation name set.
+	 *
+	 * @return the annotation name set
+	 */
 	public Set<String> getAnnotationNameSet() { return annotationNameSet; }
+	
+	/**
+	 * Gets the element set.
+	 *
+	 * @return the element set
+	 */
 	public Set<Element> getElementSet() { return elementSet;  }
+	
+	/**
+	 * Gets the domain class name set.
+	 *
+	 * @return the domain class name set
+	 */
 	public Set<String> getDomainClassNameSet() { return domainClassNameSet; }
+	
+	/**
+	 * Gets the pre generation map.
+	 *
+	 * @return the pre generation map
+	 */
 	public Map<String, DomainObjectModel> getPreGenerationMap() { return preGenerationMap;  }
+	
+	/**
+	 * Gets the element name to domain object model map.
+	 *
+	 * @return the element name to domain object model map
+	 */
 	public Map<String, DomainObjectModel> getElementNameToDomainObjectModelMap() { return elementNameToDomainObjectModelMap; }
 
+	/**
+	 * Sets the annotation name set.
+	 *
+	 * @param _annotationNameSet the new annotation name set
+	 */
 	public void setAnnotationNameSet(Set<String> _annotationNameSet) { annotationNameSet = _annotationNameSet; }
+	
+	/**
+	 * Sets the element set.
+	 *
+	 * @param _elementSet the new element set
+	 */
 	public void setElementSet(Set<Element> _elementSet) { elementSet = _elementSet; }
+	
+	/**
+	 * Sets the domain class name set.
+	 *
+	 * @param _domainClassNameSet the new domain class name set
+	 */
 	public void setDomainClassNameSet(Set<String> _domainClassNameSet) { domainClassNameSet = _domainClassNameSet; }
+	
+	/**
+	 * Sets the pre generation map.
+	 *
+	 * @param _preGenerationMap the _pre generation map
+	 */
 	public void setPreGenerationMap(Map<String, DomainObjectModel> _preGenerationMap) { preGenerationMap = _preGenerationMap; }
+	
+	/**
+	 * Sets the element name to domain object model map.
+	 *
+	 * @param _elementNameToDomainObjectModelMap the _element name to domain object model map
+	 */
 	public void setElementNameToDomainObjectModelMap(Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap) { elementNameToDomainObjectModelMap = _elementNameToDomainObjectModelMap; }
 	
+	/**
+	 * Instantiates a new compiler.
+	 */
 	public Compiler()
 	{
 		setAnnotationNameSet(new HashSet<String>());
@@ -73,6 +148,9 @@ public class Compiler
 		setDomainClassNameSet(new HashSet<String>());
 	}
 
+	/**
+	 * Inits the.
+	 */
 	private void init()
 	{
 		if (getAnnotationNameSet().isEmpty() == true)
@@ -97,6 +175,9 @@ public class Compiler
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.annotation.processing.AbstractProcessor#process(java.util.Set, javax.annotation.processing.RoundEnvironment)
+	 */
 	public boolean process(Set<? extends TypeElement> _annotationSet, RoundEnvironment _roundEnvironment)
 	{
 		boolean claimed = false;
@@ -225,6 +306,15 @@ public class Compiler
 		return claimed;
 	}
 
+	/**
+	 * Generate files.
+	 *
+	 * @param _processingEnvironment the _processing environment
+	 * @param _roundEnvironment the _round environment
+	 * @param _elementNameToDomainObjectModelMap the _element name to domain object model map
+	 * @param _annotationNameSet the _annotation name set
+	 * @param _elementSet the _element set
+	 */
 	private void generateFiles(ProcessingEnvironment _processingEnvironment, RoundEnvironment _roundEnvironment,
 							   Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap, Set<String> _annotationNameSet,
 							  Set _elementSet)
@@ -284,11 +374,25 @@ public class Compiler
 		javaScriptGenerator.writeResourceFile(fileName, "genscript", generatedString, null);
 	}
 
+	/**
+	 * Gets the full class name.
+	 *
+	 * @param _elements the _elements
+	 * @param _element the _element
+	 * @return the full class name
+	 */
 	private String getFullClassName(Elements _elements, Element _element)
 	{
 		return _elements.getPackageOf(_element).getQualifiedName().toString() + "." + _element.getSimpleName().toString();
 	}
 	
+	/**
+	 * Determine type.
+	 *
+	 * @param _element the _element
+	 * @param _types the _types
+	 * @return the string
+	 */
 	private String determineType(Element _element, Types _types)
 	{
 		String type = "";
@@ -306,6 +410,13 @@ public class Compiler
 		return type;
 	}
 
+	/**
+	 * Determine return type.
+	 *
+	 * @param _element the _element
+	 * @param _types the _types
+	 * @return the string
+	 */
 	private String determineReturnType(Element _element, Types _types)
 	{
 		String type = "";
@@ -325,6 +436,15 @@ public class Compiler
 		return type;
 	}
 
+	/**
+	 * Process declared type.
+	 *
+	 * @param _returnTypeMirror the _return type mirror
+	 * @param _declaredReturnType the _declared return type
+	 * @param _types the _types
+	 * @param _executableElement the _executable element
+	 * @return the string
+	 */
 	private String processDeclaredType(javax.lang.model.type.TypeMirror _returnTypeMirror, javax.lang.model.type.DeclaredType _declaredReturnType, Types _types, javax.lang.model.element.ExecutableElement _executableElement)
 	{
 		String type = "";
@@ -366,6 +486,15 @@ public class Compiler
 		return type + typeParameters;
 	}
 
+	/**
+	 * Process array type.
+	 *
+	 * @param _returnTypeMirror the _return type mirror
+	 * @param _arrayReturnType the _array return type
+	 * @param _types the _types
+	 * @param _executableElement the _executable element
+	 * @return the string
+	 */
 	private String processArrayType(javax.lang.model.type.TypeMirror _returnTypeMirror, javax.lang.model.type.ArrayType _arrayReturnType, Types _types, javax.lang.model.element.ExecutableElement _executableElement)
 	{
 		String type = "";
@@ -385,6 +514,13 @@ public class Compiler
 		return type;		
 	}
 	
+	/**
+	 * Creates the new domain object model.
+	 *
+	 * @param _element the _element
+	 * @param _elementUtil the _element util
+	 * @return the domain object model
+	 */
 	private DomainObjectModel createNewDomainObjectModel(Element _element, Elements _elementUtil)
 	{
 		DomainObjectModel domainObjectModel = new DomainObjectModel();
@@ -407,6 +543,13 @@ public class Compiler
 		return domainObjectModel;
 	}
 
+	/**
+	 * Prepare domain object model.
+	 *
+	 * @param _domainClassNameSet the _domain class name set
+	 * @param _domainObjectModel the _domain object model
+	 * @param _elementNameToDomainObjectModelMap the _element name to domain object model map
+	 */
 	private void prepareDomainObjectModel(Set<String> _domainClassNameSet, DomainObjectModel _domainObjectModel, Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap)
 	{
 		if (_domainObjectModel.isPreparedAlready == false)
@@ -424,6 +567,15 @@ public class Compiler
 		}
 	}
 	
+	/**
+	 * Creates the new domain object model.
+	 *
+	 * @param _tableName the _table name
+	 * @param _className the _class name
+	 * @param _rootPackageName the _root package name
+	 * @param _packageName the _package name
+	 * @return the domain object model
+	 */
 	private DomainObjectModel createNewDomainObjectModel(String _tableName, String _className, String _rootPackageName, String _packageName)
 	{
 		DomainObjectModel domainObjectModel = new DomainObjectModel();
@@ -437,6 +589,13 @@ public class Compiler
 		return domainObjectModel;
 	}
 
+	/**
+	 * Gets the relevant domain object model.
+	 *
+	 * @param _element the _element
+	 * @param _elements the _elements
+	 * @return the relevant domain object model
+	 */
 	private DomainObjectModel getRelevantDomainObjectModel(Element _element, Elements _elements)
 	{
 		String fullyQualifiedName = deriveFullyQualifiedClassName(_element, _elements);
@@ -452,11 +611,24 @@ public class Compiler
 		return domainObjectModel;
 	}
 
+	/**
+	 * Derive fully qualified class name.
+	 *
+	 * @param _element the _element
+	 * @param _elements the _elements
+	 * @return the string
+	 */
 	private String deriveFullyQualifiedClassName(Element _element, Elements _elements)
 	{
 		return _elements.getPackageOf(_element).getQualifiedName().toString().trim() + "." + _element.getSimpleName().toString().trim();
 	}
 
+	/**
+	 * Checks if is getter.
+	 *
+	 * @param _methodName the _method name
+	 * @return true, if is getter
+	 */
 	private boolean isGetter(String _methodName)
 	{
 		boolean isGetter = false;
@@ -470,6 +642,12 @@ public class Compiler
 		return isGetter;
 	}
 
+	/**
+	 * Checks if is setter.
+	 *
+	 * @param _methodName the _method name
+	 * @return true, if is setter
+	 */
 	private boolean isSetter(String _methodName)
 	{
 		boolean isSetter = false;
@@ -483,6 +661,12 @@ public class Compiler
 		return isSetter;
 	}
 
+	/**
+	 * Deduce attribute name.
+	 *
+	 * @param _methodName the _method name
+	 * @return the string
+	 */
 	private String deduceAttributeName(String _methodName)
 	{
 		String attributeName = "";
@@ -501,6 +685,15 @@ public class Compiler
 		return attributeName;
 	}
 
+	/**
+	 * Spawn interface classes.
+	 *
+	 * @param _jdbcUrl the _jdbc url
+	 * @param _driverClass the _driver class
+	 * @param _schema the _schema
+	 * @param _username the _username
+	 * @param _password the _password
+	 */
 	private void spawnInterfaceClasses(String _jdbcUrl, String _driverClass, String _schema, String _username, String _password)
 	{
 		if (_jdbcUrl != null && "".equals(_jdbcUrl) == false)
@@ -623,6 +816,12 @@ public class Compiler
 		}
 	}
 	
+	/**
+	 * Process row list.
+	 *
+	 * @param _rowList the _row list
+	 * @param _packageName the _package name
+	 */
 	private void processRowList(List<Map> _rowList, String _packageName)
 	{
 		for (Map columnMap: _rowList)
@@ -694,6 +893,11 @@ public class Compiler
 		}
 	}
 
+	/**
+	 * Generate interface files.
+	 *
+	 * @param _element the _element
+	 */
 	private void generateInterfaceFiles(Element _element)
 	{
 		JavaGenerator generator = new JavaGenerator();
@@ -713,33 +917,71 @@ public class Compiler
 		}
 	}
 	
+	/**
+	 * Checks if is nullable.
+	 *
+	 * @param _columnMap the _column map
+	 * @return true, if is nullable
+	 */
 	private boolean isNullable(Map _columnMap)
 	{
 		return ("yes".equalsIgnoreCase((String) _columnMap.get("isNullable")) == true);
 	}
 	
+	/**
+	 * Checks if is primary key.
+	 *
+	 * @param _columnMap the _column map
+	 * @return true, if is primary key
+	 */
 	private boolean isPrimaryKey(Map _columnMap)
 	{
 		return ("pri".equalsIgnoreCase((String) _columnMap.get("columnKey")) == true);
 	}
 
+	/**
+	 * Checks if is auto increment primary key.
+	 *
+	 * @param _columnMap the _column map
+	 * @return true, if is auto increment primary key
+	 */
 	private boolean isAutoIncrementPrimaryKey(Map _columnMap)
 	{
 		return ("auto_increment".equalsIgnoreCase((String) _columnMap.get("extra")) == true);
 	}
 
+	/**
+	 * Checks if is foreign key.
+	 *
+	 * @param _columnMap the _column map
+	 * @return true, if is foreign key
+	 */
 	private boolean isForeignKey(Map _columnMap)
 	{
 		return ("".equalsIgnoreCase((String) _columnMap.get("referencedTableName")) == false) &&
 				(_columnMap.get("referencedTableName") != null);
 	}
 
+	/**
+	 * Checks if is searchable.
+	 *
+	 * @param _columnMap the _column map
+	 * @return true, if is searchable
+	 */
 	private boolean isSearchable(Map _columnMap)
 	{
 		return ("mul".equalsIgnoreCase((String) _columnMap.get("columnKey")) == true) ||
 				("uni".equalsIgnoreCase((String) _columnMap.get("columnKey")) == true);
 	}
 
+	/**
+	 * Gets the java type.
+	 *
+	 * @param _databaseType the _database type
+	 * @param _precision the _precision
+	 * @param _scale the _scale
+	 * @return the java type
+	 */
 	private String getJavaType(String _databaseType, Integer _precision, Integer _scale)
 	{
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "database type is: " + _databaseType);
@@ -771,6 +1013,12 @@ public class Compiler
 		return javaType;
 	}
 
+	/**
+	 * Checks if is clockable.
+	 *
+	 * @param _element the _element
+	 * @return true, if is clockable
+	 */
 	public boolean isClockable(Element _element)
 	{
 		boolean isClockable = false;

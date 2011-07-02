@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,10 @@
 
 package airlift.generator; 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface Undoable.
+ */
 @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 
 public @interface Undoable
@@ -22,5 +26,10 @@ public @interface Undoable
 	//Method level Undoable annotations will give unpredictable
 	//results.
 	
+	/**
+	 * Checks if is undoable.
+	 *
+	 * @return true, if is undoable
+	 */
 	public boolean isUndoable() default true;
 }

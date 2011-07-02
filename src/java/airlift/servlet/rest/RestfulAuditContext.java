@@ -1,5 +1,5 @@
 /*
- Copyright 2007, Lucid Technics, LLC.
+ Copyright 2011, Lucid Technics, LLC.
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  except in compliance with the License. You may obtain a copy of the License at
@@ -18,12 +18,27 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.users.User;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RestfulAuditContext.
+ */
 public class RestfulAuditContext
 {	
+	
+	/** The Constant log. */
 	private static final Logger log = Logger.getLogger(RestfulAuditContext.class.getName());
 	
+	/**
+	 * Instantiates a new restful audit context.
+	 */
 	public RestfulAuditContext() {}
 
+	/**
+	 * Copy entity to audit trail.
+	 *
+	 * @param _entity the _entity
+	 * @return the audit trail
+	 */
 	public AuditTrail copyEntityToAuditTrail(com.google.appengine.api.datastore.Entity _entity)
 	{
 		AuditTrail auditTrail = new AuditTrail();
@@ -43,6 +58,12 @@ public class RestfulAuditContext
 		return auditTrail;
 	}
 
+	/**
+	 * Copy audit trail to entity.
+	 *
+	 * @param _auditTrail the _audit trail
+	 * @return the com.google.appengine.api.datastore. entity
+	 */
 	public com.google.appengine.api.datastore.Entity copyAuditTrailToEntity(AuditTrail _auditTrail)
 	{
 		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AuditTrail", _auditTrail.getId());
@@ -61,6 +82,15 @@ public class RestfulAuditContext
 		return entity;
 	}
 
+	/**
+	 * Collect.
+	 *
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AuditTrail> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -81,6 +111,12 @@ public class RestfulAuditContext
 		return results;
 	}
 
+	/**
+	 * Insert.
+	 *
+	 * @param _auditTrail the _audit trail
+	 * @return the string
+	 */
 	public String insert(AuditTrail _auditTrail)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -105,11 +141,23 @@ public class RestfulAuditContext
 		return _auditTrail.getId();
 	}
 
+	/**
+	 * Exists.
+	 *
+	 * @param _id the _id
+	 * @return true, if successful
+	 */
 	public boolean exists(String _id)
 	{
 		return (this.get(_id) != null);
 	}
 
+	/**
+	 * Gets the.
+	 *
+	 * @param _id the _id
+	 * @return the audit trail
+	 */
 	public AuditTrail get(String _id)
 	{
 		AuditTrail auditTrail = new AuditTrail();
@@ -129,6 +177,11 @@ public class RestfulAuditContext
 		return auditTrail;
 	}
 
+	/**
+	 * Update.
+	 *
+	 * @param _auditTrail the _audit trail
+	 */
 	public void update(AuditTrail _auditTrail)
 	{
 		if (_auditTrail.getId() == null)
@@ -156,6 +209,11 @@ public class RestfulAuditContext
 
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param _auditTrail the _audit trail
+	 */
 	public void delete(AuditTrail _auditTrail)
 	{
 		try
@@ -169,6 +227,16 @@ public class RestfulAuditContext
 		}
 	}
 
+	/**
+	 * Collect by domain id.
+	 *
+	 * @param _value the _value
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
@@ -189,6 +257,16 @@ public class RestfulAuditContext
 		return results;
 	}
 
+	/**
+	 * Collect by user id.
+	 *
+	 * @param _value the _value
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
 	public java.util.List<AuditTrail> collectByUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
