@@ -13,23 +13,21 @@
 */
 package airlift.util;
 
+import com.google.appengine.api.urlfetch.*;
+
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.urlfetch.HTTPHeader;
-import com.google.appengine.api.urlfetch.HTTPMethod;
-import com.google.appengine.api.urlfetch.HTTPRequest;
-import com.google.appengine.api.urlfetch.HTTPResponse;
-import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class Browser.
+ * The Class Browser allows the creation of HTTP requests. It is built on top
+ * of Google App Engine's API.
+ * @see <a>http://code.google.com/appengine/docs/java/javadoc>Google AppEngine Java Doc</a>
+ *
  */
 public final class Browser
 {
     
-    /** The log. */
+    /** The logger. */
     private static Logger log = Logger.getLogger(Browser.class.getName());
 
 	/**
@@ -38,7 +36,7 @@ public final class Browser
 	public Browser() {}
 
 	/**
-	 * Execute request.
+	 * Executes an HTTP GET request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -49,7 +47,7 @@ public final class Browser
 	}
 
 	/**
-	 * Execute request.
+	 * Execute an HTTP request given an HTTPMethod and URL.
 	 *
 	 * @param _url the _url
 	 * @param _method the _method
@@ -61,7 +59,7 @@ public final class Browser
 	}
 
 	/**
-	 * Execute request.
+	 * Execute an HTTP request given an HTTPMethod, URL, and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _method the _method
@@ -74,7 +72,7 @@ public final class Browser
 	}
 
 	/**
-	 * Execute request.
+	 * Execute an HTTP request given an HTTPMethod, URL, Map of parameters, and Map of Headers.
 	 *
 	 * @param _url the _url
 	 * @param _method the _method
@@ -145,7 +143,7 @@ public final class Browser
 	}
 
 	/**
-	 * Execute request.
+	 * Execute an HTTP request using a given com.google.appengine.api.fetc.HTTP
 	 *
 	 * @param _httpRequest the _http request
 	 * @return the hTTP response
@@ -167,7 +165,7 @@ public final class Browser
 	}
 
 	/**
-	 * Creates the query string.
+	 * Creates the query string for a HTTP request with a given Map of parameters.
 	 *
 	 * @param _parameterMap the _parameter map
 	 * @return the string
@@ -186,7 +184,6 @@ public final class Browser
 				count++;
 				if (count > 1)	{ prefix = "&";	}
 				queryString.append(prefix).append(name).append("=").append(_parameterMap.get(name));
-				//queryString.append(prefix).append(encode(name, "UTF-8")).append("=").append(encode(_parameterMap.get(name), "UTF-8"));
 			}
 		}
 
@@ -194,7 +191,7 @@ public final class Browser
 	}
 
 	/**
-	 * Adds the headers.
+	 * Adds the headers to a given HTTPRequest object given a Map of headers.
 	 *
 	 * @param _httpRequest the _http request
 	 * @param _headerMap the _header map
@@ -211,7 +208,7 @@ public final class Browser
 	}
 
 	/**
-	 * Gets the.
+	 * Executes a HTTP GET request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -222,7 +219,7 @@ public final class Browser
 	}
 
 	/**
-	 * Gets the.
+	 * Executes a HTTP GET request for a given URL, and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -234,8 +231,7 @@ public final class Browser
 	}
 
 	/**
-	 * Gets the.
-	 *
+     * Executes a HTTP GET request for a given URL, Map of parameters, and Map of headers.
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
 	 * @param _headerMap the _header map
@@ -247,7 +243,7 @@ public final class Browser
 	}
 
 	/**
-	 * Post.
+	 * Executes a HTTP POST request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -258,7 +254,7 @@ public final class Browser
 	}
 
 	/**
-	 * Post.
+	 * Executes a HTTP POST request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -270,7 +266,7 @@ public final class Browser
 	}
 
 	/**
-	 * Post.
+     * Executes a HTTP POST request for a given URL, Map of parameters, and Map of headers.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -283,7 +279,7 @@ public final class Browser
 	}
 
 	/**
-	 * Put.
+     * Executes a HTTP PUT request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -294,7 +290,7 @@ public final class Browser
 	}
 
 	/**
-	 * Put.
+     * Executes a HTTP PUT request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -306,7 +302,7 @@ public final class Browser
 	}
 
 	/**
-	 * Put.
+     * Executes a HTTP PUT request for a given URL, Map of parameters, and Map of headers.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -319,7 +315,7 @@ public final class Browser
 	}
 
 	/**
-	 * Delete.
+     * Executes a HTTP DELETE request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -330,7 +326,7 @@ public final class Browser
 	}
 
 	/**
-	 * Delete.
+     * Executes a HTTP DELETE request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -342,7 +338,7 @@ public final class Browser
 	}
 
 	/**
-	 * Delete.
+     * Executes a HTTP DELETE request for a given URL and Map of parameters, and Map of headers.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -355,7 +351,7 @@ public final class Browser
 	}
 
 	/**
-	 * Head.
+     * Executes a HTTP HEAD request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -366,7 +362,7 @@ public final class Browser
 	}
 
 	/**
-	 * Head.
+     * Executes a HTTP HEAD request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -378,7 +374,7 @@ public final class Browser
 	}
 
 	/**
-	 * Head.
+     * Executes a HTTP HEAD request for a given URL, Map of parameters, and Map of headers.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -391,7 +387,7 @@ public final class Browser
 	}
 
 	/**
-	 * Options.
+     * Executes a HTTP OPTIONS request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -402,7 +398,7 @@ public final class Browser
 	}
 
 	/**
-	 * Options.
+     * Executes a HTTP OPTIONS request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -414,12 +410,15 @@ public final class Browser
 	}
 
 	/**
-	 * Options.
+     * Executes a HTTP OPTIONS request for a given URL, Map of parameters, and Map of headers.
+     * Note: The OPTIONS method is not supported by Google AppEngine and a RuntimeException is
+     * thrown.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
 	 * @param _headerMap the _header map
 	 * @return the hTTP response
+     * @throws RuntimeException
 	 */
 	public HTTPResponse options(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
@@ -427,7 +426,7 @@ public final class Browser
 	}
 
 	/**
-	 * Trace.
+     * Executes a HTTP TRACE request for a given URL.
 	 *
 	 * @param _url the _url
 	 * @return the hTTP response
@@ -438,7 +437,7 @@ public final class Browser
 	}
 
 	/**
-	 * Trace.
+     * Executes a HTTP TRACE request for a given URL and Map of parameters.
 	 *
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
@@ -450,12 +449,14 @@ public final class Browser
 	}
 
 	/**
-	 * Trace.
-	 *
+     * Executes a HTTP TRACE request for a given URL, Map of parameters, and Map of headers.
+	 * Note: The OPTIONS method is not supported by Google AppEngine and a RuntimeException is
+     * thrown.
 	 * @param _url the _url
 	 * @param _parameterMap the _parameter map
 	 * @param _headerMap the _header map
 	 * @return the hTTP response
+     * @throws RuntimeException
 	 */
 	public HTTPResponse trace(String _url, Map<String, String> _parameterMap, Map<String, String> _headerMap)
 	{
@@ -463,11 +464,12 @@ public final class Browser
 	}
 
 	/**
-	 * Encode.
+	 * HTML form encodes a given URI with a given encoding.
 	 *
 	 * @param _uri the _uri
 	 * @param _encoding the _encoding
 	 * @return the string
+     * @see java.net.URLEncoder
 	 */
 	public String encode(String _uri, String _encoding)
 	{

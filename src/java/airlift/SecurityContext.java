@@ -12,9 +12,7 @@
  specific language governing permissions and limitations under the License.
 */
 
-package airlift; 
-
-import com.google.appengine.api.users.User;
+package airlift;
 
 // TODO: Auto-generated Javadoc
 /**

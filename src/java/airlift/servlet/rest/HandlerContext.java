@@ -15,14 +15,12 @@
 
 package airlift.servlet.rest;
 
-import java.util.Map;
-import java.util.logging.Logger;
+import airlift.domain.DomainConfiguration;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import airlift.domain.DomainConfiguration;
+import java.util.Map;
+import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -14,35 +14,29 @@
 
 package airlift.util;
 
+import javax.script.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
-import javax.script.SimpleScriptContext;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class ScriptingUtil.
+ * The Class ScriptingUtil gives basic scripting functionality.
+ * @see javax.script.ScriptEngine
  */
 public class ScriptingUtil
 {
-    
+
     /** The type. */
     private String type;
-    
+
     /** The script engine manager. */
     private ScriptEngineManager scriptEngineManager;
-    
+
     /** The script engine. */
     private ScriptEngine scriptEngine;
-    
+
     /** The script context. */
     private ScriptContext scriptContext;
 
@@ -52,58 +46,58 @@ public class ScriptingUtil
      * @return the type
      */
     private String getType() { return type; }
-    
+
     /**
      * Gets the script engine manager.
      *
      * @return the script engine manager
      */
     private ScriptEngineManager getScriptEngineManager() { return scriptEngineManager; }
-    
+
     /**
      * Gets the script engine.
      *
      * @return the script engine
      */
     private ScriptEngine getScriptEngine() { return scriptEngine; }
-    
+
     /**
      * Gets the script context.
      *
      * @return the script context
      */
     private ScriptContext getScriptContext() { return scriptContext; }
-    
+
     /**
      * Sets the type.
      *
      * @param _type the new type
      */
     public void setType(String _type) { type = _type; }
-    
+
     /**
      * Sets the script engine manager.
      *
      * @param _scriptEngineManager the new script engine manager
      */
     public void setScriptEngineManager(ScriptEngineManager _scriptEngineManager) { scriptEngineManager = _scriptEngineManager; }
-    
+
     /**
      * Sets the script engine.
      *
      * @param _scriptEngine the new script engine
      */
     public void setScriptEngine(ScriptEngine _scriptEngine) { scriptEngine = _scriptEngine; }
-    
+
     /**
      * Sets the script context.
      *
      * @param _scriptContext the new script context
      */
     public void setScriptContext(ScriptContext _scriptContext) { scriptContext = _scriptContext; }
-    
+
     /**
-     * Instantiates a new scripting util.
+     * Instantiates a new ScriptingUtil using a javascript script engine.
      */
     public ScriptingUtil()
     {
@@ -111,7 +105,7 @@ public class ScriptingUtil
     }
 
     /**
-     * Instantiates a new scripting util.
+     * Instantiates a new ScriptingUtil with a given type of script engine.
      *
      * @param _type the _type
      */
@@ -123,7 +117,7 @@ public class ScriptingUtil
     }
 
     /**
-     * Inits the.
+     * Initializes using a Map  to set Bindings.
      *
      * @param _bindingsMap the _bindings map
      */
@@ -136,7 +130,7 @@ public class ScriptingUtil
     }
 
     /**
-     * Execute script.
+     * Execute script using a given script resource.
      *
      * @param _scriptResource the _script resource
      * @return the object
@@ -166,14 +160,14 @@ public class ScriptingUtil
 		return result;
 		}
 
-		/**
-		 * Execute.
-		 *
-		 * @param _script the _script
-		 * @return the object
-		 */
-		public Object execute(String _script)
-		{
+    /**
+     * Executes a script.
+     *
+     * @param _script the _script
+     * @return the object
+     */
+    public Object execute(String _script)
+    {
 		if (_script == null)
 		{
 			throw new RuntimeException("Unable to execute null script");

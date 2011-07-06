@@ -14,12 +14,11 @@
 
 package airlift.generator;
 
-import java.util.Map;
-
-import javax.lang.model.element.Element;
-
 import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.lang.StringUtils;
+
+import javax.lang.model.element.Element;
+import java.util.Map;
 
 // TODO: Auto-generated Javadoc
 /**

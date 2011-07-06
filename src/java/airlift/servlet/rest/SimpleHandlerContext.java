@@ -14,19 +14,14 @@
 
 package airlift.servlet.rest;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.antlr.stringtemplate.StringTemplateGroup;
-
 import airlift.domain.DomainConfiguration;
 import airlift.util.JavascriptingUtil;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
-import com.google.appengine.api.users.User;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
 /**

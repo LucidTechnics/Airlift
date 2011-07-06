@@ -16,11 +16,9 @@ package airlift.util;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.apache.commons.lang.StringUtils;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class XhtmlTemplateUtil.
+ * The Class XhtmlTemplateUtil is a utility that helps create XHTML based on StringTemplates.
  */
 public class XhtmlTemplateUtil
 {

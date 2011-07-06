@@ -13,25 +13,19 @@
 */
 package airlift.util;
 
-import com.google.appengine.api.xmpp.JID;
-import com.google.appengine.api.xmpp.Message;
-import com.google.appengine.api.xmpp.MessageBuilder;
-import com.google.appengine.api.xmpp.SendResponse;
-import com.google.appengine.api.xmpp.XMPPService;
-import com.google.appengine.api.xmpp.XMPPServiceFactory;
+import com.google.appengine.api.xmpp.*;
 
-// TODO: Auto-generated Javadoc
 /**
  * XMPP Utility Class.
  */
 public class XMPPUtil 
 {
-	// Suppress default constructor so it cannot be instantiated.
 	/**
-	 * Instantiates a new xMPP util.
+	 * Instantiates a new XMPP util.
 	 */
 	private XMPPUtil()
 	{
+        // Suppress default constructor so it cannot be instantiated.
 		throw new AssertionError();
 	}
 	

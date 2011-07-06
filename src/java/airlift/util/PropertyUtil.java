@@ -17,9 +17,8 @@ package airlift.util;
 import java.util.Map;
 import java.util.Properties;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PropertyUtil.
+ * The Class PropertyUtil is a utility for handling Property files.
  */
 public class PropertyUtil
 {
@@ -43,7 +42,7 @@ public class PropertyUtil
     }
     
     /**
-     * Gets the property.
+     * Gets a property for a given resource.
      *
      * @param _resourceName the _resource name
      * @param _propertyName the _property name

@@ -13,10 +13,7 @@
 */
 package airlift.generator;
 
-import java.io.Writer;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -24,8 +21,10 @@ import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
-
-import org.antlr.stringtemplate.StringTemplateGroup;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 // TODO: Auto-generated Javadoc
 /**

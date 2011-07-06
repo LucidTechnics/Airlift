@@ -14,6 +14,8 @@
 
 package airlift.util;
 
+import org.mozilla.javascript.*;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -21,15 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class JavascriptingUtil.
+ * The Class JavascriptingUtil provides javascript scripting functionality.
  */
 public class JavascriptingUtil
 {

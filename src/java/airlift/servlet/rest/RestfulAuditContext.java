@@ -12,11 +12,9 @@
  specific language governing permissions and limitations under the License.
 */
 
-package airlift.servlet.rest; 
+package airlift.servlet.rest;
 
 import java.util.logging.Logger;
-
-import com.google.appengine.api.users.User;
 
 // TODO: Auto-generated Javadoc
 /**

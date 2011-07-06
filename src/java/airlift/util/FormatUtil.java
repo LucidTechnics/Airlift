@@ -15,11 +15,9 @@
 package airlift.util;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class FormatUtil.
+ * The Class FormatUtil is a utility class for formatting various data types.
  */
 public class FormatUtil
 {
@@ -34,7 +32,7 @@ public class FormatUtil
     public static final String DEFAULT_DOUBLE_FORMAT = "#,##0.00";
 	
 	/**
-	 * Format.
+	 * Formats a String.
 	 *
 	 * @param _string the _string
 	 * @return the string
@@ -52,7 +50,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a java.util.Date using the format MM-dd-yyyy.
 	 *
 	 * @param _date the _date
 	 * @return the string
@@ -63,7 +61,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a java.sql.Timestamp using the format EEE d, MMM yyyy HH:mm:ss.
 	 *
 	 * @param _timestamp the _timestamp
 	 * @return the string
@@ -74,7 +72,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a java.sql.Timestamp with a given pattern.
 	 *
 	 * @param _timestamp the _timestamp
 	 * @param _pattern the _pattern
@@ -86,7 +84,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a java.util.Date with a given pattern.
 	 *
 	 * @param _date the _date
 	 * @param _pattern the _pattern
@@ -114,7 +112,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a Number using the #,##0.00 format.
 	 *
 	 * @param _number the _number
 	 * @return the string
@@ -140,7 +138,7 @@ public class FormatUtil
 	}
 
 	/**
-	 * Format.
+	 * Formats a Boolean.
 	 *
 	 * @param _boolean the _boolean
 	 * @return the string

@@ -13,20 +13,16 @@
 */
 package airlift.util;
 
+import airlift.rest.Route;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
-
-import airlift.rest.Route;
-
-import com.google.gson.GsonBuilder;
-
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class AirliftUtil.
+ * The Class AirliftUtil provides general utility methods.
  */
 public class AirliftUtil
 {
@@ -39,7 +35,7 @@ public class AirliftUtil
 	 *
 	 * @param _allowedDateTimePatterns the _allowed date time patterns
 	 * @param _timeZone the _time zone
-	 * @return the org.apache.commons.beanutils. bean utils bean
+	 * @return BeansUtilsBean
 	 */
 	public static org.apache.commons.beanutils.BeanUtilsBean createBeanUtilsBean(String[] _allowedDateTimePatterns, java.util.TimeZone _timeZone)
 	{
@@ -101,7 +97,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * To json.
+	 * Convert a java.util.List to JSON.
 	 *
 	 * @param _list the _list
 	 * @return the string
@@ -112,7 +108,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * To json.
+	 * Convert object to JSON.
 	 *
 	 * @param _object the _object
 	 * @return the string
@@ -123,7 +119,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * From json.
+	 * Convert object from JSON.
 	 *
 	 * @param _json the _json
 	 * @param _class the _class
@@ -244,7 +240,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Checks if is domain name.
+	 * Checks for a valid domain name.
 	 *
 	 * @param _domainName the _domain name
 	 * @param _rootPackageName the _root package name
@@ -269,7 +265,8 @@ public class AirliftUtil
 	}
 	
 	/**
-	 * Checks if is new domain name.
+	 * Checks if domain name is "new" meaning the creation of a new object. A domain name with
+     * the prefix of "new_" indicates a new domain.
 	 *
 	 * @param _domainName the _domain name
 	 * @param _rootPackageName the _root package name
@@ -391,9 +388,8 @@ public class AirliftUtil
 			else if (parentDomain != null)
 			{
 				String primaryKeyName = airlift.util.AirliftUtil.determinePrimaryKeyName(parentDomain, _rootPackageName);
-				String primaryKey = candidateToken;
-				
-				Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, primaryKey);
+
+                Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, candidateToken);
 				parentDomain = null;
 			}
 		}
@@ -451,7 +447,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Do cipher.
+	 * Creates cipher to encrypt or decrypt data.
 	 *
 	 * @param _message the _message
 	 * @param _password the _password
@@ -505,7 +501,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Encrypt.
+	 * Encrypts data.
 	 *
 	 * @param _initialBytes the _initial bytes
 	 * @param _password the _password
@@ -535,7 +531,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Decrypt.
+	 * Decrypts data.
 	 *
 	 * @param _initialBytes the _initial bytes
 	 * @param _password the _password
@@ -565,7 +561,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Converts byte array.
 	 *
 	 * @param _byteArray the _byte array
 	 * @return the byte[]
@@ -576,7 +572,7 @@ public class AirliftUtil
 	}
 	
 	/**
-	 * Convert.
+	 * Converts String to byte array.
 	 *
 	 * @param _string the _string
 	 * @return the byte[]
@@ -587,7 +583,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Converts long to byte array.
 	 *
 	 * @param _number the _number
 	 * @return the byte[]
@@ -609,7 +605,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Convert integer to byte array.
 	 *
 	 * @param _number the _number
 	 * @return the byte[]
@@ -620,7 +616,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Converts double to byte array.
 	 *
 	 * @param _number the _number
 	 * @return the byte[]
@@ -631,7 +627,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Converts a float to byte array.
 	 *
 	 * @param _number the _number
 	 * @return the byte[]
@@ -642,7 +638,7 @@ public class AirliftUtil
 	}
 
 	/**
-	 * Convert.
+	 * Convert Date to byte array.
 	 *
 	 * @param _date the _date
 	 * @return the byte[]
@@ -747,11 +743,11 @@ public class AirliftUtil
 	}
 	
 	/**
-	 * Describe.
+	 * Describes a domain object by returning a Map with description and values.
 	 *
 	 * @param _do the _do
 	 * @param _interfaceClass the _interface class
-	 * @return the java.util. map
+	 * @return Map of domain object with descriptions and values
 	 */
 	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
 	{

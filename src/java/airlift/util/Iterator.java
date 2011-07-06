@@ -13,18 +13,20 @@
 */
 package airlift.util;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface Iterator.
+ * The Interface Iterator extends java.util.Iterator with for each behaviour.
+ * @see java.util.Iterator
  */
 public interface Iterator
    extends java.util.Iterator
 {
 	
 	/**
-	 * For each.
+	 * Adds for each behaviour to Iterator.
 	 *
 	 * @param _function the _function
+     * @see org.mozilla.javascript.Function
 	 */
 	public void forEach(org.mozilla.javascript.Function _function);
 }
