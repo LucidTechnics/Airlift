@@ -334,12 +334,20 @@ public class RestContext
 		return Boolean.valueOf((getThisDomainIds().isEmpty() == false));
 	}
 
+<<<<<<< local
+	public String getParameter(String _id)
+	{
+		return getIdValue(_id);
+	}
+
+=======
 	/**
 	 * Gets the id value.
 	 *
 	 * @param _id the _id
 	 * @return the id value
 	 */
+>>>>>>> other
 	public String getIdValue(String _id)
 	{
 		return (String)getUriParameterMap().get(_id.toLowerCase());
