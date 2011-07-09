@@ -345,7 +345,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 
 		for (var token in Iterator(_tokenList))
 		{
-			var query = new Query("$className$Index").addFilter("index", Query.FilterOperator.EQUAL, token).setKeysOnly();
+			var query = new Query("$className$Index").addFilter("index", Query.FilterOperator.EQUAL, token && token.toLowerCase()).setKeysOnly();
 			var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 			for (var key in Iterator(queryResults))

@@ -2714,4 +2714,35 @@
 <span class='line'>2707</span> 
 <span class='line'>2708</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">contains</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>2709</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>2710</span> </span></pre></body></html>
+<span class='line'>2710</span> 
+<span class='line'>2711</span> </span><span class="COMM">/**
+<span class='line'>2712</span>  * @author Bediako George
+<span class='line'>2713</span>  * @description - Formats value as dictated by
+<span class='line'>2714</span>  * the appropriate airlift.util.FormatUtil.format
+<span class='line'>2715</span>  *
+<span class='line'>2716</span>  * @param _value the value that needs to be formatted as a string.
+<span class='line'>2717</span>  * @param _mask - Optional - the mask that should used to defined the
+<span class='line'>2718</span>  * string format.  Useful for date and timestamp objects.
+<span class='line'>2719</span>  *
+<span class='line'>2720</span>  * @return - formatted string
+<span class='line'>2721</span>  *
+<span class='line'>2722</span>  * @example
+<span class='line'>2723</span>  * var dateString = airlift.format(new Packages.java.util.Date(),
+<span class='line'>2724</span>  * "mm/dd/yyyy");
+<span class='line'>2725</span>  *
+<span class='line'>2726</span>  */</span><span class="WHIT">
+<span class='line'>2727</span> </span><span class="NAME">airlift.format</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">_value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_mask</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>2728</span> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>2729</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">formattedValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>2730</span> 
+<span class='line'>2731</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_value</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">_mask</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>2732</span> </span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>2733</span> </span><span class="WHIT">		</span><span class="NAME">formattedValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Packages.airlift.util.FormatUtil</span><span class="PUNC">(</span><span class="NAME">_value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_mask</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>2734</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>2735</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_value</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>2736</span> </span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>2737</span> </span><span class="WHIT">		</span><span class="NAME">formattedValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Packages.airlift.util.FormatUtil</span><span class="PUNC">(</span><span class="NAME">_value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>2738</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>2739</span> 
+<span class='line'>2740</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">formattedValue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>2741</span> </span><span class="PUNC">}</span></pre></body></html>

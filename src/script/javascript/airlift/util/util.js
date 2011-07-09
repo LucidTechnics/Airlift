@@ -1448,7 +1448,7 @@ airlift.tokenizeIntoNGrams = function(_string)
  */
 airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 {
-	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName + "-") : "";
+	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName.toLowerCase() + "-") : "";
 
 	if ("month".equalsIgnoreCase(_datePart) === true )
 	{
@@ -1574,19 +1574,25 @@ airlift.getMonthIntervals = function(_date1, _date2)
  *
  * @param _config - a config object that provides the following
  * properties ...
- * @param _config.filterString - the string of tokens to filter this
- * result on.
- * @param - _config.resultArray the list of active records.
- * @param _config.propertyArray - An array of properties of the array of
- * objects the search is to be performed on.
- * @param _config.startDate - a JavaScript Date or java.util.Date that
- * marks the beginning of the date interval.
- * @param _config.endDate - a JavaScript Date or java.util.Date that
- * marks the end of the date interval.
- * @param - _config.dateFieldName the optional name of the property that
+ * 
+ * <p> _config.filterString - the string of tokens to filter this
+ * result on.</p>
+ * 
+ * <p>_config.resultArray the list of active records.</p>
+ *
+ * <p>_config.propertyArray - An array of properties of the array of
+ * objects the search is to be performed on.</p>
+ *
+ * <p>_config.startDate - a JavaScript Date or java.util.Date that
+ * marks the beginning of the date interval.</p>
+ *
+ * <p>_config.endDate - a JavaScript Date or java.util.Date that
+ * marks the end of the date interval.</p>
+ *
+ * <p>_config.dateFieldName the optional name of the property that
  * contains the date that should fall between the _config.startDate and
  * the _config.endDate.  If not provided this defaults to the
- * auditPutDate of the active record.
+ * auditPutDate of the active record.</p>
  *
  * @returns an array of active records that have properties that match
  * at least partially the words in the filter string and have the
@@ -1626,8 +1632,12 @@ airlift.filter = function(_config)
 
 	var filterTokens = airlift.tokenizeIntoNGrams(filterString);
 
-	var filterFunction = function(_item) {
-
+	var filterFunction = function(_item)
+	{
+		LOG.info("start date time: " + startDate.getTime());
+		LOG.info("target date time: " + (_item[dateFieldName] && _item[dateFieldName].getTime()));
+		LOG.info("end date time: " + endDate.getTime());
+		
 		if ((startDate && endDate && dateFieldName) &&
 			  (
 			   _item[dateFieldName] && _item[dateFieldName].getTime() < startDate.getTime() ||
@@ -2707,3 +2717,50 @@ airlift.filterContains = function(_filter, _propertyName)
 
 	return contains;
 };
+
+/**
+ * @author Bediako George
+ * @description - Formats value as dictated by
+ * the appropriate airlift.util.FormatUtil.format
+ *
+ * @param _value the value that needs to be formatted as a string.
+ * @param _mask - Optional - the mask that should used to defined the
+ * string format.  Useful for date and timestamp objects.
+ *
+ * @return - formatted string
+ *
+ * @example
+ * var dateString = airlift.format(new Packages.java.util.Date(),
+ * "mm/dd/yyyy");
+ *
+ */
+airlift.format = function(_value, _mask)
+{
+	var formattedValue = _value;
+
+	if (_value && _mask)
+	{
+		formattedValue = Packages.airlift.util.FormatUtil.format(_value, _mask);
+	}
+	else if (_value)
+	{
+		formattedValue = Packages.airlift.util.FormatUtil.format(_value);
+	}
+
+	return formattedValue;
+}
+
+/**
+ * @author Bediako George
+ * @description Convenience parameter to return
+ * Packages.airlift.util.AirliftUtil object.
+ *
+ * @example
+ *
+ * var list = airlift.l().a("Bediako").a("Damali");
+ * var jsonList = airlift.util.toJson(list); //executes toJson method
+ * on Packages.airlift.util.AirliftUtil
+ * //Creates json list representation ["Bediako", "Damali"].
+ *
+ */
+airlift.util = Packages.airlift.util.AirliftUtil;

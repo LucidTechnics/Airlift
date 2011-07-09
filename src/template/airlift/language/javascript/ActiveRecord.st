@@ -47,23 +47,48 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	
 	activeRecord.rdfa = function(_config)
 	{
-		LOG.info("Starting RDFA");
 		var config = (airlift.isDefined(_config) === true) ? _config :  {};
 		config.activeRecord = this;
 		
 		var rdfa = airlift.toRdfa(config);
-		LOG.info("Ending RDFA");
 		
 		return rdfa;
 	};
 
+	/**
+	 ** @scope airlift
+	 ** @author Bediako George
+	 **	@description convert a this active record into a json
+	 **	object represention or convert a collection of this active record into
+	 **	a json list of objects representation.
+	 **
+	 **	@param _config Optional. A config object may contain the
+	 **	following information.
+	 **
+	 **	<p> _config.collection - Optional.  If a collection or active
+	 **	records is present then this collection is stringified instead
+	 **	of this active record. </p>
+	 **
+	 **	<p> _config.restify - Optional. Default is false.  If restify
+	 **	is true, all primary and foreign keys will be converted into
+	 **	URIs that point to the resource referred to by the primary or
+	 **	foreign key. </p>
+	 **
+	 ** @return a json representation of this object or the passed in
+	 ** collection of objects.
+	 **
+	 ** @example
+	 ** var jsonObject = airlift.ar('$allLowerCaseClassName$').json();
+	 **
+	 ** var jsonList = airlift.ar('$allLowerCaseClassName$').json({collection: activeRecordList});
+	 **
+	 **/
 	activeRecord.json = function(_config)
 	{
 		//create a Javascript object {} //
 		//Convert Java values to JavaScript values and copy to Object
 		//call JSON.stringify on the JavaScript Object.
 		
-		LOG.info("Starting JSON");
 		if (_config && _config.collection)
 		{
 			var list = new Packages.java.util.ArrayList();
@@ -81,7 +106,6 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			var impl =  (_config && airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
 			var json = Packages.airlift.util.AirliftUtil.toJson(impl);
 		}
-		LOG.info("Ending JSON");
 		
 		return json;
 	};
@@ -362,6 +386,30 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		this.error = true;
 		this.addMessage(_name, _message, _category);
+
+		return this;
+	};
+
+	activeRecord.addValidationError = function(_name, _message)
+	{
+		this.error = true;
+		this.addMessage(_name, _message, "validation");
+
+		return this;
+	};
+
+	activeRecord.addConversionError = function(_name, _message)
+	{
+		this.error = true;
+		this.addMessage(_name, _message, "conversion");
+
+		return this;
+	};
+
+	activeRecord.addBusinessError = function(_name, _message)
+	{
+		this.error = true;
+		this.addMessage(_name, _message, "business");
 
 		return this;
 	};

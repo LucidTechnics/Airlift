@@ -136,6 +136,11 @@ public class JavaScriptGenerator
 
 					daoStringTemplate.setAttribute("indexAddAll", indexAddAll);
 				}
+
+				if ("true".equalsIgnoreCase(isForeignKey) == true)
+				{
+					daoStringTemplate.setAttribute("indexAddAll", "indexSet.add(_activeRecord." + name + ");"); 
+				}
 				
 				hasPrimaryKey = true;
 
@@ -356,7 +361,7 @@ public class JavaScriptGenerator
 
 			if (processedDatable == false)
 			{
-				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\", \"MM-dd-yyyy Z\", \"MM-dd-yyyy HH:mm:ss Z\"}";
+				String dateTimePatterns = ("true".equals(requestDatable) == true) ? findValue(datable, "dateTimePatterns()") : "{ \"MM-dd-yyyy\", \"MM-dd-yyyy HH:mm:ss\", \"MM-dd-yyyy Z\", \"MM-dd-yyyy HH:mm:ss Z\", \"MMM d, yyyy h:mm:ss a\"}";
 				activeRecordStringTemplate.setAttribute("dateTimePatterns", dateTimePatterns.replaceAll("^\\s*\\{", "[").replaceAll("\\}$\\s*", "]"));
 			}
 

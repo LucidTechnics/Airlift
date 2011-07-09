@@ -451,6 +451,5 @@ public class JavascriptingUtil
 		scriptable.setPrototype(sharedScope);
 		scriptable.setParentScope(null);
 		setScope(scriptable);
-		log.info("Resetting scope to this scope: " + scriptable); 
 	}
 }
