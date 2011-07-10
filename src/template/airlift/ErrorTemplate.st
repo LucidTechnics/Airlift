@@ -22,6 +22,7 @@
    <div class="container $showgrid$">
 	  
 	  <div class="span-23 sidebar">
+		 <span style="text-align: center;">$errorMessage$</span>
 		 <img src="images/error/$code$.jpg"  alt="$code$ $message$" width="800px" height="400px" />
 	  </div>
 

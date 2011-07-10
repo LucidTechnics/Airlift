@@ -450,3 +450,35 @@ airlift.email = function(_users, _message, _subject, _from)
 		});
 	}
 };
+
+airlift.doIf = function(_condition, _function, _responseCode)
+{
+	var result;
+	
+	if (_condition === true)
+	{
+		result = _function();
+	}
+	else
+	{
+		CONTENT_CONTEXT.responseCode = _responseCode;
+	}
+
+	return result;
+}
+
+airlift.doUnless = function(_condition, _function, _responseCode)
+{
+	var result;
+	
+	if (_condition === false)
+	{
+		result = _function();
+	}
+	else
+	{
+		CONTENT_CONTEXT.responseCode = _responseCode;
+	}
+
+	return result;
+}
