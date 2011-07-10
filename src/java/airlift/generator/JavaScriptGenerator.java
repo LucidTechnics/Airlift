@@ -184,11 +184,11 @@ public class JavaScriptGenerator
 				{
 					if (type.startsWith("java.util.List") == true)
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && new Packages.java.util.ArrayList(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.ArrayList()); }");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.l(_entity.getProperty(\"" + name + "\")))||(airlift.l()); }");
 					}
 					else if (type.startsWith("java.util.Set") == true)
 					{
-						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && new Packages.java.util.HashSet(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.HashSet()); }");
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.s(_entity.getProperty(\"" + name + "\")))||(airlift.s()); }");
 					}
 					else
 					{
@@ -197,11 +197,33 @@ public class JavaScriptGenerator
 
 					if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true )
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", _activeRecord." + name + "); }");
+						if (type.startsWith("java.util.List") == true)
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", new Packages.java.util.ArrayList(_activeRecord." + name + ")); }");
+						}
+						else if (type.startsWith("java.util.Set") == true)
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", new Packages.java.util.HashSet(_activeRecord." + name + ")); }");
+						}
+						else
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", _activeRecord." + name + "); }");
+						}
 					}
 					else
 					{
-						daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", _activeRecord." + name + "); }");
+						if (type.startsWith("java.util.List") == true)
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.ArrayList(_activeRecord." + name + ")); }");
+						}
+						else if (type.startsWith("java.util.Set") == true)
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.HashSet(_activeRecord." + name + ")); }");
+						}
+						else
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", _activeRecord." + name + "); }");
+						}
 					}
 				}
 				else
