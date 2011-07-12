@@ -209,9 +209,11 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		iterator.forEach = function(_function)
 		{
 			var index = 0;
-			while (this.hasNext() === true)
+			var keepGoing = true;
+			
+			while (this.hasNext() === true && keepGoing === true)
 			{
-				_function(this.next(), index);
+				keepGoing = (airlift.isDefined(_function(this.next(), index)) === true) ? status : true;
 				index++;
 			}
 		}
