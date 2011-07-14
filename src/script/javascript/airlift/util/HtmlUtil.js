@@ -72,7 +72,6 @@ airlift.toRdfa = function(_config)
 {
 	var config = _config||{};
 	var rdfa = null;
-	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : airlift.preparePath(PATH);
 	var appName = config.appName||APP_NAME;
 	var anchorProperty = config.anchorProperty||"id";
 	var anchorClass = config.anchorClass||"";
@@ -82,11 +81,13 @@ airlift.toRdfa = function(_config)
 	var domainName = config.domainName||activeRecord.retrieveDomainName();
 	var anchorTarget = config.anchorTarget||"";
 	var orderedPropertyList = config.displayOrder||activeRecord.retrieveOrderedPropertyList();
+	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : "a/" + domainName + "/" + activeRecord.id;
+	var anchorPath = config.anchorPath||"a/" + domainName + "/" + activeRecord.id;
 
 	if (airlift.isDefined(activeRecord) === true)
 	{
 		var stringBuffer = airlift.sb();
-		stringBuffer.append("<ul class=\"" + domainName + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase()) + "\" >").append("\n");
+		stringBuffer.append("<ul class=\"rdfa " + domainName + " " + APP_PROFILE.getConcept(domainName.toLowerCase()) + "\">").append("\n");
 
 		var dataObject = activeRecord.createImpl();
 		var interfaceObject = activeRecord.retrieveDomainInterface();
@@ -115,22 +116,22 @@ airlift.toRdfa = function(_config)
 					{
 						if (_property.equalsIgnoreCase(anchorProperty) === true)
 						{
-							var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path, domainName, "", anchorTarget, value, _property + "Anchor", anchorClass);
+							var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(anchorPath, domainName, "", anchorTarget, value, _property + "Anchor", anchorClass);
 							value = anchorTemplate.toString();
 						}
 
-						stringBuffer.append("<li ").append(" class=\"").append(type).append(" " + _property).append("\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
+						stringBuffer.append("<li ").append(" class=\"").append(type).append(" " + _property).append(" " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
 					}
 					else if (_property.equalsIgnoreCase("id") === true)
 					{
-						stringBuffer.append("<li ").append(_property).append(" class=\"link " + _property + "\" concept=\"" + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(path).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
+						stringBuffer.append("<li ").append(_property).append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(anchorPath).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
 					}
 					else if (activeRecord.isForeignKey(_property) === true)
 					{
 						var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
 						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
 						var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
-						stringBuffer.append("<li ").append(" class=\"link " + _property + "\" concept=\"" + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift:relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
+						stringBuffer.append("<li ").append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift-relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 					}
 				}
 			}
@@ -376,7 +377,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createMultiInputTemplate();
 							var multiType =  (Packages.org.apache.commons.lang.StringUtils.containsIgnoreCase(inputType.toString(), "radio") === true) ? "radio" : "checkbox" ;
 
-							if ((airlift.string("airlift:boolean")).equalsIgnoreCase(type) === true)
+							if ((airlift.util.createAirliftType("java.lang.Boolean")).equalsIgnoreCase(type) === true)
 							{
 								var checked = "$" + airlift.createCheckedTarget(_property, "") + "$";
 								

@@ -98,7 +98,7 @@ public class JavaGenerator
 									  domainObjectModel.getRootPackageName() + ".domaininterface." + domainObjectModel.getClassName() + "\");");
 				//TODO Need to refactor annotations into class level
 				//and attribute level annotations.
-				String urnRoot = "urn:" + domainObjectModel.getAppName() + ":" + domainObjectModel.getClassName().toLowerCase();
+				String urnRoot = "urn-" + domainObjectModel.getAppName() + "-" + domainObjectModel.getClassName().toLowerCase();
 				template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \"" + urnRoot  + "\");");
 				
 				for (Attribute attribute: domainObjectModel.getAttributeList())
@@ -109,7 +109,7 @@ public class JavaGenerator
 					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
 					String concept = findValue(persist, "concept()");
 					if (concept != null && "".equals(concept) != true) { concept += ","; }
-					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + urnRoot + ":"  + concept + attribute.getName() + "\");");
+					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + urnRoot + "-"  + concept + attribute.getName() + "\");");
 
 					Annotation present = domainObjectModel.getAnnotation(attribute, "airlift.generator.Presentable");
 					String inputType = findValue(present, "inputType()");

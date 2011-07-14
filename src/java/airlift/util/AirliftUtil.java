@@ -138,22 +138,22 @@ public class AirliftUtil
 	 */
 	public static String createAirliftType(String _javaType)
 	{
-		String airliftType = "airlift:string";
+		String airliftType = "airlift-string";
 		String[] tokenArray = _javaType.split("\\.");
 
 		String type = tokenArray[tokenArray.length - 1].toLowerCase();
 
 		if (type.startsWith("int") == true)
 		{
-			airliftType = "airlift:int";
+			airliftType = "airlift-int";
 		}
 		else if (type.startsWith("char") == true)
 		{
-			airliftType = "airlift:char";
+			airliftType = "airlift-char";
 		}
 		else
 		{
-			airliftType = "airlift:" + type;
+			airliftType = "airlift-" + type;
 		}
 
 		return airliftType;
