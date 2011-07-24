@@ -111,7 +111,7 @@ public class RestfulSecurityContext
 		{
 			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_domainName, airlift.generator.Securable.class);
 
-			if (securable.isSecurable() == true)
+			if (securable!= null && securable.isSecurable() == true)
 			{
 				if ("GET".equalsIgnoreCase(_method) == true)
 				{

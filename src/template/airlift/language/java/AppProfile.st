@@ -83,11 +83,16 @@ public class AppProfile
 
 		try
 		{
-			Class domainInterfaceClass = Class.forName(getFullyQualifiedClassName(_domainName));
+			String fullyQualifiedClassName = getFullyQualifiedClassName(_domainName);
 
-			if (domainInterfaceClass.isAnnotationPresent(_annotationClass) == true)
+			if (fullyQualifiedClassName != null)
 			{
-				annotation = domainInterfaceClass.getAnnotation(_annotationClass);
+				Class domainInterfaceClass = Class.forName(fullyQualifiedClassName);
+
+				if (domainInterfaceClass.isAnnotationPresent(_annotationClass) == true)
+				{
+					annotation = domainInterfaceClass.getAnnotation(_annotationClass);
+				}
 			}
 		}
 		catch(Throwable t)
