@@ -306,7 +306,7 @@ public class RestServlet
 
 			if (loginSuccessful == false)
 			{
-				sendCodedPage("401", "UnAuthorized", _response);
+				sendCodedPage("401", "UnAuthorized - you must log in to " + method + " access this resource.", _response);
 			}
 		}
 		else if (!success && user != null)
@@ -318,7 +318,7 @@ public class RestServlet
 				securityContext.update(user, false);
 			}
 
-			sendCodedPage("401", "UnAuthorized", _response);
+			sendCodedPage("401", "UnAuthorized - User " + user.getEmail() + " does not have " + method + " access to this resource. You may <a href=\"" + userService.createLogoutURL(_request.getRequestURI()) + "\">logout</a> and login as a user that does have access to this resource.", _response);
 		}
 		else if (success && timedOut(user) == true)
 		{
