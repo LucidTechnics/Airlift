@@ -84,8 +84,6 @@ airlift.toRdfa = function(_config)
 	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : "a/" + domainName + "/" + activeRecord.id;
 	var anchorPath = config.anchorPath||"a/" + domainName + "/" + activeRecord.id;
 
-
-	
 	if (airlift.isDefined(activeRecord) === true)
 	{
 		var stringBuffer = airlift.sb();
