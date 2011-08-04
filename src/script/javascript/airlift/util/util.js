@@ -2764,3 +2764,83 @@ airlift.format = function(_value, _mask)
  *
  */
 airlift.util = Packages.airlift.util.AirliftUtil;
+
+/**
+ * @author Bediako George
+ * @description render the information in a do into a map property
+ * names to property values as strings.
+ *
+ * @example
+ *
+ * var list = airlift.describe(_personDo, {interfaceClass:
+ * "com.yourapp.PersonDo", auditPostDate: "MMM d, yyyy h:mm:ss a ZZZ" });
+ *
+ */
+
+airlift.describe = function(_do, _config)
+{
+	var config = _config||{};
+	var interfaceClass = _config.interfaceClass||_do.getClass().getName();
+	var activeRecord = config.activeRecord;
+	var filter = config.filter||[];
+	var orderedPropertyList = config.displayOrder||activeRecord.retrieveOrderedPropertyList();
+
+	var descriptionMap = new Packages.java.util.HashMap();
+	
+	var processDo = function(_property)
+	{
+		if ("class".equalsIgnoreCase(_property) === false)
+		{
+			var rawValue = _do["get" + Packages.airlift.util.AirliftUtil.upperTheFirstCharacter(_property)]();
+
+			if (rawValue)
+			{
+				if ("java.util.Date".equals(rawValue.getClass().getName()) === true)
+				{
+					var datable = Packages.airlift.util.AirliftUtil.getMethodAnnotation(interfaceClass, _property, airlift.cc("airlift.generator.Datable"));
+
+					var mask = config[_property];
+
+					if (!mask && datable)
+					{
+						var datePatternArray = datable.dateTimePatterns();
+
+						if (datePatternArray != null && datePatternArray.length > 0)
+						{
+							mask = datePatternArray[0];
+						}
+					}
+					else if (!mask)
+					{
+						mask = "MM-dd-yyyy";
+					}
+
+					LOG.info("Christmas: processing date: " + _property);
+					LOG.info("Christmas: processing raw Value: " + rawValue);
+					LOG.info("Christmas: processing mask: " + mask);
+
+					value = airlift.formatDate(rawValue, mask);
+				}
+				else if ("java.util.ArrayList".equals(rawValue.getClass().getName()) === true ||
+						 "java.util.HashSet".equals(rawValue.getClass().getName()) === true)
+				{
+					value = rawValue||airlift.l();
+				}
+				else
+				{
+					value = (rawValue && rawValue.toString())||null;
+				}
+			}
+			else
+			{
+				value = "";
+			}
+
+			descriptionMap.put(_property, value);
+		}
+	};
+
+	orderedPropertyList.forEach(processDo);
+
+	return descriptionMap;
+}

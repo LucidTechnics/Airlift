@@ -535,9 +535,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return _collection;
 	};
 
-	activeRecord.describe = function()
+	activeRecord.describe = function(_config)
 	{
-		return Packages.airlift.util.AirliftUtil.describe(this.createImpl(), this.retrieveDomainInterface());
+		var config = _config||{};
+		config.interfaceClass = this.retrieveDomainInterface();
+		config.activeRecord = this;
+		
+		return airlift.describe(this.createImpl(), config);
 	};
 
 	activeRecord.populateFromRequestMap = function(_attributeMap)

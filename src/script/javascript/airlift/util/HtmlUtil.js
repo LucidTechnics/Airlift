@@ -91,48 +91,42 @@ airlift.toRdfa = function(_config)
 
 		var dataObject = activeRecord.createImpl();
 		var interfaceObject = activeRecord.retrieveDomainInterface();
-		var propertyMap = Packages.airlift.util.AirliftUtil.describe(dataObject, interfaceObject);
+		var propertyMap = activeRecord.describe(config);
 		
-		if (dataObject instanceof Packages.airlift.Clockable)
-		{
-			orderedPropertyList.push("clock");
-		}
-
 		var processProperties = function(_property, _index, _array)
 		{
-			if (_property.equalsIgnoreCase("class") === false)
+			var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
+			var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
+			
+			var value = airlift.escapeXml(propertyValue);
+			
+			var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
+
+			if ((airlift.isDefined(filter) === false) ||
+				  (airlift.string("")).equalsIgnoreCase(filter) === true ||
+				  (Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true) ||
+				  (airlift.filterContains(filter, _property) === contains))
 			{
-				var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
-				var propertyDescriptor = Packages.org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor(dataObject, _property);
-				var value = airlift.escapeXml(propertyValue);
-				var type = Packages.airlift.util.AirliftUtil.createAirliftType(propertyDescriptor.getPropertyType().getName());
-
-				if ((airlift.isDefined(filter) === false) ||
-					  (airlift.string("")).equalsIgnoreCase(filter) === true ||
-					  (Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) === true) ||
-					  (airlift.filterContains(filter, _property) === contains))
+				if (activeRecord.isForeignKey(_property) === false && _property.equalsIgnoreCase("id") === false)
 				{
-					if (activeRecord.isForeignKey(_property) === false && _property.equalsIgnoreCase("id") === false)
+					if (_property.equalsIgnoreCase(anchorProperty) === true)
 					{
-						if (_property.equalsIgnoreCase(anchorProperty) === true)
-						{
-							var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(anchorPath, domainName, "", anchorTarget, value, _property + "Anchor", anchorClass);
-							value = anchorTemplate.toString();
-						}
+						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(anchorPath, domainName, "", anchorTarget, value, _property + "Anchor", anchorClass);
+						value = anchorTemplate.toString();
+					}
 
-						stringBuffer.append("<li ").append(" class=\"").append(type).append(" " + _property).append(" " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
-					}
-					else if (_property.equalsIgnoreCase("id") === true)
-					{
-						stringBuffer.append("<li ").append(_property).append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(anchorPath).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
-					}
-					else if (activeRecord.isForeignKey(_property) === true)
-					{
-						var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
-						var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
-						var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
-						stringBuffer.append("<li ").append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift-relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
-					}
+					stringBuffer.append("<li ").append(" class=\"").append(type).append(" " + _property).append(" " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" >").append(value).append("</li>\n");
+				}
+				else if (_property.equalsIgnoreCase("id") === true)
+				{
+					stringBuffer.append("<li ").append(_property).append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(domainName.toLowerCase() + "." + _property) + "\" ><a href=\"").append(anchorPath).append("\" rel=\"self\" class=\"").append(type).append("\" >").append(value).append("</a></li>\n");
+				}
+				else if (activeRecord.isForeignKey(_property) === true)
+				{
+					var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
+					var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
+					var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
+					stringBuffer.append("<li ").append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift-relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 				}
 			}
 		}
@@ -241,7 +235,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 	if (domainInterfaceClass.isAnnotationPresent(Packages.java.lang.Class.forName("airlift.generator.Presentable")) === true)
 	{
-		var propertyMap = _activeRecord.describe();
+		var propertyMap = _activeRecord.describe(_config);
 
 		if (dataObject instanceof Packages.airlift.Clockable)
 		{
@@ -513,7 +507,7 @@ airlift.toTable = function(_config)
 		if (airlift.isDefined(include) === false || include)
 		{
 			orderedPropertyList = orderedPropertyList||_activeRecord.retrieveOrderedPropertyList();
-			var propertyMap = _activeRecord.describe();
+			var propertyMap = _activeRecord.describe(config);
 
 			var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + _activeRecord.retrieveDomainName() + "\"");
 			var setHeader = false;
