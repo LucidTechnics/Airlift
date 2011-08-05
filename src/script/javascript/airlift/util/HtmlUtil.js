@@ -143,7 +143,8 @@ airlift.toRdfa = function(_config)
 airlift.toForm = function(_config)
 {
 	var config = (airlift.isDefined(_config) === true) ? _config :  {};
-	var buttonName = (airlift.isDefined(config.buttonName) === true) ? config.buttonName : "submit";
+	var buttonName = config.buttonName||"submit";
+	var formIdSuffix = config.formIdSuffix||"";
 
 	//Determine active record array
 	var slice = Array.prototype.slice;
@@ -163,7 +164,7 @@ airlift.toForm = function(_config)
 			
 	var groupName = (airlift.isDefined(determineGroupName(config.groupName, argumentArray)) === true) ? determineGroupName(config.groupName, argumentArray) : "";
 
-	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(groupName, buttonName);
+	var formTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormTemplate(groupName, buttonName, formIdSuffix);
 
 	var processFieldSet = function(_activeRecord, _index, _array)
 	{
@@ -254,7 +255,6 @@ airlift.toFieldSet = function(_config, _activeRecord)
 			return groupName;
 		}
 
-		var count = 0;
 		var currentGroupName, previousGroupName;
 
 		var fieldSetTemplate;
@@ -294,7 +294,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					{
 						var fieldSetId = airlift.join(currentGroupName, airlift.convertToClassName); 
 						fieldSetTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFieldSetTemplate(currentGroupName, currentGroupName);
-						fieldSetTemplate.setAttribute("fieldSetId", fieldSetId + "_fieldSet");
+						fieldSetTemplate.setAttribute("fieldSetId", fieldSetId + "-fieldSet");
 
 						if (fieldSetArray.length === 0)
 						{
@@ -324,7 +324,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					var maxLength = (airlift.isDefined(methodPersistable) === true) ? airlift.integer(methodPersistable.maxLength()) : airlift.integer(100);
 					var nullable = (airlift.isDefined(methodPersistable) === true) ? methodPersistable.nullable() : true;
 
-					var inputClass = ""; if (nullable === false) { inputClass = "required";	}
+					var inputClass = ""; if (nullable === false) { inputClass = "required";	} else { inputClass = "optional"; }
 					var propertyError = (_activeRecord.getMessageList(_property).size() > 1);
 					
 					switch(inputType)
@@ -339,8 +339,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("text", value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
-							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
-							count++;
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
@@ -349,8 +348,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 						case Packages.airlift.generator.Presentable.Type.PASSWORD:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createInputTemplate("password", groupName, value, maxLength, displayLength, _property, groupName, readOnly, inputClass);
 							formEntryTemplate = XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
-							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
-							count++;
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
@@ -358,10 +356,12 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 						case Packages.airlift.generator.Presentable.Type.TEXTAREA:
 							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTextAreaTemplate(value, textAreaRows, textAreaColumns, _property, groupName, readOnly);
+							inputTemplate.setAttribute("inputClass", inputClass);
+							
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
-							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
-							count++;
-
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
+							
+							
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
 							break;
@@ -402,8 +402,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 							}
 
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
-							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
-							count++;
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
@@ -447,8 +446,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 							inputTemplate.setAttribute("inputClass", inputClass);
 
 							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
-							formEntryTemplate.setAttribute("count", groupName + "_" + _property + "_li_" + count);
-							count++;
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
 
 							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
 
@@ -718,9 +716,11 @@ airlift.populateFormMessages = function(_formTemplate, _groupName, _propertyName
 
 	var messageTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "message");
 	var emClassTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "emClass");
+	var widgetClassTarget = airlift.createTemplateTargetName(_groupName, _propertyName, "widgetClass");
 
 	_formTemplate.setAttribute(messageTarget, airlift.escapeHtml(messageString));
 	_formTemplate.setAttribute(emClassTarget, emClassString);
+	_formTemplate.setAttribute(widgetClassTarget, emClassString);
 };
 
 airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName, _activeRecord)

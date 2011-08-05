@@ -33,16 +33,21 @@ public class XhtmlTemplateUtil
 	 * @param _buttonName the _button name
 	 * @return the string template
 	 */
-	public static StringTemplate createFormTemplate(String _groupName, String _buttonName)
+	public static StringTemplate createFormTemplate(String _groupName, String _buttonName, String _formIdSuffix)
 	{
 		StringTemplate formTemplate = stringTemplateGroup.getInstanceOf("airlift/html/ViewHTMLTemplate");
-		String formId = _groupName + "_form";
+		String formId = _groupName + "-form";
 		
 		formTemplate.setAttribute("formName", "$formTemplateAction$");
 		formTemplate.setAttribute("formId",  formId);
 		formTemplate.setAttribute("buttonName", _buttonName);
-		formTemplate.setAttribute("buttonId", formId + "_button");
-		formTemplate.setAttribute("fieldSetId", formId + "_button_fieldset");
+		formTemplate.setAttribute("buttonId", formId + "-button");
+		formTemplate.setAttribute("fieldSetId", formId + "-button-fieldset");
+
+		if (_formIdSuffix != null && airlift.util.AirliftUtil.isWhitespace(_formIdSuffix) == false)
+		{
+			formTemplate.setAttribute("formIdSuffix", "-" + _formIdSuffix);
+		}
 
 		return formTemplate;
 	}
@@ -108,7 +113,13 @@ public class XhtmlTemplateUtil
 		StringTemplate template = stringTemplateGroup.getInstanceOf("airlift/html/SelectListTemplate");
 
 		if (_name != null) { template.setAttribute("selectAttribute", "name=\"" + _name + "\""); }
-		if (_name != null && _groupName != null) { template.setAttribute("selectAttribute", "id=\"" + _groupName + "_" + _name + "\""); }
+
+		if (_name != null && _groupName != null)
+		{
+			template.setAttribute("selectAttribute", "id=\"" + _groupName + "-" + _name + "\"");
+			template.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.
+		}
+
 		if (_size != null) { template.setAttribute("selectAttribute", "size=\"" + _size + "\""); }
 		if (_multiple) { template.setAttribute("selectAttribute", "multiple=\"" + _multiple + "\""); }
 		if (_disabled) { template.setAttribute("selectAttribute", "disabled=\"" + _disabled + "\""); }
@@ -147,8 +158,9 @@ public class XhtmlTemplateUtil
 		inputTemplate.setAttribute("maxLength", _maxLength);
 		inputTemplate.setAttribute("displayLength", _displayLength);
 		inputTemplate.setAttribute("name", _name);
-		inputTemplate.setAttribute("id", _groupName + "_" + _name);
-		inputTemplate.setAttribute("inputClass", _inputClass);
+		inputTemplate.setAttribute("id", _groupName + "-" + _name);
+		inputTemplate.setAttribute("inputClass", _inputClass + " " + _groupName + "-" + _name);
+		inputTemplate.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.);
 
 		return inputTemplate;
 	}
@@ -174,8 +186,9 @@ public class XhtmlTemplateUtil
 		inputTemplate.setAttribute("maxLength", _maxLength);
 		inputTemplate.setAttribute("displayLength", _displayLength);
 		inputTemplate.setAttribute("name", _name);
-		inputTemplate.setAttribute("id", _groupName + "_" + _name);
-		inputTemplate.setAttribute("inputClass", _inputClass);
+		inputTemplate.setAttribute("id", _groupName + "-" + _name);
+		inputTemplate.setAttribute("inputClass", _inputClass + " " + _groupName + "-" + _name);
+		inputTemplate.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.);
 		
 		return inputTemplate;
 	}
@@ -225,7 +238,8 @@ public class XhtmlTemplateUtil
 		textAreaTemplate.setAttribute("rows", _rows);
 		textAreaTemplate.setAttribute("cols", _cols);
 		textAreaTemplate.setAttribute("name", _name);
-		textAreaTemplate.setAttribute("id", _groupName + "_" + _name);
+		textAreaTemplate.setAttribute("id", _groupName + "-" + _name);
+		textAreaTemplate.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.
 		
 		return textAreaTemplate;
 	}
@@ -248,7 +262,8 @@ public class XhtmlTemplateUtil
 		textAreaTemplate.setAttribute("rows", _rows);
 		textAreaTemplate.setAttribute("cols", _cols);
 		textAreaTemplate.setAttribute("name", _name);
-		textAreaTemplate.setAttribute("id", _groupName + "_" + _name);
+		textAreaTemplate.setAttribute("id", _groupName + "-" + _name);
+		textAreaTemplate.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.
 		
 		return textAreaTemplate;
 	}
@@ -271,11 +286,12 @@ public class XhtmlTemplateUtil
 		formEntryTemplate.setAttribute("name", _name);
 		formEntryTemplate.setAttribute("label", _label);
 
-		formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");
+		formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");  //these are underscores because it is prebinded.
 		
-		formEntryTemplate.setAttribute("emId", "em_" + _groupName + "_" + _name);
+		formEntryTemplate.setAttribute("emId", "em-" + _groupName + "-" + _name);
 		formEntryTemplate.setAttribute("message", _message);
 		formEntryTemplate.setAttribute("input", _inputTemplate.toString());
+		formEntryTemplate.setAttribute("inputClass", "$" + _groupName + "_" + _name + "_widgetClass$");  //these are underscores because it is prebinded.
 
 		return formEntryTemplate;
 	}
@@ -297,7 +313,7 @@ public class XhtmlTemplateUtil
 		formEntryTemplate.setAttribute("label", _label);
 		formEntryTemplate.setAttribute("message", _message);
 		formEntryTemplate.setAttribute("input", _inputTemplate);
-
+		
 		return formEntryTemplate;
 	}
 
@@ -331,7 +347,7 @@ public class XhtmlTemplateUtil
 		StringTemplate hiddenFormEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/HiddenFormEntryTemplate");
 
 		hiddenFormEntryTemplate.setAttribute("name", _name);
-		hiddenFormEntryTemplate.setAttribute("id", _groupName + "_" + _name);
+		hiddenFormEntryTemplate.setAttribute("id", _groupName + "-" + _name);
 		hiddenFormEntryTemplate.setAttribute("value", _value);
 
 		return hiddenFormEntryTemplate;
