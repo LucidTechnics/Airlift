@@ -1039,7 +1039,7 @@ airlift.post = function(_config)
  *
  * var [activeRecord, errorMap] = airlift.put(setName);
  */
-airlift.put = function(_domainName)
+airlift.put = function(_config)
 {
 	if (typeof _domainName === 'function')
 	{

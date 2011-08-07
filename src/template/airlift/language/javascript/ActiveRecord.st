@@ -593,7 +593,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		if ("POST".equalsIgnoreCase(method) === false)
 		{
-			this.id = _restContext.getIdValue("$allLowerCaseClassName$.id");
+			this.id = restContext.getIdValue("$allLowerCaseClassName$.id");
 		}
 
 		return this.messageManager.getMessageMap();
