@@ -544,18 +544,25 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return airlift.describe(this.createImpl(), config);
 	};
 
-	activeRecord.populateFromRequestMap = function(_attributeMap)
+	activeRecord.populateFromRequestMap = function(_config)
 	{
+		var config = _config||{};
+		var restContext = config.restContext||REST_CONTEXT;
+		var parameterMap = config.parameterMap||REQUEST.getParameterMap();
+		var before = config.before||[];
+
 		var value;
 		var converter = this.getConverter();
-
+		var that = this;
+		
 		$copyPropertyFromRequestMap; separator="\n"$
 
+		before.forEach(function(_function) { _function(that, parameterMap, restContext); });
+											   
 		var errorList = [];
 											   
 		$validateProperty; separator="\n"$
 
-		var that = this;
 		errorList.forEach(function(_error) { that.addError(_error.name, _error.message, _error.category); });
 
 		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
@@ -563,9 +570,18 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.messageManager.getMessageMap();
 	};
 
-	activeRecord.populateFromRestContext = function(_restContext, _method)
+	activeRecord.populateFromRestContext = function(_config)
 	{
+		var config = _config||{};
+		var parameterMap = config.parameterMap||REQUEST.getParameterMap();
+		var restContext = config.restContext||REST_CONTEXT;
+		var method = config.method||METHOD;
+		var before = config.before||[];
+		var that = this;
+
 		$assignForeignKeyFromRestContext; separator="\n"$
+
+		before.forEach(function(_function) { _function(that, parameterMap, restContext); });
 
 		var errorList = [];
 
@@ -575,7 +591,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		if (activeRecord.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
 
-		if ("POST".equalsIgnoreCase(_method) === false)
+		if ("POST".equalsIgnoreCase(method) === false)
 		{
 			this.id = _restContext.getIdValue("$allLowerCaseClassName$.id");
 		}
@@ -583,10 +599,10 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this.messageManager.getMessageMap();
 	};
 	
-	activeRecord.populate = function(_attributeMap, _restContext, _method)
+	activeRecord.populate = function(_config)
 	{
-		this.populateFromRequestMap(_attributeMap);
-		return this.populateFromRestContext(_restContext, _method);
+		this.populateFromRequestMap(_config);
+		return this.populateFromRestContext(_config);
 	};
 	
 	activeRecord.toString = function()

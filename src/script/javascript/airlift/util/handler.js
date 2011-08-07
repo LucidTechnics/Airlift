@@ -101,10 +101,13 @@ airlift.p = function(_message)
 //populate an active record with the REQUEST and URI parameters for the
 //given domain name.  If domain name is not specified the domain
 //specified by the URI is assumed.
-airlift.populate = function(_domainName)
+airlift.populate = function(_config)
 {
-	var activeRecord = airlift.ar(_domainName);
-	var errorMap = activeRecord.populate(REQUEST.getParameterMap(), REST_CONTEXT, METHOD);
+	var config = _config||{};
+	
+	var activeRecord = airlift.ar(config.domainName);
+
+	var errorMap = activeRecord.populate(config);
 	
 	return [activeRecord, errorMap];
 };
@@ -112,10 +115,12 @@ airlift.populate = function(_domainName)
 //get the active record from the datastore for the given domain.
 //If the domain is not specified retrieve the domain specified by the
 //URI.
-airlift.get = function(_id, _domainName)
+airlift.get = function(_config)
 {
-	var activeRecord = airlift.ar(_domainName);
-	var id = _id||ID;
+	var config = _config||{};
+	var id = config.id||ID;
+	
+	var activeRecord = airlift.ar(config.domainName);
 	
 	activeRecord.setId(id);
 
@@ -223,33 +228,11 @@ airlift.get = function(_id, _domainName)
  * One may get the runners as shown above.
  *
  */
-airlift.collect = function(_arg1, _arg2)
+airlift.collect = function(_config)
 {
-	if (_arg1 && _arg2)
-	{
-		//_arg1 is the domain name and arg2 the config object
-		var domainName = _arg1;
-		var config = _arg2;
-	}
-	else if (_arg1 && airlift.isDefined(_arg1.length) === true)
-	{
-		//_arg1 is a string or java.lang.String and _arg2 os not
-		//defined.
-		var domainName = _arg1;
-	}
-	else if (_arg1 && typeof _arg1 === 'object')
-	{
-		//_arg1 is a config object
-		var domainName = DOMAIN_NAME;
-		var config = _arg1;
-	}
-	else
-	{
-		//nothing was passed in ...
-		var domainName = DOMAIN_NAME;
-		var config = {};
-	}
-
+	var config = _config||{};
+	var domainName = config.domainName||DOMAIN_NAME;
+	
 	config.limit = config.limit||REQUEST.getParameter("limit")||10;
 	config.offset = config.offset||REQUEST.getParameter("offset")||0;
 	config.orderBy = config.orderBy||REQUEST.getParameter("orderBy")||"auditPutDate";

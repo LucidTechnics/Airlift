@@ -396,7 +396,7 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("restifyForeignKey", "this[\"" + name + "\"] && impl.set" + upperTheFirstCharacter(name) + "(base + \"a/" + name.toLowerCase().replaceAll("id", "") + "/\" + this[\"" + name + "\"]);");
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
-				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && _restContext.getIdValue(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
+				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && restContext.getParameter(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
 				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
 			}
 
@@ -432,22 +432,22 @@ public class JavaScriptGenerator
 			{
 				if (type.startsWith("java.util.List") == true)  
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = _attributeMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
 				}
 				else if (type.startsWith("java.util.Set") == true)
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = _attributeMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
 				}
 				else
 				{
 					if (type.equalsIgnoreCase("java.lang.String") == true ||
 						  type.equalsIgnoreCase("java.lang.Character") == true)
 					{
-						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.airlift.util.FormatUtil.format(converter.convert(value, airlift.cc(\"" + type + "\"))))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && parameterMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.airlift.util.FormatUtil.format(converter.convert(value, airlift.cc(\"" + type + "\"))))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 					}
 					else
 					{
-						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (_attributeMap.get(\"" + name + "\") && _attributeMap.get(\"" + name + "\")[0] && (airlift.isWhitespace(_attributeMap.get(\"" + name + "\")[0]) === false) && _attributeMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && parameterMap.get(\"" + name + "\")[0] && (airlift.isWhitespace(parameterMap.get(\"" + name + "\")[0]) === false) && parameterMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 					}
 
 					if ("false".equals(isForeignKey) == true)

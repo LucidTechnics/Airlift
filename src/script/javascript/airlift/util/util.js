@@ -981,34 +981,29 @@ airlift.mm = function()
  *
  * var [activeRecord, errorMap, id] = airlift.post(setName);
  */
-airlift.post = function(_domainName)
+airlift.post = function(_config)
 {
-	if (typeof _domainName ==='function')
+	if (typeof _domainName === 'function')
 	{
-		var domainName = undefined;
-		var startingIndex = 0;
+		var config = {};
+		var after = [];
+		for (var i = 0; i < arguments.length; i++) { after.push(arguments[i]); }
 	}
 	else
 	{
-		var domainName = _domainName;
-		var startingIndex = 1;
+		var config = _config||{};
+		var after = config.after||[];
 	}
-	
-	var [activeRecord, errorMap] = airlift.populate(domainName);
+
+	var [activeRecord, errorMap] = airlift.populate(config);
 
 	if (activeRecord.error === true)
 	{
 		activeRecord["id"] =  airlift.g();
 	}
 
-	if (arguments.length > startingIndex)
-	{
-		for (var i = startingIndex; i < arguments.length; i++)
-		{
-			arguments[i](activeRecord, errorMap);
-		}
-	}
-
+	after.forEach(function(_function) { _function(activeRecord, errorMap); });
+	
 	if (activeRecord.error === false)
 	{
 		activeRecord.insert();
@@ -1048,25 +1043,20 @@ airlift.put = function(_domainName)
 {
 	if (typeof _domainName === 'function')
 	{
-		var domainName;
-		var startingIndex = 0;
+		var config = {};
+		var after = [];
+		for (var i = 0; i < arguments.length; i++) { after.push(arguments[i]); }
 	}
 	else
 	{
-		var domainName = _domainName;
-		var startingIndex = 1;
+		var config = _config||{};
+		var after = config.after||[];
 	}
 
-	var [activeRecord, errorMap] = airlift.populate(domainName);
+	var [activeRecord, errorMap] = airlift.populate(config);
 
-	if (arguments.length > startingIndex)
-	{
-		for (var i = startingIndex; i < arguments.length; i++)
-		{
-			arguments[i](activeRecord, errorMap);
-		}
-	}
-
+	after.forEach(function(_function) { _function(activeRecord, errorMap); });
+	
 	if (activeRecord.error === false)
 	{
 		activeRecord.update();
@@ -1095,11 +1085,14 @@ airlift.put = function(_domainName)
  * airlift.del("12hgh23", "user");
  *
  */
-airlift.del = function(_id, _domainName)
+airlift.del = function(_config)
 {
-	var activeRecord = airlift.ar(_domainName);
+	var config = _config||{};
+	var id = config.id||ID;
+	
+	var activeRecord = airlift.ar(config.domainName);
 
-	activeRecord.id = (airlift.isDefined(_id) === true) ? _id : ID;
+	activeRecord.id = id;
 
 	activeRecord.del();
 };
@@ -1111,9 +1104,9 @@ airlift.del = function(_id, _domainName)
  * @see airlift.del()
  *
  */
-airlift["delete"] = function(_id, _domainName)
+airlift["delete"] = function(_config)
 {
-	airlift.del(_id, _domainName);
+	airlift.del(_config);
 };
 
 /**
