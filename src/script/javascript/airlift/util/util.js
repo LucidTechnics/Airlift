@@ -983,7 +983,7 @@ airlift.mm = function()
  */
 airlift.post = function(_config)
 {
-	if (typeof _domainName === 'function')
+	if (typeof _config === 'function')
 	{
 		var config = {};
 		var after = [];
@@ -1041,7 +1041,7 @@ airlift.post = function(_config)
  */
 airlift.put = function(_config)
 {
-	if (typeof _domainName === 'function')
+	if (typeof _config === 'function')
 	{
 		var config = {};
 		var after = [];
@@ -1709,7 +1709,7 @@ airlift.getCacheService = function()
  * @returns java.util.TimeZone
  *
  * @example
- * var timezone = airlift.createTimeZone("EST");
+ * var timezone = airlift.createTimeZone("America/New_York");
  *
  * @see java.util.TimeZone
  */
@@ -2807,10 +2807,6 @@ airlift.describe = function(_do, _config)
 					{
 						mask = "MM-dd-yyyy";
 					}
-
-					LOG.info("Christmas: processing date: " + _property);
-					LOG.info("Christmas: processing raw Value: " + rawValue);
-					LOG.info("Christmas: processing mask: " + mask);
 
 					value = airlift.formatDate(rawValue, mask);
 				}

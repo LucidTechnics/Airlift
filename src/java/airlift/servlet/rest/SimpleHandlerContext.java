@@ -176,8 +176,13 @@ public class SimpleHandlerContext
 				scriptingUtil.bind(key, _restContext.getIdValue(restContextDomainName));
 			}
 
+			
 			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : _httpServlet.getServletConfig().getInitParameter("a.timezone");
 			timezone = (timezone == null) ?  "UTC" : timezone;
+
+			log.info("Timezone - a.timezone: " + _httpServletRequest.getParameter("a.timezone"));
+			log.info("Timezone - web.xml a.timezone: " + _httpServlet.getServletConfig().getInitParameter("a.timezone"));
+			log.info("Bound timezone - web.xml a.timezone: " + timezone);
 			
 			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
 			

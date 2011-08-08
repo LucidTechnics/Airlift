@@ -353,7 +353,16 @@ airlift.audit = function(_data, _action, _id)
 
 airlift.formatDate = function(_date, _mask, _timeZone)
 {
-	return Packages.airlift.util.FormatUtil.format(_date, _mask||"MM-dd-yyyy", _timeZone||TIMEZONE);
+	var timeZone = _timeZone && Packages.java.util.TimeZone.getTimeZone(_timeZone)||TIMEZONE;
+	var date = Packages.java.util.Date(_date.getTime());
+	var inDaylightTime = timeZone.inDaylightTime(date);
+
+	if (inDaylightTime === true)
+	{
+		//date = new Packages.java.util.Date(date.getTime() + timeZone.getDSTSavings());
+	}
+	
+	return Packages.airlift.util.FormatUtil.format(date, _mask||"MM-dd-yyyy", _timeZone||TIMEZONE);
 };
 
 airlift.syncAirliftUser = function(_abstractUser, _syncFunction)
