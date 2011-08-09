@@ -330,7 +330,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					switch(inputType)
 					{
 						case Packages.airlift.generator.Presentable.Type.HIDDEN:
-							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, value);
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
 							fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 
 							break;

@@ -318,7 +318,7 @@ public class RestServlet
 				securityContext.update(user, false);
 			}
 
-			sendCodedPage("401", "UnAuthorized - User " + user.getEmail() + " does not have " + method + " access to this resource. You may <a href=\"" + userService.createLogoutURL(_request.getRequestURI()) + "\">logout</a> and login as a user that does have access to this resource.", _response);
+			sendCodedPage("401", "UnAuthorized - User " + user.getEmail() + " does not have " + method + " access to this resource. You may <a href=\"" + userService.createLogoutURL(_request.getRequestURI()) + "\">logout</a> and login as another user.", _response);
 		}
 		else if (success && timedOut(user) == true)
 		{
