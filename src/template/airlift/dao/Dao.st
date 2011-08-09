@@ -213,7 +213,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 			
 			while (this.hasNext() === true && keepGoing === true)
 			{
-				keepGoing = (airlift.isDefined(_function(this.next(), index)) === true) ? status : true;
+				var status = _function(this.next(), index);
+				keepGoing = (airlift.isDefined(status) === true) ? status : true;
 				index++;
 			}
 		}
