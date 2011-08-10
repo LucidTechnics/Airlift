@@ -91,16 +91,12 @@ public class RestfulAuditContext
 	 */
 	public java.util.List<AirliftAuditTrail> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{
-		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
-		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort);
-		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
-
 		java.util.List<AirliftAuditTrail> results = new java.util.ArrayList<AirliftAuditTrail>();
-
-		while (queryResults.hasNext())
+		java.util.Iterator<com.google.appengine.api.datastore.Entity> iterator = iterator(_offset, _limit, _orderBy, _asc);
+		
+		while (iterator.hasNext())
 		{
-			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
+			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) iterator.next();
 			AirliftAuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
 			results.add(auditTrail);
@@ -109,6 +105,25 @@ public class RestfulAuditContext
 		return results;
 	}
 
+	/**
+	 * Collect.
+	 *
+	 * @param _offset the _offset
+	 * @param _limit the _limit
+	 * @param _orderBy the _order by
+	 * @param _asc the _asc
+	 * @return the java.util. list
+	 */
+	public java.util.Iterator<com.google.appengine.api.datastore.Entity> iterator(int _offset, int _limit, String _orderBy, boolean _asc)
+	{
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort);
+
+		return datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
+	}
+
+	
 	/**
 	 * Insert.
 	 *

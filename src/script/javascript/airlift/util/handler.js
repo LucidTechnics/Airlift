@@ -332,7 +332,7 @@ airlift.createCalendar = function(_config)
 	return calendar;
 };
 
-airlift.audit = function(_data, _action, _id)
+airlift.audit = function(_data, _action, _domainName, _id)
 {
 	var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
 
@@ -340,7 +340,7 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.domainId = _id||ID;
 	auditTrail.action = _action;
 	auditTrail.method = METHOD;
-	auditTrail.domain = DOMAIN_NAME;
+	auditTrail.domain = _domainName||DOMAIN_NAME;
 	auditTrail.uri = URI;
 	auditTrail.handlerName = HANDLER_NAME;
 	auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(_data);
@@ -349,6 +349,62 @@ airlift.audit = function(_data, _action, _id)
 	auditTrail.recordDate = auditTrail.actionDate;
 
 	AUDIT_CONTEXT.insert(auditTrail);
+};
+
+airlift.auditTrail = function(_config)
+{
+	var config = _config||{};
+
+	var limit = config.limit||100;
+	var offset = config.offset||0;
+	var orderBy = config.orderBy||"recordDate";
+	var asc = (airlift.isDefined(config.asc) === true) ? config.asc : true;
+	var filterList = config.filterList||airlift.l();
+
+	var datastore = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+	var Query = Packages.com.google.appengine.api.datastore.Query;
+	var sort = (asc == true) ? Query.SortDirection.ASCENDING : Query.SortDirection.DESCENDING;
+	var query = new Query("AirliftAuditTrail").addSort(orderBy, sort);
+
+	filterList.forEach(function(_filter)
+	{
+		query.addFilter(_filter.attribute, Query.FilterOperator[_filter.operatorName], _filter.value);
+	});
+
+	var auditTrails = datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
+
+	var iterator = {};
+
+	iterator.hasNext = function()
+	{
+		return auditTrails.hasNext();
+	}
+
+	iterator.next = function()
+	{
+		var result = auditTrails.next();
+		return AUDIT_CONTEXT.copyEntityToAuditTrail(result);
+	}
+
+	iterator.remove = function()
+	{
+		auditTrails.remove();
+	}
+
+	iterator.forEach = function(_function)
+	{
+		var index = 0;
+		var keepGoing = true;
+
+		while (this.hasNext() === true && keepGoing === true)
+		{
+			var status = _function(auditTrails.next(), index);
+			keepGoing = (airlift.isDefined(status) === true) ? status : true;
+			index++;
+		}
+	}
+
+	return iterator;
 };
 
 airlift.formatDate = function(_date, _mask, _timeZone)
