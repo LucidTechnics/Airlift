@@ -522,13 +522,13 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return method.getAnnotation(Packages.java.lang.Class.forName("airlift.generator.Presentable"));
 	};
 	
-	activeRecord.copyValueArrayToCollection = function(_valueArray, _collection)
+	activeRecord.copyValueArrayToCollection = function(_valueArray, _collection, _conversionFunction)
 	{
 		if (_valueArray)
 		{
 			for (var i = 0; i < _valueArray.length; i++)
 			{
-				_collection.add(_valueArray[i]);
+				_collection.add(_conversionFunction(_valueArray[i]));
 			}
 		}
 

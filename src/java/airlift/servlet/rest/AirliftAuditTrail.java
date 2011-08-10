@@ -18,13 +18,13 @@ package airlift.servlet.rest;
 /**
  * The Class AuditTrail.
  */
-public class AuditTrail
+public class AirliftAuditTrail
 {
 	
 	/**
 	 * Instantiates a new audit trail.
 	 */
-	public AuditTrail() {}
+	public AirliftAuditTrail() {}
 
 	/** The id. */
 	private String id;

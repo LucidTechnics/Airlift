@@ -37,9 +37,9 @@ public class RestfulAuditContext
 	 * @param _entity the _entity
 	 * @return the audit trail
 	 */
-	public AuditTrail copyEntityToAuditTrail(com.google.appengine.api.datastore.Entity _entity)
+	public AirliftAuditTrail copyEntityToAuditTrail(com.google.appengine.api.datastore.Entity _entity)
 	{
-		AuditTrail auditTrail = new AuditTrail();
+		AirliftAuditTrail auditTrail = new AirliftAuditTrail();
 		
 		auditTrail.setId(_entity.getKey().getName());
 		auditTrail.setDomainId((String) _entity.getProperty("domainId"));
@@ -62,9 +62,9 @@ public class RestfulAuditContext
 	 * @param _auditTrail the _audit trail
 	 * @return the com.google.appengine.api.datastore. entity
 	 */
-	public com.google.appengine.api.datastore.Entity copyAuditTrailToEntity(AuditTrail _auditTrail)
+	public com.google.appengine.api.datastore.Entity copyAuditTrailToEntity(AirliftAuditTrail _auditTrail)
 	{
-		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AuditTrail", _auditTrail.getId());
+		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AirliftAuditTrail", _auditTrail.getId());
 		
 		entity.setProperty("domainId", _auditTrail.getDomainId());
 		entity.setProperty("action", _auditTrail.getAction());
@@ -89,19 +89,19 @@ public class RestfulAuditContext
 	 * @param _asc the _asc
 	 * @return the java.util. list
 	 */
-	public java.util.List<AuditTrail> collect(int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftAuditTrail> collect(int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort);
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort);
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
+		java.util.List<AirliftAuditTrail> results = new java.util.ArrayList<AirliftAuditTrail>();
 
 		while (queryResults.hasNext())
 		{
 			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
-			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
+			AirliftAuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
 			results.add(auditTrail);
 		}
@@ -115,7 +115,7 @@ public class RestfulAuditContext
 	 * @param _auditTrail the _audit trail
 	 * @return the string
 	 */
-	public String insert(AuditTrail _auditTrail)
+	public String insert(AirliftAuditTrail _auditTrail)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Transaction transaction = null;
@@ -156,13 +156,13 @@ public class RestfulAuditContext
 	 * @param _id the _id
 	 * @return the audit trail
 	 */
-	public AuditTrail get(String _id)
+	public AirliftAuditTrail get(String _id)
 	{
-		AuditTrail auditTrail = new AuditTrail();
+		AirliftAuditTrail auditTrail = new AirliftAuditTrail();
 
 		try
 		{			
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AuditTrail", _id);
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftAuditTrail", _id);
 			com.google.appengine.api.datastore.Entity entity = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().get(key).get();
 
 			auditTrail = copyEntityToAuditTrail(entity);
@@ -180,7 +180,7 @@ public class RestfulAuditContext
 	 *
 	 * @param _auditTrail the _audit trail
 	 */
-	public void update(AuditTrail _auditTrail)
+	public void update(AirliftAuditTrail _auditTrail)
 	{
 		if (_auditTrail.getId() == null)
 		{
@@ -212,11 +212,11 @@ public class RestfulAuditContext
 	 *
 	 * @param _auditTrail the _audit trail
 	 */
-	public void delete(AuditTrail _auditTrail)
+	public void delete(AirliftAuditTrail _auditTrail)
 	{
 		try
 		{			
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AuditTrail", _auditTrail.getId());
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey("AirliftAuditTrail", _auditTrail.getId());
 			com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService().delete(key);
 		}
 		catch(Throwable t)
@@ -235,19 +235,19 @@ public class RestfulAuditContext
 	 * @param _asc the _asc
 	 * @return the java.util. list
 	 */
-	public java.util.List<AuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftAuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort).addFilter("domainId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort).addFilter("domainId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
+		java.util.List<AirliftAuditTrail> results = new java.util.ArrayList<AirliftAuditTrail>();
 
 		while (queryResults.hasNext())
 		{
 			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
-			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
+			AirliftAuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
 			results.add(auditTrail);
 		}
@@ -265,19 +265,19 @@ public class RestfulAuditContext
 	 * @param _asc the _asc
 	 * @return the java.util. list
 	 */
-	public java.util.List<AuditTrail> collectByUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftAuditTrail> collectByUserId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
 		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AuditTrail").addSort(_orderBy, sort).addFilter("userId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
-		java.util.List<AuditTrail> results = new java.util.ArrayList<AuditTrail>();
+		java.util.List<AirliftAuditTrail> results = new java.util.ArrayList<AirliftAuditTrail>();
 
 		while (queryResults.hasNext())
 		{
 			com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) queryResults.next();
-			AuditTrail auditTrail = copyEntityToAuditTrail(entity);
+			AirliftAuditTrail auditTrail = copyEntityToAuditTrail(entity);
 
 			results.add(auditTrail);
 		}

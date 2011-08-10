@@ -431,7 +431,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 									var displayValue = selectAllowedValue;
 									var selectValue = selectAllowedValue;
 								}
-								
+
 								var selected = "$" + airlift.createSelectedTarget(_property, displayValue) + "$";
 
 								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
@@ -452,8 +452,51 @@ airlift.toFieldSet = function(_config, _activeRecord)
 
 							break;
 
+						case Packages.airlift.generator.Presentable.Type.MULTISELECT:
+							inputTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectTemplate(_property, groupName, 5, true, false);
+
+							var selectAllowedValues = (airlift.isDefined(_config[_property]) === true) ? _config[_property].allowedValues : allowedValues;
+
+							for (var i = 0; i < selectAllowedValues.length; i++)
+							{
+								var selectAllowedValue = selectAllowedValues[i];
+
+								//This is a property whose allowed
+								//values are determined at runtime.
+								if (airlift.isDefined(selectAllowedValue.selectId) === true)
+								{
+									var displayValue = selectAllowedValue.displayValue;
+									var selectValue = selectAllowedValue.selectId;
+								}
+								else
+								{
+									//Use the configurable allowed
+									//values.
+									var displayValue = selectAllowedValue;
+									var selectValue = selectAllowedValue;
+								}
+								
+								var selected = "$" + airlift.createSelectedTarget(_property, displayValue) + "$";
+
+								var selectOptionTemplate = Packages.airlift.util.XhtmlTemplateUtil.createSelectOptionTemplate();
+								selectOptionTemplate.setAttribute("displayValue", airlift.escapeHtml(displayValue));
+								selectOptionTemplate.setAttribute("value", airlift.escapeHtml(selectValue));
+								selectOptionTemplate.setAttribute("selected", selected);
+								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(selectValue));
+
+								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
+							}
+
+							inputTemplate.setAttribute("inputClass", inputClass);
+
+							formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createFormEntryTemplate(_property, groupName, label, messageString, inputTemplate, propertyError);
+							formEntryTemplate.setAttribute("count", groupName + "-" + _property + "-li");
+
+							fieldSetTemplate.setAttribute("formEntry", formEntryTemplate.toString());
+
+							break;
 						default:
-							throw new RuntimeException("Cannot create form. Unknown airlift.generator.Presentable.inputType() value:" + inputType +
+        					throw new RuntimeException("Cannot create form. Unknown airlift.generator.Presentable.inputType() value:" + inputType +
 								" for field: " + _property + " on domain interface : " + domainInterfaceClass.getName() + " used to generate class: " + _activeRecord.createDO().getClass().getName());
 					}
 				}
@@ -751,6 +794,16 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 		{
 			LOG.info(_propertyName + " selected value: " + airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]));
 			_formTemplate.setAttribute(airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]), "selected=\"\"");
+		}
+		else if ("airlift.generator.Presentable.Type.MULTISELECT".equalsIgnoreCase(widget) === true)
+		{
+			var multiSelectCollection = _activeRecord[_propertyName]||airlift.s();
+			for (var collectionValue in Iterator(multiSelectCollection))
+			{
+				var collectionValueSelectedTarget = airlift.createSelectedTarget(_propertyName, collectionValue);
+				LOG.info(_propertyName + " selected value: " + collectionValueSelectedTarget);
+				_formTemplate.setAttribute(collectionValueSelectedTarget, "selected=\"\"");
+			}
 		}
 		else
 		{

@@ -214,11 +214,11 @@ public class JavaScriptGenerator
 					{
 						if (type.startsWith("java.util.List") == true)
 						{
-							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.ArrayList(_activeRecord." + name + ")); }");
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.ArrayList(_activeRecord." + name + "||airlift.l())); }");
 						}
 						else if (type.startsWith("java.util.Set") == true)
 						{
-							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.HashSet(_activeRecord." + name + ")); }");
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.HashSet(_activeRecord." + name + "||airlift.s())); }");
 						}
 						else
 						{
@@ -432,11 +432,11 @@ public class JavaScriptGenerator
 			{
 				if (type.startsWith("java.util.List") == true)  
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.ArrayList());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this." + name + " = this.copyValueArrayToCollection(value, airlift.l(), function(_value) { return Packages.airlift.util.FormatUtil.format(converter.convert(_value, airlift.cc(\"java.lang.String\"))); });");
 				}
 				else if (type.startsWith("java.util.Set") == true)
 				{
-					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this.copyValueArrayToCollection(value, new Packages.java.util.HashSet());");
+					activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap", "value = parameterMap.get(\"" + name + "\")||null; this." + name + " = this.copyValueArrayToCollection(value, airlift.s(), function(_value) { return Packages.airlift.util.FormatUtil.format(converter.convert(_value, airlift.cc(\"java.lang.String\"))); });");
 				}
 				else
 				{

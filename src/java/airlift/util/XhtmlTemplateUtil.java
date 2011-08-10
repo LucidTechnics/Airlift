@@ -121,8 +121,8 @@ public class XhtmlTemplateUtil
 		}
 
 		if (_size != null) { template.setAttribute("selectAttribute", "size=\"" + _size + "\""); }
-		if (_multiple) { template.setAttribute("selectAttribute", "multiple=\"" + _multiple + "\""); }
-		if (_disabled) { template.setAttribute("selectAttribute", "disabled=\"" + _disabled + "\""); }
+		if (_multiple) { template.setAttribute("selectAttribute", "multiple=\"multiple\""); }
+		if (_disabled) { template.setAttribute("selectAttribute", "disabled=\"disabled\""); }
 		
 		return template;
 	}
@@ -283,7 +283,7 @@ public class XhtmlTemplateUtil
 	{
 		StringTemplate formEntryTemplate = stringTemplateGroup.getInstanceOf("airlift/html/FormEntryTemplate");
 
-		formEntryTemplate.setAttribute("name", _name);
+		formEntryTemplate.setAttribute("name", _groupName + "-" + _name); // id of the input field
 		formEntryTemplate.setAttribute("label", _label);
 
 		formEntryTemplate.setAttribute("emClass", "$" + _groupName + "_" + _name + "_emClass$");  //these are underscores because it is prebinded.

@@ -334,7 +334,7 @@ airlift.createCalendar = function(_config)
 
 airlift.audit = function(_data, _action, _id)
 {
-	var auditTrail = new Packages.airlift.servlet.rest.AuditTrail();
+	var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
 
 	auditTrail.id = airlift.g();
 	auditTrail.domainId = _id||ID;
