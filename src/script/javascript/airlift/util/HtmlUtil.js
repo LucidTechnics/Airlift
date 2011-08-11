@@ -208,7 +208,7 @@ airlift.createTemplateTargetName = function(_groupName, _propertyName, _targetTy
 
 airlift.toFieldSet = function(_config, _activeRecord)
 {
-	var timezone = (airlift.isDefined(_config.timezone) === true) ? airlift.string(_config.timezone) : (airlift.isDefined(TIMEZONE) === true) ? TIMEZONE : airlift.string("UTC");
+	var timezone = (airlift.isDefined(_config.timezone) === true) ? airlift.string(_config.timezone) : (airlift.isDefined(TIMEZONE) === true) ? TIMEZONE.getDisplayName() : airlift.string("UTC");
 	var method = (airlift.isDefined(_config.method) === true) ? airlift.string(_config.method) : airlift.string("POST");
 	var groupName = (airlift.isDefined(_config.groupName) === true) ? airlift.string(_config.groupName) : _activeRecord.retrieveDomainName();
 	var filter = (airlift.isDefined(_config.filter) === true) ? _config.filter : ["id", "auditPostDate", "auditPutDate" , "auditUserId"];
