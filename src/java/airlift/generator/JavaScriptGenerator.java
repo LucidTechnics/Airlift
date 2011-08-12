@@ -114,7 +114,8 @@ public class JavaScriptGenerator
 				String isForeignKey = findValue(persist, "isForeignKey()");
 				String rangeable = findValue(persist, "rangeable()");
 				String isImmutable = findValue(persist, "immutable()");
-
+				String semanticType = findValue(persist, "semanticType()");
+				
 				isIndexable = findValue(persist, "isIndexable()");
 				isSearchable = findValue(persist, "isSearchable()");
 
@@ -205,6 +206,13 @@ public class JavaScriptGenerator
 						{
 							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", (_activeRecord." + name + " && new Packages.java.util.HashSet(_activeRecord." + name + "))||_activeRecord." + name + "); }");
 						}
+						else if (type.equalsIgnoreCase("java.lang.String") == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(semanticType) == true)
+						{
+							//com.google.appengine.api.datastore.Text
+							//cannot be indexed and as such must be
+							//added as an unindexed property ...
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.com.google.appengine.api.datastore.Text(_activeRecord." + name + "||"")); }");
+						}
 						else
 						{
 							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setProperty(\"" + name + "\", _activeRecord." + name + "); }");
@@ -219,6 +227,10 @@ public class JavaScriptGenerator
 						else if (type.startsWith("java.util.Set") == true)
 						{
 							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.java.util.HashSet(_activeRecord." + name + "||airlift.s())); }");
+						}
+						else if (type.equalsIgnoreCase("java.lang.String") == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(semanticType) == true)
+						{
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.com.google.appengine.api.datastore.Text(_activeRecord." + name + ")); }");
 						}
 						else
 						{

@@ -27,19 +27,7 @@ public @interface Persistable
     /**
      * The Enum Semantic.
      */
-    public enum Semantic { 
- /** The NONE. */
- NONE, 
- /** The EMAIL. */
- EMAIL, 
- /** The ADDRESS. */
- ADDRESS, 
- /** The CREDI t_ card. */
- CREDIT_CARD, 
- /** The ZIPCODE. */
- ZIPCODE, 
- /** The PHONENUMBER. */
- PHONENUMBER }
+    public enum Semantic { NONE, EMAIL, ADDRESS, CREDITCARD, ZIPCODE, PHONENUMBER, VERYLONGTEXT }
     
 	/**
 	 * Checks if is persistable.

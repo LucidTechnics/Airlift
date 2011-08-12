@@ -582,6 +582,11 @@ public class AirliftUtil
 		return (_string == null) ? null : convert(_string.getBytes());
 	}
 
+	public static String convert(com.google.appengine.api.datastore.Text _text)
+	{
+		return (_text == null) ? null : _text.getValue();
+	}
+
 	/**
 	 * Converts long to byte array.
 	 *

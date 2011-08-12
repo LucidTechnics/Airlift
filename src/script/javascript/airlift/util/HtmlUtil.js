@@ -126,7 +126,7 @@ airlift.toRdfa = function(_config)
 					var foreignDomainName = airlift.determineForeignDomainName(interfaceObject, _property);
 					var relationPath = "a/" + foreignDomainName + "/" + propertyMap.get(_property);
 					var foreignKeyValue = airlift.escapeXml((airlift.isDefined(propertyMap.get(_property)) === true) ? propertyMap.get(_property) : "");
-					stringBuffer.append("<li ").append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath + "/" + propertyMap.get(_property)).append("\" rel=\"airlift-relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
+					stringBuffer.append("<li ").append(" class=\"link " + _property + " " + APP_PROFILE.getConcept(foreignDomainName.toLowerCase() + ".id") + "\" ><a href=\"").append(relationPath).append("\" rel=\"airlift-relation\" class=\"").append(type).append("\" >").append(foreignKeyValue).append("</a></li>\n");
 				}
 			}
 		}
