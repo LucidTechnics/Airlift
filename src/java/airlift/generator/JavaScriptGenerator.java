@@ -211,7 +211,7 @@ public class JavaScriptGenerator
 							//com.google.appengine.api.datastore.Text
 							//cannot be indexed and as such must be
 							//added as an unindexed property ...
-							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.com.google.appengine.api.datastore.Text(_activeRecord." + name + "||"")); }");
+							daoStringTemplate.setAttribute("copyFromActiveRecordToEntity", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _entity.setUnindexedProperty(\"" + name + "\", new Packages.com.google.appengine.api.datastore.Text(_activeRecord." + name + "||\"\")); }");
 						}
 						else
 						{
