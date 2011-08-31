@@ -1398,7 +1398,7 @@ airlift.tokenizeIntoNGrams = function(_string)
 	var string = (airlift.isDefined(_string) === true) ? _string.toString().toLowerCase() : "";
 
 	var indexList = airlift.l();
-	var standardTokenizer = new Packages.org.apache.lucene.analysis.standard.StandardTokenizer(org.apache.lucene.util.Version.LUCENE_30, new Packages.java.io.StringReader(string));
+	var standardTokenizer = new Packages.org.apache.lucene.analysis.standard.StandardTokenizer(Packages.org.apache.lucene.util.Version.LUCENE_30, new Packages.java.io.StringReader(string));
 	var standardTermAttribute = standardTokenizer.addAttribute(Packages.java.lang.Class.forName("org.apache.lucene.analysis.tokenattributes.TermAttribute"));
 
 	while (standardTokenizer.incrementToken() === true)

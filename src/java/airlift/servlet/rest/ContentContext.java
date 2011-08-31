@@ -40,6 +40,8 @@ public abstract class ContentContext
 	/** The Constant FORM_TYPE. */
 	public static final String FORM_TYPE = "application/x-www-form-urlencoded";
 
+	public static final String OCTET_STREAM_TYPE = "application/octet-stream";
+
 	/** The redirect uri. */
 	public String redirectUri;
 	
@@ -185,39 +187,37 @@ public abstract class ContentContext
 	 */
 	public void setDownloadFile(String _downloadFileName)
 	{
-		addHeader("Content-Disposition", "attachment; filename=request-" + _downloadFileName);
+		addHeader("Content-Disposition", "attachment; filename=" + _downloadFileName);
 	}
 	
-	/**
-	 * Checks if is json.
-	 */
 	public void isJson()
 	{
 		setType(JSON_TYPE);
 	}
 
-	/**
-	 * Checks if is html.
-	 */
 	public void isHtml()
 	{
 		setType(HTML_TYPE);
 	}
 
-	/**
-	 * Checks if is xml.
-	 */
 	public void isXml()
 	{
 		setType(XML_TYPE);
 	}
 	
-	/**
-	 * Checks if is atom.
-	 */
 	public void isAtom()
 	{
 		setType(ATOM_TYPE);
+	}
+
+	public void isPdf()
+	{
+		setType(PDF_TYPE);
+	}
+
+	public void isOctetStream()
+	{
+		setType(OCTET_STREAM_TYPE);
 	}
 
 	/**

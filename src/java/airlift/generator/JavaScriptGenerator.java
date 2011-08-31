@@ -191,6 +191,13 @@ public class JavaScriptGenerator
 					{
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.s(_entity.getProperty(\"" + name + "\")))||(airlift.s()); }");
 					}
+					else if (type.equalsIgnoreCase("java.lang.String") == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(semanticType) == true)
+					{
+						//com.google.appengine.api.datastore.Text
+						//cannot be indexed and as such must be
+						//added as an unindexed property ...
+						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && _entity.getProperty(\"" + name + "\").getValue())||null; }");
+					}
 					else
 					{
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && converter.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null; }");
