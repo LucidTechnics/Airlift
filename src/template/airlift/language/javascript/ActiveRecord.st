@@ -576,7 +576,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		
 		$validateForeignKey; separator="\n"$
 
-		errorList.forEach(function(_error) { this.addError(_error.name, _error.message, _error.category); });
+		errorList.forEach(function(_error) { that.addError(_error.name, _error.message, _error.category); });
 
 		if (this.error) { LOG.warning("Active Record: " + this.retrieveDomainName() + " has errors: " + this.messageManager.getMessageMap()); }
 

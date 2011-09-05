@@ -398,7 +398,7 @@ airlift.auditTrail = function(_config)
 
 		while (this.hasNext() === true && keepGoing === true)
 		{
-			var status = _function(auditTrails.next(), index);
+			var status = _function(this.next(), index);
 			keepGoing = (airlift.isDefined(status) === true) ? status : true;
 			index++;
 		}

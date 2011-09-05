@@ -70,8 +70,8 @@ public class RestfulAuditContext
 		entity.setProperty("action", _auditTrail.getAction());
 		entity.setProperty("method", _auditTrail.getMethod());
 		entity.setProperty("domain", _auditTrail.getDomain());
-		entity.setUnindexedProperty("uri", _auditTrail.getUri());
-		entity.setUnindexedProperty("handlerName", _auditTrail.getHandlerName());
+		entity.setProperty("uri", _auditTrail.getUri());
+		entity.setProperty("handlerName", _auditTrail.getHandlerName());
 		entity.setUnindexedProperty("data", _auditTrail.getData());
 		entity.setProperty("userId", _auditTrail.getUserId());
 		entity.setProperty("actionDate", _auditTrail.getActionDate());
