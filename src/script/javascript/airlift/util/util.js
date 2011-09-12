@@ -2485,7 +2485,7 @@ airlift.chat = function(_users, _message)
  */
 airlift.escapeXml = function(_value)
 {
-	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value);
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeXml(_value)||"";
 };
 
 /**
@@ -2527,7 +2527,7 @@ airlift.unescapeXml = function(_value)
 
 airlift.escapeHtml = function(_value)
 {
-	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value);
+	return Packages.org.apache.commons.lang.StringEscapeUtils.escapeHtml(_value)||"";
 };
 
 /**

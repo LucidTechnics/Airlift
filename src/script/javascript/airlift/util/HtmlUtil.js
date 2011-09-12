@@ -380,7 +380,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								inputTemplate.setAttribute("value", "");
 								inputTemplate.setAttribute("maxLength", maxLength);
 								inputTemplate.setAttribute("checked", checked);
-								inputTemplate.setAttribute("id", groupName + "_" + _property);
+								inputTemplate.setAttribute("id", groupName + "-" + _property);
 								inputTemplate.setAttribute("inputClass", inputClass);
 							}
 							else
@@ -396,7 +396,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 									inputTemplate.setAttribute("value", airlift.escapeHtml(allowedValue));
 									inputTemplate.setAttribute("maxLength", maxLength);
 									inputTemplate.setAttribute("checked", checked);
-									inputTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(allowedValue));
+									inputTemplate.setAttribute("id", groupName + "-" + _property + "-" + airlift.escapeHtml(allowedValue).replaceAll(" ", "-"));
 									inputTemplate.setAttribute("inputClass", inputClass);
 								}
 							}
@@ -438,7 +438,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								selectOptionTemplate.setAttribute("displayValue", airlift.escapeHtml(displayValue));
 								selectOptionTemplate.setAttribute("value", airlift.escapeHtml(selectValue));
 								selectOptionTemplate.setAttribute("selected", selected);
-								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(selectValue));
+								selectOptionTemplate.setAttribute("id", groupName + "-" + _property + "-" + airlift.escapeHtml(selectValue).replaceAll(" ", "-"));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
 							}
@@ -482,7 +482,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 								selectOptionTemplate.setAttribute("displayValue", airlift.escapeHtml(displayValue));
 								selectOptionTemplate.setAttribute("value", airlift.escapeHtml(selectValue));
 								selectOptionTemplate.setAttribute("selected", selected);
-								selectOptionTemplate.setAttribute("id", groupName + "_" + _property + "_" + airlift.escapeHtml(selectValue));
+								selectOptionTemplate.setAttribute("id", groupName + "-" + _property + "-" + airlift.escapeHtml(selectValue).replaceAll(" ", "-"));
 
 								inputTemplate.setAttribute("optionList", selectOptionTemplate.toString());
 							}
