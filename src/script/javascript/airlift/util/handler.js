@@ -292,6 +292,8 @@ airlift.renderError = function(_errorMap)
 airlift.prepareUri = function(_id, _uri)
 {
 	var baseURI = (airlift.isDefined(_uri) === true) ? airlift.string(_uri) : URI;
+
+	LOG.info("prepared URI is using base URI: " + baseURI);
 	
 	var uri = airlift.string(baseURI).replaceAll("\\/$", "");
 
@@ -410,7 +412,7 @@ airlift.auditTrail = function(_config)
 airlift.formatDate = function(_date, _mask, _timeZone)
 {
 	var timeZone = _timeZone && Packages.java.util.TimeZone.getTimeZone(_timeZone)||TIMEZONE;
-	var date = Packages.java.util.Date(_date.getTime());
+	var date = _date && Packages.java.util.Date(_date.getTime());
 	
 	return Packages.airlift.util.FormatUtil.format(date, _mask||"MM-dd-yyyy", _timeZone||TIMEZONE);
 };
