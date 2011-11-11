@@ -88,17 +88,16 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		//create a Javascript object {} //
 		//Convert Java values to JavaScript values and copy to Object
 		//call JSON.stringify on the JavaScript Object.
+
+		var config = _config||{};
 		
-		if (_config && _config.collection)
+		if (config && config.collection)
 		{
 			var list = new Packages.java.util.ArrayList();
 
-			_config.collection.forEach(function(_activeRecord)
+			config.collection.forEach(function(_activeRecord)
 			{
-				var impl = (airlift.isDefined(_config.restify) && _config.restify && _activeRecord.restify())||_activeRecord.createImpl();
-
-				_config.nullEncrypted && impl.nullEncrypted();
-				
+				var impl = (airlift.isDefined(config.restify) && config.restify && _activeRecord.restify())||_activeRecord.createImpl();
 				list.add(impl);
 			});
 
@@ -106,8 +105,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		}
 		else
 		{
-			var impl =  (_config && airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
-			_config.nullEncrypted && impl.nullEncrypted();
+			var impl =  (config && airlift.isDefined(config.restify) && config.restify && this.restify())||this.createImpl();
 			var json = Packages.airlift.util.AirliftUtil.toJson(impl);
 		}
 		
