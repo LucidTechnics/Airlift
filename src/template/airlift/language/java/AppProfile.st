@@ -4,7 +4,7 @@ import airlift.servlet.rest.RestfulSecurityContext;
 
 @javax.annotation.Generated
 (
-	value="hannibal.generator.Generator",
+	value="airlift.generator.Generator",
 	comments="$generatorComment$",
 	date = "$dateTimestamp$"
 )

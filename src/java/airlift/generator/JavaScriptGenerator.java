@@ -502,10 +502,10 @@ public class JavaScriptGenerator
 
 		if (_domainObjectModel.getDomainAnnotationSet().contains(auditable) == true)
 		{
-			activeRecordStringTemplate.setAttribute("auditGet", "if (\"on\".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit(this.json(), \"GET\", this.retrieveDomainName(), this.id); }");
-			activeRecordStringTemplate.setAttribute("auditPut", "if (\"on\".equalsIgnoreCase(AUDITING_UPDATE) === true) { airlift.audit(this.json(), \"UPDATE\", this.retrieveDomainName(), this.id); }");
-			activeRecordStringTemplate.setAttribute("auditPost", "if (\"on\".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(this.json(), \"INSERT\", this.retrieveDomainName(), this.id); }");
-			activeRecordStringTemplate.setAttribute("auditDelete", "if (\"on\".equalsIgnoreCase(AUDITING_DELETE) === true) { airlift.audit(this.json(), \"DELETE\", this.retrieveDomainName(), this.id); }");
+			activeRecordStringTemplate.setAttribute("auditGet", "if (\"on\".equalsIgnoreCase(AUDITING_GET) === true) { airlift.audit('{}', \"GET\", this.retrieveDomainName(), this.id); }");
+			activeRecordStringTemplate.setAttribute("auditPut", "if (\"on\".equalsIgnoreCase(AUDITING_UPDATE) === true) { airlift.audit(Packages.airlift.util.AirliftUtil.toJson(propertyMap), \"UPDATE\", this.retrieveDomainName(), this.id); }");
+			activeRecordStringTemplate.setAttribute("auditPost", "if (\"on\".equalsIgnoreCase(AUDITING_INSERT) === true) { airlift.audit(Packages.airlift.util.AirliftUtil.toJson(propertyMap), \"INSERT\", this.retrieveDomainName(), this.id); }");
+			activeRecordStringTemplate.setAttribute("auditDelete", "if (\"on\".equalsIgnoreCase(AUDITING_DELETE) === true) { airlift.audit('{}', \"DELETE\", this.retrieveDomainName(), this.id); }");
 		}
 		
 		activeRecordStringTemplate.setAttribute("attributeStringBufferAppends", stringBufferStringTemplate);

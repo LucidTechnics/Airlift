@@ -22,7 +22,7 @@ public class $className$Impl
 	$attributeSetters$
 
 	public $className$Impl() {}
-
+	
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();

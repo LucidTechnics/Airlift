@@ -301,29 +301,35 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 	dao.insert = function(_activeRecord, _config)
 	{
 		var config = _config||{};
+		var persist = config.persist||true;
 
 		dao.postAudit(_activeRecord);
 		
 		var id = this.provideUniqueId();
-		
+				
 		var parentKey = Packages.com.google.appengine.api.datastore.KeyFactory.createKey("$className$", id);
 		var parent = new Packages.com.google.appengine.api.datastore.Entity(parentKey);
 		dao.copyToEntity(_activeRecord, parent);
 		dao.encrypt(parent);
 
-		$index$
+		if ((airlift.notDefined(config.cacheOnly) === true) || (config.cacheOnly === false))
+		{
+			$index$
 
-		var datastore = this.datastore;
-		var transaction = datastore.beginTransaction().get();
-		
-		var parentWritten = dao.multiTry(function() { datastore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
-		$writeIndex$
+			var datastore = this.datastore;
+			var transaction = datastore.beginTransaction().get();
 
-		$indexWritten$parentWritten && transaction.commitAsync();
+			var parentWritten = dao.multiTry(function() { datastore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
+			$writeIndex$
+
+			$indexWritten$parentWritten && transaction.commitAsync();
+		}
 
 		dao.populateCache(parentKey, parent);
+
+		var propertyMap = (parent && parent.getProperties())||(new Packages.java.util.HashMap());
 		
-		return id;
+		return [id, propertyMap];
 	};
 
 	dao.index = function(_activeRecord)

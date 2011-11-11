@@ -80,6 +80,7 @@ public class RestServlet
 
 		//Create cache for user sessions ...
 		String durationString = this.getServletConfig().getInitParameter("a.session.timeout.duration");
+
 		//set cache timeout to be twice as long as the user's timeout.
 		int duration = (durationString == null) ? (20 * 60 * 2) : Integer.parseInt(durationString);
 
@@ -141,45 +142,29 @@ public class RestServlet
 
 	}
 
-	protected boolean timedOut(AirliftUser _user, HttpServletRequest _request)
+	protected boolean timedOut(AirliftUser _user)
 	{
 		boolean timedOut = false;
 		long currentTimeMillis = System.currentTimeMillis();
 
+		log.info("Current time is: " + currentTimeMillis);
+
 		if (_user != null && _user.getTimeOutDate() != null)
 		{
+			log.info("user time out time is: " + _user.getTimeOutDate().getTime());
 			timedOut = (currentTimeMillis >= _user.getTimeOutDate().getTime());
-		}
-
-		if (timedOut)
-		{
-			//check to see if there is an active airlift hash
-			String hash = _request.getParameter("a.login");
-
-			if (this.cachingContextMap.get("user.session").get(hash) != null)
-			{
-				//They have just logged in for the first time in a while.
-				timedOut = false;
-				this.cachingContextMap.get("user.session").remove(hash);
-			}
 		}
 				
 		return timedOut;
 	}
 
-	protected boolean requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService, String _hash)
+	protected boolean requestLogin(HttpServletRequest _request, HttpServletResponse _response, UserService _userService)
 	{
 		boolean loginRequestSuccessful = false;
 		
 		try
 		{
-			//generate a key and attach as parameter to the request URI
-			StringBuffer requestUri = _request.getRequestURL();
-
-			requestUri = (_request.getQueryString() == null) ? requestUri.append("?a.login=").append(_hash)  : requestUri.append(_request.getQueryString()).append("&a.login=").append(_hash);
-			this.cachingContextMap.get("user.session").put(_hash, "a.login");
-			
-			String uri = _userService.createLoginURL(requestUri.toString());
+			String uri = _userService.createLoginURL(_request.getRequestURL().toString());
 
 			if (uri != null)
 			{
@@ -205,7 +190,11 @@ public class RestServlet
 			if (userLogoutUri != null)
 			{
 				logoutSuccessful = true;
-				_response.sendRedirect(_userService.createLogoutURL(_request.getRequestURI()));
+				String logoutUrl = _userService.createLogoutURL(_request.getRequestURI());
+
+				log.info("User log out URL is: " + logoutUrl);
+				
+				_response.sendRedirect(logoutUrl);
 			}
 		}
 		catch(Throwable t)
@@ -301,8 +290,7 @@ public class RestServlet
 
 		if (!success && user == null)
 		{
-			String hash = airlift.util.IdGenerator.generate(32);
-			boolean loginSuccessful = requestLogin(_request, _response, userService, hash);
+			boolean loginSuccessful = requestLogin(_request, _response, userService);
 
 			if (loginSuccessful == false)
 			{			
@@ -320,17 +308,22 @@ public class RestServlet
 
 			sendCodedPage("401", "UnAuthorized - User " + user.getEmail() + " does not have " + method + " access to this resource. You may <a href=\"" + userService.createLogoutURL(_request.getRequestURI()) + "\">logout</a> and login as another user.", _response);
 		}
-		else if (success && timedOut(user, _request) == true)
-		{
-			user.setTimeOutDate(null); // A user with a null time out date cannot be timed out.
-			securityContext.update(user);
-
+		else if (success && timedOut(user) == true)
+		{			
 			log.info("Timed out user is now: " + user);
+
 			boolean logoutSuccessful = logUserOut(_request, _response, userService);
 
 			if (logoutSuccessful == false)
 			{
+				log.info("Time out incepted log out failed");
 				sendCodedPage("408", "Request Timeout", _response);
+			}
+			else
+			{
+				log.info("Time out incepted log out succeeded");
+				user.setTimeOutDate(null);
+				securityContext.update(user, true);
 			}
 		}
 		else if (success)
@@ -340,22 +333,7 @@ public class RestServlet
 			//or your time out date time is greater than the current date
 			//time.
 
-			try
-			{
-				//if user id is null there is no AirliftUser for this user.
-				if (user != null && user.getId() != null)
-				{
-					user.setTimeOutDate(calculateNextTimeOutDate());
-					securityContext.update(user, true);
-					log.info("Successful user is now: " + user);
-				}
-				
-				processRequest(_request, _response, method, restContext, uriParameterMap);
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
+			proceedToProcessRequest(user, securityContext, _request, _response, method, restContext, uriParameterMap);
 		}
 
 		long totalMegaCycles = quotaService.getCpuTimeInMegaCycles();
@@ -365,6 +343,25 @@ public class RestServlet
 		return restContext;
 	}
 
+	private void proceedToProcessRequest(AbstractUser _user, RestfulSecurityContext _securityContext, HttpServletRequest _request, HttpServletResponse _response, String _method, RestContext _restContext, Map _uriParameterMap)
+	{
+		try
+		{
+			//if user id is null there is no AirliftUser for this user.
+			if (_user != null && _user.getId() != null)
+			{
+				_user.setTimeOutDate(calculateNextTimeOutDate());
+				_securityContext.update(_user, true);
+				log.info("Successful user is now: " + _user);
+			}
+
+			processRequest(_request, _response, _method, _restContext, _uriParameterMap);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+	}
 	/**
 	 * Process request.
 	 *

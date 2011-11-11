@@ -96,6 +96,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 			_config.collection.forEach(function(_activeRecord)
 			{
 				var impl = (airlift.isDefined(_config.restify) && _config.restify && _activeRecord.restify())||_activeRecord.createImpl();
+
+				_config.nullEncrypted && impl.nullEncrypted();
+				
 				list.add(impl);
 			});
 
@@ -104,6 +107,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		else
 		{
 			var impl =  (_config && airlift.isDefined(_config.restify) && _config.restify && this.restify())||this.createImpl();
+			_config.nullEncrypted && impl.nullEncrypted();
 			var json = Packages.airlift.util.AirliftUtil.toJson(impl);
 		}
 		
@@ -240,7 +244,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "PUT"); }
 
-		this.dao.update(this);
+		var propertyMap = this.dao.update(this);
 		$auditPut$
 
 		return this;
@@ -250,7 +254,8 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		if (_config && _config.checkSecurity) { airlift.checkAllowed(this.retrieveDomainName(), "POST"); }
 
-		this.setId(this.dao.insert(this));
+		var [id, propertyMap] = this.dao.insert(this);
+		this.setId(id);
 		$auditPost$
 
 		return this;

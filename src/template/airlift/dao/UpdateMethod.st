@@ -24,17 +24,22 @@ dao.update = function(_activeRecord, _config)
 	dao.copyToEntity(_activeRecord, parent);
 	dao.encrypt(parent);
 
-	$index$
+	if ((airlift.notDefined(config.cacheOnly) === true) || (config.cacheOnly === false))
+	{
+		$index$
 
-	var datastore = this.datastore;
-	var transaction = datastore.beginTransaction().get();
-		
-	var parentWritten = dao.multiTry(function() { datastore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
-	$writeIndex$
+		var datastore = this.datastore;
+		var transaction = datastore.beginTransaction().get();
 
-	$indexWritten$parentWritten && transaction.commitAsync();
+		var parentWritten = dao.multiTry(function() { datastore.put(transaction, parent); return true; }, 5, "Encountered this error while accessing the datastore for $className$ insert", function() { transaction.rollbackAsync(); });
+		$writeIndex$
+
+		$indexWritten$parentWritten && transaction.commitAsync();
+	}
 
 	dao.populateCache(parentKey, parent);
+
+	var propertyMap = (parent && parent.getProperties())||(new Packages.java.util.HashMap());
 	
-	return _activeRecord.id;
+	return propertyMap;
 };

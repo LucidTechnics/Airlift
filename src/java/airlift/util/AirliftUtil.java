@@ -97,6 +97,17 @@ public class AirliftUtil
 	}
 
 	/**
+	 * Convert a java.util.Map to JSON.
+	 *
+	 * @param _map the _map
+	 * @return the string
+	 */
+	public static String toJson(java.util.Map _map)
+	{
+		return new GsonBuilder().create().toJson(_map);
+	}
+
+	/**
 	 * Convert a java.util.List to JSON.
 	 *
 	 * @param _list the _list
