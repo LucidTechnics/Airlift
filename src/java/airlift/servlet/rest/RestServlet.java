@@ -139,7 +139,6 @@ public class RestServlet
 	    throws ServletException, IOException
 	{
 		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.DELETE);
-
 	}
 
 	protected boolean timedOut(AirliftUser _user)
@@ -234,6 +233,15 @@ public class RestServlet
 	 */
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
+		java.util.Enumeration<String> headerNames = _request.getHeaderNames();
+
+		log.info("reporting request header info ..."); 
+		while (headerNames.hasMoreElements() == true)
+		{
+			String headerName = headerNames.nextElement();
+			log.info(headerName +  ":" + _request.getHeader(headerName));
+		}
+			
 		String namespace = this.getServletConfig().getInitParameter("a.namespace");
 		
 		if (namespace != null && org.apache.commons.lang.StringUtils.isWhitespace(namespace) == false)
