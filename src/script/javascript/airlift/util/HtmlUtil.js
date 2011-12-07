@@ -594,7 +594,8 @@ airlift.toTable = function(_config)
 					}
 					else if (_property.equalsIgnoreCase(anchorProperty) === true)
 					{
-						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path + "/" + propertyMap.get("id"), _activeRecord.retrieveDomainName(), "", anchorTarget, propertyValue, _property + "Anchor", anchorClass);
+						LOG.info("Bediako: " + propertyMap);
+						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path + "/" + _activeRecord.id, _activeRecord.retrieveDomainName(), "", anchorTarget, propertyValue, _property + "Anchor", anchorClass);
 						trTemplate.setAttribute("td", anchorTemplate.toString());
 					}
 					else if (_activeRecord.isForeignKey(_property) === true &&
