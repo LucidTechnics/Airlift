@@ -315,7 +315,9 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		if ((airlift.notDefined(config.cacheOnly) === true) || (config.cacheOnly === false))
 		{
 			$index$
-
+					
+			$addIndexFilterParameters; separator="\n"$
+				
 			var datastore = this.datastore;
 			var transaction = datastore.beginTransaction().get();
 

@@ -121,6 +121,10 @@ public class JavaScriptGenerator
 
 				if ("true".equalsIgnoreCase(isSearchable) == true)
 				{
+					//Note!!! This variable is only to be used outside
+					//of the loop.  The intent is that if one attribute
+					//is searchable then the whole domain is to be
+					//considered searchable!!!
 					thisDomainIsSearchable = true;
 
 					String indexAddAll = "";
@@ -292,6 +296,21 @@ public class JavaScriptGenerator
 				updateMethodStringTemplate.setAttribute("index", "var indexList = this.index(_activeRecord), index = new Packages.com.google.appengine.api.datastore.Entity(\"" + _domainObjectModel.getClassName() + "Index\", _activeRecord.id, parentKey); index.setProperty(\"index\", indexList);");
 				updateMethodStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index update\", function() { transaction.rollbackAsync(); });");
 				updateMethodStringTemplate.setAttribute("indexWritten", "indexWritten && ");
+
+				java.util.Iterator updateIndexAttributes = _domainObjectModel.getAttributes();
+
+				while (updateIndexAttributes.hasNext() == true)
+				{
+					Attribute updateIndexAttribute = (Attribute) updateIndexAttributes.next();
+					Annotation updateIndexPersist = (Annotation) _domainObjectModel.getAnnotation(updateIndexAttribute,"airlift.generator.Persistable");
+					String updateIndexAttributeIsIndexable = findValue(updateIndexPersist, "isIndexable()");
+					String updateIndexSemanticType = findValue(updateIndexPersist, "semanticType()");
+					
+					if ("true".equalsIgnoreCase(updateIndexAttributeIsIndexable) == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(updateIndexSemanticType) == false)
+					{
+						updateMethodStringTemplate.setAttribute("addIndexFilterParameters", "index.setProperty(\"" + updateIndexAttribute.getName() + "\", _activeRecord[\"" + updateIndexAttribute.getName() + "\"]);");
+					}
+				}
 			}
 			else
 			{
@@ -319,6 +338,21 @@ public class JavaScriptGenerator
 			daoStringTemplate.setAttribute("index", "var indexList = this.index(_activeRecord), index = new Packages.com.google.appengine.api.datastore.Entity(\"" + _domainObjectModel.getClassName() + "Index\", id, parentKey); index.setProperty(\"index\", indexList);");
 			daoStringTemplate.setAttribute("writeIndex", "var indexWritten = parentWritten && dao.multiTry(function() { datastore.put(transaction, index);  return true; }, 5, \"Encountered this error while accessing the datastore for " + _domainObjectModel.getClassName() + " index insert\", function() { transaction.rollbackAsync(); });");
 			daoStringTemplate.setAttribute("indexWritten", "indexWritten && ");
+			
+			java.util.Iterator insertIndexAttributes = _domainObjectModel.getAttributes();
+
+			while (insertIndexAttributes.hasNext() == true)
+			{
+				Attribute insertIndexAttribute = (Attribute) insertIndexAttributes.next();
+				Annotation insertIndexPersist = (Annotation) _domainObjectModel.getAnnotation(insertIndexAttribute,"airlift.generator.Persistable");
+				String insertIndexAttributeIsIndexable = findValue(insertIndexPersist, "isIndexable()");
+				String insertIndexSemanticType = findValue(insertIndexPersist, "semanticType()");
+
+				if ("true".equalsIgnoreCase(insertIndexAttributeIsIndexable) == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(insertIndexSemanticType) == false)
+				{
+					daoStringTemplate.setAttribute("addIndexFilterParameters", "index.setProperty(\"" + insertIndexAttribute.getName() + "\", _activeRecord[\"" + insertIndexAttribute.getName() + "\"]);");
+				}
+			}
 		}
 		else
 		{
@@ -418,7 +452,6 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && restContext.getParameter(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
 				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
 			}
-
 			
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");
 			activeRecordStringTemplate.setAttribute("setMethod", "activeRecord.set" + upperTheFirstCharacter(name) + " = function(_" + name + ") { this." + name + " = _" + name + "; return this; };");

@@ -28,6 +28,8 @@ dao.update = function(_activeRecord, _config)
 	{
 		$index$
 
+	    $addIndexFilterParameters; separator="\n"$
+				
 		var datastore = this.datastore;
 		var transaction = datastore.beginTransaction().get();
 
