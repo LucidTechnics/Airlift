@@ -108,6 +108,9 @@ public class SimpleHandlerContext
 		Map<String, String> domainPathMap = _restContext.extractDomainObjectPaths(path);
 
 		AbstractUser user = _restContext.getUser();
+
+		if (user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
+		
 		String userName = (user != null) ? user.getFullName() : null;
 		String userEmail = (user != null) ? user.getEmail() : null;
 
