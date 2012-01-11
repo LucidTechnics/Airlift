@@ -1,0 +1,1 @@
+$annotation, scope, type, name:{a, s, t, n |$a$ $s$ $t$ $n$; }; separator="\n"$

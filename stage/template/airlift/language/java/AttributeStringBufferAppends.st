@@ -1,0 +1,2 @@
+$! Note that this template is also used by the JavaScriptGenerator so make sure you don't make changes that will only work in Java !$ 
+$name, getterName:{n,g | stringBuffer.append("$n$:").append($g$).append("\n"); }; separator="\n"$

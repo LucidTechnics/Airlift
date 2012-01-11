@@ -1,0 +1,1 @@
+SELECT FROM $tableName$ WHERE id = :_id

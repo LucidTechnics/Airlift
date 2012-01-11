@@ -1,0 +1,1 @@
+$setterName, name:{ s, n | $s$(_$n$); }; separator="\n"$

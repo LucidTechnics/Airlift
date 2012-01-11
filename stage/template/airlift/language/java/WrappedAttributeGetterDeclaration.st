@@ -1,0 +1,1 @@
+$scope, type, getterName, wrappedObjectName:{s, t, g, w | $s$ $t$ $g$() \{ return $w$.$g$(); \} }; separator="\n"$

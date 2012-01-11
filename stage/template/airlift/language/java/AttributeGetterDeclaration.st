@@ -1,0 +1,1 @@
+$scope, type, getterName, name:{s, t, g, n | $s$ $t$ $g$() \{ return $n$; \} }; separator="\n"$

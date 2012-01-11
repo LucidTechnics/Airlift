@@ -287,9 +287,10 @@ public class RestfulSecurityContext
 	public AirliftUser getUser(String _id)
 	{
 		AirliftUser user = null;
+		String id = (_id != null) ? _id.toLowerCase() : null;
 		
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
-		com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), _id);
+		com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(getKind(), id);
 
 		com.google.appengine.api.datastore.Entity entity = (com.google.appengine.api.datastore.Entity) getCachingContext().get(key);
 
