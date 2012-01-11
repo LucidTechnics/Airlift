@@ -42,5 +42,5 @@ public @interface Cacheable
 	 *
 	 * @return the int
 	 */
-	public int life() default 3600; //0 means cache forever.  Otherwise set this value to determine number of seconds to cache.
+	public int life() default 172800; //0 means cache forever.  Otherwise set this value to determine number of seconds to cache. The default is 48 hours.
 }

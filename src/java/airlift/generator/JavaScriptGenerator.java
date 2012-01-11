@@ -495,11 +495,11 @@ public class JavaScriptGenerator
 					if (type.equalsIgnoreCase("java.lang.String") == true ||
 						  type.equalsIgnoreCase("java.lang.Character") == true)
 					{
-						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && parameterMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && Packages.airlift.util.FormatUtil.format(converter.convert(value, airlift.cc(\"" + type + "\"))))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && airlift.trim(parameterMap.get(\"" + name + "\")[0]))||null; try { this." + name + " =  (value && Packages.airlift.util.FormatUtil.format(converter.convert(value, airlift.cc(\"" + type + "\"))))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 					}
 					else
 					{
-						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && parameterMap.get(\"" + name + "\")[0] && (airlift.isWhitespace(parameterMap.get(\"" + name + "\")[0]) === false) && parameterMap.get(\"" + name + "\")[0])||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
+						activeRecordStringTemplate.setAttribute("copyPropertyFromRequestMap",  "value = (parameterMap.get(\"" + name + "\") && parameterMap.get(\"" + name + "\")[0] && (airlift.isWhitespace(parameterMap.get(\"" + name + "\")[0]) === false) && airlift.trim(parameterMap.get(\"" + name + "\")[0]))||null; try { this." + name + " =  (value && converter.convert(value, airlift.cc(\"" + type + "\")))||null; } catch(e) { this.addError(\"" + name + "\", e.javaException.getMessage(), \"conversion\"); }");
 					}
 
 					if ("false".equals(isForeignKey) == true)

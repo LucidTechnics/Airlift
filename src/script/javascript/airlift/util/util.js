@@ -2674,7 +2674,7 @@ airlift.typeOf = function(_value)
  */
 airlift.trim = function(_string)
 {
-	var trimmed = Packages.org.apache.commons.lang.StringUtils.trim(_string);
+	var trimmed = (_string && Packages.org.apache.commons.lang.StringUtils.trim(_string))||null;
 	return (airlift.typeOf(_string) === 'string') ? trimmed + "" : trimmed;
 };
 

@@ -531,7 +531,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		{
 			for (var i = 0; i < _valueArray.length; i++)
 			{
-				_collection.add(_conversionFunction(_valueArray[i]));
+				_collection.add(_conversionFunction(airlift.trim(_valueArray[i])));
 			}
 		}
 
