@@ -231,7 +231,8 @@ public class RestfulSecurityContext
 	{
 		if (_user != null)
 		{
-			AirliftUser user = getUser(_user.getExternalUserId());
+			String externalUserId = (_user.getExternalUserId() != null) ? _user.getExternalUserId().toLowerCase() : null;
+			AirliftUser user = getUser(externalUserId);
 
 			//Only return active users ...
 			if (user != null && user.getActive() == true)
@@ -335,6 +336,14 @@ public class RestfulSecurityContext
 		airliftUser.setShortName((String) _entity.getProperty("shortName"));
 		airliftUser.setExternalUserId((String) _entity.getProperty("externalUserId"));
 
+		if (_entity.getProperty("externalUserId") != null)
+		{
+			airliftUser.setExternalUserId(((String) _entity.getProperty("externalUserId")).toLowerCase());
+		}
+		else
+		{
+			airliftUser.setExternalUserId((String) _entity.getProperty("externalUserId"));
+		}
 
 		if (_entity.getProperty("email") != null)
 		{
@@ -376,6 +385,15 @@ public class RestfulSecurityContext
 		entity.setProperty("shortName", _airliftUser.getShortName());
 		entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 
+		if (entity.getProperty("externalUserId") != null)
+		{
+			_airliftUser.setExternalUserId(((String) entity.getProperty("externalUserId")).toLowerCase());
+		}
+		else
+		{
+			_airliftUser.setExternalUserId((String) entity.getProperty("externalUserId"));
+		}
+
 		if (_airliftUser.getEmail() != null)
 		{
 			entity.setProperty("email", _airliftUser.getEmail());
@@ -384,6 +402,7 @@ public class RestfulSecurityContext
 		{
 			entity.setProperty("email", _airliftUser.getEmail());
 		}
+		
 		entity.setProperty("roleSet", _airliftUser.getRoleSet());
 		entity.setProperty("active", _airliftUser.getActive());
 		entity.setProperty("auditPostDate", _airliftUser.getAuditPostDate());
@@ -587,10 +606,12 @@ public class RestfulSecurityContext
 		{
 			email = _email.toLowerCase();
 		}
+
+		log.info("looking for user with email: " + email + " lowercased from " + _email);
 		
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("email", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, email);;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("email", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, email);
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();
