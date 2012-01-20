@@ -109,7 +109,7 @@ public class SimpleHandlerContext
 
 		AbstractUser user = _restContext.getUser();
 
-		if (user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
+		if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
 		
 		String userName = (user != null) ? user.getFullName() : null;
 		String userEmail = (user != null) ? user.getEmail() : null;
