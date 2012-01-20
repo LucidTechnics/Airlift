@@ -334,7 +334,6 @@ public class RestfulSecurityContext
 		airliftUser.setId((String) _entity.getKey().getName());
 		airliftUser.setFullName((String) _entity.getProperty("fullName"));
 		airliftUser.setShortName((String) _entity.getProperty("shortName"));
-		airliftUser.setExternalUserId((String) _entity.getProperty("externalUserId"));
 
 		if (_entity.getProperty("externalUserId") != null)
 		{
@@ -383,15 +382,14 @@ public class RestfulSecurityContext
 		
 		entity.setProperty("fullName", _airliftUser.getFullName());
 		entity.setProperty("shortName", _airliftUser.getShortName());
-		entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 
-		if (entity.getProperty("externalUserId") != null)
+		if (_airliftUser.getExternalUserId() != null)
 		{
-			_airliftUser.setExternalUserId(((String) entity.getProperty("externalUserId")).toLowerCase());
+			entity.setProperty("externalUserId", _airliftUser.getExternalUserId().toLowerCase());
 		}
 		else
 		{
-			_airliftUser.setExternalUserId((String) entity.getProperty("externalUserId"));
+			entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 		}
 
 		if (_airliftUser.getEmail() != null)
