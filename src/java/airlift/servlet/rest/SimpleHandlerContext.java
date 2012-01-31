@@ -112,7 +112,7 @@ public class SimpleHandlerContext
 		if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
 		
 		String userName = (user != null) ? user.getFullName() : null;
-		String userEmail = (user != null) ? user.getEmail() : null;
+		String userEmail = (user != null && user.getEmail() != null) ? user.getEmail().toLowerCase() : null;
 
 		airlift.AppProfile appProfile = null;
 		

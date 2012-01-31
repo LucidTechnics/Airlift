@@ -394,7 +394,7 @@ public class RestfulSecurityContext
 
 		if (_airliftUser.getEmail() != null)
 		{
-			entity.setProperty("email", _airliftUser.getEmail());
+			entity.setProperty("email", _airliftUser.getEmail().toLowerCase());
 		}
 		else
 		{
