@@ -402,7 +402,7 @@ airlift.partition = function(_collection, _attribute)
 			{
 				var list = partitionMap.get(value);
 
-				if (list)
+				if (!list)
 				{
 					list = airlift.l();
 					partitionMap.put(value, list);
@@ -426,7 +426,7 @@ airlift.partition = function(_collection, _attribute)
 			{
 				var list = partitionMap[value];
 
-				if (list)
+				if (!list)
 				{
 					list = [];
 					partitionMap[value] = list;
