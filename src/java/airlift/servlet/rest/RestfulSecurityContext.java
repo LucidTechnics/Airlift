@@ -243,7 +243,7 @@ public class RestfulSecurityContext
 
 				if (user.getEmail() != null)
 				{
-					_user.setEmail(user.getEmail().toLowerCase());
+					_user.setEmail(org.apache.commons.lang.StringUtils.trim(user.getEmail().toLowerCase()));
 				}
 				else
 				{
@@ -337,7 +337,7 @@ public class RestfulSecurityContext
 
 		if (_entity.getProperty("externalUserId") != null)
 		{
-			airliftUser.setExternalUserId(((String) _entity.getProperty("externalUserId")).toLowerCase());
+			airliftUser.setExternalUserId(org.apache.commons.lang.StringUtils.trim(((String) _entity.getProperty("externalUserId")).toLowerCase()));
 		}
 		else
 		{
@@ -346,7 +346,7 @@ public class RestfulSecurityContext
 
 		if (_entity.getProperty("email") != null)
 		{
-			airliftUser.setEmail(((String) _entity.getProperty("email")).toLowerCase());
+			airliftUser.setEmail(org.apache.commons.lang.StringUtils.trim(((String) _entity.getProperty("email")).toLowerCase()));
 		}
 		else
 		{
@@ -385,7 +385,7 @@ public class RestfulSecurityContext
 
 		if (_airliftUser.getExternalUserId() != null)
 		{
-			entity.setProperty("externalUserId", _airliftUser.getExternalUserId().toLowerCase());
+			entity.setProperty("externalUserId", org.apache.commons.lang.StringUtils.trim(_airliftUser.getExternalUserId().toLowerCase()));
 		}
 		else
 		{
@@ -394,7 +394,7 @@ public class RestfulSecurityContext
 
 		if (_airliftUser.getEmail() != null)
 		{
-			entity.setProperty("email", _airliftUser.getEmail().toLowerCase());
+			entity.setProperty("email", org.apache.commons.lang.StringUtils.trim(_airliftUser.getEmail().toLowerCase()));
 		}
 		else
 		{
@@ -602,7 +602,7 @@ public class RestfulSecurityContext
 
 		if (_email != null)
 		{
-			email = _email.toLowerCase();
+			email = org.apache.commons.lang.StringUtils.trim(_email.toLowerCase());
 		}
 
 		log.info("looking for user with email: " + email + " lowercased from " + _email);

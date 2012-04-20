@@ -450,7 +450,7 @@ public class JavaScriptGenerator
 				activeRecordStringTemplate.setAttribute("foreignKeyListEntry", "\"" + name + "\"");
 
 				activeRecordStringTemplate.setAttribute("assignForeignKeyFromRestContext", "this." + name + " = ((airlift.isDefined(this." + name + ") === false)  && restContext.getParameter(\"" + name.toLowerCase().replaceAll("id", "") + ".id\"))||this." + name + ";");
-				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
+				activeRecordStringTemplate.setAttribute("validateForeignKey", "errorList = errorList.concat(this.validator.validate" + upperTheFirstCharacter(name) + "(((this." + name + " && Packages.airlift.util.FormatUtil.format(this." + name + "))||\"\") + \"\"));");
 			}
 			
 			activeRecordStringTemplate.setAttribute("defineProperty", "activeRecord." + name + " = null;");

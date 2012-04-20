@@ -402,7 +402,7 @@ airlift.partition = function(_collection, _attribute)
 			{
 				var list = partitionMap.get(value);
 
-				if (list)
+				if (!list)
 				{
 					list = airlift.l();
 					partitionMap.put(value, list);
@@ -426,7 +426,7 @@ airlift.partition = function(_collection, _attribute)
 			{
 				var list = partitionMap[value];
 
-				if (list)
+				if (!list)
 				{
 					list = [];
 					partitionMap[value] = list;
@@ -2674,8 +2674,19 @@ airlift.typeOf = function(_value)
  */
 airlift.trim = function(_string)
 {
-	var trimmed = (_string && Packages.org.apache.commons.lang.StringUtils.trim(_string))||null;
-	return (airlift.typeOf(_string) === 'string') ? trimmed + "" : trimmed;
+	var trimmed = _string;
+
+	if (_string)
+	{
+		trimmed = Packages.org.apache.commons.lang.StringUtils.trim(_string);
+
+		if (airlift.typeOf(_string) === 'string')
+		{
+			trimmed = trimmed + "";
+		}
+	}
+
+	return trimmed;
 };
 
 /**
@@ -2742,6 +2753,34 @@ airlift.format = function(_value, _mask)
 
 	return formattedValue;
 }
+
+airlift.convertTimeToMinutes = functon(_twelveHourTime)
+{
+	var twelveHourTime = $.trim(_twelveHourTime) + '';
+	
+	var hoursRegex = /^([0-9]{1,2}):.*$/;
+	var minutesRegex = /^.*:([0-9]{2}).*$/;
+	var pmRegex = /^.*pm$/i;
+
+	var hours, minutes;
+
+	twelveHourTime.replace(hoursRegex, function(_match, _hours)
+	{
+		hours = parseInt(_hours);
+	});
+
+	if (pmRegex.test(twelveHourTime) === true && hours < 12)
+	{
+		hours = 12 + hours;
+	}
+
+	twelveHourTime.replace(minutesRegex, function(_match, _minutes)
+	{
+		minutes = parseInt(_minutes);
+	});
+
+	return (hours *  60) + minutes;
+};
 
 /**
  * @author Bediako George

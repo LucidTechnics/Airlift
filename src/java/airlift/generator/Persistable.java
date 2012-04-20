@@ -57,12 +57,9 @@ public @interface Persistable
 	 */
 	public String field() default "";
 	
-	/**
-	 * Max length.
-	 *
-	 * @return the int
-	 */
 	public int maxLength() default 200;
+
+	public int minLength() default 200;
 	
 	/**
 	 * Precision.
