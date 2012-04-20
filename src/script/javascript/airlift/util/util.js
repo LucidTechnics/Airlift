@@ -2779,7 +2779,9 @@ airlift.convertTimeToMinutes = functon(_twelveHourTime)
 		minutes = parseInt(_minutes);
 	});
 
-	return (hours *  60) + minutes;
+	var totalMinutes = (hours *  60) + minutes;
+	
+	return totalMinutes;
 };
 
 /**
