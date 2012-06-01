@@ -417,12 +417,19 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 		return this;
 	};
 
+	activeRecord.addMessageMap = function(_messageMap)
+	{
+		this.messageManager.add(_messageMap);
+
+		return this;
+	};
+
 	activeRecord.addErrorMap = function(_errorMap)
 	{
 		if (_errorMap && _errorMap.isEmpty() === false)
 		{
 			this.error = true;
-			this.messageManager.add(_errorMap);
+			this.addMessageMap(_errorMap)
 		}
 
 		return this;

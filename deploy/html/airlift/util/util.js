@@ -2754,7 +2754,7 @@ airlift.format = function(_value, _mask)
 	return formattedValue;
 }
 
-airlift.convertTimeToMinutes = functon(_twelveHourTime)
+airlift.convertTimeToMinutes = function(_twelveHourTime)
 {
 	var twelveHourTime = $.trim(_twelveHourTime) + '';
 	
@@ -2779,7 +2779,7 @@ airlift.convertTimeToMinutes = functon(_twelveHourTime)
 		minutes = parseInt(_minutes);
 	});
 
-	var totalMinutes = (hours *  60) + minutes;
+	var totalMinutes = (hours * 60) + minutes;
 	
 	return totalMinutes;
 };

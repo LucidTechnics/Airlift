@@ -410,7 +410,37 @@ public class JavascriptingUtil
 
 				try
 				{
+
+					/**
+					 ** I discovered that a script object extends
+					 ** org.mozilla.javascript.NativeFunction
+					 ** which in itself is java.io.Serializable.
+					 **
+					 ** This probably means we can cast the script to a
+					 ** NativeFunction (if the super class of the
+					 ** object is a NativeFunction) then we can stick
+					 ** that object in memcache using the Memcache
+					 ** service directly.
+					 ** 
+					 **/
+					
 					script = Context.getCurrentContext().compileReader(reader, _scriptResource, 0, null);
+
+					if ("org.mozilla.javascript.NativeFunction".equalsIgnoreCase(script.getClass().getSuperclass().getName()) == true)
+					{
+						org.mozilla.javascript.NativeFunction nativeFunction = (org.mozilla.javascript.NativeFunction) script;
+						com.google.appengine.api.memcache.MemcacheService cache = com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+
+						try
+						{
+							log.info("caching this script: " + _scriptResource);
+							cache.put(_scriptResource, nativeFunction, com.google.appengine.api.memcache.Expiration.byDeltaSeconds(600));
+						}
+						catch(Throwable t)
+						{
+							log.warning("Unable to place key: " + _scriptResource + " with its value: " + nativeFunction + " in the cache.");
+						}
+					}
 				}
 				catch(Throwable t)
 				{
