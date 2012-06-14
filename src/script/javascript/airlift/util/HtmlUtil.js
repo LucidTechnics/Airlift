@@ -892,22 +892,22 @@ airlift.getCachedFormTemplate = function(_formKey, _activeRecord, _config, _expi
 
 				var foreignKeyActiveRecord = airlift.ar(_foreignKey.replaceAll("Id$", ""));
 				var array = foreignKeyActiveRecord.collect(config);
-				var displayArray = [];
+				var displayArray = [], displayName;
 
 				//Sometimes the developer will want to derive the
 				//display based on one or more  properties in the activerecord.
 				if (airlift.typeOf(config.displayName) === 'function')
 				{
-					var displayName = config.displayName(_activeRecord);
+					displayName = config.displayName;
 				}
 				else
 				{
-					var displayName = config.displayName;
+					displayName = function(_foreignKeyActiveRecord) { return _foreignKeyActiveRecord[config.displayName]; };
 				}
 				
 				array.forEach(function(_foreignKeyActiveRecord) {
 					var allowedValue = {};
-					allowedValue.displayValue = _foreignKeyActiveRecord[displayName];
+					allowedValue.displayValue = displayName(_foreignKeyActiveRecord);
 					allowedValue.selectId = _foreignKeyActiveRecord.id;
 					displayArray.push(allowedValue);
 				});
