@@ -1442,24 +1442,29 @@ airlift.tokenizeIntoNGrams = function(_string)
 airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 {
 	var name = (airlift.isDefined(_attributeName) === true) ? (_attributeName.toLowerCase() + "-") : "";
-
+	
 	if ("month".equalsIgnoreCase(_datePart) === true )
 	{
 		var datePart = "month-";
-		var getter = "MONTH";
+		var suffix = _calendar.get(_calendar["MONTH"]);
 	}
 	else if ("year".equalsIgnoreCase(_datePart) === true)
 	{
 		var datePart = "year-";
-		var getter = "YEAR";
+		var suffix = _calendar.get(_calendar["YEAR"]);
 	}
 	else if ("date".equalsIgnoreCase(_datePart) === true)
 	{
+		var suffix = _calendar.get(_calendar["DAY_OF_MONTH"]);
 		var datePart = "date-";
-		var getter = "DAY_OF_MONTH";
+	}
+	else if ("fullDate".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "fullDate-";
+		var suffix = _calendar.get(_calendar["MONTH"]) + "-" + _calendar.get(_calendar["DAY_OF_MONTH"]) + "-" +  _calendar.get(_calendar["YEAR"]);
 	}
 
-	return name + datePart + _calendar.get(_calendar[getter]);
+	return name + datePart + suffix;
 };
 
 
@@ -1490,6 +1495,7 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "year"));
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "month"));
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "date"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "fullDate"));
 	}
 
 	return indexList;
@@ -1532,25 +1538,58 @@ airlift.getMonthIntervals = function(_date1, _date2)
 
 		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
 		{
-			var month = interval.get(interval.MONTH);
-
-			var fullYear = interval.get(interval.YEAR);
-
 			monthList.add(interval);
-
 			interval = airlift.createCalendar({date: interval.getTime()});
-
-			var nextMonth = month + 1;
-
-			var nextYear = fullYear + 1;
-
-			interval.set(interval.MONTH, (((nextMonth) > 11) ? 0 : nextMonth));
-			interval.set(interval.YEAR, (interval.get(interval.MONTH) === 0) ? nextYear : fullYear);
+			interval.add(interval.MONTH, 1);
 		}
 	}
 
 	return monthList;
 };
+
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description This function returns the list of dates that
+ * occur between two dates
+ *
+ * @param _date1 - start date
+ * @param _date2 - end date
+ *
+ * @returns the dates as calendar objects between two dates
+ *
+ * @example
+ *
+ */
+airlift.getFullDateIntervals = function(_date1, _date2)
+{
+	var fullDateList = airlift.l();
+
+	if (_date1 && _date2)
+	{
+		//works for java.util.Date and for Date
+		var date1 = airlift.createCalendar({date: _date1});
+		var date2 = airlift.createCalendar({date: _date2});
+
+		var startDate = (date1.getTimeInMillis() < date2.getTimeInMillis()) ? date1 : date2;
+		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
+
+		var interval = airlift.createCalendar({date: startDate.getTime()});
+		interval.set(interval.HOUR_OF_DAY, 0);
+
+		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
+		{
+			monthList.add(interval);
+			interval = airlift.createCalendar({date: interval.getTime()});
+			interval.add(interval.DAY_OF_MONTH, 1);
+		}
+	}
+
+	return fullDateList;
+};
+
 
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
@@ -1626,11 +1665,7 @@ airlift.filter = function(_config)
 	var filterTokens = airlift.tokenizeIntoNGrams(filterString);
 
 	var filterFunction = function(_item)
-	{
-		LOG.info("start date time: " + startDate.getTime());
-		LOG.info("target date time: " + (_item[dateFieldName] && _item[dateFieldName].getTime()));
-		LOG.info("end date time: " + endDate.getTime());
-		
+	{		
 		if ((startDate && endDate && dateFieldName) &&
 			  (
 			   _item[dateFieldName] && _item[dateFieldName].getTime() < startDate.getTime() ||

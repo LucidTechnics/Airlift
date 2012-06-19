@@ -300,6 +300,7 @@ public class RestfulSecurityContext
 			try
 			{
 				entity = datastore.get(key).get();
+				log.info("Retrieved airlift user entity from datastore: " + entity.toString());
 			}
 			catch(Throwable t)
 			{
@@ -314,6 +315,7 @@ public class RestfulSecurityContext
 
 		if (entity != null)
 		{
+			log.info("Copy entity to user");
 			user = copyEntityToAirliftUser(entity);
 		}
 
