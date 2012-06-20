@@ -1446,7 +1446,7 @@ airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 	if ("month".equalsIgnoreCase(_datePart) === true )
 	{
 		var datePart = "month-";
-		var suffix = _calendar.get(_calendar["MONTH"]);
+		var suffix = _calendar.get(_calendar["MONTH"]) + "-" +  _calendar.get(_calendar["YEAR"]);
 	}
 	else if ("year".equalsIgnoreCase(_datePart) === true)
 	{
@@ -1455,13 +1455,13 @@ airlift.prepareForDateSearch = function(_calendar, _attributeName, _datePart)
 	}
 	else if ("date".equalsIgnoreCase(_datePart) === true)
 	{
-		var suffix = _calendar.get(_calendar["DAY_OF_MONTH"]);
 		var datePart = "date-";
-	}
-	else if ("fullDate".equalsIgnoreCase(_datePart) === true)
-	{
-		var datePart = "fullDate-";
 		var suffix = _calendar.get(_calendar["MONTH"]) + "-" + _calendar.get(_calendar["DAY_OF_MONTH"]) + "-" +  _calendar.get(_calendar["YEAR"]);
+	}
+	else if ("week".equalsIgnoreCase(_datePart) === true)
+	{
+		var datePart = "week-";
+		var suffix = _calendar.get(_calendar["WEEK_OF_YEAR"]) + "-" + _calendar.get(_calendar["YEAR"]);
 	}
 
 	return name + datePart + suffix;
@@ -1495,7 +1495,7 @@ airlift.tokenizeIntoDateParts = function(_date, _name)
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "year"));
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "month"));
 		indexList.add(airlift.prepareForDateSearch(calendar, _name, "date"));
-		indexList.add(airlift.prepareForDateSearch(calendar, _name, "fullDate"));
+		indexList.add(airlift.prepareForDateSearch(calendar, _name, "week"));
 	}
 
 	return indexList;
@@ -1534,7 +1534,8 @@ airlift.getMonthIntervals = function(_date1, _date2)
 		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
 
 		var interval = airlift.createCalendar({date: startDate.getTime()});
-		interval.set(interval.DAY_OF_MONTH, 1);
+		interval.add(interval.DAY_OF_MONTH, 1 - interval.DAY_OF_MONTH);
+		interval.add(interval.HOUR_OF_DAY, -(interval.HOUR_OF_DAY));
 
 		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
 		{
@@ -1563,7 +1564,7 @@ airlift.getMonthIntervals = function(_date1, _date2)
  * @example
  *
  */
-airlift.getFullDateIntervals = function(_date1, _date2)
+airlift.getDateIntervals = function(_date1, _date2)
 {
 	var fullDateList = airlift.l();
 
@@ -1577,17 +1578,60 @@ airlift.getFullDateIntervals = function(_date1, _date2)
 		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
 
 		var interval = airlift.createCalendar({date: startDate.getTime()});
-		interval.set(interval.HOUR_OF_DAY, 0);
+		interval.add(interval.HOUR_OF_DAY, -(interval.HOUR_OF_DAY));
 
 		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
 		{
-			monthList.add(interval);
+			fullDateList.add(interval);
 			interval = airlift.createCalendar({date: interval.getTime()});
 			interval.add(interval.DAY_OF_MONTH, 1);
 		}
 	}
 
 	return fullDateList;
+};
+
+/**
+ * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
+ * George</a>
+ *
+ * @description This function returns the list of dates that
+ * occur between two dates
+ *
+ * @param _date1 - start date
+ * @param _date2 - end date
+ *
+ * @returns the dates as calendar objects between two dates
+ *
+ * @example
+ *
+ */
+airlift.getWeekIntervals = function(_date1, _date2)
+{
+	var weekList = airlift.l();
+
+	if (_date1 && _date2)
+	{
+		//works for java.util.Date and for Date
+		var date1 = airlift.createCalendar({date: _date1});
+		var date2 = airlift.createCalendar({date: _date2});
+
+		var startDate = (date1.getTimeInMillis() < date2.getTimeInMillis()) ? date1 : date2;
+		var endDate = (date1.getTimeInMillis() >= date2.getTimeInMillis()) ? date1 : date2;
+
+		var interval = airlift.createCalendar({date: startDate.getTime()});
+		interval.add(interval.DAY_OF_MONTH, 1 - interval.DAY_OF_WEEK);
+		interval.add(interval.HOUR_OF_DAY, -(interval.HOUR_OF_DAY));
+
+		while (interval.getTimeInMillis() < endDate.getTimeInMillis())
+		{
+			weekList.add(interval);
+			interval = airlift.createCalendar({date: interval.getTime()});
+			interval.add(interval.DAY_OF_MONTH, 7);
+		}
+	}
+
+	return weekList;
 };
 
 
