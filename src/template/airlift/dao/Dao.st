@@ -358,6 +358,12 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		{
 			token = airlift.trim(token);
 			var query = new Query("$className$Index").addFilter("index", Query.FilterOperator.EQUAL, token && token.toLowerCase()).setKeysOnly();
+
+			filterList.forEach(function(_filter)
+			{
+				query.addFilter(_filter.attribute, Query.FilterOperator[_filter.operatorName], _filter.value);
+			});
+
 			var queryResults = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 			for (var key in Iterator(queryResults))
