@@ -183,13 +183,23 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 
 		var foreignKeyArray = this.retrieveOrderedForeignKeyList();
 		var that = this;
+
 		var processForeignKeys = function(_foreignKey)
 		{
 			if ((airlift.filterContains(orderedPropertyList, _foreignKey) === true) || (airlift.filterContains(filter, _foreignKey) === contains))
 			{
 				var foreignKeyActiveRecord = airlift.ar(_foreignKey.replaceAll("Id\$", ""));
-				var displayName = config.collections && config.collections[_foreignKey] && config.collections[_foreignKey].displayName||"id";
-				var name = (that[_foreignKey] && foreignKeyActiveRecord.setId(that[_foreignKey]).get() && foreignKeyActiveRecord[displayName])||"";
+				var foundForeignKeyActiveRecord = foreignKeyActiveRecord.setId(that[_foreignKey]).get();
+
+				var displayName = config.collections && config.collections[_foreignKey] && config.collections[_foreignKey].displayName||function() { return "id"; }
+
+				if (typeof displayName !== 'function')
+				{
+					var displayNameCopy = displayName;
+					displayName = function(_foreignKeyActiveRecord) { return (_foreignKeyActiveRecord && _foreignKeyActiveRecord[displayNameCopy])||''; };
+				}
+
+				var name = displayName(foreignKeyActiveRecord)||"";
 
 				//this is a foreign key so the only viable option is selected ...
 				formTemplate.setAttribute(airlift.createSelectedTarget(_foreignKey, name), "selected=selected");
