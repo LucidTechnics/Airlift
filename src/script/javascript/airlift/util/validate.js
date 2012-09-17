@@ -102,7 +102,7 @@ airlift.isNumeric = function(value, paramsObj)
 	var tooLowMessage = paramsObj.tooLowMessage || "Must not be less than " + minimum + "-  ";
 	var tooHighMessage = paramsObj.tooHighMessage || "Must not be more than " + maximum + "- ";
 	if (!isFinite(value)) error = notANumberMessage;
-	if (paramsObj.onlyInteger && (/\.0+$|\.$/.test(String(suppliedValue))  || value != parseInt(value)) ) error = notAnIntegerMessage;
+	if (paramsObj.onlyInteger && (/\.0+$|\.$/.test(String(suppliedValue))  || value != parseInt(value, 10)) ) error = notAnIntegerMessage;
 	switch(true){
 		case (is !== null):
 			if( value != Number(is) ) error = wrongNumberMessage;

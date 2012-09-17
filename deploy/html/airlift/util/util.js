@@ -2845,7 +2845,7 @@ airlift.convertTimeToMinutes = function(_twelveHourTime)
 
 	twelveHourTime.replace(hoursRegex, function(_match, _hours)
 	{
-		hours = parseInt(_hours);
+		hours = parseInt(_hours, 10);
 	});
 
 	if (pmRegex.test(twelveHourTime) === true && hours < 12)
@@ -2855,7 +2855,7 @@ airlift.convertTimeToMinutes = function(_twelveHourTime)
 
 	twelveHourTime.replace(minutesRegex, function(_match, _minutes)
 	{
-		minutes = parseInt(_minutes);
+		minutes = parseInt(_minutes, 10);
 	});
 
 	var totalMinutes = (hours * 60) + minutes;
