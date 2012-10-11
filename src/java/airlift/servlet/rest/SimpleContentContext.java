@@ -96,6 +96,7 @@ public class SimpleContentContext
     public SimpleContentContext()
     {
 		setType("text/html");
+		setCorHeaders();
     }
 
 	/**
@@ -108,6 +109,15 @@ public class SimpleContentContext
 	{
 		setType(_type);
 		setContent(_content);
+		setCorHeaders();
+	}
+
+	public void setCorHeaders()
+	{
+		addHeader("Access-Control-Allow-Origin", "*");
+		addHeader("Access-Control-Allow-Headers", "Content-Type");
+		addHeader("Access-Control-Max-Age", "86400");
+		addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
 	}
 
     /**
