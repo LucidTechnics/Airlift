@@ -401,9 +401,11 @@ public class JavascriptingUtil
 			//Instead place it in a static map that will be available
 			//on the instance level.  If a new instance is started the
 			//cache will be empty ... but this is OK because after
-			//running for a few seconds the cache will be full ... 
+			//running for a few seconds the cache will be full ...
+
+			script = getScriptResourceMap().get(_scriptResource);
 			
-			if (getScriptResourceMap().containsKey(_scriptResource) == false)
+			if (script == null)
 			{
 				log.info("Script not compiled and cached: " + _scriptResource);
 				reader = new InputStreamReader(findScript(_scriptResource));
@@ -426,7 +428,7 @@ public class JavascriptingUtil
 					
 					script = Context.getCurrentContext().compileReader(reader, _scriptResource, 0, null);
 
-					if ("org.mozilla.javascript.NativeFunction".equalsIgnoreCase(script.getClass().getSuperclass().getName()) == true)
+					/*if ("org.mozilla.javascript.NativeFunction".equalsIgnoreCase(script.getClass().getSuperclass().getName()) == true)
 					{
 						org.mozilla.javascript.NativeFunction nativeFunction = (org.mozilla.javascript.NativeFunction) script;
 						com.google.appengine.api.memcache.MemcacheService cache = com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
@@ -440,7 +442,7 @@ public class JavascriptingUtil
 						{
 							log.warning("Unable to place key: " + _scriptResource + " with its value: " + nativeFunction + " in the cache.");
 						}
-					}
+					}*/
 				}
 				catch(Throwable t)
 				{
@@ -456,10 +458,6 @@ public class JavascriptingUtil
 						getScriptResourceMap().put(_scriptResource, script);
 					}
 				}
-			}
-			else
-			{
-				script = getScriptResourceMap().get(_scriptResource);
 			}
 		}
 		finally

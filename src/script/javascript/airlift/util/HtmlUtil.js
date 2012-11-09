@@ -286,7 +286,7 @@ airlift.toFieldSet = function(_config, _activeRecord)
 					formEntryTemplate = Packages.airlift.util.XhtmlTemplateUtil.createHiddenFormEntryTemplate(_property, groupName, value);
 					fieldSetTemplate.setAttribute("hiddenFormEntry", formEntryTemplate.toString());
 				}
-				else if (airlift.isClockProperty(_property) === false)
+				else
 				{
 					currentGroupName = determineCurrentGroupName(_activeRecord, _property);
 
@@ -513,52 +513,59 @@ airlift.toFieldSet = function(_config, _activeRecord)
 	return fieldSetArray;
 };
 
-airlift.toTable = function(_config)
+airlift.toTable = function(_activeRecord, _config)	
 {
 	var config = (airlift.isDefined(_config) === true) ? _config : {};
 	
 	var path = (airlift.isDefined(config.path) === true) ? airlift.preparePath(config.path) : airlift.preparePath(PATH);
 	var tf = (airlift.isDefined(config.tf) === true) ? config.tf : "";
 	var anchorProperty = (airlift.isDefined(config.anchorProperty) === true) ? config.anchorProperty : "id";
-	var anchorClass = (airlift.isDefined(_config.anchorClass) === true) ? _config.anchorClass : "";
+	var anchorClass = (airlift.isDefined(config.anchorClass) === true) ? config.anchorClass : "";
 	var filter = (airlift.isDefined(config.filter) === true) ? config.filter : ["auditPostDate","auditPutDate","auditUserId"];
 	var contains = (airlift.isDefined(config.contains) === true) ? config.contains : false;
 	var collection = (airlift.isDefined(config.collection) === true) ? config.collection : [];
-	var domainName = config.domainName||DOMAIN_NAME;
+	var domainName = config.domainName||_activeRecord.retrieveDomainName();
 	var domainInterfaceClass = 	Packages.java.lang.Class.forName(APP_PROFILE.getFullyQualifiedClassName(domainName));
 	var tableId = (airlift.isDefined(config.tableId) === true) ? config.tableId : domainName + "Table";
 	var anchorTarget = (airlift.isDefined(config.anchorTarget) === true) ? config.anchorTarget : "";
 	var augmentFunction = config.augmentFunction||undefined;
-	var orderedPropertyList = config.displayOrder;
+	var orderedPropertyList = config.displayOrder||_activeRecord.retrieveOrderedPropertyList();
 	
-	//If you do not specify a class the table class will be display to
+	//If you do not specify a class the table class will be displayed to
 	//work with JQuery's datatable.
 	var tableClass = (airlift.isDefined(config.tableClass) === true) ? config.tableClass : "display";
-							  
+
+	LOG.info("Creating table template");
 	var tableTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTableTemplate(tf);
+	LOG.info("Creating table header template");
 	var thTemplate = Packages.airlift.util.XhtmlTemplateUtil.createThTemplate();
+	LOG.info("Table header template created");
 	var headerTypeSet = false;
 
-	var renderRow = function(_activeRecord, _index)
+	config.activeRecord = _activeRecord;
+	config.interfaceClass = _activeRecord.retrieveDomainInterface();
+
+
+	
+	var renderRow = function(_activeRecord, _implementation, _index)
 	{
+		LOG.info("Describing implementation");
+		var propertyMap = airlift.describe(_implementation, config);
+		LOG.info("Implementation described");
 		var include = augmentFunction && augmentFunction(_activeRecord);
 
 		//If include is defined then it better be true or else this
 		//record is excluded from the table ...
 		if (airlift.isDefined(include) === false || include)
 		{
-			orderedPropertyList = orderedPropertyList||_activeRecord.retrieveOrderedPropertyList();
-			var propertyMap = _activeRecord.describe(config);
-
-			var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + _activeRecord.retrieveDomainName() + "\"");
+			var trTemplate = Packages.airlift.util.XhtmlTemplateUtil.createTrTemplate("class=\"" + domainName + "\"");
 			var setHeader = false;
 
 			if (_index === 0) { setHeader = true; }
 
-			var processProperties = function(_property, _index, _array)
+			var processProperty = function(_property, _index, _array)
 			{
-				if (airlift.isClockProperty(_property) === false &&
-					  (airlift.isDefined(filter) === false ||
+				if ((airlift.isDefined(filter) === false ||
 					   (airlift.string("")).equalsIgnoreCase(filter) === true ||
 					   Packages.org.apache.commons.lang.StringUtils.isWhitespace(filter) == true ||
 					   airlift.filterContains(filter, _property) == contains))
@@ -588,14 +595,13 @@ airlift.toTable = function(_config)
 					//should bind an anchor instead
 					var propertyValue = (airlift.isDefined(propertyMap.get(_property)) === false) ? " " : propertyMap.get(_property);
 
-					if (airlift.isLinkArray(_property, _activeRecord.retrieveDomainName()) === true)
+					if (airlift.isLinkArray(_property, domainName) === true)
 					{
-						trTemplate.setAttribute("td", generateStringFromArray(Packages.org.apache.commons.beanutils.PropertyUtils.getProperty(_activeRecord.createImpl(), _property)));
+						trTemplate.setAttribute("td", generateStringFromArray(Packages.org.apache.commons.beanutils.PropertyUtils.getProperty(_implementation, _property)));
 					}
 					else if (_property.equalsIgnoreCase(anchorProperty) === true)
 					{
-						LOG.info("Bediako: " + propertyMap);
-						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path + "/" + _activeRecord.id, _activeRecord.retrieveDomainName(), "", anchorTarget, propertyValue, _property + "Anchor", anchorClass);
+						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(path + "/" + _implementation.getId(), domainName, "", anchorTarget, propertyValue, _property + "Anchor", anchorClass);
 						trTemplate.setAttribute("td", anchorTemplate.toString());
 					}
 					else if (_activeRecord.isForeignKey(_property) === true &&
@@ -614,12 +620,12 @@ airlift.toTable = function(_config)
 								foreignKeyDisplayName = foreignActiveRecord[_config[_property]];
 							}
 						}
-						
+
 						var mapTo = methodPersistable.mapTo();
 						var foreignDomainName = (mapTo != null) ? mapTo.split("\\.")[0].toLowerCase() : null;
 
 						var foreignPath = path.toLowerCase().replaceAll("\\/$", "").
-											 replaceAll(_activeRecord.retrieveDomainName().toLowerCase() + "$", foreignDomainName);
+											 replaceAll(domainName.toLowerCase() + "$", foreignDomainName);
 
 						var anchorTemplate = Packages.airlift.util.XhtmlTemplateUtil.createAnchorTemplate(
 							foreignPath + "/" + propertyValue,
@@ -633,9 +639,9 @@ airlift.toTable = function(_config)
 
 					trTemplate.setAttribute("tda", "class=\"" + _property + "\"");
 				}
-			}
+			};
 
-			orderedPropertyList.forEach(processProperties);
+			orderedPropertyList.forEach(processProperty);
 
 			if (setHeader === true)
 			{
@@ -644,21 +650,24 @@ airlift.toTable = function(_config)
 
 			tableTemplate.setAttribute("tb", trTemplate.toString());
 		}
-	}
+	};
 
 	if (airlift.isDefined(collection.hasNext) === true || airlift.isDefined(collection.iterator) === true)
 	{
-		//this is an iterable so iterate ...
 		var index = 0;
 
-		for (var activeRecord in Iterator(collection))
+		for (var implementation in Iterator(collection))
 		{
-			renderRow(activeRecord, index);
+			renderRow(_activeRecord, implementation, index);
 			index++;
 		}
 	}
+
+	LOG.info("Rendering table");
+	var tableTemplateString = tableTemplate.toString();
+	LOG.info("Table rendered");
 	
-	return tableTemplate.toString();
+	return tableTemplateString;
 };
 
 airlift.toAtom = function(_config)

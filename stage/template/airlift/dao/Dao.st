@@ -159,46 +159,81 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		return activeRecord;
 	};
 
+	dao.copyToImplementation = function(_entity)
+	{
+		var impl = new Packages.org.nvahec.airlift.domain.$className$Impl();
+
+		$copyFromEntityToImpl; separator="\n"$
+		
+		return impl;
+	};
+
 	dao.asIterator = function(_queryResultIterator, _config)
 	{
 		var iterator = {};
-		var nextResults = [];
-		var bufferSize = 100;
+		var bufferSize = 2000;
+		var resultBuffer = new Packages.java.util.ArrayList();
+		var resultBufferIterator;
 
 		var config = _config||{}
 		var keysOnly = (airlift.isDefined(config.keysOnly) === true) ? config.keysOnly : true;
-		
-		iterator.fetchNextResults = function(_queryResultIterator)
+		var representation = (airlift.isDefined(config.representation) === true) ? config.representation : "activeRecord";
+
+		if (keysOnly === true)
 		{
-			var nextKeys = airlift.l();
-			
-			for (var i = 0; i < bufferSize && _queryResultIterator.hasNext() === true; i++)
+			LOG.info('fetching keys');
+
+			var keyList = keyList||[];
+
+			while (_queryResultIterator.hasNext() === true)
 			{
-				nextKeys.add(_queryResultIterator.next().getKey());
+				keyList.push(_queryResultIterator.next().getKey());
 			}
 
-			return dao.getAll(nextKeys);
+			LOG.info('... now fetching next results');
+
+			var start = 0;
+			var end = 0;
+
+			while (end < keyList.length)
+			{
+				end += bufferSize;
+
+				if (end > keyList.length) { end = keyList.length; }
+
+				var nextKeys = airlift.l(keyList.slice(start, end));
+				resultBuffer.addAll(dao.getAll(nextKeys));
+				start += bufferSize;
+			}
+
+			resultBufferIterator = resultBuffer.iterator();
+
+			LOG.info("results fetched");
 		}
-				
+		else
+		{
+			resultBufferIterator = _queryResultIterator;
+		}
+
 		iterator.hasNext = function()
 		{
-			return (nextResults.length > 0) || _queryResultIterator.hasNext();
+			return resultBufferIterator.hasNext();
 		}
 
 		iterator.next = function()
 		{
-			if (keysOnly === true)
+			var result = resultBufferIterator.next();
+
+			if (keysOnly === false && "activeRecord".equalsIgnoreCase(representation) === true)
 			{
-				nextResults = ((nextResults.length === 0) && iterator.fetchNextResults(_queryResultIterator)) || nextResults;
+				result = dao.convertEntity(result);
 			}
-			else
+			else if (keysOnly === false && "implementation".equalsIgnoreCase(representation) === true)
 			{
-				var result = _queryResultIterator.next();
-				var activeRecord = dao.convertEntity(result);
-				nextResults.push(activeRecord);
+				result = dao.copyToImplementation(result);
 			}
-			
-			return nextResults.shift();
+
+			return result;
 		}
 
 		iterator.remove = function()
@@ -210,7 +245,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$Dao = function()
 		{
 			var index = 0;
 			var keepGoing = true;
-			
+
 			while (this.hasNext() === true && keepGoing === true)
 			{
 				var status = _function(this.next(), index);

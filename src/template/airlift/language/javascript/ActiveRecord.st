@@ -220,7 +220,7 @@ airlift.create$upperCaseFirstLetterDomainClassName$ = function()
 	{
 		_config.domainName = _config.domainName||this.retrieveDomainName();
 		
-		return airlift.toTable(_config);
+		return airlift.toTable(this, _config);
 	};
 	
 	activeRecord.atom = function(_config)

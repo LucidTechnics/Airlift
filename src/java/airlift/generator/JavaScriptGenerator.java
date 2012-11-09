@@ -186,14 +186,16 @@ public class JavaScriptGenerator
 				}
 
 				if ("id".equalsIgnoreCase(name) == false)
-				{
+				{				
 					if (type.startsWith("java.util.List") == true)
 					{
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.l(_entity.getProperty(\"" + name + "\")))||(airlift.l()); }");
+						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") && (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.l(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.ArrayList());");
 					}
 					else if (type.startsWith("java.util.Set") == true)
 					{
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.s(_entity.getProperty(\"" + name + "\")))||(airlift.s()); }");
+						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\") instanceof Packages.java.util.Collection) && airlift.s(_entity.getProperty(\"" + name + "\")))||(new Packages.java.util.HashSet());");
 					}
 					else if (type.equalsIgnoreCase("java.lang.String") == true && "airlift.generator.Persistable.Semantic.VERYLONGTEXT".equalsIgnoreCase(semanticType) == true)
 					{
@@ -201,10 +203,12 @@ public class JavaScriptGenerator
 						//cannot be indexed and as such must be
 						//added as an unindexed property ...
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && _entity.getProperty(\"" + name + "\").getValue())||null; }");
+						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\").getValue())||null;");
 					}
 					else
 					{
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && converter.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null; }");
+						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") && converter.convert( _entity.getProperty(\"" + name + "\"), airlift.cc(\"" + type + "\")))||null;");
 					}
 
 					if ("true".equalsIgnoreCase(isIndexable) == true || "true".equalsIgnoreCase(isForeignKey) == true )
@@ -252,6 +256,7 @@ public class JavaScriptGenerator
 				else
 				{
 					daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"id\") === contains) { _activeRecord.id = _entity.getKey().getName(); }");
+					daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl.id = _entity.getKey().getName();");
 				}
 
 				if ("true".equalsIgnoreCase(encrypted) == true)
