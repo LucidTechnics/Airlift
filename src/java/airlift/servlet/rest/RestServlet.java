@@ -141,6 +141,67 @@ public class RestServlet
 		applySecurityChecks(_httpServletRequest, _httpServletResponse, Method.DELETE);
 	}
 
+	/* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doOptions(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+	@Override
+	protected final void doHead(HttpServletRequest _httpServletRequest,
+				HttpServletResponse _httpServletResponse)
+		throws ServletException, IOException
+	{
+		_httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+		_httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+		_httpServletResponse.addHeader("Access-Control-Max-Age", "86400");
+		_httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+
+		super.doHead(_httpServletRequest, _httpServletResponse);
+	}
+
+	/* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doOptions(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+	@Override
+	protected final void doOptions(HttpServletRequest _httpServletRequest,
+				HttpServletResponse _httpServletResponse)
+		throws ServletException, IOException
+	{
+		java.util.Enumeration<String> headerNames = _httpServletRequest.getHeaderNames();
+
+		log.info("reporting request header info ..."); 
+		while (headerNames.hasMoreElements() == true)
+		{
+			String headerName = headerNames.nextElement();
+			log.info(headerName +  ":" + _httpServletRequest.getHeader(headerName));
+		}
+
+		_httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+		//Instead of returning this Content-Type, Depth, User-Agent,
+		//X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control
+		//we simply say whatever you ask for we allow.  We really
+		//should make this configurable.
+		_httpServletResponse.addHeader("Access-Control-Allow-Headers", _httpServletRequest.getHeader("Access-Control-Request-Headers"));
+		_httpServletResponse.addHeader("Access-Control-Max-Age", "86400");
+		_httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+
+		super.doOptions(_httpServletRequest, _httpServletResponse);
+	}
+
+	/* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doOptions(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+	@Override
+	protected final void doTrace(HttpServletRequest _httpServletRequest,
+				HttpServletResponse _httpServletResponse)
+		throws ServletException, IOException
+	{
+		_httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+		_httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+		_httpServletResponse.addHeader("Access-Control-Max-Age", "86400");
+		_httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+
+		super.doTrace(_httpServletRequest, _httpServletResponse);
+	}
+
 	protected boolean timedOut(AirliftUser _user)
 	{
 		boolean timedOut = false;
@@ -233,6 +294,13 @@ public class RestServlet
 	 */
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
+		//Deal with COR headers
+		_response.addHeader("Access-Control-Allow-Origin", "*");
+		_response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+		_response.addHeader("Access-Control-Allow-Credentials",  "true");
+		_response.addHeader("Access-Control-Max-Age", "86400");
+		_response.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+		
 		java.util.Enumeration<String> headerNames = _request.getHeaderNames();
 
 		log.info("reporting request header info ..."); 

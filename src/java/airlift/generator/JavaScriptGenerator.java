@@ -203,7 +203,7 @@ public class JavaScriptGenerator
 						//cannot be indexed and as such must be
 						//added as an unindexed property ...
 						daoStringTemplate.setAttribute("copyFromEntityToActiveRecord", "if (airlift.filterContains(filter, \"" + name + "\") === contains) { _activeRecord." + name + " = (_entity.getProperty(\"" + name + "\") && _entity.getProperty(\"" + name + "\").getValue())||null; }");
-						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\").getValue())||null;");
+						daoStringTemplate.setAttribute("copyFromEntityToImpl", "impl." + name + " = (_entity.getProperty(\"" + name + "\") &&  (_entity.getProperty(\"" + name + "\").getValue()))||null;");
 					}
 					else
 					{
