@@ -65,7 +65,7 @@ public class ErrorHandlerContext
 
 		ContentContext contentContext = new SimpleContentContext();
 
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil(_appName, this.productionMode);
 
 		String servletName = _httpServlet.getServletName();
 		String base = "http://" + _httpServletRequest.getServerName() + ":" +

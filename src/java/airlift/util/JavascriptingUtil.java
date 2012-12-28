@@ -15,75 +15,40 @@
 package airlift.util;
 
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 
 import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
+import org.mozilla.javascript.serialize.ScriptableOutputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * The Class JavascriptingUtil provides javascript scripting functionality.
- */
 public class JavascriptingUtil
 {
-	
-	/** The log. */
 	private static Logger log = Logger.getLogger(JavascriptingUtil.class.getName());
 
-	/** The Constant scriptResourceMap. */
 	private static final Map<String, Script> scriptResourceMap = new HashMap<String, Script>();
-	
-	/** The bindings map. */
 	private Map<String, Object> bindingsMap;
-	
-	/** The scope. */
 	private Scriptable scope;
-	
-	/** The Constant sharedScope. */
 	private static final ScriptableObject sharedScope;
-	
-	/** The compile script. */
-	private boolean compileScript = true;
+	private String appName;
 
-	/**
-	 * Gets the script resource map.
-	 *
-	 * @return the script resource map
-	 */
+	
 	private Map<String, Script> getScriptResourceMap() { return scriptResourceMap; }
-	
-	/**
-	 * Gets the bindings map.
-	 *
-	 * @return the bindings map
-	 */
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
-	
-	/**
-	 * Gets the scope.
-	 *
-	 * @return the scope
-	 */
 	private Scriptable getScope() { return scope; }
-
-	/**
-	 * Sets the bindings map.
-	 *
-	 * @param _bindingsMap the _bindings map
-	 */
 	public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
-	
-	/**
-	 * Sets the scope.
-	 *
-	 * @param _scope the new scope
-	 */
 	public void setScope(Scriptable _scope) { scope = _scope; }
-
-	/** The script stack. */
+	public String getAppName() { return appName; }
+	public void setAppName(String _appName) { appName = _appName; }
+	
 	public java.util.List scriptStack = new java.util.ArrayList();
+	private boolean cacheScript = false;
 
 	static
 	{
@@ -109,20 +74,16 @@ public class JavascriptingUtil
     /**
      * Instantiates a new javascripting util.
      */
-    public JavascriptingUtil()
+    public JavascriptingUtil(String _appName)
 	{
+		setAppName(_appName);
 		setBindingsMap(new HashMap<String, Object>());
-    }
+	}
 
-	/**
-	 * Instantiates a new javascripting util.
-	 *
-	 * @param _compileScript the _compile script
-	 */
-	public JavascriptingUtil(boolean _compileScript)
+	public JavascriptingUtil(String _appName, boolean _cacheScript)
 	{
-		this();
-		compileScript = _compileScript;
+		this(_appName);
+		this.cacheScript = _cacheScript;
 	}
 
     /**
@@ -136,23 +97,20 @@ public class JavascriptingUtil
 		getBindingsMap().put(_name, _value);
 	}
 
-	/**
-	 * Load script.
-	 *
-	 * @param _scriptResource the _script resource
-	 */
-	public void loadScript(String _scriptResource)
+	public byte[] serialize(Function _function)
 	{
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		ScriptableOutputStream scriptableOutputStream = null;
+		
 		try
 		{
 			if (Context.getCurrentContext() == null)
 			{
-				throw new RuntimeException("Cannot use loadScript outside of the scope of a call to executeScript.  A context must be present.");
+				throw new RuntimeException("Cannot use serialize outside of the scope of a call to executeScript.  A context must be present.");
 			}
 			
-			scriptStack.add(_scriptResource);
-			compileScript(_scriptResource).exec(Context.getCurrentContext(), getScope());
-
+			scriptableOutputStream = new ScriptableOutputStream(byteArrayOutputStream, getScope());
+			scriptableOutputStream.writeObject(_function);
 		}
 		catch(Throwable t)
 		{
@@ -160,6 +118,12 @@ public class JavascriptingUtil
 			log.severe(t.toString());
 			throw new RuntimeException(t);
 		}
+		finally
+		{
+			try { if (scriptableOutputStream != null) { scriptableOutputStream.close(); } } catch(Throwable t) { log.warning("Small issue closing ScriptableOutputStream: " + t.toString()); }
+		}
+
+		return byteArrayOutputStream.toByteArray();
 	}
 
 	/**
@@ -193,27 +157,14 @@ public class JavascriptingUtil
 		return inputStream;
 	}
 
-	/**
-	 * Execute script.
-	 *
-	 * @param _scriptResource the _script resource
-	 * @return the object
-	 */
-	public Object executeScript(String _scriptResource)
+	public void executeScript(String _scriptResource)
 	{
-		return executeScript(_scriptResource, false, null);
+		executeScript(_scriptResource, false, null);
 	}
 
-	/**
-	 * Execute script.
-	 *
-	 * @param _scriptResource the _script resource
-	 * @param _timeScript the _time script
-	 * @return the object
-	 */
-	public Object executeScript(String _scriptResource, boolean _timeScript)
+	public void executeScript(String _scriptResource, boolean _timeScript)
 	{
-		return executeScript(_scriptResource, _timeScript, null);
+		executeScript(_scriptResource, _timeScript, null);
 	}
 
 	/**
@@ -222,14 +173,12 @@ public class JavascriptingUtil
 	 * @param _scriptResource the _script resource
 	 * @param _timeScript the _time script
 	 * @param _context the _context
-	 * @return the object
 	 */
-	public Object executeScript(String _scriptResource, boolean _timeScript, Context _context)
+	public void executeScript(String _scriptResource, boolean _timeScript, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
 		
 		long startTime = 0l;
-		Object result = null;
 
 		try
 		{
@@ -237,12 +186,14 @@ public class JavascriptingUtil
 			{
 				resetScope(context);
 			}
-
+			
 			for (String key: getBindingsMap().keySet())
 			{
 				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
 				ScriptableObject.putProperty(getScope(), key, object);
 			}
+
+			log.info("script is running this scope object: " + getScope().getIds().length);
 
 			if (_timeScript == true)
 			{
@@ -250,7 +201,7 @@ public class JavascriptingUtil
 			}
 
 			scriptStack.add(_scriptResource);
-			result = compileScript(_scriptResource).exec(context, getScope());
+			executeHandler(_scriptResource, context);
 
 			if (_timeScript == true)
 			{
@@ -270,42 +221,19 @@ public class JavascriptingUtil
 		{
 			if (_context == null) { context.exit(); }
 		}
-
-		return result;
 	}
 
-	/**
-	 * Execute script.
-	 *
-	 * @param _scriptResources the _script resources
-	 * @return the object
-	 */
-	public Object executeScript(String[] _scriptResources)
+	public void executeScript(String[] _scriptResources)
 	{
-		return executeScript(_scriptResources, false, null);
+		executeScript(_scriptResources, false, null);
 	}
 
-	/**
-	 * Execute script.
-	 *
-	 * @param _scriptResources the _script resources
-	 * @param _timeScript the _time script
-	 * @return the object
-	 */
-	public Object executeScript(String[] _scriptResources, boolean _timeScript)
+	public void executeScript(String[] _scriptResources, boolean _timeScript)
 	{
-		return executeScript(_scriptResources, _timeScript, null);
+		executeScript(_scriptResources, _timeScript, null);
 	}
 
-	/**
-	 * Execute script.
-	 *
-	 * @param _scriptResources the _script resources
-	 * @param _timeScripts the _time scripts
-	 * @param _context the _context
-	 * @return the object
-	 */
-	public Object executeScript(String[] _scriptResources, boolean _timeScripts, Context _context)
+	public void executeScript(String[] _scriptResources, boolean _timeScripts, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
 		long startTime = 0l;
@@ -334,7 +262,7 @@ public class JavascriptingUtil
 				}
 
 				scriptStack.add(_scriptResources[i]);
-				result = compileScript(_scriptResources[i]).exec(context, getScope());
+				executeHandler(_scriptResources[i], context);
 				
 				if (_timeScripts)
 				{
@@ -356,8 +284,6 @@ public class JavascriptingUtil
 		{
 			if (_context == null) { context.exit(); }
 		}
-
-		return result;
 	}
 
 	/**
@@ -375,11 +301,18 @@ public class JavascriptingUtil
 		//late at night :) ... Bediako 06/18/2011 5:49 am.
 		
 		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
+		context.setLanguageVersion(180);
+		context.setOptimizationLevel(-1);
 
 		log.info("Using context: " + context); 
 		
 		return context;
+	}
+
+	public static String convertStreamToString(java.io.InputStream is)
+	{
+		java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
 	}
 
 	/**
@@ -388,84 +321,54 @@ public class JavascriptingUtil
 	 * @param _scriptResource the _script resource
 	 * @return the script
 	 */
-	public Script compileScript(String _scriptResource)
+	public void executeHandler(String _scriptResource, Context _context)
 	{
-		Script script = null;
-		Reader reader = null;
-		
 		try
 		{
-			//I do not think it is necessary to place the scripts in
-			//memcache because this will make it more difficult to
-			//manage with regards to cache expiration ...
-			//Instead place it in a static map that will be available
-			//on the instance level.  If a new instance is started the
-			//cache will be empty ... but this is OK because after
-			//running for a few seconds the cache will be full ...
+			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
+			String handler = "LOG.info(\"What in the world!!!!\"); require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle();";
 
-			script = getScriptResourceMap().get(_scriptResource);
+			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(sharedScope, "require");
 			
-			if (script == null)
+			if (requireFunction == org.mozilla.javascript.UniqueTag.NOT_FOUND)
 			{
-				log.info("Script not compiled and cached: " + _scriptResource);
-				reader = new InputStreamReader(findScript(_scriptResource));
+				log.info("loading require for the first time into the shared scope");
+				
+				java.util.Set uris = new java.util.HashSet();
 
 				try
 				{
-
-					/**
-					 ** I discovered that a script object extends
-					 ** org.mozilla.javascript.NativeFunction
-					 ** which in itself is java.io.Serializable.
-					 **
-					 ** This probably means we can cast the script to a
-					 ** NativeFunction (if the super class of the
-					 ** object is a NativeFunction) then we can stick
-					 ** that object in memcache using the Memcache
-					 ** service directly.
-					 ** 
-					 **/
-					
-					script = Context.getCurrentContext().compileReader(reader, _scriptResource, 0, null);
-
-					/*if ("org.mozilla.javascript.NativeFunction".equalsIgnoreCase(script.getClass().getSuperclass().getName()) == true)
-					{
-						org.mozilla.javascript.NativeFunction nativeFunction = (org.mozilla.javascript.NativeFunction) script;
-						com.google.appengine.api.memcache.MemcacheService cache = com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
-
-						try
-						{
-							log.info("caching this script: " + _scriptResource);
-							cache.put(_scriptResource, nativeFunction, com.google.appengine.api.memcache.Expiration.byDeltaSeconds(600));
-						}
-						catch(Throwable t)
-						{
-							log.warning("Unable to place key: " + _scriptResource + " with its value: " + nativeFunction + " in the cache.");
-						}
-					}*/
+					//Note that we are really not calling out to the
+					//http ... we ultimately just use the path of this
+					//URI to find the resource in the jar.
+					uris.add(new java.net.URI("http://" + getAppName() + "/airlift/"));
+					uris.add(new java.net.URI("http://" + getAppName() + "/handler/"));
+					uris.add(new java.net.URI("http:///"));
 				}
 				catch(Throwable t)
 				{
 					throw new RuntimeException(t);
 				}
 
-				if (this.compileScript == true)
-				{
-					log.info("Caching compiled script: " + _scriptResource);
-					
-					synchronized(getScriptResourceMap())
-					{
-						getScriptResourceMap().put(_scriptResource, script);
-					}
-				}
+				Require require = new Require(_context, sharedScope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(null, uris)), null, null, false);
+				require.install(sharedScope);
+				log.info("require loaded for the first time into the shared scope");
 			}
+			else
+			{
+				log.info("require already loaded into shared scope: " + requireFunction.toString());
+			}
+
+			log.info("_scriptResource: " + _scriptResource);
+			log.info("scriptResource: " + scriptResource);
+			log.info("handle script: " + handler);
+
+			// Now evaluate the string we've collected. We'll ignore the result.
+			_context.evaluateString(getScope(), handler, scriptResource, 1, null);
 		}
 		finally
 		{
-			if (reader != null) { try { reader.close(); } catch(Throwable t) {} }
 		}
-
-		return script;
 	}
 
 	/**
