@@ -109,7 +109,7 @@ public class RestfulSecurityContext
 		
 		try
 		{
-			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_domainName, airlift.generator.Securable.class);
+/*			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_domainName, airlift.generator.Securable.class);
 
 			if (securable!= null && securable.isSecurable() == true)
 			{
@@ -159,7 +159,7 @@ public class RestfulSecurityContext
 			else
 			{
 				log.info("User: " + userId + " is allowed method: " + _method + " access to this domain: " + _domainName);
-			}
+			} */
 		}
 		catch(Throwable t)
 		{

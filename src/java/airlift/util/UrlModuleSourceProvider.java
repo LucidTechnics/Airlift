@@ -106,7 +106,7 @@ public class UrlModuleSourceProvider
         return source != null ? source : loadFromActualUri(uri, base, validator);
     }
 
-    protected ModuleSource loadFromActualUri(URI uri, URI base, Object validator)
+	protected ModuleSource loadFromActualUri(URI uri, URI base, Object validator)
 			throws IOException
     {
         final URL url = new URL(base == null ? null : base.toURL(), uri.toString());
@@ -116,22 +116,35 @@ public class UrlModuleSourceProvider
 
 		try
 		{
-			inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
+			/*ClassLoader classLoader = airlift.util.JavascriptingUtil.class.getClassLoader();
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			log.info("fetching resource: " + "/" + scriptResource);*/
+			
+			java.net.URL resourceURL = airlift.util.JavascriptingUtil.class.getResource("/" + scriptResource);
+			log.info("resource url object: " + resourceURL.toString());
+			
+			java.net.URLConnection resourceConnection = resourceURL.openConnection();
+			log.info("default value of use caches: " + resourceConnection.getUseCaches());
+			resourceConnection.setUseCaches(false);
+			log.info("now use caches: " + resourceConnection.getUseCaches());
+			inputStream = resourceConnection.getInputStream();
+			//inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
 		}
 		catch(Throwable t)
 		{
-
-			throw new RuntimeException(t);
+			java.io.StringWriter stringWriter = new java.io.StringWriter();
+			java.io.PrintWriter printWriter = new java.io.PrintWriter(stringWriter);
+			t.printStackTrace(printWriter);
+			
+			log.info("Swallowed this exception: " + stringWriter.toString());
 		}
 
 		if (inputStream == null)
 		{
-			log.severe("Cannot find script: " + url.getPath());
-			throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Is this resource: " + url.getPath() + " in the application's classpath?",
-				airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
+			log.warning("Cannot find script: " + url.getPath());
 		}
 
-		return new ModuleSource(getReader(inputStream), null, uri, base, new URLValidator());
+		return (inputStream != null) ? new ModuleSource(getReader(inputStream), null, uri, base, new URLValidator()) : null;
     }
 
     private static Reader getReader(java.io.InputStream _inputStream)

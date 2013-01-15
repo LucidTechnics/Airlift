@@ -37,13 +37,8 @@
 	<property name="src.test" location="${src}/test" />
 	<property name="src.doc" location="${src}/doc" />
 	<property name="src.cfg" location="${src}/cfg" />
-	<property name="src.html" location="${src}/html" />
 	<property name="src.images" location="${src}/images" />
-	<property name="src.css" location="${src}/css" />
 	<property name="src.script" location="${src}/script" />
-	<property name="src.webapp" location="${src}/webapp" />
-	<property name="src.webinf" location="${src.webapp}/WEB-INF" />
-	<property name="src.php" location="${src}/php" />
 	
 	
 	<property name="stage" location="stage" />
@@ -62,13 +57,9 @@
 	<property name="deployDir.java" location="${deployDir}/java" />
 	<property name="deployDir.template" location="${deployDir}/template" />
 	<property name="deployDir.test" location="${deployDir}/test" />
-	<property name="deployDir.cfg" location="${deployDir}/cfg" />
-	<property name="deployDir.html" location="${deployDir}/html" />
 	<property name="deployDir.javascript" location="${deployDir}/html" />
 	<property name="deployDir.images" location="${deployDir}/images" />
-	<property name="deployDir.css" location="${deployDir}/css" />
 	<property name="deployDir.script" location="${deployDir}/script" />
-	<property name="deployDir.sequence" location="${deployDir}/sequence" />
 	<property name="deployDir.workspace" location="${deployDir}/workspace" />
 	<property name="deployDir.bin" location="${deployDir}/bin" />
 	<property name="deployDir.lib" location="${deployDir}/lib" />
@@ -160,15 +151,11 @@
 		
 		<mkdir dir="${stage}" />
 		<mkdir dir="${stage.shl}" />
-		<mkdir dir="${stage.html}" />
 		<mkdir dir="${stage.template}" />
 		<mkdir dir="${stage.test}" />
-		<mkdir dir="${stage.cfg}" />
 		<mkdir dir="${stage.images}" />
-		<mkdir dir="${stage.css}" />
 		<mkdir dir="${stage.script}" />
 		<mkdir dir="${stage.javascript}" />
-		<mkdir dir="${stage.cfg}/${appName}" />
 
 		<mkdir dir="${src}" />
 		<mkdir dir="${src.shl}" />
@@ -177,31 +164,19 @@
 		<mkdir dir="${src.template}" />
 		<mkdir dir="${src.test}" />
 		<mkdir dir="${src.doc}" />
-		<mkdir dir="${src.cfg}" />
-		<mkdir dir="${src.html}" />
 		<mkdir dir="${src.images}" />
-		<mkdir dir="${src.css}" />
 		<mkdir dir="${src.script}" />
-		<mkdir dir="${src.webapp}" />
-		<mkdir dir="${src.webinf}" />
-		<mkdir dir="${src.php}" />		
 
 		<mkdir dir="${deployDir}" />
 		<mkdir dir="${deployDir.lib}" />
 		<mkdir dir="${deployDir.bin}" />
 		<mkdir dir="${deployDir.log}" />
-		<mkdir dir="${deployDir.sequence}" />
 		<mkdir dir="${deployDir.shl}" />
-		<mkdir dir="${deployDir.html}" />
 		<mkdir dir="${deployDir.template}" />
 		<mkdir dir="${deployDir.javascript}" />
 		<mkdir dir="${deployDir.test}" />
-		<mkdir dir="${deployDir.cfg}" />
-		<mkdir dir="${deployDir.html}" />
 		<mkdir dir="${deployDir.images}" />
-		<mkdir dir="${deployDir.css}" />
 		<mkdir dir="${deployDir.script}" />
-		<mkdir dir="${deployDir.cfg}/${appName}" />
 
 		<mkdir dir="${classes}" />
 		<mkdir dir="${workspace}" />
@@ -255,7 +230,7 @@
 
 		 <jar destfile="${dist}/lib/${jar}-core.jar"
 		       basedir="${classes}"
-			   excludes="**\*Test.class,**\*TestSuite.class, **\*spring*\, **\*php\"
+			   excludes="**\*Test.class,**\*TestSuite.class"
 		  />
 
 		<jar destfile="${dist}/lib/${testJar}-core.jar"
@@ -296,15 +271,6 @@
 		<!-- Make application shell scripts executable -->
 		<chmod dir="${deployDir.bin}" includes="**/*.sh"  perm="ugo+rx"/>
 
-		<!-- copy config files -->
-		<copy todir="${deployDir.cfg}">
-			<fileset dir="${stage.cfg}" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${deployDir.html}">
-			<fileset dir="${src.html}" includes="**/*.*" />
-		</copy>
-
 		<copy todir="${deployDir.template}">
 			<fileset dir="${src.template}" includes="**/*.*" />
 		</copy>
@@ -315,10 +281,6 @@
 
 		<copy todir="${deployDir.images}">
 			<fileset dir="${src.images}" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${deployDir.css}">
-			<fileset dir="${src.css}" includes="**/*.*" />
 		</copy>
 		
 	</target>

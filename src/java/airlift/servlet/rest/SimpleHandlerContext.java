@@ -14,7 +14,6 @@
 
 package airlift.servlet.rest;
 
-import airlift.domain.DomainConfiguration;
 import airlift.util.JavascriptingUtil;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -63,7 +62,7 @@ public class SimpleHandlerContext
 							RestServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
 							HttpServletResponse _httpServletResponse,
-							Map _uriParameterMap, DomainConfiguration _domainConfiguration)
+							Map _uriParameterMap)
     {
 		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
 		String rootPackageName = _httpServlet.getServletConfig().getInitParameter("a.root.package.name");
@@ -118,14 +117,14 @@ public class SimpleHandlerContext
 		
 		try
 		{
-			appProfile = (airlift.AppProfile) Class.forName(rootPackageName + ".AppProfile").newInstance();
+			appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
 
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(_appName, this.productionMode);
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 
 		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
 		

@@ -263,9 +263,9 @@ public class AirliftUtil
 
 		try
 		{
-			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName(_rootPackageName + ".AppProfile").newInstance();
+			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
 
-			isDomainName = appProfile.isValidDomain(_domainName);
+			isDomainName = appProfile.isValidResource(_domainName);
 		}
 		catch(Throwable t)
 		{
@@ -765,7 +765,7 @@ public class AirliftUtil
 	 * @param _interfaceClass the _interface class
 	 * @return Map of domain object with descriptions and values
 	 */
-	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
+	/*public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
 	{
 		java.util.Map<String, Object> descriptionMap = new java.util.HashMap<String, Object>();
 
@@ -859,7 +859,7 @@ public class AirliftUtil
 		{
 			throw  new RuntimeException(t);
 		}
-	}
+	}*/
 
 	/**
 	 * The Class SqlDateInstanceCreator.

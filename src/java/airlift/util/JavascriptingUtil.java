@@ -15,7 +15,6 @@
 package airlift.util;
 
 import org.mozilla.javascript.*;
-import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -32,20 +31,14 @@ public class JavascriptingUtil
 {
 	private static Logger log = Logger.getLogger(JavascriptingUtil.class.getName());
 
-	private static final Map<String, Script> scriptResourceMap = new HashMap<String, Script>();
 	private Map<String, Object> bindingsMap;
 	private Scriptable scope;
 	private static final ScriptableObject sharedScope;
-	private String appName;
-
 	
-	private Map<String, Script> getScriptResourceMap() { return scriptResourceMap; }
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
 	private Scriptable getScope() { return scope; }
 	public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 	public void setScope(Scriptable _scope) { scope = _scope; }
-	public String getAppName() { return appName; }
-	public void setAppName(String _appName) { appName = _appName; }
 	
 	public java.util.List scriptStack = new java.util.ArrayList();
 	private boolean cacheScript = false;
@@ -74,15 +67,15 @@ public class JavascriptingUtil
     /**
      * Instantiates a new javascripting util.
      */
-    public JavascriptingUtil(String _appName)
+    public JavascriptingUtil()
 	{
-		setAppName(_appName);
+		this.cacheScript = false;
 		setBindingsMap(new HashMap<String, Object>());
 	}
 
-	public JavascriptingUtil(String _appName, boolean _cacheScript)
+	public JavascriptingUtil(boolean _cacheScript)
 	{
-		this(_appName);
+		this();
 		this.cacheScript = _cacheScript;
 	}
 
@@ -95,66 +88,6 @@ public class JavascriptingUtil
     public void bind(String _name, Object _value)
     {
 		getBindingsMap().put(_name, _value);
-	}
-
-	public byte[] serialize(Function _function)
-	{
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		ScriptableOutputStream scriptableOutputStream = null;
-		
-		try
-		{
-			if (Context.getCurrentContext() == null)
-			{
-				throw new RuntimeException("Cannot use serialize outside of the scope of a call to executeScript.  A context must be present.");
-			}
-			
-			scriptableOutputStream = new ScriptableOutputStream(byteArrayOutputStream, getScope());
-			scriptableOutputStream.writeObject(_function);
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-			log.severe(t.toString());
-			throw new RuntimeException(t);
-		}
-		finally
-		{
-			try { if (scriptableOutputStream != null) { scriptableOutputStream.close(); } } catch(Throwable t) { log.warning("Small issue closing ScriptableOutputStream: " + t.toString()); }
-		}
-
-		return byteArrayOutputStream.toByteArray();
-	}
-
-	/**
-	 * Find script.
-	 *
-	 * @param _scriptResource the _script resource
-	 * @return the input stream
-	 */
-	private InputStream findScript(String _scriptResource)
-	{
-		InputStream inputStream = null;
-		String scriptResource = _scriptResource.replaceAll("^/", "");
-
-		try
-		{
-			inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
-		}
-		catch(Throwable t)
-		{
-
-			throw new RuntimeException(t);
-		}
-
-		if (inputStream == null)
-		{
-			log.severe("Cannot find script: " + scriptResource);
-			throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Is this resource: " + _scriptResource + " in the application's classpath?",
-				airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
-		}
-
-		return inputStream;
 	}
 
 	public void executeScript(String _scriptResource)
@@ -326,7 +259,7 @@ public class JavascriptingUtil
 		try
 		{
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
-			String handler = "LOG.info(\"What in the world!!!!\"); require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle();";
+			String handler = "require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle(CONTENT_CONTEXT, REQUEST, RESPONSE, LOG);";
 
 			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(sharedScope, "require");
 			
@@ -341,16 +274,21 @@ public class JavascriptingUtil
 					//Note that we are really not calling out to the
 					//http ... we ultimately just use the path of this
 					//URI to find the resource in the jar.
-					uris.add(new java.net.URI("http://" + getAppName() + "/airlift/"));
-					uris.add(new java.net.URI("http://" + getAppName() + "/handler/"));
-					uris.add(new java.net.URI("http:///"));
+					uris.add(new java.net.URI("http://localhost:80/handler/"));
+					uris.add(new java.net.URI("http://localhost:80/lib/"));
+					uris.add(new java.net.URI("http://localhost:80/"));
+					uris.add(new java.net.URI("http://localhost:80//airlift/lib/"));
+					uris.add(new java.net.URI("http://localhost:80//"));
 				}
 				catch(Throwable t)
 				{
 					throw new RuntimeException(t);
 				}
 
-				Require require = new Require(_context, sharedScope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(null, uris)), null, null, false);
+				log.info("************ Caching has value: " + this.cacheScript + "*******************");
+
+				Require require = new Require(_context, sharedScope, new StrongCachingModuleScriptProvider(
+					new UrlModuleSourceProvider(null, uris), this.cacheScript), null, null, false, this.cacheScript) ;
 				require.install(sharedScope);
 				log.info("require loaded for the first time into the shared scope");
 			}

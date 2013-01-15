@@ -15,8 +15,6 @@
 
 package airlift.servlet.rest;
 
-import airlift.domain.DomainConfiguration;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -51,5 +49,5 @@ public abstract class HandlerContext
 										   RestServlet _httpServlet,
 									HttpServletRequest _httpServletRequest,
 									HttpServletResponse _httpServletResponse,
-									Map restParameterMap, DomainConfiguration _domainConfiguration);
+									Map restParameterMap);
 }

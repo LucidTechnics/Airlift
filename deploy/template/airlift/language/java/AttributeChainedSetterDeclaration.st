@@ -1,0 +1,1 @@
+$scope, type, name, setterName:{s, t, n, sn | $s$ void $sn$($t$ _$n$) \{ $n$ = _$n$; return this; \} }; separator="\n"$

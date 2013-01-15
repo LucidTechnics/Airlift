@@ -629,6 +629,6 @@ public abstract class Generator
     protected abstract void generate(String _appName,
 					String _directory,
 					Element _element,
-					DomainObjectModel _domainObjectModel,
-					Map<String, DomainObjectModel> _elementNameToDomainObjectModelMap);
+					ResourceModel _resourceModel,
+					Map<String, ResourceModel> _elementNameToResourceObjectModelMap);
 }

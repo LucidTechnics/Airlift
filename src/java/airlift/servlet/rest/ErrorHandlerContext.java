@@ -14,7 +14,6 @@
 
 package airlift.servlet.rest;
 
-import airlift.domain.DomainConfiguration;
 import airlift.util.JavascriptingUtil;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -59,13 +58,13 @@ public class ErrorHandlerContext
 							RestServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
 							HttpServletResponse _httpServletResponse,
-							Map _uriParameterMap, DomainConfiguration _domainConfiguration)
+							Map _uriParameterMap)
     {
 		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
 
 		ContentContext contentContext = new SimpleContentContext();
 
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(_appName, this.productionMode);
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
 
 		String servletName = _httpServlet.getServletName();
 		String base = "http://" + _httpServletRequest.getServerName() + ":" +
