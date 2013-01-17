@@ -14,6 +14,7 @@
 
 package airlift.util;
 
+import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.*;
 
 import java.io.InputStream;
@@ -235,7 +236,7 @@ public class JavascriptingUtil
 		
 		Context context = (new ContextFactory()).enterContext();
 		context.setLanguageVersion(180);
-		context.setOptimizationLevel(-1);
+		context.setOptimizationLevel(-1);   //in app engine it turns out that interpreted mode is fastest for handler execution.
 
 		log.info("Using context: " + context); 
 		
@@ -261,11 +262,13 @@ public class JavascriptingUtil
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
 			String handler = "require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle(CONTENT_CONTEXT, REQUEST, RESPONSE, LOG);";
 
+			System.out.println("getting require: " + System.currentTimeMillis()); 
 			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(sharedScope, "require");
+			System.out.println("got require: " + System.currentTimeMillis());
 			
 			if (requireFunction == org.mozilla.javascript.UniqueTag.NOT_FOUND)
 			{
-				log.info("loading require for the first time into the shared scope");
+				log.info("loading require for the first time into the shared scope: " + System.currentTimeMillis());
 				
 				java.util.Set uris = new java.util.HashSet();
 
@@ -288,9 +291,10 @@ public class JavascriptingUtil
 				log.info("************ Caching has value: " + this.cacheScript + "*******************");
 
 				Require require = new Require(_context, sharedScope, new StrongCachingModuleScriptProvider(
-					new UrlModuleSourceProvider(null, uris), this.cacheScript), null, null, false, this.cacheScript) ;
+					new UrlModuleSourceProvider(null, uris)), null, null, false, this.cacheScript);
+				log.info("constructed new require: " + System.currentTimeMillis());
 				require.install(sharedScope);
-				log.info("require loaded for the first time into the shared scope");
+				log.info("installed new require: " + System.currentTimeMillis());
 			}
 			else
 			{
@@ -301,8 +305,11 @@ public class JavascriptingUtil
 			log.info("scriptResource: " + scriptResource);
 			log.info("handle script: " + handler);
 
-			// Now evaluate the string we've collected. We'll ignore the result.
+			// Now evaluate the string we've collected. We'll ignore
+			// the result.
+			log.info("executing handler string: " + System.currentTimeMillis());
 			_context.evaluateString(getScope(), handler, scriptResource, 1, null);
+			log.info("executed handler string: " + System.currentTimeMillis());
 		}
 		finally
 		{
