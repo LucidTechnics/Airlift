@@ -38,7 +38,7 @@ public class UrlModuleSourceProvider
    extends org.mozilla.javascript.commonjs.module.provider.ModuleSourceProviderBase
 {
     private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(JavascriptingUtil.class.getName());
+	private static Logger log = Logger.getLogger(UrlModuleSourceProvider.class.getName());
 	
     private final Iterable<URI> privilegedUris;
     private final Iterable<URI> fallbackUris;
@@ -116,11 +116,11 @@ public class UrlModuleSourceProvider
 
 		try
 		{
-			/*ClassLoader classLoader = airlift.util.JavascriptingUtil.class.getClassLoader();
+			/*ClassLoader classLoader = airlift.util.JavaScriptingUtil.class.getClassLoader();
 			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 			log.info("fetching resource: " + "/" + scriptResource);*/
 			
-			java.net.URL resourceURL = airlift.util.JavascriptingUtil.class.getResource("/" + scriptResource);
+			java.net.URL resourceURL = airlift.util.JavaScriptingUtil.class.getResource("/" + scriptResource);
 			log.info("resource url object: " + resourceURL.toString());
 			
 			java.net.URLConnection resourceConnection = resourceURL.openConnection();

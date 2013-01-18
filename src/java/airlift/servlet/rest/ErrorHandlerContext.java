@@ -14,7 +14,7 @@
 
 package airlift.servlet.rest;
 
-import airlift.util.JavascriptingUtil;
+import airlift.util.JavaScriptingUtil;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +64,7 @@ public class ErrorHandlerContext
 
 		ContentContext contentContext = new SimpleContentContext();
 
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
+		JavaScriptingUtil scriptingUtil = new JavaScriptingUtil(this.productionMode);
 
 		String servletName = _httpServlet.getServletName();
 		String base = "http://" + _httpServletRequest.getServerName() + ":" +

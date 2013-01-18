@@ -47,25 +47,10 @@ public class Require extends BaseFunction
 {
     private static final long serialVersionUID = 1L;
 
-    private final ModuleScriptProvider moduleScriptProvider;
-    private final Scriptable nativeScope;
-    private final Scriptable paths;
-    private final boolean sandboxed;
-    private final Script preExec;
-    private final Script postExec;
-    private String mainModuleId = null;
-    private Scriptable mainExports;
+    private final Map<String, Object> bindings;
+	private SharedRequire require;
 	private boolean cachingEnabled = true;
 	
-    // Modules that completed loading; visible to all threads
-    private final Map<String, Scriptable> exportedModuleInterfaces =
-        new ConcurrentHashMap<String, Scriptable>();
-    private final Object loadLock = new Object();
-    // Modules currently being loaded on the thread. Used to resolve circular
-    // dependencies while loading.
-    private static final ThreadLocal<Map<String, Scriptable>>
-        loadingModuleInterfaces = new ThreadLocal<Map<String,Scriptable>>();
-
     /**
      * Creates a new instance of the require() function. Upon constructing it,
      * you will either want to install it in the global (or some other) scope
@@ -84,91 +69,12 @@ public class Require extends BaseFunction
      * This means that it doesn't have the "paths" property, and also that the
      * modules it loads don't export the "module.uri" property.
      */
-    public Require(Context cx, Scriptable nativeScope,
-            ModuleScriptProvider moduleScriptProvider, Script preExec,
-            Script postExec, boolean sandboxed, boolean cachingEnabled) {
-        this.moduleScriptProvider = moduleScriptProvider;
-        this.nativeScope = nativeScope;
-		this.sandboxed = sandboxed;
-		this.cachingEnabled = cachingEnabled;
-        this.preExec = preExec;
-        this.postExec = postExec;
-        setPrototype(ScriptableObject.getFunctionPrototype(nativeScope));
-        if(!sandboxed) {
-            paths = cx.newArray(nativeScope, 0);
-            defineReadOnlyProperty(this, "paths", paths);
-        }
-        else {
-            paths = null;
-        }
-    }
-
-    /**
-     * Calling this method establishes a module as being the main module of the
-     * program to which this require() instance belongs. The module will be
-     * loaded as if require()'d and its "module" property will be set as the
-     * "main" property of this require() instance. You have to call this method
-     * before the module has been loaded (that is, the call to this method must
-     * be the first to require the module and thus trigger its loading). Note
-     * that the main module will execute in its own scope and not in the global
-     * scope. Since all other modules see the global scope, executing the main
-     * module in the global scope would open it for tampering by other modules.
-     * @param cx the current context
-     * @param mainModuleId the ID of the main module
-     * @return the "exports" property of the main module
-     * @throws IllegalStateException if the main module is already loaded when
-     * required, or if this require() instance already has a different main
-     * module set.
-     */
-    public Scriptable requireMain(Context cx, String mainModuleId) {
-        if(this.mainModuleId != null) {
-            if (!this.mainModuleId.equals(mainModuleId)) {
-                throw new IllegalStateException("Main module already set to " +
-                    this.mainModuleId);
-            }
-            return mainExports;
-        }
-
-        ModuleScript moduleScript;
-        try {
-            // try to get the module script to see if it is on the module path
-            moduleScript = moduleScriptProvider.getModuleScript(
-                    cx, mainModuleId, null, null, paths);
-        } catch (RuntimeException x) {
-            throw x;
-        } catch (Exception x) {
-            throw new RuntimeException(x);
-        }
-
-        if (moduleScript != null) {
-            mainExports = getExportedModuleInterface(cx, mainModuleId,
-                    null, null, true);
-        } else if (!sandboxed) {
-
-            URI mainUri = null;
-
-            // try to resolve to an absolute URI or file path
-            try {
-                mainUri = new URI(mainModuleId);
-            } catch (URISyntaxException usx) {
-                // fall through
-            }
-
-            // if not an absolute uri resolve to a file path
-            if (mainUri == null || !mainUri.isAbsolute()) {
-                File file = new File(mainModuleId);
-                if (!file.isFile()) {
-                    throw ScriptRuntime.throwError(cx, nativeScope,
-                            "Module \"" + mainModuleId + "\" not found.");
-                }
-                mainUri = file.toURI();
-            }
-            mainExports = getExportedModuleInterface(cx, mainUri.toString(),
-                    mainUri, null, true);
-        }
-
-        this.mainModuleId = mainModuleId;
-        return mainExports;
+	public Require(Scriptable _nativeScope, SharedRequire _require, Map<String, Object> _bindings, boolean _cachingEnabled)
+	{
+		require = _require;
+		bindings = _bindings;
+		cachingEnabled = _cachingEnabled;
+		setPrototype(ScriptableObject.getFunctionPrototype(_nativeScope));
     }
 
     /**
@@ -182,7 +88,17 @@ public class Require extends BaseFunction
 
     public Object call(Context cx, Scriptable scope, Scriptable thisObj,
             Object[] args)
-    {
+	{
+		for(int i = 0; i < scope.getIds().length; i++)
+		{
+			System.out.println("REQUIRE SCOPE id: " + scope.getIds()[i]);			
+		}
+
+		for(int i = 0; i < scope.getIds().length; i++)
+		{
+			System.out.println("REQUIRE THIS.SCOPE id: " + scope.getIds()[i]);			
+		}
+
         if(args == null || args.length < 1) {
             throw ScriptRuntime.throwError(cx, scope,
                     "require() needs one argument");
@@ -213,7 +129,7 @@ public class Require extends BaseFunction
                 if (id.charAt(0) == '.') {
                     // resulting URI is not contained in base,
                     // throw error or make absolute depending on sandbox flag.
-                    if (sandboxed) {
+                    if (this.require.sandboxed) {
                         throw ScriptRuntime.throwError(cx, scope,
                             "Module \"" + id + "\" is not contained in sandbox.");
                     } else {
@@ -221,176 +137,28 @@ public class Require extends BaseFunction
                     }
                 }
             }
-        }
-        return getExportedModuleInterface(cx, id, uri, base, false);
+		}
+		
+		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
+
+		for(int i = 0; i < scope.getIds().length; i++)
+		{
+			System.out.println("REQUIRE EXPORTED.SCOPE id: " + scope.getIds()[i]);			
+		}
+
+		for (String key: this.bindings.keySet())
+		{
+			Object object = Context.javaToJS(this.bindings.get(key), scope);
+			ScriptableObject.putConstProperty(exportedModuleInterface, key, object);
+		}
+
+		return exportedModuleInterface;
     }
 
+	@Override
     public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
         throw ScriptRuntime.throwError(cx, scope,
                 "require() can not be invoked as a constructor");
-    }
-
-    private Scriptable getExportedModuleInterface(Context cx, String id,
-            URI uri, URI base, boolean isMain)
-	{
-		Scriptable exports = null;
-		Map<String, Scriptable> threadLoadingModules = null;
-		
-		if (this.cachingEnabled == true)
-		{
-			// Check if the requested module is already completely loaded
-			exports = exportedModuleInterfaces.get(id);
-			if(exports != null) {
-				if(isMain) {
-					throw new IllegalStateException(
-							"Attempt to set main module after it was loaded");
-				}
-				return exports;
-			}
-			// Check if it is currently being loaded on the current thread
-			// (supporting circular dependencies).
-			threadLoadingModules = loadingModuleInterfaces.get();
-			if(threadLoadingModules != null) {
-				exports = threadLoadingModules.get(id);
-				if(exports != null) {
-					return exports;
-				}
-			}
-		}
-        // The requested module is neither already loaded, nor is it being
-        // loaded on the current thread. End of fast path. We must synchronize
-        // now, as we have to guarantee that at most one thread can load
-        // modules at any one time. Otherwise, two threads could end up
-        // attempting to load two circularly dependent modules in opposite
-        // order, which would lead to either unacceptable non-determinism or
-        // deadlock, depending on whether we underprotected or overprotected it
-        // with locks.
-        synchronized(loadLock) {
-            // Recheck if it is already loaded - other thread might've
-            // completed loading it just as we entered the synchronized
-			// block.
-			if (this.cachingEnabled == true)
-			{
-				exports = exportedModuleInterfaces.get(id);
-			}
-			
-            if(exports != null) {
-                return exports;
-            }
-            // Nope, still not loaded; we're loading it then.
-            final ModuleScript moduleScript = getModule(cx, id, uri, base);
-            if (sandboxed && !moduleScript.isSandboxed()) {
-                throw ScriptRuntime.throwError(cx, nativeScope, "Module \""
-                        + id + "\" is not contained in sandbox.");
-            }
-            exports = cx.newObject(nativeScope);
-            // Are we the outermost locked invocation on this thread?
-            final boolean outermostLocked = threadLoadingModules == null;
-            if(outermostLocked) {
-                threadLoadingModules = new HashMap<String, Scriptable>();
-                loadingModuleInterfaces.set(threadLoadingModules);
-            }
-            // Must make the module exports available immediately on the
-            // current thread, to satisfy the CommonJS Modules/1.1 requirement
-            // that "If there is a dependency cycle, the foreign module may not
-            // have finished executing at the time it is required by one of its
-            // transitive dependencies; in this case, the object returned by
-            // "require" must contain at least the exports that the foreign
-            // module has prepared before the call to require that led to the
-            // current module's execution."
-            threadLoadingModules.put(id, exports);
-            try {
-                // Support non-standard Node.js feature to allow modules to
-                // replace the exports object by setting module.exports.
-                Scriptable newExports = executeModuleScript(cx, id, exports,
-                        moduleScript, isMain);
-                if (exports != newExports) {
-                    threadLoadingModules.put(id, newExports);
-                    exports = newExports;
-                }
-            }
-            catch(RuntimeException e) {
-                // Throw loaded module away if there was an exception
-                threadLoadingModules.remove(id);
-                throw e;
-            }
-            finally {
-                if(outermostLocked) {
-                    // Make loaded modules visible to other threads only after
-                    // the topmost triggering load has completed. This strategy
-                    // (compared to the one where we'd make each module
-                    // globally available as soon as it loads) prevents other
-                    // threads from observing a partially loaded circular
-                    // dependency of a module that completed loading.
-                    exportedModuleInterfaces.putAll(threadLoadingModules);
-                    loadingModuleInterfaces.set(null);
-                }
-            }
-        }
-        return exports;
-    }
-
-    private Scriptable executeModuleScript(Context cx, String id,
-            Scriptable exports, ModuleScript moduleScript, boolean isMain)
-    {
-        final ScriptableObject moduleObject = (ScriptableObject)cx.newObject(
-                nativeScope);
-        URI uri = moduleScript.getUri();
-        URI base = moduleScript.getBase();
-        defineReadOnlyProperty(moduleObject, "id", id);
-        if(!sandboxed) {
-            defineReadOnlyProperty(moduleObject, "uri", uri.toString());
-        }
-        final Scriptable executionScope = new ModuleScope(nativeScope, uri, base);
-        // Set this so it can access the global JS environment objects.
-        // This means we're currently using the "MGN" approach (ModuleScript
-        // with Global Natives) as specified here:
-        // <http://wiki.commonjs.org/wiki/Modules/ProposalForNativeExtension>
-        executionScope.put("exports", executionScope, exports);
-        executionScope.put("module", executionScope, moduleObject);
-        moduleObject.put("exports", moduleObject, exports);
-        install(executionScope);
-        if(isMain) {
-            defineReadOnlyProperty(this, "main", moduleObject);
-        }
-        executeOptionalScript(preExec, cx, executionScope);
-        moduleScript.getScript().exec(cx, executionScope);
-        executeOptionalScript(postExec, cx, executionScope);
-        return ScriptRuntime.toObject(nativeScope,
-                ScriptableObject.getProperty(moduleObject, "exports"));
-    }
-
-    private static void executeOptionalScript(Script script, Context cx,
-            Scriptable executionScope)
-    {
-        if(script != null) {
-            script.exec(cx, executionScope);
-        }
-    }
-
-    private static void defineReadOnlyProperty(ScriptableObject obj,
-            String name, Object value) {
-        ScriptableObject.putProperty(obj, name, value);
-        obj.setAttributes(name, ScriptableObject.READONLY |
-                ScriptableObject.PERMANENT);
-    }
-
-    private ModuleScript getModule(Context cx, String id, URI uri, URI base) {
-        try {
-            final ModuleScript moduleScript =
-                    moduleScriptProvider.getModuleScript(cx, id, uri, base, paths);
-            if (moduleScript == null) {
-                throw ScriptRuntime.throwError(cx, nativeScope, "Module \""
-                        + id + "\" not found.");
-            }
-            return moduleScript;
-        }
-        catch(RuntimeException e) {
-            throw e;
-        }
-        catch(Exception e) {
-            throw Context.throwAsScriptRuntimeEx(e);
-        }
     }
 
     @Override

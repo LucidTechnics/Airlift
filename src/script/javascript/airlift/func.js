@@ -1,14 +1,3 @@
-exports.partial = function(_function)
-{
-	var restOfArguments = Array.prototype.slice.call(arguments, 1);
-
-	return function()
-	{
-		var functionArguments = restOfArguments.concat(Array.prototype.slice.call(arguments, 0));;
-		return _function.apply(_function, functionArguments); //honestly can you set the this to the function itself?
-	};
-};
-
 exports.each = function(_resourceName, _resource, _function)
 {
 	var context = {};
@@ -29,7 +18,7 @@ exports.map = function(_resourceName, _resource, _function)
 
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
-		result[_attributeName] = _function.call(this, _attributeName, _resource);
+		result[_attributeName] = _function.call(this, _value, _attributeName, _resource);
 	});
 
 	return result;
@@ -45,27 +34,27 @@ exports.copy = function(_resourceName, c1, c2)
 
 exports.validate = function(_resourceName, _resource)
 {
-	var validator = require('util/validator');
+	var validator = require('./validator');
 	
 	return this.map(_resourceName, _resource, validator.validate);
 };
 
 exports.convert = function(_resourceName, _resource)
 {
-	var converter = require('util/converter');
+	var converter = require('./converter');
 
-	return this.map(_resourceName, _resource, convertor.convert);
+	return this.map(_resourceName, _resource, converter.convert);
 };
 
-exports.serialize = function(_resourceName, _resource)
+exports.entify = function(_resourceName, _resource)
 {
 	var entity = new Entity(_resourceName);
-	this.each(_resourceName, _resource, this.partial(require('util/serializer').serialize, entity));
+	this.each(_resourceName, _resource, require('./entifier').entify.partial(entity));
 
 	return entity;
 };
 
-exports.deserialize = function(_resourceName, _entity)
+exports.deentify = function(_resourceName, _entity)
 {
-	return this.map(_resourceName, _resource, require('util/deserializer').deserialize);
+	return this.map(_resourceName, _resource, require('./entifier').deentify);
 };

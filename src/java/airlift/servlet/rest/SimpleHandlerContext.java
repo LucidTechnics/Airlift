@@ -14,7 +14,7 @@
 
 package airlift.servlet.rest;
 
-import airlift.util.JavascriptingUtil;
+import airlift.util.JavaScriptingUtil;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import javax.servlet.http.HttpServletRequest;
@@ -124,7 +124,7 @@ public class SimpleHandlerContext
 			throw new RuntimeException(t);
 		}
 
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
+		JavaScriptingUtil scriptingUtil = new JavaScriptingUtil(this.productionMode);
 
 		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
 		
