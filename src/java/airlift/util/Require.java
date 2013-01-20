@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -46,7 +47,7 @@ import org.mozilla.javascript.commonjs.module.ModuleScope;
 public class Require extends BaseFunction
 {
     private static final long serialVersionUID = 1L;
-
+	private static Logger log = Logger.getLogger(Require.class.getName());
     private final Map<String, Object> bindings;
 	private SharedRequire require;
 	private boolean cachingEnabled = true;
@@ -89,16 +90,6 @@ public class Require extends BaseFunction
     public Object call(Context cx, Scriptable scope, Scriptable thisObj,
             Object[] args)
 	{
-		for(int i = 0; i < scope.getIds().length; i++)
-		{
-			System.out.println("REQUIRE SCOPE id: " + scope.getIds()[i]);			
-		}
-
-		for(int i = 0; i < scope.getIds().length; i++)
-		{
-			System.out.println("REQUIRE THIS.SCOPE id: " + scope.getIds()[i]);			
-		}
-
         if(args == null || args.length < 1) {
             throw ScriptRuntime.throwError(cx, scope,
                     "require() needs one argument");
@@ -141,15 +132,25 @@ public class Require extends BaseFunction
 		
 		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 
-		for(int i = 0; i < scope.getIds().length; i++)
+		if (bindings.keySet().isEmpty() == true)
 		{
-			System.out.println("REQUIRE EXPORTED.SCOPE id: " + scope.getIds()[i]);			
+			throw new RuntimeException("bindings map is empty");
 		}
 
+		Scriptable webContext = cx.newObject(scope);
+		
 		for (String key: this.bindings.keySet())
 		{
 			Object object = Context.javaToJS(this.bindings.get(key), scope);
-			ScriptableObject.putConstProperty(exportedModuleInterface, key, object);
+			log.info("Putting key: " + key + " for object: " + object + " in module: " + uri);
+			ScriptableObject.putConstProperty(webContext, key, object);
+		}
+
+		ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
+
+		for (int i = 0; i < exportedModuleInterface.getIds().length; i++)
+		{
+			log.info("exported id: " + exportedModuleInterface.getIds()[i] + " in module: " + uri);
 		}
 
 		return exportedModuleInterface;

@@ -287,22 +287,16 @@ public class JavaScriptingUtil
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
 			String handler = "require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle();";
 
-			System.out.println("getting require: " + System.currentTimeMillis()); 
+			log.info("getting require: " + System.currentTimeMillis()); 
 			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(getScope(), "require");
-			System.out.println("got require: " + System.currentTimeMillis());
+			log.info("got require: " + System.currentTimeMillis());
 			
-			if (requireFunction == org.mozilla.javascript.UniqueTag.NOT_FOUND)
-			{
-				Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
-				log.info("constructed new require: " + System.currentTimeMillis());
-				require.install(getScope());
-				log.info("installed new require: " + System.currentTimeMillis());
-			}
-			else
-			{
-				log.info("require already loaded into shared scope: " + requireFunction.toString());
-			}
+			//Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
+			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), true);
+			log.info("constructed new require: " + System.currentTimeMillis());
+			require.install(getScope());
 
+			log.info("installed new require: " + System.currentTimeMillis());
 			log.info("_scriptResource: " + _scriptResource);
 			log.info("scriptResource: " + scriptResource);
 			log.info("handle script: " + handler);
