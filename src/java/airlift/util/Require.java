@@ -98,7 +98,9 @@ public class Require extends BaseFunction
         String id = (String)Context.jsToJava(args[0], String.class);
         URI uri = null;
         URI base = null;
-        if (id.startsWith("./") || id.startsWith("../")) {
+
+		if (id.startsWith("./") || id.startsWith("../"))
+		{
             if (!(thisObj instanceof ModuleScope)) {
                 throw ScriptRuntime.throwError(cx, scope,
                         "Can't resolve relative module ID \"" + id +
@@ -132,25 +134,32 @@ public class Require extends BaseFunction
 		
 		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 
-		if (bindings.keySet().isEmpty() == true)
+		if (id != null && id.contains("extlib/") == false)
 		{
-			throw new RuntimeException("bindings map is empty");
+			if (bindings.keySet().isEmpty() == true)
+			{
+				throw new RuntimeException("bindings map is empty");
+			}
+
+			Scriptable webContext = cx.newObject(scope);
+
+			for (String key: this.bindings.keySet())
+			{
+				Object object = Context.javaToJS(this.bindings.get(key), scope);
+				log.info("Putting key: " + key + " for object: " + object + " in module: " + id);
+				ScriptableObject.putConstProperty(webContext, key, object);
+			}
+
+			ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
+
+			for (int i = 0; i < exportedModuleInterface.getIds().length; i++)
+			{
+				log.info("exported id: " + exportedModuleInterface.getIds()[i] + " in module: " + id);
+			}
 		}
-
-		Scriptable webContext = cx.newObject(scope);
-		
-		for (String key: this.bindings.keySet())
+		else
 		{
-			Object object = Context.javaToJS(this.bindings.get(key), scope);
-			log.info("Putting key: " + key + " for object: " + object + " in module: " + uri);
-			ScriptableObject.putConstProperty(webContext, key, object);
-		}
-
-		ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
-
-		for (int i = 0; i < exportedModuleInterface.getIds().length; i++)
-		{
-			log.info("exported id: " + exportedModuleInterface.getIds()[i] + " in module: " + uri);
+			log.info("will not attach bindings to resource: " + id);
 		}
 
 		return exportedModuleInterface;

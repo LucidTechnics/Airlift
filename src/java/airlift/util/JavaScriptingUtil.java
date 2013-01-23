@@ -53,8 +53,10 @@ public class JavaScriptingUtil
 		try
 		{
 			sharedScope = context.initStandardObjects();
-			String partialSupport = "var donkey = {name: 'Shared scope donkey'}; Function.prototype.partial = function(){var fn = this, args = Array.prototype.slice.call(arguments);return function() { return fn.apply(this, args.concat( Array.prototype.slice.call(arguments))); };};";
-			context.evaluateString(sharedScope, partialSupport, "JavaScriptingUtil initialization", 1, null);
+			String support = "Function.prototype.partial = function(){var fn = this, args = Array.prototype.slice.call(arguments);return function() { return fn.apply(this, args.concat( Array.prototype.slice.call(arguments))); };};" +
+							 "String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); };" +
+							 "String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
+			context.evaluateString(sharedScope, support, "JavaScriptingUtil initialization", 1, null);
 
 			log.info("loading require for the first time into the shared scope: " + System.currentTimeMillis());
 

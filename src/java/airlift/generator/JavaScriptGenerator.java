@@ -106,13 +106,22 @@ public class JavaScriptGenerator
 			{
 				for (Map.Entry<String, Object> entry: annotation.getParameterMap().entrySet())
 				{
-					configTemplate.setAttribute("name", entry.getKey());
+					String name = entry.getKey();
+					
+					configTemplate.setAttribute("name", name);
 					configTemplate.setAttribute("value", entry.getValue());
+
+					System.out.println("Christmas processing name:" + name + ":"+ entry.getValue() + ":" + attribute.getName());
+					if ("mapTo".equalsIgnoreCase(name) == true)
+					{
+						System.out.println("Found MAP TO");
+						attributeMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length() - 2)));
+					}
 				}
 			}
 
 			attributeMetadataStringTemplate.setAttribute("propertyName", attribute.getName());
-			attributeMetadataStringTemplate.setAttribute("propertyConfig", configTemplate.toString()); 
+			attributeMetadataStringTemplate.setAttribute("propertyConfig", configTemplate.toString());
 		}
 
 		return attributeMetadataStringTemplate.toString();

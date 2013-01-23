@@ -1,13 +1,13 @@
 var MetaData = function()
 {
-	var defaultDomainMetaData = ;
 	this.resourceName = '$resourceName$';
-	this.attributeMetadata = {};
+	this.attributes = {};
+    this.foreignKeys = [$foreignKeyName: {f |'$f$'}; separator=","$];
 
-	$propertyName, propertyConfig: {n,c| this.attributeMetadata.$n$ = require('airlift/AttributeMetadata').create($c$); }; separator="\n"$
+	$propertyName, propertyConfig: {n,c| this.attributes['$n$'] = require('airlift/AttributeMetadata').create($c$); }; separator="\n"$
 }
 
 exports.create = function()
 {
 	return new MetaData();
-}
+};
