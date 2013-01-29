@@ -25,11 +25,11 @@ var AttributeMetadata = function(_config)
 	this.isPrimaryKey = _config.isPrimaryKey || false;
 	this.isUniqueKey = _config.isUniqueKey || false;
 	this.concept = _config.concept || '';
-	this.nullable = _config.nullable || false;
+	this.required = _config.required || false;
 	this.immutable = _config.immutable || false;
 	this.ranged = _config.ranged || false;
-	this.minimumValue = _config.minimumValue || null;
-	this.maximumValue = _config.maximumValue || null;
+	this.minValue = _config.minValue || null;
+	this.maxValue = _config.maxValue || null;
 	this.encrypted = _config.encrypted || false;
 	this.semanticType = _config.semanticType || 'NONE';
 };

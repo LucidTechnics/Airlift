@@ -55,3 +55,8 @@ exports.isWhitespace = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 };
+
+exports.hasValue = function(_value)
+{
+	return (_value !== null && _value !== undefined);
+};

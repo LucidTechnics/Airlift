@@ -40,6 +40,7 @@ public class JavaScriptGenerator
 				ResourceModel _resourceModel,
 				Map<String, ResourceModel> _elementNameToResourceModelMap)
 	{
+		//transitioning from the Java 6 compiler to dictate.js
 	}
 	
 	/**
