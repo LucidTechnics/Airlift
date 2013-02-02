@@ -47,5 +47,5 @@ exports.decrypt = function(_entity, _error, _value, _attributeName)
 	  var revolutions = web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
 
 	  var attributeEncryptedName = _attributeName + "Encrypted";
-	  return Packages.airlift.util.AirliftUtil.convertToString(Packages.airlift.util.AirliftUtil.decrypt(((_entity.getProperty(attributeEncryptedName) && _entity.getProperty(attributeEncryptedName).getBytes())||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions)); 
+	  _entity.setUnindexedProperty(_attributeName, Packages.airlift.util.AirliftUtil.convertToString(Packages.airlift.util.AirliftUtil.decrypt(((_entity.getProperty(attributeEncryptedName) && _entity.getProperty(attributeEncryptedName).getBytes())||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions)));
 };

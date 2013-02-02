@@ -1,5 +1,6 @@
 var web = require('./web');
 var util = require('./util');
+var constructors = {};
 
 exports.view = function()
 {
@@ -59,31 +60,7 @@ exports.map = function(_resourceName, _resource, _function)
 	return result;
 };
 
-exports.clone = function(_resourceName, _resource)
-{
-	return this.map(_resourceName, _resource, function(_value)
-	{
-		return _value;
-	});
-};
-
-exports.deepClone = function(_resourceName, _resource)
-{
-	var constructors = {};
-	var createClass = util.createClass;
-	
-	return this.map(_resourceName, _resource, function(_value, _attributeName)
-	{
-		var type = this.attributesMetaData[_attributeName].type;
-
-		var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
-		constructors[type] = constructors[type] || constructor;
-		
-		return constructor.newInstance(_value);
-	});
-};
-
-exports.reduce = function(_base, _resourceName, _resource, _function)
+exports.reduce = function(_resourceName, _resource, _function, _base)
 {
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
@@ -93,28 +70,21 @@ exports.reduce = function(_base, _resourceName, _resource, _function)
 	return _base;
 };
 
-exports.copy = function(_resourceName, _resource1, _resource2)
+exports.reduceRight = function(_resourceName, _resource, _function, _base)
 {
-	this.each(_resourceName, _resource1, function(_value, _attributeName, _resource)
+	context.resourceName = _resourceName;
+	context.resourceMeta = require('meta/r/' + _resourceName).create();
+	context.attributes = this.attributes || context.resourceMeta.attributes;
+
+	var reversedAttributes = attributes.reverse();
+	reversedAttributes.push(each.partial(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
-		_resource2[_attributeName] = _value;
-	});
-};
+		_base = _function.call(this, _base, _value, _attributeName, _resource);
+	}));
+	
+	this.view.apply(this, reversedAttributes); 
 
-exports.deepCopy = function(_resourceName, _resource1, _resource2)
-{
-	var constructors = {};
-	var createClass = util.createClass;
-
-	this.each(_resourceName, _resource1, function(_value, _attributeName, _resource)
-	{
-		var type = this.attributesMetaData[_attributeName].type;
-
-		var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
-		constructors[type] = constructors[type] || constructor;
-
-		_resource2[_attributeName] = constructor.newInstance(_value);
-	});
+	return _base;
 };
 
 exports.sequence = function(_error)
@@ -279,4 +249,32 @@ exports.audit = function(_resourceName, _resource, _action, _actionDate)
 	auditTrail.recordDate = auditTrail.actionDate;
 
 	web.getAuditContext().insert(auditTrail);
+};
+
+exports.copy = function(_target, _value, _attributeName)
+{
+	_target[_attributeName] = _value;
+};
+
+exports.deepCopy = function(_target, _value, _attributeName, _source)
+{
+	var type = this.attributesMetaData[_attributeName].type;
+	var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
+	constructors[type] = constructors[type] || constructor;
+
+	_target[_attributeName] = constructor.newInstance(_value);
+};
+
+exports.clone = function(_value, _attributeName, _source)
+{
+	return _source[_attribute];
+};
+
+exports.deepClone = function(_target, _value, _attributeName, _source)
+{
+	var type = this.attributesMetaData[_attributeName].type;
+	var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
+	constructors[type] = constructors[type] || constructor;
+
+	return constructor.newInstance(_value);
 };

@@ -436,7 +436,7 @@ exports.partition = function(_collection, _attribute)
 	return {keys: orderedKeys, partition: partitionMap};
 };
 
-exports.reduce = function(_collection, _function)
+exports.reduce = function(_collection, _function, _initialValue)
 {
 	var result;
 	
@@ -449,23 +449,29 @@ exports.reduce = function(_collection, _function)
 		iterator = Iterator(_collection);
 	}
 
+	if (iterator && iterator.hasNext() === false && util.isDefined(_initialValue) === false)
+	{
+		throw TypeError('Collection is empty ... Must provide initial value or a non empty collection');
+	}
+	
 	if (iterator)
 	{
 		var index = 0;
-		var firstTime = true;
-
-		for (var item in iterator)
+		
+		if (util.isDefined(_initialValue) === true)
 		{
-			if (firstTime)
-			{
-				firstTime = false;
-				result = item;
-				index++;
-			}
-			else
-			{	
-				result = _function(result, item, index++, _collection);
-			}
+			result = _initialValue;
+		}
+		else if (iterator.hasNext() === true)
+		{
+			result = iterator.next();
+			index++;
+		}
+		
+		while (iterator.hasNext() === true)
+		{
+			result = _function.call(undefined, result, iterator.next(), index, _collection);
+			index++;
 		}
 	}
 	else if (_collection && _collection.reduce)
@@ -476,7 +482,7 @@ exports.reduce = function(_collection, _function)
 	return result;
 };
 
-exports.reduceRight = function(_collection, _function)
+exports.reduceRight = function(_collection, _function, _initialValue)
 {
 	var collection;
 
@@ -495,5 +501,5 @@ exports.reduceRight = function(_collection, _function)
 		Packages.java.util.Collections.reverse(collection);
 	}
 
-	return this.reduce(collection, _function);
+	return this.reduce(collection, _function, _initialValue);
 };
