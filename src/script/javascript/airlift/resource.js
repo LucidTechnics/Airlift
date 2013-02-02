@@ -30,15 +30,16 @@ exports.view = function()
 	}
 };
 
-exports.each = function(_resourceName, _resource, _function)
+exports.each = function(_resourceName, _resource, _function, _context)
 {
-	var context = {};
+	var context = _context || {};
 
-	context.resourceName = _resourceName;
-	context.resourceMeta = require('meta/r/' + _resourceName).create();
-	context.attributesMetaData = require('meta/a/' + _resourceName).create().attributes;
-	context.attributes = this.attributes || context.resourceMeta.attributes;
-	context.WEB_CONTEXT = _function.WEB_CONTEXT || this.WEB_CONTEXT;
+	context.resourceName = context.resourceName || _resourceName;
+	context.resourceMeta = context.resourceMeta || require('meta/r/' + _resourceName).create();
+	context.attributesMetaData = context.attributesMetaData || require('meta/a/' + _resourceName).create().attributes;
+	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
+	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || this.WEB_CONTEXT;
+	
 	var length = (context.attributes && context.attributes.length)||0;
 	
 	for (var i = 0; i < length; i++)
@@ -48,29 +49,29 @@ exports.each = function(_resourceName, _resource, _function)
 	}
 };
 
-exports.map = function(_resourceName, _resource, _function)
+exports.map = function(_resourceName, _resource, _function, _context)
 {
 	var result = {};
 
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
 		result[_attributeName] = _function.call(this, _value, _attributeName, _resource);
-	});
+	}, _context);
 
 	return result;
 };
 
-exports.reduce = function(_resourceName, _resource, _function, _base)
+exports.reduce = function(_base, _resourceName, _resource, _function, _context)
 {
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
 		_base = _function.call(this, _base, _value, _attributeName, _resource);
-	});
+	}, _context);
 
 	return _base;
 };
 
-exports.reduceRight = function(_resourceName, _resource, _function, _base)
+exports.reduceRight = function(_base, _resourceName, _resource, _function, _context)
 {
 	context.resourceName = _resourceName;
 	context.resourceMeta = require('meta/r/' + _resourceName).create();
@@ -80,7 +81,7 @@ exports.reduceRight = function(_resourceName, _resource, _function, _base)
 	reversedAttributes.push(each.partial(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
 		_base = _function.call(this, _base, _value, _attributeName, _resource);
-	}));
+	}, _context));
 	
 	this.view.apply(this, reversedAttributes); 
 
@@ -119,7 +120,7 @@ exports.compose = function(_error)
 	};
 };
 
-exports.toString = function(_resourceName, _resource)
+exports.toString = function(_resourceName, _resource, _context)
 {
 	var stringBuffer = new Packages.java.lang.StringBuffer("[** ");
 	stringBuffer.append(_resourceName).append("\n");
@@ -127,7 +128,7 @@ exports.toString = function(_resourceName, _resource)
 	this.each(_resourceName, _resource, function(_value, _name)
 	{
 		stringBuffer.append(_name).append(": ").append(_value||"").append("\n"); 
-	});
+	}, _context);
 
 	return stringBuffer.append(" **]\n").toString();
 };
