@@ -21,7 +21,7 @@
  *
  * var success = require('collection').every(users, function(_item, _index, _collection) { return true; });
  */
-exports.every = function(_collection, _function)
+exports.every = function(_collection, _function, _this)
 {
 	var success = true;
 
@@ -40,7 +40,7 @@ exports.every = function(_collection, _function)
 
 		for (var item in iterator)
 		{
-			success = _function(item, index, _collection);
+			success = _function.call(_this, item, index, _collection);
 			if (success === false) { break; } else { index++; }
 		}
 	}
@@ -75,7 +75,7 @@ exports.every = function(_collection, _function)
  * require('collection').forEach(users, function(_item, _index, _collection) { LOG.info("Hello " + _item); });
  * //this writes "Hello <item>" to the logs.
  */
-exports.forEach = function(_collection, _function)
+exports.forEach = function(_collection, _function, _this)
 {
 	var iterator;
 			
@@ -94,7 +94,7 @@ exports.forEach = function(_collection, _function)
 
 		for (var item in iterator)
 		{
-			_function && _function(item, index, _collection.add && _collection);
+			_function && _function.call(_this, item, index, _collection.add && _collection);
 			index++;
 		}		
 	}
@@ -131,7 +131,7 @@ exports.forEach = function(_collection, _function)
  * var results = require('collection').filter(users, function(_item, _index, _collection) { return true; });  //this returns every item in users.
  *
  */
-exports.filter = function(_collection, _function)
+exports.filter = function(_collection, _function, _this)
 {
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -148,7 +148,7 @@ exports.filter = function(_collection, _function)
 		
 		for (var item in iterator)
 		{
-			_function && (_function(item, index, _collection) === true) && result.add(item);
+			_function && (_function.call(_this, item, index, _collection) === true) && result.add(item);
 			index++;
 		}
 	}
@@ -188,7 +188,7 @@ exports.filter = function(_collection, _function)
  * of "Hello <item>" for every item in users.
  *
  */
-exports.map = function(_collection, _function)
+exports.map = function(_collection, _function, _this)
 {
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -205,7 +205,7 @@ exports.map = function(_collection, _function)
 		
 		for (var item in iterator)
 		{
-			results = results.add(_function && _function(item, index, _collection));
+			results = results.add(_function && _function.call(_this, item, index, _collection));
 			index++;
 		}
 	}
@@ -244,7 +244,7 @@ exports.map = function(_collection, _function)
  *
  * var success = require('collection').every(users, function(_item, _index, _collection) { return true; });
  */
-exports.some = function(_collection, _function)
+exports.some = function(_collection, _function, _this)
 {
 	var success = false;
 
@@ -263,7 +263,7 @@ exports.some = function(_collection, _function)
 
 		for (var item in iterator)
 		{
-			success = _function(item, index, _collection);
+			success = _function.call(_this, item, index, _collection);
 			if (success === true) { break; } else { index++; }
 		}
 	}
