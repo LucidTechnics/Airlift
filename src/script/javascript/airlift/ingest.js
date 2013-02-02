@@ -1,128 +1,7 @@
 var res = require('./resource');
-
-exports.entify = function(_resourceName, _resource)
-{
-	var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, _resource.id);
-	var entity = new Packages.com.google.appengine.api.datastore.Entity(key);
-
-	res.each(_resourceName, _resource, function(_value, _attributeName)
-	{
-		if ("id".equalsIgnoreCase(_attributeName) === false)
-		{
-			var attributesMetaData = require('meta/a/' + _resourceName).create().attributes;
-			var isIndexable = attributesMetaData[_attributeName].isIndexable;
-			var type = attributesMetaData[_attributeName].type;
-			var value = _value;
-
-			if (type === 'java.lang.String')
-			{
-				//500 is the Google App Engine limitation for Strings
-				//persisted to the datastore.
-				if (attributesMetaData.maxLength > 500)
-				{
-					value = new Package.com.google.appengine.api.datastore.Text(value);
-				}
-			}
-
-			(isIndexable === true) ? entity.setProperty(_value) : entity.setUnindexedProperty(_value);
-		}
-	});
-
-	return entity;
-};
-
 var util = require('./util');
-
 var convertUtil = Packages.org.apache.commons.beanutils.ConvertUtils;
 var formatUtil = Packages.airlift.util.FormatUtil;
-var reportError = function(_errors, _name, _error)
-{
-	var errorList = _errors[_name]||[];
-	
-	if (Array.isArray(_error) === true)
-	{
-		errorList = errorList.concat(_error);
-	}
-	else
-	{
-		errorList.push(error);
-	}
-
-	_errors[_name] = errorList;
-};
-
-exports.reportError = reportError;
-
-exports.convert = function(_errors, _value, _attributeName, _resource)
-{
-	var restContext = this.WEB_CONTEXT.REST_CONTEXT;
-	var request = this.WEB_CONTEXT.REQUEST;
-	var resourceName = this.resourceName;
-	var attributesMetaData = require('meta/a/' + resourceName).create().attributes;
-	var value;
-	
-	try
-	{
-		var type = attributesMetaData[_attributeName].type;
-		var mapTo = attributesMetaData[_attributeName].mapTo;
-
-		var parameterValue = request.getParameterValues(_attributeName);
-
-		if ("java.util.Set".equalsIgnoreCase(type) === false &&
-			  "java.util.HashSet".equalsIgnoreCase(type) === false &&
-			  "java.util.List".equalsIgnoreCase(type) === false &&
-			  "java.util.ArrayList".equalsIgnoreCase(type) === false
-		   )
-		{
-			value = parameterValue && (util.isWhitespace(parameterValue) === false) && util.trim(parameterValue[0]) || null;
-			value = formatUtil.format(convertUtil.convert(value, util.createClass(type)));
-
-			if (value && "java.lang.Boolean".equalsIgnoreCase(type) === true)
-			{
-				value = value.booleanValue();
-			}
-		}
-		else
-		{
-			if ("java.util.Set".equalsIgnoreCase(type) === true &&
-				  "java.util.HashSet".equalsIgnoreCase(type) === true)
-			{
-				value = new Packages.java.util.HashSet();
-			}
-			else if ("java.util.List".equalsIgnoreCase(type) === true &&
-					 "java.util.ArrayList".equalsIgnoreCase(type) === true)
-			{
-				value = new Packages.java.util.ArrayList();
-			}
-
-			if (parameterValue)
-			{
-				var length = parameterValue.length;
-
-				for (var i = 0; i < length; i++)
-				{
-					var item = parameterValue[i];
-					item = item && (util.isWhitespace(item) === false) && util.trim(item) || null;
-					value.add(formatUtil.format(convertUtil.convert(item, util.createClass("java.lang.String"))));
-				}
-			}
-		}
-	}
-	catch(e)
-	{
-		this.LOG.info(e.javaException.getMessage());
-		this.reportError(_errors, _attributeName, util.createError(_attributeName, "This value is not correct.", "conversion"));
-	}
-
-	if (util.isWhitespace(mapTo) === true)
-	{
-		value = value || restContext.getParameter(_attributeName.replace('id$', '.id'));
-	}
-
-	return value;
-};
-
-var validator = require('./validator');
 
 var validationError = function(_name, _message)
 {
@@ -317,7 +196,7 @@ var validateCollection = function(_value, _name, _metadata)
 		for (var item in Iterator(collection))
 		{
 			item = item + '';
-			
+
 			if (util.isEmpty(_metadata.allowedValues) === false)
 			{
 				errors = allowedValue(errors, _metadata, _name, item);
@@ -341,6 +220,137 @@ var validateCollection = function(_value, _name, _metadata)
 	return errors;
 };
 
+exports.entify = function(_entity, _error, _value, _attributeName)
+{
+	if (util.isEmpty(_error) === true && "id".equalsIgnoreCase(_attributeName) === false)
+	{
+		var isIndexable = attributesMetaData[_attributeName].isIndexable;
+		var type = attributesMetaData[_attributeName].type;
+		var value = _value;
+
+		if (type === 'java.lang.String')
+		{
+				//500 is the Google App Engine limitation for Strings
+				//persisted to the datastore.
+			if (attributesMetaData.maxLength > 500)
+			{
+				value = new Package.com.google.appengine.api.datastore.Text(value);
+			}
+		}
+
+		(isIndexable === true) ? _entity.setProperty(_value) : _entity.setUnindexedProperty(_value);
+	}
+};
+
+exports.encrypt = function(_entity, _error, _value, _attributeName)
+{
+	var password = web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
+	var initialVector = web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
+	var revolutions = web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+
+	var encryptedAttribute = new Packages.com.google.appengine.api.datastore.Blob(Packages.airlift.util.AirliftUtil.encrypt(Packages.airlift.util.AirliftUtil.convert(_entity.getProperty(_attributeName)||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions));
+	var attributeEncryptedName = _attributeName + "Encrypted";
+	
+	_entity.setProperty(attributeEncryptedName, encryptedAttribute);
+	_entity.setProperty(_attributeName, null); 
+};
+
+
+exports.convert = function(_errors, _value, _attributeName, _resource)
+{
+	var restContext = this.WEB_CONTEXT.REST_CONTEXT;
+	var request = this.WEB_CONTEXT.REQUEST;
+	var resourceName = this.resourceName;
+	var attributesMetaData = require('meta/a/' + resourceName).create().attributes;
+	var value;
+	
+	try
+	{
+		var type = attributesMetaData[_attributeName].type;
+		var mapTo = attributesMetaData[_attributeName].mapTo;
+
+		var parameterValue = request.getParameterValues(_attributeName);
+
+		if ("java.util.Set".equalsIgnoreCase(type) === false &&
+			  "java.util.HashSet".equalsIgnoreCase(type) === false &&
+			  "java.util.List".equalsIgnoreCase(type) === false &&
+			  "java.util.ArrayList".equalsIgnoreCase(type) === false
+		   )
+		{
+			value = parameterValue && (util.isWhitespace(parameterValue) === false) && util.trim(parameterValue[0]) || null;
+			value = formatUtil.format(convertUtil.convert(value, util.createClass(type)));
+
+			if (value)
+			{
+				switch(type)
+				{
+					case "java.lang.String":
+						//do nothing
+					case "java.lang.Integer":
+						value = value.intValue();
+						break;
+					case "java.lang.Boolean":
+						value = value.booleanValue();
+						break;
+					case "java.lang.Long":
+						value = value.longValue();
+						break;
+					case "java.lang.Double":
+						value = value.doubleValue();
+						break;
+					case "java.lang.Float":
+						value = value.floatValue();
+						break;
+					case "java.lang.Short":
+						value = value.shortValue();
+						break;
+					case "java.lang.Byte":
+					case "java.lang.Character":				
+						throw new Error("Airlift currently does not support java.lang.Byte or java.lang.Character objects. Try using String instead or file a feature request.");
+						break;
+				}
+			}
+		}
+		else
+		{
+			if ("java.util.Set".equalsIgnoreCase(type) === true &&
+				  "java.util.HashSet".equalsIgnoreCase(type) === true)
+			{
+				value = new Packages.java.util.HashSet();
+			}
+			else if ("java.util.List".equalsIgnoreCase(type) === true &&
+					 "java.util.ArrayList".equalsIgnoreCase(type) === true)
+			{
+				value = new Packages.java.util.ArrayList();
+			}
+
+			if (parameterValue)
+			{
+				var length = parameterValue.length;
+
+				for (var i = 0; i < length; i++)
+				{
+					var item = parameterValue[i];
+					item = item && (util.isWhitespace(item) === false) && util.trim(item) || null;
+					value.add(formatUtil.format(convertUtil.convert(item, util.createClass("java.lang.String"))));
+				}
+			}
+		}
+	}
+	catch(e)
+	{
+		this.LOG.info(e.javaException.getMessage());
+		util.reportError(_errors, _attributeName, util.createError(_attributeName, "This value is not correct.", "conversion"));
+	}
+
+	if (util.isWhitespace(mapTo) === true)
+	{
+		value = value || restContext.getParameter(_attributeName.replace('id$', '.id'));
+	}
+
+	return value;
+};
+
 exports.validate = function(_errors, _value, _attributeName, _resource)
 {
 	var restContext = this.WEB_CONTEXT.REST_CONTEXT;
@@ -351,7 +361,7 @@ exports.validate = function(_errors, _value, _attributeName, _resource)
 
 	var addErrors = function (_errorList)
 	{
-		reportError(_errors, _attributeName, _errorList);
+		util.reportError(_errors, _attributeName, _errorList);
 	};
 	
 	try

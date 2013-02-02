@@ -1,4 +1,5 @@
 var timezone;
+var userId;
 var userEmail;
 var userName;
 var uriBase;
@@ -242,6 +243,17 @@ exports.getUser = function()
 	}
 
 	return user;
+};
+
+exports.getUserId = function()
+{
+	if (userId === undefined)
+	{
+		var user = this.getUser();
+		userId = (user != null) ? user.getId() : null;
+	}
+
+	return userId;
 };
 
 exports.getUserName = function()

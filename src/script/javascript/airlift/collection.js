@@ -25,11 +25,20 @@ exports.every = function(_collection, _function)
 {
 	var success = true;
 
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var index = 0;
 
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			success = _function(item, index, _collection);
 			if (success === false) { break; } else { index++; }
@@ -52,7 +61,8 @@ exports.every = function(_collection, _function)
  * George</a>
  *
  * @param _collection - a java.util.Collection, a java.lang.String, a
- * Javascript array, or a Javascript string to iterate over.
+ * Javascript array, or a Javascript string to iterate over, or an
+ * java.util.Iterator.
  * 
  * @param _function - a function that will be applied to every member
  * of that collection or array, OR every character of the
@@ -67,15 +77,26 @@ exports.every = function(_collection, _function)
  */
 exports.forEach = function(_collection, _function)
 {
-	if (_collection && _collection.add)
+	var iterator;
+			
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var index = 0;
 
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
-			_function && _function(item, index, _collection);
+			_function && _function(item, index, _collection.add && _collection);
 			index++;
-		}
+		}		
 	}
 	else if (_collection && _collection.forEach)
 	{
@@ -112,11 +133,20 @@ exports.forEach = function(_collection, _function)
  */
 exports.filter = function(_collection, _function)
 {
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var result = new Packages.java.util.ArrayList(), index = 0;
 		
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			_function && (_function(item, index, _collection) === true) && result.add(item);
 			index++;
@@ -160,11 +190,20 @@ exports.filter = function(_collection, _function)
  */
 exports.map = function(_collection, _function)
 {
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var results = new Packages.java.util.ArrayList(), index = 0;
 		
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			results = results.add(_function && _function(item, index, _collection));
 			index++;
@@ -209,11 +248,20 @@ exports.some = function(_collection, _function)
 {
 	var success = false;
 
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var index = 0;
 
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			success = _function(item, index, _collection);
 			if (success === true) { break; } else { index++; }
@@ -259,13 +307,22 @@ exports.split = function(_collection, _function)
 {
 	var success = [], fail = [];
 
-	if (_collection && _function && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		success = new Packages.java.util.ArrayList()
 		fail = new Packages.java.util.ArrayList()
 
 		var index = 0;
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			(_function(item, index, _collection) === true) ? success.add(item) : fail.add(item);
 			index++;
@@ -318,12 +375,21 @@ exports.split = function(_collection, _function)
  */
 exports.partition = function(_collection, _attribute)
 {
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
 	{
 		var partitionMap = new Packages.java.util.HashMap()
 		var orderedKeys = new Packages.java.util.ArrayList()
 
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			var value = item[_attribute];
 
@@ -374,24 +440,32 @@ exports.reduce = function(_collection, _function)
 {
 	var result;
 	
-	if (_collection && _collection.add)
+	if (_collection && _collection.hasNext && _collection.next)
 	{
-		var index = 1;
-		var previous;
+		iterator = _collection;
+	}
+	else if (_collection && _collection.iterator)
+	{
+		iterator = Iterator(_collection);
+	}
+
+	if (iterator)
+	{
+		var index = 0;
 		var firstTime = true;
 
-		for (var item in Iterator(_collection))
+		for (var item in iterator)
 		{
 			if (firstTime)
 			{
 				firstTime = false;
+				result = item;
+				index++;
 			}
 			else
 			{	
-				result = _function(previous, item, index++, _collection);
+				result = _function(result, item, index++, _collection);
 			}
-
-			previous = item;
 		}
 	}
 	else if (_collection && _collection.reduce)
@@ -405,6 +479,11 @@ exports.reduce = function(_collection, _function)
 exports.reduceRight = function(_collection, _function)
 {
 	var collection;
+
+	if (_collection && _collection.hasNext && _collection.next)
+	{
+		throw Error("Cannot right reduce an iterator");
+	}
 
 	if (collection.reverse)
 	{

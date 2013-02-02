@@ -42,10 +42,10 @@ public class RestfulAuditContext
 		AirliftAuditTrail auditTrail = new AirliftAuditTrail();
 		
 		auditTrail.setId(_entity.getKey().getName());
-		auditTrail.setDomainId((String) _entity.getProperty("domainId"));
+		auditTrail.setResourceId((String) _entity.getProperty("resourceId"));
 		auditTrail.setAction((String) _entity.getProperty("action"));
 		auditTrail.setMethod((String) _entity.getProperty("method"));
-		auditTrail.setDomain((String) _entity.getProperty("domain"));
+		auditTrail.setResource((String) _entity.getProperty("resource"));
 		auditTrail.setUri((String) _entity.getProperty("uri"));
 		auditTrail.setHandlerName((String) _entity.getProperty("handlerName"));
 		auditTrail.setData((com.google.appengine.api.datastore.Text) _entity.getProperty("data"));
@@ -66,10 +66,10 @@ public class RestfulAuditContext
 	{
 		com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity("AirliftAuditTrail", _auditTrail.getId());
 		
-		entity.setProperty("domainId", _auditTrail.getDomainId());
+		entity.setProperty("resourceId", _auditTrail.getResourceId());
 		entity.setProperty("action", _auditTrail.getAction());
 		entity.setProperty("method", _auditTrail.getMethod());
-		entity.setProperty("domain", _auditTrail.getDomain());
+		entity.setProperty("resource", _auditTrail.getResource());
 		entity.setProperty("uri", _auditTrail.getUri());
 		entity.setProperty("handlerName", _auditTrail.getHandlerName());
 		entity.setUnindexedProperty("data", _auditTrail.getData());
@@ -241,7 +241,7 @@ public class RestfulAuditContext
 	}
 
 	/**
-	 * Collect by domain id.
+	 * Collect by resource id.
 	 *
 	 * @param _value the _value
 	 * @param _offset the _offset
@@ -250,11 +250,11 @@ public class RestfulAuditContext
 	 * @param _asc the _asc
 	 * @return the java.util. list
 	 */
-	public java.util.List<AirliftAuditTrail> collectByDomainId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
+	public java.util.List<AirliftAuditTrail> collectByResourceId(String _value, int _offset, int _limit, String _orderBy, boolean _asc)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort).addFilter("domainId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("AirliftAuditTrail").addSort(_orderBy, sort).addFilter("resourceId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftAuditTrail> results = new java.util.ArrayList<AirliftAuditTrail>();
