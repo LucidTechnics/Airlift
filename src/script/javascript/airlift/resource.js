@@ -2,34 +2,6 @@ var web = require('./web');
 var util = require('./util');
 var constructors = {};
 
-exports.view = function()
-{
-	var args = Array.prototype.slice.call(arguments, 0), length = args.length, view = [];
-
-	for (var i = 0; i < length; i++)
-	{
-		var item = args[i];
-
-		if (typeof item !== 'function')
-		{
-			if (Array.isArray(item) === true)
-			{
-				view = view.concat(item);
-			}
-			else
-			{
-				view.push(item);
-			}
-		}
-		else
-		{
-			item.attributes = view;
-			item();
-			delete item.attributes;
-		}
-	}
-};
-
 exports.each = function(_resourceName, _resource, _function, _context)
 {
 	var context = _context || {};
