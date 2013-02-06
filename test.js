@@ -31,7 +31,6 @@ var resetScope = function resetScope(_context, _sharedScope)
 
 var context = createContext();
 var sharedScope = context.initStandardObjects();
-//context.evaluateString(sharedScope, Packages.airlift.util.JavaScriptingUtil.support, "support", 1, null);
 
 context.evaluateString(sharedScope, "var print = function(_item) { Packages.java.lang.System.out.println(_item); };", "print", 1, null);
 
