@@ -90,6 +90,10 @@
 	</path>
 
 	<path id="test.class.path">
+	   	<fileset dir="${deployDir.lib}">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
 		<fileset dir="${runtime.lib}">
 			<include name="**/*.jar"/>
 			<include name="**/*.zip"/>
@@ -101,8 +105,10 @@
 		<fileset dir="${dist}">
 			<include name="**/*Test*.jar"/>
 		</fileset>
-		<pathelement path="${src.cfg}"/>
-		<pathelement location="certs"/>
+		<fileset dir="${src.test}">
+			<include name="airlift/test/**/test*.js"/>
+			<include name="airlift/test/test*.js"/>
+		</fileset>
 	</path>
 
 	<!-- Make sure findbugs-ant.jar is included in your ant lib directory
@@ -245,6 +251,10 @@
 		<jar destfile="${dist}/lib/${jar}-core.jar"
 		       basedir="${src.script}/javascript"
 			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift/test"
 		  />
 
     </target>
@@ -544,5 +554,13 @@
 	   </javadoc>
 	</target>
 
-    
+	<target name="test" depends="redeploy">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="test.js">
+		    <classpath refid="test.class.path"/>			
+		</script>
+	</target>
+
+	
 </project>

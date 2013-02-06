@@ -220,6 +220,25 @@ var validateCollection = function(_value, _name, _metadata)
 	return errors;
 };
 
+exports.createKey = function(_resourceName, _id)
+{
+	return Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, _id);
+};
+
+exports.createEntity = function(_resourceName, _id)
+{
+	return new Packages.com.google.appengine.api.datastore.Entity(this.createKey(_resourceName, _id));
+};
+
+exports.bookkeeping = function(_entity, _userId, _postDate, _putDate)
+{
+	var userId = _userId||require('./web').getUserId()||'user id not provided';
+
+	_entity.setProperty("auditUserId", userId);
+	_entity.setProperty("auditPostDate", _postDate||util.createDate());
+	_entity.setProperty("auditPutDate", _putDate||postDate);
+};
+
 exports.entify = function(_entity, _error, _value, _attributeName)
 {
 	if (util.isEmpty(_error) === true && "id".equalsIgnoreCase(_attributeName) === false)
@@ -244,17 +263,19 @@ exports.entify = function(_entity, _error, _value, _attributeName)
 
 exports.encrypt = function(_entity, _error, _value, _attributeName)
 {
-	var password = web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
-	var initialVector = web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
-	var revolutions = web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+	if (util.isEmpty(_error) === true && this.attributeMetadata.encrypted === true)
+	{
+		var password = web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
+		var initialVector = web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
+		var revolutions = web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
 
-	var encryptedAttribute = new Packages.com.google.appengine.api.datastore.Blob(Packages.airlift.util.AirliftUtil.encrypt(Packages.airlift.util.AirliftUtil.convert(_entity.getProperty(_attributeName)||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions));
-	var attributeEncryptedName = _attributeName + "Encrypted";
-	
-	_entity.setProperty(attributeEncryptedName, encryptedAttribute);
-	_entity.setProperty(_attributeName, null); 
+		var encryptedAttribute = new Packages.com.google.appengine.api.datastore.Blob(Packages.airlift.util.AirliftUtil.encrypt(Packages.airlift.util.AirliftUtil.convert(_entity.getProperty(_attributeName)||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions));
+		var attributeEncryptedName = _attributeName + "Encrypted";
+
+		_entity.setUnindexedProperty(attributeEncryptedName, encryptedAttribute);
+		_entity.setUnindexedProperty(_attributeName, null);
+	}
 };
-
 
 exports.convert = function(_errors, _value, _attributeName, _resource)
 {

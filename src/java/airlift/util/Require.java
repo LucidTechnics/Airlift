@@ -136,11 +136,6 @@ public class Require extends BaseFunction
 
 		if (id != null && id.contains("extlib/") == false)
 		{
-			if (bindings.keySet().isEmpty() == true)
-			{
-				throw new RuntimeException("bindings map is empty");
-			}
-
 			Scriptable webContext = cx.newObject(scope);
 
 			for (String key: this.bindings.keySet())

@@ -1,6 +1,6 @@
-var egest = require('./egest');
-var resource = require('./res');
-var util = require('./util');
+var egest = require('../egest');
+var resource = require('../res');
+var util = require('../util');
 
 var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 var datastore = factory.getAsyncDatastoreService();

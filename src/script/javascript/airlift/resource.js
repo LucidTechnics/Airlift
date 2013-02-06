@@ -60,34 +60,36 @@ exports.reduceRight = function(_base, _resourceName, _resource, _function, _cont
 	return _base;
 };
 
-exports.sequence = function(_error)
+exports.sequence = function(_errors)
 {
+	this.errors = _errors;
 	var functions = Array.prototype.slice.call(arguments, 1);
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 
-	return function(_error, _value, _attributeName, _resource)
+	return function(_errors, _value, _attributeName, _resource)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			return functions[i].call(this, _error, _value, _attributeName, _resource);
+			return functions[i].call(this, _errors, _value, _attributeName, _resource);
 		}
 	};
 };
 
-exports.compose = function(_error)
+exports.compose = function(_errors)
 {
+	this.errors = _errors;
 	var functions = Array.prototype.slice.call(arguments, 1);
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 
 	functions = functions.reverse();
 
-	return function(_error, _value, _attributeName, _resource)
+	return function(_errors, _value, _attributeName, _resource)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			return functions[i].call(this, _error, _value, _attributeName, _resource);
+			return functions[i].call(this, _errors, _value, _attributeName, _resource);
 		}
 	};
 };
@@ -186,40 +188,37 @@ exports.json = function(_resource, _replacer)
 	return JSON.stringify(object, _replacer || replacer);
 };
 
-exports.bookkeeping = function(_resource, _userId, _postDate, _putDate)
+exports.audit = function(_config)
 {
-	var userId = _userId||require('./web').getUserId()||'user id not provided';
-	
-	_resource.auditUserId = userId;
-	_resource.auditPostDate = _postDate||util.createDate();
-	_resource.auditPutDate = _putDate||postDate;
-};
-
-exports.audit = function(_resourceName, _resource, _action, _actionDate)
-{
+	var entity = _config.entity;
+	var id = _config.id||_config.entity && _config.entity.getKey().getName();
+	var action = _config.action;
+	var actionDate = _config.actionDate||_entity.getProperty("auditPutDate")||util.createDate();
+	var resourceName = _config.resourceName||_config.entity.getKind();	
 	var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
 
 	auditTrail.id = util.guid();
-
-	if (typeof _resource === "object")
+	auditTrail.resourceId = id;
+	
+	if (entity)
 	{
-		auditTrail.resourceId = _resource.id;
-		auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(this.json(_resource));
+		var propertiesMap = _entity.getProperties();
+		propertiesMap.put('AIRLIFT_RESOURCE_NAME', resourceName);
+		auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(Packages.airlift.util.AirliftUtil.toJson(propertiesMap));
 	}
 	else
 	{
-		auditTrail.resourceId = _resource;
 		auditTrail.data = null;
 	}
 	
 	auditTrail.action = _action;
 	auditTrail.method = web.getMethod();
-	auditTrail.resourceName = _resourceName;
+	auditTrail.resourceName = resourceName;
 	auditTrail.uri = web.getUri();
 	auditTrail.handlerName = web.getHandlerName();
 	auditTrail.userId = web.getUserId();
-	auditTrail.actionDate = _actionDate||_resource.auditPutDate()||util.createDate();
-	auditTrail.recordDate = auditTrail.actionDate;
+	auditTrail.actionDate = actionDate;
+	auditTrail.recordDate = util.createDate();
 
 	web.getAuditContext().insert(auditTrail);
 };
