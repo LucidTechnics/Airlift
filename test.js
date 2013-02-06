@@ -79,6 +79,7 @@ var files = directoryScanner.getIncludedFiles();
 
 for (var i = 0; i < files.length; i++)
 {
+	print ("Looking for: " + files[i]);
 	Packages.java.lang.System.out.println(files[i]);
 	var testScript = new Packages.java.lang.String(files[i]);
 	var harness = "var test = require(\"" + testScript.replaceAll(".js$", "") + "\"); test.setUp(); test.tearDown();";
@@ -88,15 +89,3 @@ for (var i = 0; i < files.length; i++)
 
 	context.evaluateString(scope, harness, files[i], 1, null);
 }
-
-/*
-find all the tests ...
-   then for a test
-   execute test harness on that test ... test harness will use require to get test
-   
-
-while there are test files to execute ...
-   
-	var scope = resetScope(context, sharedScope);
-	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
-*/

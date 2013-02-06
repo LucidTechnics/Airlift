@@ -105,10 +105,6 @@
 		<fileset dir="${dist}">
 			<include name="**/*Test*.jar"/>
 		</fileset>
-		<fileset dir="${src.test}">
-			<include name="airlift/test/**/test*.js"/>
-			<include name="airlift/test/test*.js"/>
-		</fileset>
 	</path>
 
 	<!-- Make sure findbugs-ant.jar is included in your ant lib directory
@@ -295,25 +291,6 @@
 		
 	</target>
 
-	<target name="hardRedeploy"  depends="redeploy, startup" />
-
-	<target name="hardDeploy"  depends="deploy, startup" />
-
-	<target name="buildWar" depends="deploy" >
-		<war destfile="${archive}/${appName}.war" webxml="${deployDir.cfg}/**/web.xml">
-		   
-			<zipfileset dir="${deployDir.html}" prefix="html"/>
-			<zipfileset dir="${deployDir.javascript}" prefix="javascript"/>
-			<zipfileset dir="${deployDir.template}" prefix="template" />
-			<zipfileset dir="${deployDir.css}" prefix="css" />
-			<zipfileset dir="${stage.images}" prefix="images" />
-			<zipfileset dir="${deployDir.script}" prefix="WEB-INF/script" />
-			
-			<lib dir="${deployDir.lib}" />
-			<classes dir="${classes}"/>
-		</war>
-	</target>
-
 	<target name="createRootPackageDirProperty" >
 
 	  <pathconvert property="java.package.dir" targetos="${targetOs}" >
@@ -343,118 +320,7 @@
 		<mkdir dir="${java.package.dir}/servlet" />
 		
 	</target>
-	
-	<target name="deployWebApp" depends="buildWar" >
 	   
-	</target>
-	
-	<!-- Start -->
-	<target name="startup" depends="jetty-start">
-		<echo>Starting server instance</echo>
-	</target>
-
-	<target name="shutdown" depends="jetty-stop">
-		<echo>Stopping server instance</echo>
-	</target>	
-
-	<target name="unit-test" depends="compile, jar">
-
-		<property name="test.class.path" refId="test.class.path"/>
-		<echo message="Class path is:  ${test.class.path}"/>
-
-		<junit printsummary="yes" haltonfailure="no">
-			<!--<jvmarg value="-Xmx512m -Xmn512m"/>-->
-			<classpath>
-				<pathelement path="${test.class.path}"/>
-			</classpath>
-			<formatter type="plain"/>
-
-			<batchtest fork="yes" todir="${junit-result}">
-				<fileset dir="${src.test}">
-					<include name="**/*Test.java"/>
-					<exclude name="**/*TestSuite.java"/>
-				</fileset>
-			</batchtest>
-		</junit>
-	</target>
-
-	<taskdef resource="checkstyletask.properties"
-         classpath="/home/bediako/app/checkstyle/checkstyle-5.0/checkstyle-all-5.0.jar"/>
-
-	<macrodef name="jetty-start">
-		<attribute name="arg1" default=""/>
-		<attribute name="arg2" default=""/>
-		<sequential>
-			<antcall target="jetty-stop"/>
-			<java jar="${jettyHome}/start.jar" fork="true" spawn="yes" dir="${jettyHome}">
-				<jvmarg value="-Dfile.encoding=UTF-8"/>
-				<jvmarg value="-DSTOP.PORT=8079"/>
-				<jvmarg value="-DSTOP.KEY=secret"/>
-				<jvmarg value="@{arg1}"/>
-				<jvmarg value="@{arg2}"/>
-			</java>
-		</sequential>
-	</macrodef>
-
-	<target name="jetty-check-status">
-		<condition property="jetty.started">
-			<socket server="localhost" port="8080"/>
-		</condition>
-	</target>
-
-	<target name="jetty-start" depends="deploy">
-		<jetty-start/>
-	</target>
-
-	<target name="jetty-start-debug" depends="deploy">
-		<jetty-start
-			arg1="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
-			arg2="-Xdebug"/>
-	</target> 
-
-	<target name="jetty-stop" depends="jetty-check-status" if="jetty.started">
-		<java jar="${jettyHome}/start.jar" fork="true" spawn="yes" dir="${jettyHome}">
-			<jvmarg value="-DSTOP.PORT=8079"/>
-			<jvmarg value="-DSTOP.KEY=secret"/>
-			<arg value="--stop"/>
-		</java>
-		<sleep seconds="2"/>
-	</target>
-
-
-    <!-- =================================
-         Installs ivy with magic
-         ================================= -->
-    <property name="ivy.install.version" value="2.0.0-alpha-2-incubating" />
-	<property name="ivy.jar.dir" value="${basedir}/ivy" />
-	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
-    <property name="build.dir" value="build" />                       
-
-    <target name="install-ivy" description="--> install ivy">
-    	<mkdir dir="${ivy.jar.dir}"/>
-		<!-- download Ivy from web site so that it can be used even without any special installation -->
-		<echo message="installing ivy..."/>
-    	<get src="http://people.apache.org/~xavier/ivy/${ivy.install.version}/ivy.jar"
-    		 dest="${ivy.jar.file}" usetimestamp="true"/>
-
-    	<!-- try to load ivy here from local ivy dir, in case the user has not already dropped
-    	      it into ant's lib dir (note that the latter copy will always take precedence).
-    	      We will not fail as long as local lib dir exists (it may be empty) and
-    	      ivy is in at least one of ant's lib dir or the local lib dir. -->
-    	<path id="ivy.lib.path">
-    	    <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-    	</path>
-    	<taskdef resource="org/apache/ivy/ant/antlib.xml"
-    	          uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-
-    <!-- =================================
-        target: resolve
-         ================================= -->
-    <target name="resolve" depends="install-ivy" description="--> retreive dependencies with ivy">
-        <ivy:retrieve/>
-    </target>  
-
 	<target name="cleanProject" >
 		<delete dir="${workspace}/build/" />
 	</target>

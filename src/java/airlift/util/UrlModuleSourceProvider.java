@@ -99,7 +99,6 @@ public class UrlModuleSourceProvider
 	{
         // We expect modules to have a ".js" file name extension ...
 		URI fullUri = new URI(uri + ".js");
-		log.info("loading source from: " + fullUri);
         ModuleSource source = loadFromActualUri(fullUri, base, validator);
         // ... but for compatibility we support modules without extension,
         // or ids with explicit extension.
@@ -115,33 +114,20 @@ public class UrlModuleSourceProvider
 		String scriptResource = url.getPath().replaceAll("^/", "");
 
 		try
-		{
-			/*ClassLoader classLoader = airlift.util.JavaScriptingUtil.class.getClassLoader();
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			log.info("fetching resource: " + "/" + scriptResource);*/
-			
+		{			
 			java.net.URL resourceURL = airlift.util.JavaScriptingUtil.class.getResource("/" + scriptResource);
-			log.info("resource url object: " + resourceURL.toString());
 			
 			java.net.URLConnection resourceConnection = resourceURL.openConnection();
-			log.info("default value of use caches: " + resourceConnection.getUseCaches());
 			resourceConnection.setUseCaches(false);
-			log.info("now use caches: " + resourceConnection.getUseCaches());
 			inputStream = resourceConnection.getInputStream();
 			//inputStream = airlift.util.JavascriptingUtil.class.getResourceAsStream("/" + scriptResource);
 		}
 		catch(Throwable t)
 		{
-			java.io.StringWriter stringWriter = new java.io.StringWriter();
+			//nothing to do here ...
+			/*java.io.StringWriter stringWriter = new java.io.StringWriter();
 			java.io.PrintWriter printWriter = new java.io.PrintWriter(stringWriter);
-			t.printStackTrace(printWriter);
-			
-			log.info("Swallowed this exception: " + stringWriter.toString());
-		}
-
-		if (inputStream == null)
-		{
-			log.warning("Cannot find script: " + url.getPath());
+			t.printStackTrace(printWriter);*/
 		}
 
 		return (inputStream != null) ? new ModuleSource(getReader(inputStream), null, uri, base, new URLValidator()) : null;

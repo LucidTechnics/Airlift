@@ -141,20 +141,10 @@ public class Require extends BaseFunction
 			for (String key: this.bindings.keySet())
 			{
 				Object object = Context.javaToJS(this.bindings.get(key), scope);
-				log.info("Putting key: " + key + " for object: " + object + " in module: " + id);
 				ScriptableObject.putConstProperty(webContext, key, object);
 			}
 
 			ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
-
-			for (int i = 0; i < exportedModuleInterface.getIds().length; i++)
-			{
-				log.info("exported id: " + exportedModuleInterface.getIds()[i] + " in module: " + id);
-			}
-		}
-		else
-		{
-			log.info("will not attach bindings to resource: " + id);
 		}
 
 		return exportedModuleInterface;
