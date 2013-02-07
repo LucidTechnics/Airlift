@@ -45,7 +45,7 @@ public class JavaScriptingUtil
 	public java.util.List scriptStack = new java.util.ArrayList();
 	private boolean cacheScript = false;
 
-	private static final String support = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; args = args.concat(remainingArgs); return fn.apply(this, args);	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
+	private static final String shim = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; args = args.concat(remainingArgs); return fn.apply(this, args);	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
 
 	static
 	{
@@ -55,7 +55,7 @@ public class JavaScriptingUtil
 		try
 		{
 			sharedScope = context.initStandardObjects();
-			context.evaluateString(sharedScope, support, "JavaScriptingUtil initialization", 1, null);
+			context.evaluateString(sharedScope, shim, "JavaScriptingUtil initialization", 1, null);
 
 			log.info("loading require for the first time into the shared scope: " + System.currentTimeMillis());
 
@@ -296,7 +296,7 @@ public class JavaScriptingUtil
 			//Require require = new Require(getScope(), sharedRequire, getBindingsMap(), true);
 			log.info("constructed new require: " + System.currentTimeMillis());
 			require.install(getScope());
-
+			
 			log.info("installed new require: " + System.currentTimeMillis());
 			log.info("_scriptResource: " + _scriptResource);
 			log.info("scriptResource: " + scriptResource);

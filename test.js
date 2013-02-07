@@ -43,6 +43,7 @@ importClass(Packages.java.net.URI);
 //http ... we ultimately just use the path of this
 //URI to find the resource in the jar.
 uris.add(new URI("http://localhost:80/test/airlift/test"));
+uris.add(new URI("http://localhost:80/airlift"));
 uris.add(new URI("http://localhost:80/"));
 uris.add(new URI("http://localhost:80//airlift/lib/"));
 uris.add(new URI("http://localhost:80//"));
@@ -76,15 +77,35 @@ directoryScanner.scan();
 Packages.java.lang.System.out.println("Executing tests ...");
 var files = directoryScanner.getIncludedFiles();
 
+var totalFailedAssertions = 0;
+var totalAssertions = 0;
+
 for (var i = 0; i < files.length; i++)
 {
-	print ("Looking for: " + files[i]);
-	Packages.java.lang.System.out.println(files[i]);
 	var testScript = new Packages.java.lang.String(files[i]);
-	var harness = "var test = require(\"" + testScript.replaceAll(".js$", "") + "\"); test.setUp(); test.tearDown();";
+	var harness = "var harness = require('airlift/test/harness'); var name = \"" + testScript.replaceAll(".js$", "") + "\"; var test = require(name); this.stats = harness.run(name, test);";	
+
 	var scope = resetScope(context, sharedScope);
 	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
 	require.install(scope);
 
+	Packages.java.lang.System.out.println('');
 	context.evaluateString(scope, harness, files[i], 1, null);
+
+	var scriptableObject = Packages.org.mozilla.javascript.ScriptableObject;
+
+	var stats = scope.get("stats", scope);
+	var failed = stats.get("failed", stats);
+	var total = stats.get("total", stats);
+
+	totalFailedAssertions += failed;
+	totalAssertions += total;
 }
+
+if (totalFailedAssertions > 0)
+{
+	Packages.java.lang.System.out.println('');
+	throw new Error('Test run ended with a total of ' + totalFailedAssertions + ' failed assertions');
+}
+
+
