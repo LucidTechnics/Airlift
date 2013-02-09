@@ -253,6 +253,12 @@
 		       basedir="${src.test}/airlift/test"
 		  />
 
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift"
+			   includes="harness.js"
+			   update="true"
+		  />
+
     </target>
 
 	<!-- Redeploy -->

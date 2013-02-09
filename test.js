@@ -33,6 +33,7 @@ var context = createContext();
 var sharedScope = context.initStandardObjects();
 
 context.evaluateString(sharedScope, "var print = function(_item) { Packages.java.lang.System.out.println(_item); };", "print", 1, null);
+context.evaluateString(sharedScope, Packages.airlift.util.JavaScriptingUtil.shim, "shim", 1, null);
 
 print("loading require for the first time into the shared scope: " + Packages.java.lang.System.currentTimeMillis());
 
@@ -42,6 +43,7 @@ importClass(Packages.java.net.URI);
 //Note that we are really not calling out to the
 //http ... we ultimately just use the path of this
 //URI to find the resource in the jar.
+uris.add(new URI("http://localhost:80/test/airlift/"));
 uris.add(new URI("http://localhost:80/test/airlift/test"));
 uris.add(new URI("http://localhost:80/airlift"));
 uris.add(new URI("http://localhost:80/"));
@@ -79,11 +81,12 @@ var files = directoryScanner.getIncludedFiles();
 
 var totalFailedAssertions = 0;
 var totalAssertions = 0;
+var totalTestCount = 0;
 
 for (var i = 0; i < files.length; i++)
 {
 	var testScript = new Packages.java.lang.String(files[i]);
-	var harness = "var harness = require('airlift/test/harness'); var name = \"" + testScript.replaceAll(".js$", "") + "\"; var test = require(name); this.stats = harness.run(name, test);";	
+	var harness = "var harness = require('harness'); var name = \"" + testScript.replaceAll(".js$", "") + "\"; var test = require(name); this.stats = harness.run(name, test);";	
 
 	var scope = resetScope(context, sharedScope);
 	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
@@ -97,15 +100,17 @@ for (var i = 0; i < files.length; i++)
 	var stats = scope.get("stats", scope);
 	var failed = stats.get("failed", stats);
 	var total = stats.get("total", stats);
+	var testCount = stats.get("testCount", stats);
 
 	totalFailedAssertions += failed;
 	totalAssertions += total;
+	totalTestCount += testCount;
 }
 
 if (totalFailedAssertions > 0)
 {
 	Packages.java.lang.System.out.println('');
-	throw new Error('Test run ended with a total of ' + totalFailedAssertions + ' failed assertions');
+	throw new Error('Test run ended with a total of ' + totalTestCount + ' tests with '+ totalFailedAssertions + ' failed assertions');
 }
 
 
