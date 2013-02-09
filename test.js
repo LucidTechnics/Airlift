@@ -16,8 +16,6 @@ var createContext = function createContext()
 	context.setLanguageVersion(180);
 	context.setOptimizationLevel(-1);   //in app engine it turns out that interpreted mode is fastest for handler execution.
 
-	print("Using context: " + context); 
-
 	return context;
 };
 
@@ -32,10 +30,7 @@ var resetScope = function resetScope(_context, _sharedScope)
 var context = createContext();
 var sharedScope = context.initStandardObjects();
 
-context.evaluateString(sharedScope, "var print = function(_item) { Packages.java.lang.System.out.println(_item); };", "print", 1, null);
 context.evaluateString(sharedScope, Packages.airlift.util.JavaScriptingUtil.shim, "shim", 1, null);
-
-print("loading require for the first time into the shared scope: " + Packages.java.lang.System.currentTimeMillis());
 
 var uris = new Packages.java.util.HashSet();
 importClass(Packages.java.net.URI);
@@ -62,7 +57,6 @@ var sharedRequire = new SharedRequire(
 	new UrlModuleSourceProvider(null, uris)), null, null, false);
 
 var testDir = project.getProperty("src.test");
-print("Bediako: " + testDir);
 
 var directoryScanner = new org.apache.tools.ant.DirectoryScanner();
 var includes = 	Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.String, 2);
@@ -70,13 +64,12 @@ includes[0] = "test*.js";
 includes[1] = "**/test*.js";
 
 var baseDir = project.getBaseDir().getPath() + "/src/test/airlift/test/";
-print("Base dir: " + baseDir);
 directoryScanner.setIncludes(includes);
 directoryScanner.setBasedir(new Packages.java.io.File(baseDir));
 directoryScanner.setCaseSensitive(true);
 directoryScanner.scan();
 
-Packages.java.lang.System.out.println("Executing tests ...");
+print("Executing tests ...");
 var files = directoryScanner.getIncludedFiles();
 
 var totalFailedAssertions = 0;
@@ -92,7 +85,7 @@ for (var i = 0; i < files.length; i++)
 	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
 	require.install(scope);
 
-	Packages.java.lang.System.out.println('');
+	print('');
 	context.evaluateString(scope, harness, files[i], 1, null);
 
 	var scriptableObject = Packages.org.mozilla.javascript.ScriptableObject;
@@ -109,7 +102,7 @@ for (var i = 0; i < files.length; i++)
 
 if (totalFailedAssertions > 0)
 {
-	Packages.java.lang.System.out.println('');
+	print('');
 	throw new Error('Test run ended with a total of ' + totalTestCount + ' tests with '+ totalFailedAssertions + ' failed assertions');
 }
 

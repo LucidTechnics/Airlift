@@ -60,14 +60,9 @@ exports.charArray = function(_size, _initializer)
 	return this.createArray(_size, Packages.java.lang.Character.TYPE, _initializer);
 };
 
-exports.charObjectArray = function(_size, _initializer)
-{
-	return this.createArray(_size, Packages.java.lang.Character, _initializer);
-};
-
 exports.characterObjectArray = function(_size, _initializer)
 {
-	return this.charObjectArray(_size, _initializer);
+	return this.createArray(_size, Packages.java.lang.Character, _initializer);
 };
 
 exports.intArray = function(_size, _initializer)
@@ -75,14 +70,9 @@ exports.intArray = function(_size, _initializer)
 	return this.createArray(_size, Packages.java.lang.Integer.TYPE, _initializer);
 };
 
-exports.intObjectArray = function(_size, _initializer)
-{
-	return this.createArray(_size, Packages.java.lang.Integer, _initializer);
-};
-
 exports.integerObjectArray = function(_size, _initializer)
 {
-	return this.intObjectArray(_size, _initializer);
+	return this.createArray(_size, Packages.java.lang.Integer, _initializer);
 };
 
 exports.longArray = function(_size, _initializer)
