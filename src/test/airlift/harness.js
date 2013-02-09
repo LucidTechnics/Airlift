@@ -82,11 +82,13 @@ exports.run = function(_name, _test)
 		{
 			if (typeof _test[item] === 'function' && /^test/i.test(item) === true)
 			{
-				Packages.java.lang.System.out.print('... ' + item);
 				testCount++;
-				_test[item](assertion);
+				try{ _test[item](assertion); } catch(e) { }
 
-				!!(assertion.assertionCount - failedAssertionCount) && Packages.java.lang.System.out.println(' ... OK'); 
+				!(assertion.failedAssertionCount - failedAssertionCount) && Packages.java.lang.System.out.println('OK ... ' + item);
+				!!(assertion.failedAssertionCount - failedAssertionCount) && Packages.java.lang.System.out.println('Failed ... ' + item);
+
+				failedAssertionCount = assertion.failedAssertionCount;
 			}
 		}
 
