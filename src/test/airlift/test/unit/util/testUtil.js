@@ -40,18 +40,18 @@ exports['test hasValue exists and isDefined doesn\'t'] = function(_assert)
 	_assert.eq(false, !!util.isDefined, 'isDefined function does exist on util. It should not and you should use hasValue instead.');
 };
 
-exports['test report error'] = function(_assert)
+exports['test create error reporter'] = function(_assert)
 {
-	var errors = {};
-	var error1 = {message: 'message 1', name: 'error', category: 'test'};
-	var error2 = {message: 'message 2', name: 'error', category: 'test'};
-	var error3 = {message: 'message 3', name: 'error', category: 'test'};
-
-	util.reportError(errors, 'hello', error1);
-	util.reportError(errors, 'hello', error2);
-	util.reportError(errors, 'goodbye', error3);
+	var errorReporter = util.createErrorReporter();
 	
-	_assert.deepEqual({hello:[error1, error2], goodbye: [error3]}, errors, 'report error is not reporting errors correctly' );
+	errorReporter.report('hello', 'message1', 'test');
+	errorReporter.report('hello', 'message2', 'test');
+	errorReporter.report('goodbye', 'message3', 'test');
+	
+	_assert.deepEqual({hello:[{name: 'hello', message: 'message1', category: 'test'},
+							  {name: 'hello', message: 'message2', category: 'test'}],
+					  goodbye: [{name: 'goodbye', message: 'message3', category: 'test'}]},
+					  errorReporter.getAllErrors(), 'report error is not reporting errors correctly' );
 };
 
 exports['test multi-try NEEDS TO BE CREATED ONCE MOCKUPS WORKS'] = function(_assert)

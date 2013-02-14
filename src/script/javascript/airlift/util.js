@@ -72,31 +72,34 @@ var ErrorReporter = function()
 {
 	var errors = {};
 
-	this.getErrors = function() { return errors; };
-	this.report = function(_name, _error) { this.reportError(errors, _name, _error); };
-	this.getError = function(_name) { return errors[_name];}
+	this.getAllErrors = function() { return errors; };
+	this.report = function(_name, _message, _category) { this.reportError(errors, _name, {name: _name, message: _message, category: _category}); };
+	this.getErrorList = function(_name) { return errors[_name];}
+
+	this.reportError = function(_errors, _name, _error)
+	{
+		if (_errors === undefined || _errors === null) { throw new Error('Cannot report errors on undefined or null errors object'); }
+		
+		var errorList = _errors[_name]||[];
+
+		if (Array.isArray(_error) === true)
+		{
+			errorList = errorList.concat(_error);
+		}
+		else
+		{
+			errorList.push(_error);
+		}
+
+		_errors[_name] = errorList;
+	};
+
 };
 
 exports.createErrorReporter = function()
 {
 	return new ErrorReporter();
 }
-
-exports.reportError = function(_errors, _name, _error)
-{
-	var errorList = _errors[_name]||[];
-
-	if (Array.isArray(_error) === true)
-	{
-		errorList = errorList.concat(_error);
-	}
-	else
-	{
-		errorList.push(_error);
-	}
-
-	_errors[_name] = errorList;
-};
 
 exports.multiTry = function(_executable, _tryCount, _message, _completeFailure)
 {

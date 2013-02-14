@@ -11,7 +11,8 @@ exports.each = function(_resourceName, _resource, _function, _context)
 	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create().attributes;
 	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
 	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || web;
-	
+	context.errorReporter = util.createErrorReporter();
+						   
 	var length = (context.attributes && context.attributes.length)||0;
 	
 	for (var i = 0; i < length; i++)
@@ -45,23 +46,8 @@ exports.reduce = function(_base, _resourceName, _resource, _function, _context)
 
 exports.sequence = function()
 {
-	var errorReporter, functions;	
-
-	var args = Array.prototype.slice.call(arguments, 0);
-
-	if (args[0] && args[0].getErrors && args[0].report && args[0].getError)
-	{
-		errorReporter = args[0];
-		functions = args.slice(1);
-	}
-	else
-	{
-		errorReporter = util.createErrorReporter();
-		functions = args;
-	}
-		
-	this.errorReporter = errorReporter;
-
+	var functions = Array.prototype.slice.call(arguments, 0);		
+	
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 	
@@ -69,29 +55,14 @@ exports.sequence = function()
 	{
 		for (var i = 0; i < length; i++)
 		{
-			functions[i].call(errorReporter, _value, _attributeName, _resource);
+			functions[i].call(this, _value, _attributeName, _resource);
 		}
 	};
 };
 
 exports.compose = function()
 {
-	var errorReporter, functions;	
-
-	var args = Array.prototype.slice.call(arguments, 0);
-
-	if (args[0] && args[0].getErrors && args[0].report && args[0].getError)
-	{
-		errorReporter = args[0];
-		functions = args.slice(1);
-	}
-	else
-	{
-		errorReporter = util.createErrorReporter();
-		functions = args;
-	}
-
-	this.errorReporter = errorReporter;
+	var functions = Array.prototype.slice.call(arguments, 0);
 
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
@@ -102,7 +73,7 @@ exports.compose = function()
 	{
 		for (var i = 0; i < length; i++)
 		{
-			functions[i].call(this, errorReporter, _value, _attributeName, _resource);
+			functions[i].call(this, _value, _attributeName, _resource);
 		}
 	};
 };
@@ -133,7 +104,7 @@ exports.watch = function()
 		}
 	}
 
-	return function(_error, _value, _attributeName, _resource)
+	return function(_value, _attributeName, _resource)
 	{
 		var result;
 
@@ -143,7 +114,7 @@ exports.watch = function()
 
 			if (util.isEmpty(watch) === true)
 			{
-				result = executable(_error, _value, _attributeName, _resource);
+				result = executable.call(this, _value, _attributeName, _resource);
 				executed = true;
 			}
 		}
@@ -236,25 +207,7 @@ exports.copy = function(_target, _value, _attributeName)
 	_target[_attributeName] = _value;
 };
 
-exports.deepCopy = function(_target, _value, _attributeName, _source)
+exports.clone = function(_value)
 {
-	var type = this.attributesMetaData[_attributeName].type;
-	var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
-	constructors[type] = constructors[type] || constructor;
-
-	_target[_attributeName] = constructor.newInstance(_value);
-};
-
-exports.clone = function(_value, _attributeName, _source)
-{
-	return _source[_attribute];
-};
-
-exports.deepClone = function(_target, _value, _attributeName, _source)
-{
-	var type = this.attributesMetaData[_attributeName].type;
-	var constructor = constructors[type] || createClass(type).getConstructor(createClass(type));
-	constructors[type] = constructors[type] || constructor;
-
-	return constructor.newInstance(_value);
+	return _value;
 };
