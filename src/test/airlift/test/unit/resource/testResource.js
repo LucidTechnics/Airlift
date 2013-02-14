@@ -283,7 +283,6 @@ exports['test copy'] = function(_assert)
 
 exports['test clone'] = function(_assert)
 {
-
 	var target = res.map('person', bediako, res.clone, context);
 
 	_assert.eq(bediako.id, target.id, 'id not equal');

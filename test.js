@@ -98,9 +98,9 @@ for (var i = 0; i < files.length; i++)
 		var total = stats.get("total", stats);
 		var testCount = stats.get("testCount", stats);
 
-		totalFailedAssertions += failed;
-		totalAssertions += total;
-		totalTestCount += testCount;
+		totalFailedAssertions += parseInt(failed, 10);
+		totalAssertions += parseInt(total, 10);
+		totalTestCount += parseInt(testCount, 10);
 	}
 }
 
@@ -109,5 +109,9 @@ if (totalFailedAssertions > 0)
 	print('');
 	throw new Error('Test run ended with a total of ' + totalTestCount + ' tests with '+ totalFailedAssertions + ' failed assertions');
 }
-
+else
+{
+	print('');
+	print(totalTestCount + ' test(s) with ' + totalAssertions + ' assertion(s) passed.');
+}
 
