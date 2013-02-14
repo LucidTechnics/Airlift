@@ -45,7 +45,7 @@ public class JavaScriptingUtil
 	public java.util.List scriptStack = new java.util.ArrayList();
 	private boolean cacheScript = false;
 
-	public static final String shim = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; args = args.concat(remainingArgs); return fn.apply(this, args);	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
+	public static final String shim = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; return fn.apply(this, args.concat(remainingArgs));	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
 
 	static
 	{

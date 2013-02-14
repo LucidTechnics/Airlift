@@ -140,7 +140,7 @@ exports.getAuditContext = function()
 {
 	if (!auditContext)
 	{
-		auditContext = new Packages.airlift.servlet.rest.RestfulAuditContext());
+		auditContext = new Packages.airlift.servlet.rest.RestfulAuditContext();
 	}
 
 	return auditContext;
@@ -349,7 +349,7 @@ exports.getResourceBindings = function()
 	for (var resourceName in Iterator(this.getRestContext().getDomainIds()))
 	{
 		var key = resourceName.replaceAll("\\.", "_").toUpperCase();
-		resourceBindings[key] =  this.getRestContext().getIdValue(resourceName));
+		resourceBindings[key] =  this.getRestContext().getIdValue(resourceName);
 	}
 
 	return resourceBindings;

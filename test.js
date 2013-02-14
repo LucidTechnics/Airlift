@@ -91,13 +91,17 @@ for (var i = 0; i < files.length; i++)
 	var scriptableObject = Packages.org.mozilla.javascript.ScriptableObject;
 
 	var stats = scope.get("stats", scope);
-	var failed = stats.get("failed", stats);
-	var total = stats.get("total", stats);
-	var testCount = stats.get("testCount", stats);
 
-	totalFailedAssertions += failed;
-	totalAssertions += total;
-	totalTestCount += testCount;
+	if (stats)
+	{
+		var failed = stats.get("failed", stats);
+		var total = stats.get("total", stats);
+		var testCount = stats.get("testCount", stats);
+
+		totalFailedAssertions += failed;
+		totalAssertions += total;
+		totalTestCount += testCount;
+	}
 }
 
 if (totalFailedAssertions > 0)

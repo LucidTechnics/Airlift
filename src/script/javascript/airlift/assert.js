@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // UTILITY
+var util = require('./util');
 var pSlice = Array.prototype.slice;
 
 // 1. The assert module provides functions that throw
@@ -138,17 +139,33 @@ assert.ok = ok;
 // ==.
 // assert.equal(actual, expected, message_opt);
 
-assert.equal = function equal(actual, expected, message) {
-  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
+assert.eq = function eq(actual, expected, message)
+{
+	if (actual && actual instanceof Packages.java.lang.Object)
+	{
+		if (actual.equals(expected) === false) { fail(actual, expected, message, '==', assert.equal); }
+	}
+	else
+	{
+		if (actual != expected) { fail(actual, expected, message, '==', assert.equal); }
+	}
 };
 
 // 6. The non-equality assertion tests for whether two objects are not equal
 // with != assert.notEqual(actual, expected, message_opt);
 
-assert.notEqual = function notEqual(actual, expected, message) {
-  if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
-  }
+assert.notEq = function notEq(actual, expected, message)
+{
+	if (actual && actual instanceof Packages.java.lang.Object)
+	{
+		if (actual.equals(expected) === true) { fail(actual, expected, message, '==', assert.equal); }
+	}
+	else
+	{
+		if (actual == expected) {
+			fail(actual, expected, message, '!=', assert.notEqual);
+		}
+	} 
 };
 
 // 7. The equivalence assertion tests a deep equality relation.
@@ -165,19 +182,15 @@ function _deepEqual(actual, expected) {
   if (actual === expected) {
     return true;
 
-  } else if (Buffer.isBuffer(actual) && Buffer.isBuffer(expected)) {
-    if (actual.length != expected.length) return false;
-
-    for (var i = 0; i < actual.length; i++) {
-      if (actual[i] !== expected[i]) return false;
-    }
-
-    return true;
-
   // 7.2. If the expected value is a Date object, the actual value is
   // equivalent if it is also a Date object that refers to the same time.
   } else if (actual instanceof Date && expected instanceof Date) {
     return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a instance of Java
+  // Packages.java.lang.Object then rely on the equals method
+  } else if (actual instanceof Packages.java.lang.Object && expected instanceof Packages.java.lang.Object) {
+	  return actual.equals(expected);
 
   // 7.3 If the expected value is a RegExp object, the actual value is
   // equivalent if it is also a RegExp object with the same source and
@@ -268,19 +281,33 @@ assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
 // 9. The strict equality assertion tests strict equality, as determined by ===.
 // assert.strictEqual(actual, expected, message_opt);
 
-assert.strictEqual = function strictEqual(actual, expected, message) {
-  if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
-  }
+assert.kindaEqual = function kindaEqual(actual, expected, message) {
+	if (actual && actual instanceof Packages.java.lang.Object)
+	{
+		if (actual.equals(expected) === false) { fail(actual, expected, message, '==', assert.equal); }
+	}
+	else
+	{
+		if (actual !== expected) {
+			fail(actual, expected, message, '===', assert.strictEqual);
+		}
+	}
 };
 
 // 10. The strict non-equality assertion tests for strict inequality, as
 // determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
 
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-  if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
-  }
+assert.notKindaEqual = function notKindaEqual(actual, expected, message) {
+	if (actual && actual instanceof Packages.java.lang.Object)
+	{
+		if (actual.equals(expected) === true) { fail(actual, expected, message, '==', assert.equal); }
+	}
+	else
+	{
+	  if (actual === expected) {
+		fail(actual, expected, message, '!==', assert.notStrictEqual);
+	  }
+	}
 };
 
 function expectedException(actual, expected) {

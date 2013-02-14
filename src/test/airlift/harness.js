@@ -1,68 +1,74 @@
 var assert = require('airlift/assert');
+var util = require('airlift/util');
 
 function Assert()
 {
 	this.assertionCount = 0;
 	this.failedAssertionCount = 0;
+
+	var report = function(_message, _e)
+	{
+		util.println('\t', _message, _e.expected, _e.operator, _e.actual);
+	}
 	
 	this.ok = function(_value, _message)
 	{
 		this.assertionCount++;
-		try { assert.ok(_value, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.ok(_value, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++; }
 	};
 
-	this.equal = function(_actual, _expected, _message)
+	this.eq = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.equal(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.eq(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
-	this.notEqual = function(_actual, _expected, _message)
+	this.notEq = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.notEqual(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.notEq(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
 	this.deepEqual = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.deepEqual(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.deepEqual(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
 	this.notDeepEqual = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.notDeepEqual(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.notDeepEqual(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
-	this.strictEqual = function(_actual, _expected, _message)
+	this.kindaEqual = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.strictEqual(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.kindaEqual(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
-	this.notStrictEqual = function(_actual, _expected, _message)
+	this.notKindaEqual = function(_actual, _expected, _message)
 	{
 		this.assertionCount++;
-		try { assert.notStrictEqual(_actual, _expected, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.notKindaEqual(_actual, _expected, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
 	this.throws = function(_block, _error, _message)
 	{
 		this.assertionCount++;
-		try { assert.throws(_block, _error, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.throws(_block, _error, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
 	this.doesNotThrow = function(_block, _error, _message)
 	{
 		this.assertionCount++;
-		try { assert.doesNotThrow(_block, _error, _message); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.doesNotThrow(_block, _error, _message); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 
 	this.ifError = function(_value)
 	{
 		this.assertionCount++;
-		try { assert.ifError(_value); } catch(_e) { this.failedAssertionCount++; throw _e; }
+		try { assert.ifError(_value); } catch(_e) { report(_message, _e); this.failedAssertionCount++;}
 	};
 };
 
@@ -83,10 +89,17 @@ exports.run = function(_name, _test)
 			if (typeof _test[item] === 'function' && /^test/i.test(item) === true)
 			{
 				testCount++;
-				try{ _test[item](assertion); } catch(e) { }
+				_test[item](assertion);
 
-				!(assertion.failedAssertionCount - failedAssertionCount) && Packages.java.lang.System.out.println('OK ... ' + item);
-				!!(assertion.failedAssertionCount - failedAssertionCount) && Packages.java.lang.System.out.println('Failed ... ' + item);
+				if (status === 'succeeded')
+				{
+					!(assertion.failedAssertionCount - failedAssertionCount) && util.println('OK ... ' + item);
+					!!(assertion.failedAssertionCount - failedAssertionCount) && util.println('Failed ... ' + item);
+				}
+				else
+				{
+					util.println('Failed ... ' + item);
+				}
 
 				failedAssertionCount = assertion.failedAssertionCount;
 			}
@@ -104,7 +117,7 @@ exports.run = function(_name, _test)
 
 	if (status !== 'setup failed')
 	{
-		Packages.java.lang.System.out.println(testCount + ' test(s) with ' + assertion.assertionCount + ' assertion(s) executed with ' + assertion.failedAssertionCount + " failures.");
+		Packages.java.lang.System.out.println(testCount + ' test(s) with ' + assertion.assertionCount + ' assertion(s) executed with ' + assertion.failedAssertionCount + " failure(s).");
 	}
 
 	return {testCount: testCount, total: assertion.assertionCount, failed: assertion.failedAssertionCount, status: status, message: message};

@@ -1,6 +1,6 @@
 var web = require('./web');
 
-exports.typeOf = function(_string)
+exports.typeOf = function(value)
 {
 	var s = typeof value;
 
@@ -26,21 +26,26 @@ exports.typeOf = function(_string)
 
 exports.isEmpty = function(o)
 {
-	var i, v;
+	var i, v, isEmpty = true;
 
-	if (typeOf(o) === 'object')
+	if ( this.typeOf(o) === 'object')
 	{
 		for (i in o)
 		{
 			v = o[i];
-			if (v !== undefined && typeOf(v) !== 'function')
+			
+			if (v !== undefined && this.typeOf(v) !== 'function')
 			{
-				return false;
+				isEmpty = false;
 			}
 		}
 	}
+	else
+	{
+		isEmpty = false;
+	}
 
-	return true;
+	return isEmpty;
 };
 
 exports.createClass = function(_className)
@@ -73,7 +78,7 @@ exports.reportError = function(_errors, _name, _error)
 	}
 	else
 	{
-		errorList.push(error);
+		errorList.push(_error);
 	}
 
 	_errors[_name] = errorList;
@@ -92,12 +97,13 @@ exports.multiTry = function(_executable, _tryCount, _message, _completeFailure)
 		}
 		catch(e)
 		{
-			this.LOG.warning(_message + " " + e.toString());
+			var log = web.getLog();
+			log.warning(_message + " " + e.toString());
 
 			if (i >= _tryCount)
 			{
 				_completeFailure && _completeFailure(_tries);
-				this.LOG.severe("After this many tries: " + _tryCount + " - " +  e.toString());
+				log.severe("After this many tries: " + _tryCount + " - " +  e.toString());
 				throw e;
 			}
 		}
@@ -110,7 +116,7 @@ exports.createDate = function(_milliseconds)
 {
 	var date;
 	
-	if (util.isDefined(_milliseconds) === true)
+	if (this.hasValue(_milliseconds) === true)
 	{
 		date = new Packages.java.util.Date(_milliseconds);
 	}
@@ -130,7 +136,7 @@ exports.createCalendar = function(_config)
 	var timeZone = (_config && _config.timeZone) ? _config.timeZone : web.getTimezone();
 	var locale = (_config && _config.locale) ? _config.locale : web.getLocale();
 
-	if (airlift.isDefined(date) === true)
+	if (this.hasValue(date) === true)
 	{
 		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
 		calendar.setTime(date);
@@ -153,3 +159,47 @@ exports.guid = function(_length)
 
 	return id; 
 };
+
+exports.trim = function(_string)
+{
+	var trimmed = _string;
+
+	if (_string)
+	{
+		trimmed = Packages.org.apache.commons.lang.StringUtils.trim(_string);
+
+		if (this.typeOf(_string) === 'string')
+		{
+			trimmed = trimmed + '';
+		}
+	}
+
+	return trimmed;
+};
+
+exports.print = function()
+{
+	var args = Array.prototype.slice.call(arguments, 0);
+
+	for (var i = 0, length = args.length; i < length; i++)
+	{
+		if (i === 0)
+		{
+			Packages.java.lang.System.out.print(args[i]);
+		}
+		else
+		{
+			Packages.java.lang.System.out.print(' ' + args[i]);
+		}
+	}
+};
+
+exports.println = function()
+{
+	var args = Array.prototype.slice.call(arguments, 0);
+
+	exports.print.apply(this, args);
+	
+	Packages.java.lang.System.out.println('');
+};
+					

@@ -23,7 +23,7 @@
  */
 exports.every = function(_collection, _function, _this)
 {
-	var success = true;
+	var success = true, iterator;
 
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -41,6 +41,7 @@ exports.every = function(_collection, _function, _this)
 		for (var item in iterator)
 		{
 			success = _function.call(_this, item, index, _collection);
+			
 			if (success === false) { break; } else { index++; }
 		}
 	}
@@ -133,6 +134,8 @@ exports.forEach = function(_collection, _function, _this)
  */
 exports.filter = function(_collection, _function, _this)
 {
+	var iterator;
+	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
 		iterator = _collection;
@@ -190,6 +193,8 @@ exports.filter = function(_collection, _function, _this)
  */
 exports.map = function(_collection, _function, _this)
 {
+	var iterator, results;
+	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
 		iterator = _collection;
@@ -201,21 +206,21 @@ exports.map = function(_collection, _function, _this)
 
 	if (iterator)
 	{
-		var results = new Packages.java.util.ArrayList(), index = 0;
+		results = new Packages.java.util.ArrayList(), index = 0;
 		
 		for (var item in iterator)
 		{
-			results = results.add(_function && _function.call(_this, item, index, _collection));
+			results.add(_function && _function.call(_this, item, index, _collection));
 			index++;
 		}
 	}
 	else if (_collection && _collection.map)
 	{
-		var results = _collection.map(_function);
+		results = _collection.map(_function);
 	}
 	else if (_collection && _collection.replace)
 	{
-		var results = Array.map(_collection + "", _function);
+		results = Array.map(_collection + "", _function);
 	}
 
 	return results;
@@ -246,7 +251,7 @@ exports.map = function(_collection, _function, _this)
  */
 exports.some = function(_collection, _function, _this)
 {
-	var success = false;
+	var success = false, iterator;
 
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -303,9 +308,9 @@ exports.some = function(_collection, _function, _this)
  *	return (_item.length > 4);
  * });  //this returns [["Bediako"], ["Dave", "Loki"]].
  */
-exports.split = function(_collection, _function)
+exports.split = function(_collection, _function, _this)
 {
-	var success = [], fail = [];
+	var success = [], fail = [], iterator;
 
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -324,7 +329,7 @@ exports.split = function(_collection, _function)
 		var index = 0;
 		for (var item in iterator)
 		{
-			(_function(item, index, _collection) === true) ? success.add(item) : fail.add(item);
+			(_function.call(_this, item, index, _collection) === true) ? success.add(item) : fail.add(item);
 			index++;
 		}
 	}
@@ -332,14 +337,15 @@ exports.split = function(_collection, _function)
 	{
 		for (var i = 0; i < _collection.length; i++)
 		{
-			(_function(_collection[i], i, _collection) === true) ? success.push(item) : fail.push(item);
+			var item = _collection[i];
+			(_function.call(_this, item, i, _collection) === true) ? success.push(item) : fail.push(item);
 		}
 	}
 	else if (_collection && _collection.replace)
 	{
-		Array.forEach(_collection + "", function(_item, _index, _string)
+		Array.forEach(_collection + "", function(_item, _index, _collection)
 		{
-			(_function(_item, _index, _string) === true) ? success.push(_item) : fail.push(_item);
+			(_function.call(_this, _item, _index, _collection) === true) ? success.push(_item) : fail.push(_item);
 		});
 	}
 	
@@ -367,14 +373,14 @@ exports.split = function(_collection, _function)
  * var users = [{name: "Bediako"}, {name: "Dave"}, {name: "Loki"}
  * {name: "Bediako"}];
  *
- * var [valueList, valueMap] = require('collection').every(users, function(_item, _index, _collection)
- * {
- *	return (_item.length > 4);
- * });  //this returns [["Bediako", "Dave", "Loki"], {"Bediako" : [{name: "Bediako"}, {name: Bediako}], "Dave": [{name: "Dave"}], "Loki": [{name: Loki}]}]
+ * var [valueList, valueMap] = require('collection').partition(users, 'name');
+ * this returns [["Bediako", "Dave", "Loki"], {"Bediako" : [{name: "Bediako"}, {name: Bediako}], "Dave": [{name: "Dave"}], "Loki": [{name: Loki}]}]
  * 
  */
 exports.partition = function(_collection, _attribute)
 {
+	var iterator;
+	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
 		iterator = _collection;
@@ -415,6 +421,7 @@ exports.partition = function(_collection, _attribute)
 
 		for (var i =0; i < _collection.length; i++)
 		{
+			var item = _collection[i];
 			var value = item[_attribute];
 
 			if (value)
