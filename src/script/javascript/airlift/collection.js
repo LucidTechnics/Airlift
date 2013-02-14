@@ -445,7 +445,7 @@ exports.partition = function(_collection, _attribute)
 
 exports.reduce = function(_collection, _function, _initialValue)
 {
-	var result;
+	var result, iterator;
 	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -453,10 +453,12 @@ exports.reduce = function(_collection, _function, _initialValue)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
-	if (iterator && iterator.hasNext() === false && util.isDefined(_initialValue) === false)
+	var util = require('./util');
+	
+	if (iterator && iterator.hasNext() === false && util.hasValue(_initialValue) === false)
 	{
 		throw TypeError('Collection is empty ... Must provide initial value or a non empty collection');
 	}
@@ -465,7 +467,7 @@ exports.reduce = function(_collection, _function, _initialValue)
 	{
 		var index = 0;
 		
-		if (util.isDefined(_initialValue) === true)
+		if (util.hasValue(_initialValue) === true)
 		{
 			result = _initialValue;
 		}
@@ -491,7 +493,7 @@ exports.reduce = function(_collection, _function, _initialValue)
 
 exports.reduceRight = function(_collection, _function, _initialValue)
 {
-	var collection;
+	var collection = _collection;
 
 	if (_collection && _collection.hasNext && _collection.next)
 	{
