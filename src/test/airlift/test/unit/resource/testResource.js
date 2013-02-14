@@ -145,10 +145,11 @@ exports['test reduce'] = function(_assert)
 		_assert.eq(false, util.isEmpty(this.resourceMetadata), 'resource meta data should not be empty');
 		_assert.eq(this.resourceMetadata.name, 'person', 'resource has wrong name');
 
-		return _base + ':' + _attributeName + '=' + _value;		
+		var formattedValue = Packages.airlift.util.FormatUtil.format(_value||"");
+		return _base + ':' + _attributeName + '=' + formattedValue;		
 	}, context);
 
-	_assert.eq("person::fullName=Bediako George:shortName=Bedi:status=middle aged:birthDate=Thu Jan 01 00:00:00 EST 1970:age=43:friendList=[friend1, friend2, friend3]:enemySet=[enemy2, enemy1]:auditPostDate=undefined:auditPutDate=undefined:auditUserId=undefined:id=6524d6f79d19",
+	_assert.eq("person::fullName=Bediako George:shortName=Bedi:status=middle aged:birthDate=01-01-1970:age=43.0:friendList=[\"friend1\",\"friend2\",\"friend3\"]:enemySet=[\"enemy2\",\"enemy1\"]:auditPostDate=:auditPutDate=:auditUserId=:id=6524d6f79d19",
 			   reducedResult, 'unexpected reduced result');
 };
 

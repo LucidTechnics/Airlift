@@ -46,7 +46,7 @@ public class FormatUtil
 				 "java.lang.Integer".equals(className) == true ||
 				 "java.lang.Float".equals(className) == true)
 		{
-			format = format((java.lang.Number)_object);
+			format = format(_object);
 		}
 		else
 		{
@@ -383,7 +383,7 @@ public class FormatUtil
 		return stringBuffer.toString();
 	}
 
-	public static String format(Number _number)
+	public static String formatNumber(Number _number)
 	{
 		String number = "";
 
@@ -395,7 +395,7 @@ public class FormatUtil
 		return number;
 	}
 
-	public static String format(Number[] _array)
+	public static String formatNumber(Number[] _array)
 	{
 		StringBuffer stringBuffer = new StringBuffer("[");
 
@@ -419,6 +419,151 @@ public class FormatUtil
 		return stringBuffer.toString();
 	}
 	
+	public static String format(int _number)
+	{
+		return formatNumber(_number);
+	}
+
+	public static String format(int[] _array)
+	{
+		StringBuffer stringBuffer = new StringBuffer("[");
+
+		if (_array != null)
+		{
+			for (int i = 0; i < _array.length; i++)
+			{
+				stringBuffer.append("\"").append(format(_array[i]));
+
+				if (i == (_array.length - 1))
+				{
+					stringBuffer.append("\"]");
+				}
+				else
+				{
+					stringBuffer.append("\",");
+				}
+			}
+		}
+
+		return stringBuffer.toString();
+	}
+
+	public static String format(short _number)
+	{
+		return formatNumber(_number);
+	}
+
+	public static String format(short[] _array)
+	{
+		StringBuffer stringBuffer = new StringBuffer("[");
+
+		if (_array != null)
+		{
+			for (int i = 0; i < _array.length; i++)
+			{
+				stringBuffer.append("\"").append(format(_array[i]));
+
+				if (i == (_array.length - 1))
+				{
+					stringBuffer.append("\"]");
+				}
+				else
+				{
+					stringBuffer.append("\",");
+				}
+			}
+		}
+
+		return stringBuffer.toString();
+	}
+
+	public static String format(long _number)
+	{
+		return formatNumber(_number);
+	}
+
+	public static String format(long[] _array)
+	{
+		StringBuffer stringBuffer = new StringBuffer("[");
+
+		if (_array != null)
+		{
+			for (int i = 0; i < _array.length; i++)
+			{
+				stringBuffer.append("\"").append(format(_array[i]));
+
+				if (i == (_array.length - 1))
+				{
+					stringBuffer.append("\"]");
+				}
+				else
+				{
+					stringBuffer.append("\",");
+				}
+			}
+		}
+
+		return stringBuffer.toString();
+	}
+
+	public static String format(double _number)
+	{
+		return formatNumber(_number);
+	}
+
+	public static String format(double[] _array)
+	{
+		StringBuffer stringBuffer = new StringBuffer("[");
+
+		if (_array != null)
+		{
+			for (int i = 0; i < _array.length; i++)
+			{
+				stringBuffer.append("\"").append(format(_array[i]));
+
+				if (i == (_array.length - 1))
+				{
+					stringBuffer.append("\"]");
+				}
+				else
+				{
+					stringBuffer.append("\",");
+				}
+			}
+		}
+
+		return stringBuffer.toString();
+	}
+
+	public static String format(float _number)
+	{
+		return formatNumber(_number);
+	}
+
+	public static String format(float[] _array)
+	{
+		StringBuffer stringBuffer = new StringBuffer("[");
+
+		if (_array != null)
+		{
+			for (int i = 0; i < _array.length; i++)
+			{
+				stringBuffer.append("\"").append(format(_array[i]));
+
+				if (i == (_array.length - 1))
+				{
+					stringBuffer.append("\"]");
+				}
+				else
+				{
+					stringBuffer.append("\",");
+				}
+			}
+		}
+
+		return stringBuffer.toString();
+	}
+
 	public static String format(Boolean _boolean)
 	{
 		String booleanString = "";
