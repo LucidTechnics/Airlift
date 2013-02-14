@@ -31,15 +31,15 @@ exports.every = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		var index = 0;
-
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			success = _function.call(_this, item, index, _collection);
 			
 			if (success === false) { break; } else { index++; }
@@ -86,15 +86,15 @@ exports.forEach = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		var index = 0;
-
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			_function && _function.call(_this, item, index, _collection.add && _collection);
 			index++;
 		}		
@@ -142,15 +142,17 @@ exports.filter = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		var result = new Packages.java.util.ArrayList(), index = 0;
+		var result = new Packages.java.util.ArrayList();
 		
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			_function && (_function.call(_this, item, index, _collection) === true) && result.add(item);
 			index++;
 		}
@@ -201,15 +203,17 @@ exports.map = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		results = new Packages.java.util.ArrayList(), index = 0;
+		results = new Packages.java.util.ArrayList();
 		
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			results.add(_function && _function.call(_this, item, index, _collection));
 			index++;
 		}
@@ -259,15 +263,15 @@ exports.some = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		var index = 0;
-
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			success = _function.call(_this, item, index, _collection);
 			if (success === true) { break; } else { index++; }
 		}
@@ -318,7 +322,7 @@ exports.split = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
@@ -326,9 +330,10 @@ exports.split = function(_collection, _function, _this)
 		success = new Packages.java.util.ArrayList()
 		fail = new Packages.java.util.ArrayList()
 
-		var index = 0;
-		for (var item in iterator)
+		var index = 0, item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			(_function.call(_this, item, index, _collection) === true) ? success.add(item) : fail.add(item);
 			index++;
 		}
@@ -387,16 +392,18 @@ exports.partition = function(_collection, _attribute)
 	}
 	else if (_collection && _collection.iterator)
 	{
-		iterator = Iterator(_collection);
+		iterator = _collection.iterator();
 	}
 
 	if (iterator)
 	{
-		var partitionMap = new Packages.java.util.HashMap()
-		var orderedKeys = new Packages.java.util.ArrayList()
+		var partitionMap = new Packages.java.util.HashMap();
+		var orderedKeys = new Packages.java.util.ArrayList();
 
-		for (var item in iterator)
+		var item;
+		while (iterator.hasNext())
 		{
+			item = iterator.next();
 			var value = item[_attribute];
 
 			if (value)

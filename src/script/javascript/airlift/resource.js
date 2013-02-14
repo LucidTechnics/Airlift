@@ -1,16 +1,16 @@
 var web = require('./web');
 var util = require('./util');
-var constructors = {};
+var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
 exports.each = function(_resourceName, _resource, _function, _context)
 {
 	var context = _context || {};
 
 	context.resourceName = context.resourceName || _resourceName;
-	context.resourceMeta = context.resourceMeta || require('meta/r/' + _resourceName).create();
-	context.attributesMetaData = context.attributesMetaData || require('meta/a/' + _resourceName).create().attributes;
+	context.resourceMetadata = context.resourceMetadata || require('meta/r/' + _resourceName).create();
+	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create().attributes;
 	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
-	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || this.WEB_CONTEXT;
+	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || web;
 	
 	var length = (context.attributes && context.attributes.length)||0;
 	
@@ -43,68 +43,76 @@ exports.reduce = function(_base, _resourceName, _resource, _function, _context)
 	return _base;
 };
 
-exports.reduceRight = function(_base, _resourceName, _resource, _function, _context)
+exports.sequence = function()
 {
-	context.resourceName = _resourceName;
-	context.resourceMeta = require('meta/r/' + _resourceName).create();
-	context.attributes = this.attributes || context.resourceMeta.attributes;
+	var errorReporter, functions;	
 
-	var reversedAttributes = attributes.reverse();
-	reversedAttributes.push(each.partial(_resourceName, _resource, function(_value, _attributeName, _resource)
+	var args = Array.prototype.slice.call(arguments, 0);
+
+	if (args[0] && args[0].getErrors && args[0].report && args[0].getError)
 	{
-		_base = _function.call(this, _base, _value, _attributeName, _resource);
-	}, _context));
-	
-	this.view.apply(this, reversedAttributes); 
+		errorReporter = args[0];
+		functions = args.slice(1);
+	}
+	else
+	{
+		errorReporter = util.createErrorReporter();
+		functions = args;
+	}
+		
+	this.errorReporter = errorReporter;
 
-	return _base;
-};
-
-exports.sequence = function(_errors)
-{
-	this.errors = _errors;
-	var functions = Array.prototype.slice.call(arguments, 1);
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
-
-	return function(_errors, _value, _attributeName, _resource)
+	
+	return function(_value, _attributeName, _resource)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			return functions[i].call(this, _errors, _value, _attributeName, _resource);
+			functions[i].call(errorReporter, _value, _attributeName, _resource);
 		}
 	};
 };
 
-exports.compose = function(_errors)
+exports.compose = function()
 {
-	this.errors = _errors;
-	var functions = Array.prototype.slice.call(arguments, 1);
+	var errorReporter, functions;	
+
+	var args = Array.prototype.slice.call(arguments, 0);
+
+	if (args[0] && args[0].getErrors && args[0].report && args[0].getError)
+	{
+		errorReporter = args[0];
+		functions = args.slice(1);
+	}
+	else
+	{
+		errorReporter = util.createErrorReporter();
+		functions = args;
+	}
+
+	this.errorReporter = errorReporter;
+
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 
 	functions = functions.reverse();
 
-	return function(_errors, _value, _attributeName, _resource)
+	return function(_value, _attributeName, _resource)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			return functions[i].call(this, _errors, _value, _attributeName, _resource);
+			functions[i].call(this, errorReporter, _value, _attributeName, _resource);
 		}
 	};
 };
 
 exports.toString = function(_resourceName, _resource, _context)
 {
-	var stringBuffer = new Packages.java.lang.StringBuffer("[** ");
-	stringBuffer.append(_resourceName).append("\n");
-	
-	this.each(_resourceName, _resource, function(_value, _name)
+	return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName).append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 	{
-		stringBuffer.append(_name).append(": ").append(_value||"").append("\n"); 
-	}, _context);
-
-	return stringBuffer.append(" **]\n").toString();
+		return _base.append(_name).append(": ").append(_value||"").append("\n");
+	}, context).toString();
 };
 
 exports.watch = function()

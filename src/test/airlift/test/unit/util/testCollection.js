@@ -38,9 +38,11 @@ exports['test every'] = function(_assert)
 	_assert.eq(true, collection.every(list, function(_item, _index, _collection) { return !!_item; }), 'LIST: every does not return true for universal true check');
 	_assert.eq(false, collection.every(list, function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'LIST: every does not return false for at least one check returning false');
 
+	_assert.eq(true, collection.every(list.iterator(), function(_item, _index, _collection) { return !!_item; }), 'ITERATOR: every does not return true for universal true check');
+	_assert.eq(false, collection.every(list.iterator(), function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'ITERATOR: every does not return false for at least one check returning false');
+
 	_assert.eq(true, collection.every(set, function(_item, _index, _collection) { return !!_item; }), 'SET: every does not return true for universal true check');
 	_assert.eq(false, collection.every(set, function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'SET: every does not return false for at least one check returning false');
-
 };
 
 
@@ -75,6 +77,21 @@ exports['test for each'] = function(_assert)
 	_assert.eq(results[1], list.get(1), 'LIST: second item in result is not equal');
 	_assert.eq(results[2], list.get(2), 'LIST: third item in result is not equal');
 	_assert.eq(results[3], list.get(3), 'LIST: fourth item in result is not equal');
+
+	results = [];
+	index = 0;
+
+	collection.forEach(list.iterator(), function(_item, _index, _collection)
+	{
+		_assert.eq(index++, _index, 'ITERATOR: index is out of sync');
+		results.push(_item);
+	});
+
+	_assert.eq(results.length, list.size(), 'ITERATOR: result length not equal to collection length');
+	_assert.eq(results[0], list.get(0), 'ITERATOR: first item in result is not equal');
+	_assert.eq(results[1], list.get(1), 'ITERATOR: second item in result is not equal');
+	_assert.eq(results[2], list.get(2), 'ITERATOR: third item in result is not equal');
+	_assert.eq(results[3], list.get(3), 'ITERATOR: fourth item in result is not equal');
 
 	results = [];
 	index = 0;
@@ -115,7 +132,6 @@ exports['test filter'] = function(_assert)
 	_assert.eq(results[1], array[3], 'ARRAY: second item in result is not equal');
 
 	index = 0;
-
 	results = collection.filter(list, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'LIST: index is out of sync');
@@ -135,7 +151,25 @@ exports['test filter'] = function(_assert)
 	_assert.eq(results.get(1), list.get(3), 'LIST: second item in result is not equal');
 
 	index = 0;
+	results = collection.filter(list.iterator(), function(_item, _index, _collection)
+	{
+		_assert.eq(index++, _index, 'ITERATOR: index is out of sync');
 
+		if (_index % 2 === 0)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	});
+
+	_assert.eq(results.size(), list.size() - 2, 'ITERATOR: result length not correct');
+	_assert.eq(results.get(0), list.get(1), 'ITERATOR: first item in result is not equal');
+	_assert.eq(results.get(1), list.get(3), 'ITERATOR: second item in result is not equal');
+
+	index = 0;
 	results = collection.filter(set, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'SET: index is out of sync');
@@ -158,7 +192,6 @@ exports['test filter'] = function(_assert)
 exports['test map'] = function(_assert)
 {
 	var index = 0;
-
 	var results = collection.map(array, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'ARRAY: index is out of sync');
@@ -172,7 +205,6 @@ exports['test map'] = function(_assert)
 	_assert.eq(results[3], array[3], 'ARRAY: fourth item in result is not equal');
 
 	index = 0;
-
 	results = collection.map(list, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'LIST: index is out of sync');
@@ -186,7 +218,19 @@ exports['test map'] = function(_assert)
 	_assert.eq(results.get(3), list.get(3), 'LIST: fourth item in result is not equal');
 
 	index = 0;
+	results = collection.map(list.iterator(), function(_item, _index, _collection)
+	{
+		_assert.eq(index++, _index, 'ITERATOR: index is out of sync');
+		return _item;
+	});
 
+	_assert.eq(results.size(), list.size(), 'ITERATOR: result length not equal to collection length');
+	_assert.eq(results.get(0), list.get(0), 'ITERATOR: first item in result is not equal');
+	_assert.eq(results.get(1), list.get(1), 'ITERATOR: second item in result is not equal');
+	_assert.eq(results.get(2), list.get(2), 'ITERATOR: third item in result is not equal');
+	_assert.eq(results.get(3), list.get(3), 'ITERATOR: fourth item in result is not equal');
+
+	index = 0;
 	results = collection.map(set, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'SET: index is out of sync');
@@ -208,6 +252,9 @@ exports['test some'] = function(_assert)
 	_assert.eq(false, collection.some(list, function(_item, _index, _collection) { return !!!_item; }), 'LIST: some does not return false for universal false check');
 	_assert.eq(true, collection.some(list, function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'LIST: some does not return true for at least one check returning true');
 
+	_assert.eq(false, collection.some(list.iterator(), function(_item, _index, _collection) { return !!!_item; }), 'ITERATOR: some does not return false for universal false check');
+	_assert.eq(true, collection.some(list.iterator(), function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'ITERATOR: some does not return true for at least one check returning true');
+
 	_assert.eq(false, collection.some(set, function(_item, _index, _collection) { return !!!_item; }), 'SET: every does not return false for universal false check');
 	_assert.eq(true, collection.some(set, function(_item, _index, _collection) { if ("hello".equalsIgnoreCase(_item) === true) { return false; } return true; }), 'SET: some does not return true for at least one check returning true');
 };
@@ -215,7 +262,6 @@ exports['test some'] = function(_assert)
 exports['test split'] = function(_assert)
 {
 	var index = 0;
-
 	var results = collection.split(array, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'ARRAY: index is out of sync');
@@ -238,7 +284,6 @@ exports['test split'] = function(_assert)
 	_assert.eq(results.fail[1], array[2], 'ARRAY: second item in fail result is not equal');
 
 	index = 0;
-
 	results = collection.split(list, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'LIST: index is out of sync');
@@ -261,7 +306,28 @@ exports['test split'] = function(_assert)
 	_assert.eq(results.fail.get(1), list.get(2), 'LIST: second item in fail result is not equal');
 
 	index = 0;
+	results = collection.split(list.iterator(), function(_item, _index, _collection)
+	{
+		_assert.eq(index++, _index, 'ITERATOR: index is out of sync');
 
+		if (_index % 2 === 0)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	});
+
+	_assert.eq(results.success.size(), list.size() - 2, 'ITERATOR: success result length not correct');
+	_assert.eq(results.fail.size(), list.size() - 2, 'ITERATOR: fail result length not correct');
+	_assert.eq(results.success.get(0), list.get(1), 'ITERATOR: first item in success result is not equal');
+	_assert.eq(results.success.get(1), list.get(3), 'ITERATOR: second item in success result is not equal');
+	_assert.eq(results.fail.get(0), list.get(0), 'ITERATOR: first item in fail result is not equal');
+	_assert.eq(results.fail.get(1), list.get(2), 'ITERATOR: second item in fail result is not equal');
+
+	index = 0;
 	results = collection.split(set, function(_item, _index, _collection)
 	{
 		_assert.eq(index++, _index, 'SET: index is out of sync');

@@ -143,11 +143,11 @@ assert.eq = function eq(actual, expected, message)
 {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === false) { fail(actual, expected, message, '==', assert.equal); }
+		if (actual.equals(expected) === false) { fail(actual, expected, message, '===', assert.equal); }
 	}
 	else
 	{
-		if (actual != expected) { fail(actual, expected, message, '==', assert.equal); }
+		if (actual != expected) { fail(actual, expected, message, '===', assert.equal); }
 	}
 };
 
@@ -158,12 +158,12 @@ assert.notEq = function notEq(actual, expected, message)
 {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === true) { fail(actual, expected, message, '==', assert.equal); }
+		if (actual.equals(expected) === true) { fail(actual, expected, message, '!==', assert.equal); }
 	}
 	else
 	{
 		if (actual == expected) {
-			fail(actual, expected, message, '!=', assert.notEqual);
+			fail(actual, expected, message, '!==', assert.notEqual);
 		}
 	} 
 };
@@ -289,7 +289,7 @@ assert.kindaEqual = function kindaEqual(actual, expected, message) {
 	else
 	{
 		if (actual !== expected) {
-			fail(actual, expected, message, '===', assert.strictEqual);
+			fail(actual, expected, message, '==', assert.strictEqual);
 		}
 	}
 };
@@ -305,7 +305,7 @@ assert.notKindaEqual = function notKindaEqual(actual, expected, message) {
 	else
 	{
 	  if (actual === expected) {
-		fail(actual, expected, message, '!==', assert.notStrictEqual);
+		fail(actual, expected, message, '!=', assert.notStrictEqual);
 	  }
 	}
 };

@@ -68,6 +68,20 @@ exports.hasValue = function(_value)
 	return (_value !== null && _value !== undefined);
 };
 
+var ErrorReporter = function()
+{
+	var errors = {};
+
+	this.getErrors = function() { return errors; };
+	this.report = function(_name, _error) { this.reportError(errors, _name, _error); };
+	this.getError = function(_name) { return errors[_name];}
+};
+
+exports.createErrorReporter = function()
+{
+	return new ErrorReporter();
+}
+
 exports.reportError = function(_errors, _name, _error)
 {
 	var errorList = _errors[_name]||[];
