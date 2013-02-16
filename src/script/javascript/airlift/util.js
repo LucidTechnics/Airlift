@@ -53,11 +53,6 @@ exports.createClass = function(_className)
 	return Packages.java.lang.Class.forName(_className);
 };
 
-exports.createError = function(_name, _message, _category)
-{
-	return {name: _name, message: _message, category: _category};
-};
-
 exports.isWhitespace = function(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
@@ -72,28 +67,42 @@ var ErrorReporter = function()
 {
 	var errors = {};
 
-	this.getAllErrors = function() { return errors; };
-	this.report = function(_name, _message, _category) { this.reportError(errors, _name, {name: _name, message: _message, category: _category}); };
-	this.getErrorList = function(_name) { return errors[_name];}
-
-	this.reportError = function(_errors, _name, _error)
+	this.allErrors = function() { return errors; };
+	this.getErrors = function(_name)
 	{
-		if (_errors === undefined || _errors === null) { throw new Error('Cannot report errors on undefined or null errors object'); }
+		if (_name === undefined || _name === null)
+		{
+			throw new Error('getErrors expects an error name.  To get allErrors use allErrors instead');
+		}
 		
-		var errorList = _errors[_name]||[];
+		return errors[_name];
+	}
 
-		if (Array.isArray(_error) === true)
+	this.report = function(_name, _error)
+	{
+		if (_name === null || _name === undefined)
+		{
+			throw new Error('Cannot report and error with an undefined or null name');
+		}
+		
+		var errorList = errors[_name]||[];
+
+		if (_error && Array.isArray(_error) === true)
 		{
 			errorList = errorList.concat(_error);
 		}
-		else
+		else if (_error && _error.name !== null && _error.name !== undefined)
 		{
 			errorList.push(_error);
 		}
+		else if (_error && typeof _error === 'string')
+		{
+			var error = {name: _name, message: _error, category: arguments[2]||''};
+			errorList.push(error);
+		}
 
-		_errors[_name] = errorList;
+		errors[_name] = errorList;
 	};
-
 };
 
 exports.createErrorReporter = function()

@@ -2,7 +2,7 @@ var web = require('./web');
 var util = require('./util');
 var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
-exports.each = function(_resourceName, _resource, _function, _context)
+exports.each = function each(_resourceName, _resource, _function, _context)
 {
 	var context = _context || {};
 
@@ -11,18 +11,35 @@ exports.each = function(_resourceName, _resource, _function, _context)
 	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create().attributes;
 	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
 	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || web;
-	context.errorReporter = util.createErrorReporter();
+
+	var reporter = util.createErrorReporter();
+	
+	context.report = reporter.report;
+	context.allErrors = reporter.allErrors;
+	context.getErrors = reporter.getErrors;
 						   
 	var length = (context.attributes && context.attributes.length)||0;
 	
 	for (var i = 0; i < length; i++)
 	{
 		var name = context.attributes[i];
-		_function.call(context, _resource[name], name, _resource);
+
+		try
+		{
+			_function.call(context, _resource[name], name, _resource);
+		}
+		catch(e)
+		{
+			e.javaException && this.LOG.info(e.javaException.getMessage());
+			var category = e.category || _function.name || 'resource';
+			var message = e.message || e.javaException && e.javaException.getMessage();
+			this.LOG.severe('Exception: ' + context.resourceName + ':' + name + ':' + message + ':' + category);
+			context.report(name, message, category);
+		}
 	}
 };
 
-exports.map = function(_resourceName, _resource, _function, _context)
+exports.map = function map(_resourceName, _resource, _function, _context)
 {
 	var result = {};
 
@@ -34,7 +51,7 @@ exports.map = function(_resourceName, _resource, _function, _context)
 	return result;
 };
 
-exports.reduce = function(_base, _resourceName, _resource, _function, _context)
+exports.reduce = function reduce(_base, _resourceName, _resource, _function, _context)
 {
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
 	{
@@ -44,7 +61,7 @@ exports.reduce = function(_base, _resourceName, _resource, _function, _context)
 	return _base;
 };
 
-exports.sequence = function()
+exports.sequence = function sequence()
 {
 	var functions = Array.prototype.slice.call(arguments, 0);		
 	
@@ -60,7 +77,7 @@ exports.sequence = function()
 	};
 };
 
-exports.compose = function()
+exports.compose = function compose()
 {
 	var functions = Array.prototype.slice.call(arguments, 0);
 
@@ -78,7 +95,7 @@ exports.compose = function()
 	};
 };
 
-exports.toString = function(_resourceName, _resource, _context)
+exports.toString = function toString(_resourceName, _resource, _context)
 {
 	return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName).append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 	{
@@ -86,17 +103,29 @@ exports.toString = function(_resourceName, _resource, _context)
 	}, context).toString();
 };
 
-exports.watch = function()
+exports.watch = function watch()
 {
-	var args = Array.prototype.slice.call(arguments, 0), length = args.length, watch = {}, executable, executed = false;
-
-	for (var i = 0; i < length; i++)
+	var args = Array.prototype.slice.call(arguments, 0), watch, executable, executed = false;
+	
+	for (var i = 0, length = args.length; i < length; i++)
 	{
 		var item = args[i];
 
 		if (typeof item !== 'function')
 		{
-			watch[item] = 1;
+			watch = watch || {};
+
+			if (Array.isArray(item) === true)
+			{
+				for (var j = 0, jLength = item.length; i < jLength; i++)
+				{
+					watch[item[j]] = 1;
+				}
+			}
+			else if (typeof item === 'string')
+			{
+				watch[item] = 1;
+			}
 		}
 		else
 		{
@@ -107,6 +136,17 @@ exports.watch = function()
 	return function(_value, _attributeName, _resource)
 	{
 		var result;
+
+		if (!watch)
+		{
+			watch = {};
+			var attributes = this.attributes;
+			
+			for (var i = 0, length = attributes.length; i < length; i++)
+			{
+				watch[attributes[i]] = 1;
+			}
+		}
 
 		if (!executed)
 		{
@@ -162,12 +202,12 @@ var replacer = function replacer(key, value)
 	return replacement;
 };
 
-exports.json = function(_resource, _replacer)
+exports.json = function json(_resource, _replacer)
 {
 	return JSON.stringify(object, _replacer || replacer);
 };
 
-exports.audit = function(_config)
+exports.audit = function audit(_config)
 {
 	var entity = _config.entity;
 	var id = _config.id||_config.entity && _config.entity.getKey().getName();
@@ -202,12 +242,12 @@ exports.audit = function(_config)
 	web.getAuditContext().insert(auditTrail);
 };
 
-exports.copy = function(_target, _value, _attributeName)
+exports.copy = function copy(_target, _value, _attributeName)
 {
 	_target[_attributeName] = _value;
 };
 
-exports.clone = function(_value)
+exports.clone = function clone(_value)
 {
 	return _value;
 };

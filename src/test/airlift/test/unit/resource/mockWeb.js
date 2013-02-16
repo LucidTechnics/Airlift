@@ -1,0 +1,4 @@
+exports.create = function()
+{
+	return {};
+};

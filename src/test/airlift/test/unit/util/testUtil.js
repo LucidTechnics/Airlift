@@ -23,11 +23,6 @@ exports['test create class'] = function(_assert)
 	_assert.eq(new Packages.airlift.util.JavaScriptingUtil().getClass(), util.createClass('airlift.util.JavaScriptingUtil'), 'createClass does not create the right class');
 }
 
-exports['test create error object'] = function(_assert)
-{
-	_assert.deepEqual({message: 'message 1', name: 'error', category: 'test'}, util.createError('error', 'message 1', 'test'), 'createError does not create the error object correctly');
-}
-
 exports['test is white space'] = function(_assert)
 {
 	_assert.eq(true, util.isWhitespace('    \t\n'), 'is white space does not detect white space properly');
@@ -51,7 +46,7 @@ exports['test create error reporter'] = function(_assert)
 	_assert.deepEqual({hello:[{name: 'hello', message: 'message1', category: 'test'},
 							  {name: 'hello', message: 'message2', category: 'test'}],
 					  goodbye: [{name: 'goodbye', message: 'message3', category: 'test'}]},
-					  errorReporter.getAllErrors(), 'report error is not reporting errors correctly' );
+					  errorReporter.allErrors(), 'report error is not reporting errors correctly' );
 };
 
 exports['test multi-try NEEDS TO BE CREATED ONCE MOCKUPS WORKS'] = function(_assert)
