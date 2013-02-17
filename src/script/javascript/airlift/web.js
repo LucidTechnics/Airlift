@@ -19,6 +19,7 @@ var contentContext;
 var productionMode;
 var handlerName;
 var servlet;
+var log;
 
 exports.getServlet = function()
 {
@@ -358,7 +359,6 @@ exports.getResourceBindings = function()
 exports.init = function(_webContext)
 {
 	if (!_webContext) { throw "web context needs to be passed in order to initialize web utility object"; }
-	if (!_webContext.REST_CONTEXT) { throw "web context appears to be malformed"; }
 
 	this.WEB_CONTEXT = _webContext;
 };

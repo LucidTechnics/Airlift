@@ -29,6 +29,7 @@ public class AirliftAuditTrail
 	private String userId;
 	private java.util.Date actionDate;
 	private java.util.Date recordDate;
+	private String requestId;
 	
 	public String getId() { return id; }	
 	public String getResourceId() { return resourceId; }
@@ -41,6 +42,7 @@ public class AirliftAuditTrail
 	public String getUserId() { return userId; }	
 	public java.util.Date getActionDate() { return actionDate; }
 	public java.util.Date getRecordDate() { return recordDate; }
+	public String getRequestId() { return requestId; }
 	
 	public void setId(String _id) { id = _id; }
 	public void setResourceId(String _resourceId) { resourceId = _resourceId; }
@@ -53,4 +55,5 @@ public class AirliftAuditTrail
 	public void setUserId(String _userId) { userId = _userId; }
 	public void setActionDate(java.util.Date _actionDate) { actionDate = _actionDate; }
 	public void setRecordDate(java.util.Date _recordDate) { recordDate = _recordDate; }
+	public void setRequestId(String _requestId) { requestId = _requestId; }
 }

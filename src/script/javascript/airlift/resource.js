@@ -10,8 +10,9 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 	context.resourceMetadata = context.resourceMetadata || require('meta/r/' + _resourceName).create();
 	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create().attributes;
 	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
-	context.WEB_CONTEXT = context.WEB_CONTEXT || _function.WEB_CONTEXT || web;
-
+	context.web = web.init(context.WEB_CONTEXT || _function.WEB_CONTEXT || this.WEB_CONTEXT);
+	context.log = web.log;
+	
 	var reporter = util.createErrorReporter();
 	
 	context.report = reporter.report;
@@ -24,18 +25,7 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 	{
 		var name = context.attributes[i];
 
-		try
-		{
-			_function.call(context, _resource[name], name, _resource);
-		}
-		catch(e)
-		{
-			e.javaException && this.LOG.info(e.javaException.getMessage());
-			var category = e.category || _function.name || 'resource';
-			var message = e.message || e.javaException && e.javaException.getMessage();
-			this.LOG.severe('Exception: ' + context.resourceName + ':' + name + ':' + message + ':' + category);
-			context.report(name, message, category);
-		}
+		_function.call(context, _resource[name], name, _resource);
 	}
 };
 
@@ -111,18 +101,18 @@ exports.watch = function watch()
 	{
 		var item = args[i];
 
-		if (typeof item !== 'function')
+		if (typeof item === 'string' || Array.isArray(item) === true)
 		{
 			watch = watch || {};
 
 			if (Array.isArray(item) === true)
 			{
-				for (var j = 0, jLength = item.length; i < jLength; i++)
+				for (var j = 0, jLength = item.length; j < jLength; j++)
 				{
 					watch[item[j]] = 1;
 				}
 			}
-			else if (typeof item === 'string')
+			else
 			{
 				watch[item] = 1;
 			}

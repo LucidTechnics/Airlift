@@ -145,6 +145,9 @@ public class Require extends BaseFunction
 			}
 
 			ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
+			
+			Object log = Context.javaToJS(java.util.logging.Logger.getLogger(id), scope);
+			ScriptableObject.putConstProperty(exportedModuleInterface, "LOG", log);
 		}
 
 		return exportedModuleInterface;

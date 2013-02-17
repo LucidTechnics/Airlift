@@ -142,20 +142,41 @@ exports['test compose'] = function(_assert)
 exports['test watch'] = function(_assert)
 {
 	var executionTest = [], attributes = {};
-	
-	var watch = res.watch('birthDate', 'age', function(_value, _attributeName, _resource)
+
+	var watchFunction = function(_value, _attributeName, _resource)
 	{
 		executionTest.push(1);
 
 		attributes[_attributeName] = (attributes[_attributeName] && attributes[_attributeName] + 1)||1;
 
 		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
-	});
-
+	};
+	
+	var watch = res.watch('birthDate', 'age', watchFunction);
 	res.each('person', bediako, watch, context);
-
 	var result = {age: 1};
 	
+	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
+	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once.');
+
+	executionTest = [];
+	attributes = {};
+	result = {id: 1};
+
+	watch = res.watch(watchFunction);
+	res.each('person', bediako, watch, context);
+	
+	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
+	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once.');
+
+	executionTest = [];
+	attributes = {};
+	result = {age: 1};
+	
+	watch = res.watch(['birthDate', 'age'], watchFunction);
+	res.each('person', bediako, watch, context);
+	var result = {age: 1};
+
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
 	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once.');
 };

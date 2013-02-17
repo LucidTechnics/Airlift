@@ -74,7 +74,6 @@ public class SimpleHandlerContext
 		try
 		{
 			log.info("Starting binding");
-			scriptingUtil.bind("LOG", log);
 			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
 			scriptingUtil.bind("SERVLET", _httpServlet);
 			scriptingUtil.bind("RESPONSE", _httpServletResponse);
