@@ -7,7 +7,7 @@ var formatUtil = Packages.airlift.util.FormatUtil;
 
 var validationError = function(_name, _message)
 {
-	return {name: _name, message: _message, validation: "validation"};
+	return {name: _name, message: _message, category: "validation"};
 };
 
 var isRequired = function(_errors, _metadata, _name, _value)
@@ -35,7 +35,7 @@ var hasFormat = function(_errors, _metadata, _name, _value)
 
 	if (format.test(_value) === false)
 	{
-		_errors.push(validationError(_name, "This value is not in the specified format.");
+		_errors.push(validationError(_name, "This value is not in the specified format."));
 	}
 
 	return _errors;
@@ -43,9 +43,9 @@ var hasFormat = function(_errors, _metadata, _name, _value)
 
 var maxLength = function(_errors, _metadata, _name, _value)
 {
-	if (_value.length > metadata.maxLength)
+	if (_value.length > _metadata.maxLength)
 	{
-		_errors.push(validationError(name, "This value has too many characters."));
+		_errors.push(validationError(_name, "This value has too many characters."));
 	}
 
 	return _errors;
@@ -53,9 +53,9 @@ var maxLength = function(_errors, _metadata, _name, _value)
 
 var minLength = function(_errors, _metadata, _name, _value)
 {
-	if (_value.length < metadata.minLength)
+	if (_value.length < _metadata.minLength)
 	{
-		_errors.push(validationError(name, "This value has too few characters."));
+		_errors.push(validationError(_name, "This value has too few characters."));
 	}
 
 	return _errors;
@@ -63,9 +63,9 @@ var minLength = function(_errors, _metadata, _name, _value)
 
 var maxValue = function(_errors, _metadata, _name, _value)
 {
-	if (util.hasValue(metadata.maxValue) && (_value < metadata.maxValue))
+	if (util.hasValue(_metadata.maxValue) && (_value > _metadata.maxValue))
 	{
-		_errors.push(validationError(name, "This value is bigger than the allowed maximum."));
+		_errors.push(validationError(_name, "This value is bigger than the allowed maximum."));
 	}
 
 	return _errors;
@@ -73,9 +73,9 @@ var maxValue = function(_errors, _metadata, _name, _value)
 
 var minValue = function(_errors, _metadata, _name, _value)
 {
-	if (util.hasValue(metadata.minValue) && (_value < metadata.minValue))
+	if (util.hasValue(_metadata.minValue) && (_value < _metadata.minValue))
 	{
-		_errors.push(validationError(name, "This value is smaller than the allowed minimum."));
+		_errors.push(validationError(_name, "This value is smaller than the allowed minimum."));
 	}
 
 	return _errors;
@@ -90,8 +90,8 @@ var validateString = function(_value, _name, _metadata)
 	{
 		value = _value + '';
 	}
-
-	if (_metadata.required === true)
+	
+	if (_metadata.nullable === false)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -117,7 +117,7 @@ var validateString = function(_value, _name, _metadata)
 			errors = (_metadata.minValue && minValue(errors, _metadata, _name, value)) || errors;
 		}
 	}
-
+	
 	return errors;
 };
 
@@ -126,7 +126,7 @@ var validateDate = function(_value, _name, _metadata)
 	var errors = [];
 	var value = _value;
 
-	if (_metadata.required === true)
+	if (_metadata.nullable === false)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -140,7 +140,7 @@ var validateNumber = function(_value, _name, _metadata)
 	var errors = [];
 	var value = _value;
 
-	if (_metadata.required === true)
+	if (_metadata.nullable === true)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -173,7 +173,7 @@ var validateBoolean = function(_value, _name, _metadata)
 		value = _value + '';
 	}
 
-	if (_metadata.required === true)
+	if (_metadata.nullable === true)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -187,7 +187,7 @@ var validateCollection = function(_value, _name, _metadata)
 	var errors = [];
 	var collection = _value;
 
-	if (_metadata.required === true)
+	if (_metadata.nullable === true)
 	{
 		var message = isRequired(errors, _metadata, _name, collection);
 		message && errors.push(validationError(_name, message));
@@ -204,12 +204,12 @@ var validateCollection = function(_value, _name, _metadata)
 				errors = allowedValue(errors, _metadata, _name, item);
 			}
 
-			if (+metadata.hasFormat)
+			if (_metadata.hasFormat)
 			{
 				errors = hasFormat(errors, _metadata, _name, item);
 			}
 
-			if (value)
+			if (item)
 			{
 				errors = maxLength(errors, _metadata, _name, item);
 				errors = minLength(errors, _metadata, _name, item);
@@ -302,6 +302,10 @@ function Primitive()
 	this["java.util.HashSet"] = this["java.util.List"];
 	this["java.util.Set"] = this["java.util.List"];
 	this["java.util.ArrayList"] = this["java.util.List"];
+	this["java.util.List<java.lang.String>"] = this["java.util.List"];
+	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+	this["java.util.HashSet<java.lang.String>"] = this["java.util.List"];
+	this["java.util.Set<java.lang.String>"] = this["java.util.List"];
 	
 	this["java.lang.Integer"] = function(_value) { return (_value && _value.intValue()) || null; };
 	this["java.lang.Boolean"] = function(_value) { return (_value && _value.booleanValue()) || null; };
@@ -332,6 +336,10 @@ function Converter()
     this["java.util.HashSet"] = this["java.util.Set"];
 	this["java.util.List"] = function(_parameterValue) { var collection = new Packages.java.util.ArrayList(); return convertToMultiValue(_parameterValue, collection); }
 	this["java.util.ArrayList"] = this["java.util.List"];
+	this["java.util.List<java.lang.String>"] = this["java.util.List"];
+	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+	this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
+	this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
 };
 
 var converter = new Converter();
@@ -375,14 +383,14 @@ exports.convert = function convert(_value, _attributeName, _resource)
 		value = value || restContext.getParameter(_attributeName.replace('id$', '.id'));
 	}
 
-	return value;
+	_resource[_attributeName] = value;
 };
 
-function Validator
+function Validator()
 {
-	this["java.lang.String"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { _reportErrors(validateString(_value, _attributeName, _attributesMetadata); };
-	this["java.lang.Boolean"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { _reportErrors(validateBoolean(_value, _attributeName, _attributesMetadata); };
-	this["java.lang.Integer"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { _reportErrors(validateNumber(_value, _attributeName, _attributesMetadata); };
+	this["java.lang.String"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateString(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
+	this["java.lang.Boolean"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateBoolean(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
+	this["java.lang.Integer"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateNumber(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
 	
 	this["java.lang.Double"] = this["java.lang.Integer"];
 	this["java.lang.Long"] = this["java.lang.Integer"];
@@ -392,30 +400,31 @@ function Validator
 	this["java.lang.Character"] = function() { throw new Error("Airlift currently does not support java.lang.Character. Try using String instead or file a feature request."); };
 	this["java.lang.Byte"] = function() { throw new Error("Airlift currently does not support java.lang.Byte. Try using String instead or file a feature request."); };
 
-	this.["java.util.Date"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { _reportErrors(validateDate(_value, _attributeName, _attributesMetadata); };
+	this["java.util.Date"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateDate(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
 	
-	this["java.lang.List"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { _reportErrors(validateCollection(_value, _attributeName, _attributesMetadata); };
-	this["java.lang.Set"] = 	this["java.lang.List"];
-	this["java.lang.ArrayList"] = 	this["java.lang.List"];
-	this["java.lang.HashSet"] = 	this["java.lang.List"];
+	this["java.util.List"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateCollection(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
+	this["java.util.Set"] = this["java.lang.List"];
+	this["java.util.ArrayList"] = this["java.lang.List"];
+	this["java.util.HashSet"] = this["java.lang.List"];
+
+	this["java.util.List<java.lang.String>"] = this["java.util.List"];
+	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+	this["java.util.HashSet<java.lang.String>"] = this["java.util.List"];
+	this["java.util.Set<java.lang.String>"] = this["java.util.List"];
 }
 
 var validator = new Validator();
 
-exports.validate = function validate(_value, _attributeName, _resource)
+exports.validate = function validate(_value, _name, _resource, _metadata)
 {
-	var resourceName = this.resourceName;
-	var attributesMetadata = require('meta/a/' + resourceName).create().attributes;
-	var type = attributesMetadata[_attributeName].type;
-
-	if (util.hasValue(validator[type]) === true)
+	var type = _metadata.type;
+	
+	if (!!validator[type] === true)
 	{
-		validator[type](_value, _attributeName, attributesMetadata, this.reportErrors);
+		validator[type](_value, _name, _metadata, this.report);
 	}
 	else
 	{
-		throw new Error('no validator found for type: ' + type);
+		throw 'no validator found for type: ' + type;
 	}
-
-	return _value;
 };

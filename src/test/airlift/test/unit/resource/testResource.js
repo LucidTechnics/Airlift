@@ -5,11 +5,16 @@ var web = require('./mockWeb').create(),
 context = require('./mockContext').person(),
 bediako = require('./mockPerson').create("6524d6f79d19", "Bediako George", 'middle aged', '01/01/1970', 43);
 
-var assertContextIsOK = function(_assert, _resourceName, _value, _attributeName, _resource, _context)
+context.WEB_CONTEXT = require('./mockWebContext').create({productionMode: false});
+
+var assertContextIsOK = function(_assert, _resourceName, _value, _attributeName, _resource, _metadata, _context)
 {
 	_assert.eq(bediako, _resource, 'resource is not the resource provided to each');
 	_assert.eq(bediako[_attributeName], _value, 'value for: ' + _attributeName + ' is not correct');
 	_assert.eq(bediako[_attributeName], _resource[_attributeName], 'resource attribute value for: ' + _attributeName + ' is not correct');
+
+	_assert.eq(true, util.hasValue(_metadata), 'resource attribute metadata for: ' + _attributeName + ' is not present');
+	_assert.eq(true, util.hasValue(_metadata.type), 'resource attribute metadata type for: ' + _attributeName + ' is not present');
 
 	_assert.eq(true, util.hasValue(_context.report) && util.typeOf(_context.report) === 'function', 'this should have a report function');
 	_assert.eq(true, util.hasValue(_context.allErrors) && util.typeOf(_context.allErrors) === 'function', 'this should have a allErrors function');
@@ -26,11 +31,10 @@ exports['test each'] = function(_assert)
 {
 	var attributes = [];
 	
-	res.each('person', bediako, function(_value, _attributeName, _resource)
+	res.each('person', bediako, function(_value, _attributeName, _resource, _metadata)
 	{
 		attributes.push(_attributeName);
-
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 		
 	}, context);
 
@@ -42,11 +46,11 @@ exports['test map'] = function(_assert)
 	var attributes = [];
 
 	//create a person resource using map ...
-	var person = res.map('person', bediako, function(_value, _attributeName, _resource)
+	var person = res.map('person', bediako, function(_value, _attributeName, _resource, _metadata)
 	{
 		attributes.push(_attributeName);
 
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
 		return _value;
 
@@ -69,11 +73,11 @@ exports['test reduce'] = function(_assert)
 {
 	var attributes = [];
 	
-	var reducedResult = res.reduce('person:', 'person', bediako, function(_base, _value, _attributeName, _resource)
+	var reducedResult = res.reduce('person:', 'person', bediako, function(_base, _value, _attributeName, _resource, _metadata)
 	{
 		attributes.push(_attributeName);
 
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
 		var formattedValue = Packages.airlift.util.FormatUtil.format(_value||"");
 		return _base + ':' + _attributeName + '=' + formattedValue;		
@@ -100,11 +104,11 @@ exports['test sequence'] = function(_assert)
 
 	var attributes = [];
 	
-	res.each('person', bediako, res.sequence(function(_value, _attributeName, _resource)
+	res.each('person', bediako, res.sequence(function(_value, _attributeName, _resource, _metadata)
 	{
 		attributes.push(_attributeName);
 
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
 	}), context);
 
@@ -128,11 +132,11 @@ exports['test compose'] = function(_assert)
 
 	var attributes = [];
 
-	res.each('person', bediako, res.compose(function(_value, _attributeName, _resource)
+	res.each('person', bediako, res.compose(function(_value, _attributeName, _resource, _metadata)
 	{
 		attributes.push(_attributeName);
 
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
 	}), context);
 
@@ -143,13 +147,13 @@ exports['test watch'] = function(_assert)
 {
 	var executionTest = [], attributes = {};
 
-	var watchFunction = function(_value, _attributeName, _resource)
+	var watchFunction = function(_value, _attributeName, _resource, _metadata)
 	{
 		executionTest.push(1);
 
 		attributes[_attributeName] = (attributes[_attributeName] && attributes[_attributeName] + 1)||1;
 
-		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, this);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 	};
 	
 	var watch = res.watch('birthDate', 'age', watchFunction);
@@ -158,6 +162,16 @@ exports['test watch'] = function(_assert)
 	
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
 	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once.');
+
+	executionTest = [];
+	attributes = {};
+	result = {age: 1};
+	
+	var watch = res.watch('birthDate', watchFunction, 'age');
+	res.each('person', bediako, watch, context);
+
+	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution when order is unorthodox');
+	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once when order is unorthodox.');
 
 	executionTest = [];
 	attributes = {};

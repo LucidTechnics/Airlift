@@ -109,6 +109,8 @@ exports.forEach = function(_collection, _function, _this)
 	}
 };
 
+exports.each = exports.forEach;
+
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>

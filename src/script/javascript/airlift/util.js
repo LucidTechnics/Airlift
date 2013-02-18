@@ -1,6 +1,6 @@
 var web = require('./web');
 
-exports.typeOf = function(value)
+exports.typeOf = function typeOf(value)
 {
 	var s = typeof value;
 
@@ -24,7 +24,7 @@ exports.typeOf = function(value)
 	return s;
 };
 
-exports.isEmpty = function(o)
+exports.isEmpty = function isEmpty(o)
 {
 	var i, v, isEmpty = true;
 
@@ -48,17 +48,17 @@ exports.isEmpty = function(o)
 	return isEmpty;
 };
 
-exports.createClass = function(_className)
+exports.createClass = function createClass(_className)
 {
 	return Packages.java.lang.Class.forName(_className);
 };
 
-exports.isWhitespace = function(_string)
+exports.isWhitespace = function isWhitespace(_string)
 {
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 };
 
-exports.hasValue = function(_value)
+exports.hasValue = function hasValue(_value)
 {
 	return (_value !== null && _value !== undefined);
 };
@@ -110,7 +110,7 @@ exports.createErrorReporter = function()
 	return new ErrorReporter();
 }
 
-exports.multiTry = function(_executable, _tryCount, _message, _completeFailure)
+exports.multiTry = function multiTry(_executable, _tryCount, _message, _completeFailure)
 {
 	var result, success = false;
 
@@ -138,7 +138,7 @@ exports.multiTry = function(_executable, _tryCount, _message, _completeFailure)
 	return result;
 };
 
-exports.createDate = function(_milliseconds)
+exports.createDate = function createDate(_milliseconds)
 {
 	var date;
 	
@@ -154,7 +154,7 @@ exports.createDate = function(_milliseconds)
 	return date; 
 };
 
-exports.createCalendar = function(_config)
+exports.createCalendar = function createCalendar(_config)
 {
 	var date = (_config && _config.date) ? _config.date : null;
 	var dateOffset = (_config && _config.dateOffset) ? _config.dateOffset : 0;
@@ -178,7 +178,7 @@ exports.createCalendar = function(_config)
 	return calendar;
 };
 
-exports.guid = function(_length)
+exports.guid = function guid(_length)
 {
 	if (_length) { var id = Packages.airlift.util.IdGenerator.generate(_length); }
 	else { var id = Packages.airlift.util.IdGenerator.generate(); }
@@ -186,7 +186,7 @@ exports.guid = function(_length)
 	return id; 
 };
 
-exports.trim = function(_string)
+exports.trim = function trim(_string)
 {
 	var trimmed = _string;
 
@@ -203,7 +203,7 @@ exports.trim = function(_string)
 	return trimmed;
 };
 
-exports.print = function()
+exports.print = function print()
 {
 	var args = Array.prototype.slice.call(arguments, 0);
 
@@ -211,16 +211,16 @@ exports.print = function()
 	{
 		if (i === 0)
 		{
-			Packages.java.lang.System.out.print(args[i]);
+			Packages.java.lang.System.out.print(args[i]||'');
 		}
 		else
 		{
-			Packages.java.lang.System.out.print(' ' + args[i]);
+			Packages.java.lang.System.out.print(' ' + args[i]||'');
 		}
 	}
 };
 
-exports.println = function()
+exports.println = function println()
 {
 	var args = Array.prototype.slice.call(arguments, 0);
 
@@ -228,4 +228,19 @@ exports.println = function()
 	
 	Packages.java.lang.System.out.println('');
 };
-					
+
+exports.value = function value(_candidate, _default)
+{
+	var candidate;
+
+	if (this.hasValue(_candidate) === true)
+	{
+		candidate = _candidate;
+	}
+	else
+	{
+		candidate = _default;
+	}
+
+	return candidate;
+};

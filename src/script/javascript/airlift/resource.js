@@ -8,7 +8,8 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 
 	context.resourceName = context.resourceName || _resourceName;
 	context.resourceMetadata = context.resourceMetadata || require('meta/r/' + _resourceName).create();
-	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create().attributes;
+	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create();
+	context.foreignKeys = context.attributesMetadata.foreignKeys;
 	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
 	context.web = web.init(context.WEB_CONTEXT || _function.WEB_CONTEXT || this.WEB_CONTEXT);
 	context.log = web.log;
@@ -23,9 +24,8 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 	
 	for (var i = 0; i < length; i++)
 	{
-		var name = context.attributes[i];
-
-		_function.call(context, _resource[name], name, _resource);
+		var name = context.attributes[i];		
+		_function.call(context, _resource[name], name, _resource, context.attributesMetadata.attributes[name]);
 	}
 };
 
@@ -33,9 +33,9 @@ exports.map = function map(_resourceName, _resource, _function, _context)
 {
 	var result = {};
 
-	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
+	this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
 	{
-		result[_attributeName] = _function.call(this, _value, _attributeName, _resource);
+		result[_attributeName] = _function.call(this, _value, _attributeName, _resource, _metadata);
 	}, _context);
 
 	return result;
@@ -43,9 +43,9 @@ exports.map = function map(_resourceName, _resource, _function, _context)
 
 exports.reduce = function reduce(_base, _resourceName, _resource, _function, _context)
 {
-	this.each(_resourceName, _resource, function(_value, _attributeName, _resource)
+	this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
 	{
-		_base = _function.call(this, _base, _value, _attributeName, _resource);
+		_base = _function.call(this, _base, _value, _attributeName, _resource, _metadata);
 	}, _context);
 
 	return _base;
@@ -58,11 +58,12 @@ exports.sequence = function sequence()
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 	
-	return function(_value, _attributeName, _resource)
+	return function(_value, _attributeName, _resource, _metadata)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			functions[i].call(this, _value, _attributeName, _resource);
+			var value = _resource && _attributeName && _resource[_attributeName]||null;
+			functions[i].call(this, value, _attributeName, _resource, _metadata);
 		}
 	};
 };
@@ -76,21 +77,22 @@ exports.compose = function compose()
 
 	functions = functions.reverse();
 
-	return function(_value, _attributeName, _resource)
+	return function(_value, _attributeName, _resource, _metadata)
 	{
 		for (var i = 0; i < length; i++)
 		{
-			functions[i].call(this, _value, _attributeName, _resource);
+			var value = _resource && _attributeName && _resource[_attributeName]||null;
+			functions[i].call(this, value, _attributeName, _resource, _metadata);
 		}
 	};
 };
 
 exports.toString = function toString(_resourceName, _resource, _context)
 {
-	return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName).append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
+	return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 	{
 		return _base.append(_name).append(": ").append(_value||"").append("\n");
-	}, context).toString();
+	}, _context).toString();
 };
 
 exports.watch = function watch()
@@ -123,7 +125,7 @@ exports.watch = function watch()
 		}
 	}
 
-	return function(_value, _attributeName, _resource)
+	return function(_value, _attributeName, _resource, _metadata)
 	{
 		var result;
 
@@ -144,7 +146,7 @@ exports.watch = function watch()
 
 			if (util.isEmpty(watch) === true)
 			{
-				result = executable.call(this, _value, _attributeName, _resource);
+				result = executable.call(this, _value, _attributeName, _resource, _metadata);
 				executed = true;
 			}
 		}
@@ -153,39 +155,53 @@ exports.watch = function watch()
 	}
 };
 
-var replacer = function replacer(key, value)
+var replacer = function replacer(_key, _value)
 {
-	var replacement = value;
+	var replacement = _value;
 
-	if (value instanceof java.util.Collection)
+	if (_value instanceof java.util.Collection)
 	{
 		var list = [];
 
-		for (var item in Iterator(value))
+		for (var item in Iterator(_value))
 		{
 			list.push(item);
 		}
 
-		return list;
+		replacement = list;
 	}
-	else if (value instanceof java.util.Date)
+	else if (_value instanceof java.util.Date)
 	{
-		replacement = Date(value.getTime());
+		replacement = Date(_value.getTime());
 	}
-	else if (value instanceof java.lang.String)
+	else if (_value instanceof java.lang.String)
 	{
-		replacement = new String(value);
+		replacement = new String(_value);
 	}
-	else if (value instanceof java.lang.Number)
+	else if (_value.length && _value.getClass() &&
+			 _value.getClass().getComponentType() &&
+			 "java.lang.String".equals(_value.getClass().getComponentType().getName()) === true)
 	{
-		replacement = new Number(value);
+		var list = [];
+
+		for (var i = 0, length = _value.length; i < length; i++)
+		{
+			list.push(_value[i]);
+		}
+		
+		replacement = list;
 	}
-	else if (value instanceof java.lang.Boolean)
+	else if (_value instanceof java.lang.Number)
 	{
-		replacement = value.booleanValue();
+		replacement = new Number(_value);
 	}
-	else if (value instanceof java.lang.Character || value instanceof java.lang.Byte)
+	else if (_value instanceof java.lang.Boolean)
 	{
+		replacement = _value.booleanValue();
+	}
+	else if (_value instanceof java.lang.Character || _value instanceof java.lang.Byte)
+	{
+		//do not show a property with this type.
 		replacement = undefined;
 	}
 
@@ -194,7 +210,7 @@ var replacer = function replacer(key, value)
 
 exports.json = function json(_resource, _replacer)
 {
-	return JSON.stringify(object, _replacer || replacer);
+	return JSON.stringify(_resource, _replacer || replacer);
 };
 
 exports.audit = function audit(_config)

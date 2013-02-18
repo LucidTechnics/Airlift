@@ -21,7 +21,7 @@ exports.person = function(_id, _fullName, _status, _birthDate, _age)
 		this.attributes['shortName'] = require('airlift/AttributeMetadata').create({ name:"shortName", type:"java.lang.String", isIndexable:true, displayOrder:20, label:"short name" }); 
 		this.attributes['status'] = require('airlift/AttributeMetadata').create({ name:"status", type:"java.lang.String", displayOrder:30, label:"status", allowedValues:{ "senior": 1,"middle aged": 1,"youth": 1 } }); 
 		this.attributes['birthDate'] = require('airlift/AttributeMetadata').create({ name:"birthDate", type:"java.util.Date", isIndexable:true, displayOrder:40, label:"birth date" }); 
-		this.attributes['age'] = require('airlift/AttributeMetadata').create({ name:"age", type:"java.lang.Integer", isIndexable:true, displayOrder:50, label:"age" }); 
+		this.attributes['age'] = require('airlift/AttributeMetadata').create({ minValue: 18, maxValue: 110, name:"age", type:"java.lang.Integer", isIndexable:true, displayOrder:50, label:"age" }); 
 		this.attributes['friendList'] = require('airlift/AttributeMetadata').create({ name:"friendList", type:"java.util.List<java.lang.String>", isIndexable:true, displayOrder:60, label:"friend list" }); 
 		this.attributes['familySet'] = require('airlift/AttributeMetadata').create({ name:"familySet", type:"java.util.Set<java.lang.String>", isIndexable:true, displayOrder:70, label:"family set" }); 
 		this.attributes['auditPostDate'] = require('airlift/AttributeMetadata').create({ name:"auditPostDate", type:"java.util.Date", isSearchable:true, isIndexable:true, nullable:true, label:"record created date" }); 
@@ -32,7 +32,7 @@ exports.person = function(_id, _fullName, _status, _birthDate, _age)
 
 	context.attributesMetadata = new MetaData();
 	context.attributes = context.resourceMetadata.attributes;
-	context.WEB_CONTEXT = {}; //not needed for unit tests ...
+	context.WEB_CONTEXT;
 
 	return context;
 };
