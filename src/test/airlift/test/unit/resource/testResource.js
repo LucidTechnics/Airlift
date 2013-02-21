@@ -128,7 +128,7 @@ exports['test compose'] = function(_assert)
 
 	compose();
 
-	_assert.deepEqual([4,3,2,1], results, 'all functions did not appear to run in composition');
+	_assert.deepEqual([1, 2, 3, 4], results, 'all functions did not appear to run in composition');
 
 	var attributes = [];
 
@@ -141,6 +141,27 @@ exports['test compose'] = function(_assert)
 	}), context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
+
+	attributes = [];
+	results = [];
+	res.each('person', bediako, res.compose(function(_value, _attributeName, _resource, _metadata)
+	{
+		results.push(1);
+		_assert.eq(_value, _resource[_attributeName], 'first function execution is not correct');
+		attributes.push(_attributeName);
+
+		return 5;
+
+	},
+	function(_value, _attributeName, _resource, _metadata)
+	{
+		_assert.notEq(_value, _resource[_attributeName], 'subsequent function execution is not correct');
+		_assert.eq(results.length > 0, _value === 5, 'subsequent function value argument is not correct');
+		results = [];
+		
+	}), context);
+
+	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct after second compose test');
 };
 
 exports['test watch'] = function(_assert)

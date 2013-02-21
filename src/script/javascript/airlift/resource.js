@@ -58,13 +58,21 @@ exports.sequence = function sequence()
 	var length = functions && functions.length || 0;
 	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 	
-	return function(_value, _attributeName, _resource, _metadata)
+	return function()
 	{
+		var args, result;
+
 		for (var i = 0; i < length; i++)
 		{
-			var value = _resource && _attributeName && _resource[_attributeName]||null;
-			functions[i].call(this, value, _attributeName, _resource, _metadata);
+			if (i === 0)
+			{
+				args = Array.prototype.slice.call(arguments, 0);
+			}
+
+			result = functions[i].apply(this, args);
 		}
+
+		return result;
 	};
 };
 
@@ -73,17 +81,25 @@ exports.compose = function compose()
 	var functions = Array.prototype.slice.call(arguments, 0);
 
 	var length = functions && functions.length || 0;
-	if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
+	if (!functions || length < 1) { throw "please provide at least one function for compose to execute"; }
 
-	functions = functions.reverse();
-
-	return function(_value, _attributeName, _resource, _metadata)
+	var value;
+	
+	return function()
 	{
+		var args;
+		
 		for (var i = 0; i < length; i++)
 		{
-			var value = _resource && _attributeName && _resource[_attributeName]||null;
-			functions[i].call(this, value, _attributeName, _resource, _metadata);
+			if (i === 0)
+			{
+				args = Array.prototype.slice.call(arguments, 0);
+			}
+ 
+			args[0] = functions[i].apply(this, args);
 		}
+
+		return args[0];
 	};
 };
 
