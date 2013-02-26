@@ -108,3 +108,44 @@ exports['test string trim'] = function(_assert)
 {
 	_assert.eq("Bediako", util.trim(" Bediako "), 'util trim function is not working correctly');
 };
+
+exports['test primitive'] = function(_assert)
+{
+	var list = new Packages.java.util.ArrayList();
+	var set = new Packages.java.util.HashSet();
+	var integer = new Packages.java.lang.Integer(1);
+	var long = new Packages.java.lang.Long(1);
+	var double = new Packages.java.lang.Double(1);
+	var float = new Packages.java.lang.Float(1);
+	var short = new Packages.java.lang.Short(1);
+	var character = new Packages.java.lang.Character(Packages.java.lang.Character.MAX_VALUE);
+	var boolean = new Packages.java.lang.Boolean(true);
+	var string = new Packages.java.lang.String('hello');
+	var byte = new Packages.java.lang.Byte(Packages.java.lang.Byte.MAX_VALUE);
+	var jsString = new String('hello');
+	var jsNumber = 1;
+
+	_assert.eq(util.primitive(list), list, 'list has changed');
+	_assert.eq(util.primitive(set), set, 'set has changed');
+	_assert.eq(util.primitive(string), string, 'string has changed');
+	_assert.eq(util.primitive(jsString), jsString, 'jsString has changed');
+	_assert.eq(util.primitive(jsNumber), jsNumber, 'jsNumber has changed');
+
+	_assert.eq(util.primitive(integer), 1, 'integer is incorrect');
+	_assert.eq(util.primitive(long), 1, 'long is incorrect');
+	_assert.eq(util.primitive(double), 1, 'double is incorrect');
+	_assert.eq(util.primitive(float), 1, 'float is incorrect');
+	_assert.eq(util.primitive(short), 1, 'short is incorrect');
+	_assert.eq(util.primitive(character), Packages.java.lang.Character.MAX_VALUE, 'character is incorrect');
+	_assert.eq(util.primitive(boolean), true, 'boolean is incorrect');
+	_assert.eq(util.primitive(byte), Packages.java.lang.Byte.MAX_VALUE, 'byte is incorrect');
+	
+	_assert.eq(!!util.primitive(integer).intValue, false, 'integer is not a primitive');
+	_assert.eq(!!util.primitive(long).longValue, false, 'long is not a primitive');
+	_assert.eq(!!util.primitive(double).doubleValue, false, 'double is not a primitive');
+	_assert.eq(!!util.primitive(float).floatValue, false, 'float is not a primitive');
+	_assert.eq(!!util.primitive(short).shortValue, false, 'short is not a primitive');
+	_assert.eq(!!util.primitive(character).charValue, false, 'character is not a primitive');
+	_assert.eq(!!util.primitive(boolean).booleanValue, false, 'boolean is not a primitive');
+	_assert.eq(!!util.primitive(byte).byteValue, false, 'boolean is not a primitive');
+};

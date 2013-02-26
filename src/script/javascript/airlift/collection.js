@@ -290,6 +290,8 @@ exports.some = function(_collection, _function, _this)
 	return success;
 };
 
+exports.any = exports.some;
+
 /**
  * @author <a href="mailto:bediako.george@lucidtechnics.com">Bediako
  * George</a>
@@ -309,7 +311,7 @@ exports.some = function(_collection, _function, _this)
  * @example
  * var users = ["Bediako", "Dave", "Loki"];
  *
- * var [successList, failList] = require('collection').every(users, function(_item, _index, _collection)
+ * var [successList, failList] = require('collection').split(users, function(_item, _index, _collection)
  * {
  *	return (_item.length > 4);
  * });  //this returns [["Bediako"], ["Dave", "Loki"]].
@@ -452,7 +454,7 @@ exports.partition = function(_collection, _attribute)
 	return {keys: orderedKeys, partition: partitionMap};
 };
 
-exports.reduce = function(_collection, _function, _initialValue)
+exports.reduce = function(_collection, _function, _initialValue, _this)
 {
 	var result, iterator;
 	
@@ -488,7 +490,7 @@ exports.reduce = function(_collection, _function, _initialValue)
 		
 		while (iterator.hasNext() === true)
 		{
-			result = _function.call(undefined, result, iterator.next(), index, _collection);
+			result = _function.call(_this, result, iterator.next(), index, _collection);
 			index++;
 		}
 	}
@@ -498,26 +500,4 @@ exports.reduce = function(_collection, _function, _initialValue)
 	}
 	
 	return result;
-};
-
-exports.reduceRight = function(_collection, _function, _initialValue)
-{
-	var collection = _collection;
-
-	if (_collection && _collection.hasNext && _collection.next)
-	{
-		throw Error("Cannot right reduce an iterator");
-	}
-
-	if (collection.reverse)
-	{
-		collection = collection.reverse();
-	}
-	else if (collection.add && collection.get)
-	{
-		collection = new Packages.java.util.ArrayList(_collection);
-		Packages.java.util.Collections.reverse(collection);
-	}
-
-	return this.reduce(collection, _function, _initialValue);
 };

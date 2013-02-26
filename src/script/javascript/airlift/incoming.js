@@ -292,40 +292,16 @@ var convertToMultiValue = function(_parameterValue, _collection)
 		for (var i = 0, length = _parameterValue.length; i < length; i++) { _collection.add(convertToSingleValue(_parameterValue, "java.lang.String", i)) }
 	}
 };
-
-function Primitive()
-{
-	this["java.lang.String"] = function(_value) { return _value };
-	this["java.util.Date"] = function(_value) { return _value };
-
-	this["java.util.List"] = function(_value) { return _value };
-	this["java.util.HashSet"] = this["java.util.List"];
-	this["java.util.Set"] = this["java.util.List"];
-	this["java.util.ArrayList"] = this["java.util.List"];
-	this["java.util.List<java.lang.String>"] = this["java.util.List"];
-	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
-	this["java.util.HashSet<java.lang.String>"] = this["java.util.List"];
-	this["java.util.Set<java.lang.String>"] = this["java.util.List"];
-	
-	this["java.lang.Integer"] = function(_value) { return (_value && _value.intValue()) || null; };
-	this["java.lang.Boolean"] = function(_value) { return (_value && _value.booleanValue()) || null; };
-	this["java.lang.Long"] = function(_value) { return (_value && _value.longValue()) || null; };
-	this["java.lang.Short"] = function(_value) { return (_value && _value.shortValue()) || null; };
-	this["java.lang.Double"] = function(_value) { return (_value && _value.doubleValue()) || null; };
-	this["java.lang.Float"] = function(_value) { return (_value && _value.floatValue()) || null; };
-	this["java.lang.Character"] = function(_value) { return (_value && _value.byteValue()) || null; };
-	this["java.lang.Byte"] = function(_value) { return (_value && _value.charValue()) || null; };
-}
 	
 function Converter()
 {
 	this["java.lang.String"] = function(_parameterValue) { return convertToSingleValue(_parameterValue, "java.lang.String", 0); };
-	this["java.lang.Integer"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Integer", 0); return primitive["java.lang.Integer"](value) && value.intValue() || null; };
-	this["java.lang.Boolean"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Boolean", 0); return primitive["java.lang.Boolean"] };
-	this["java.lang.Long"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Long", 0); return primitive["java.lang.Long"] };
-	this["java.lang.Double"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Double", 0); return primitive["java.lang.Double"] };
-	this["java.lang.Float"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Float", 0); return primitive["java.lang.Float"] };
-	this["java.lang.Short"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Short", 0); return primitive["java.lang.Short"] };
+	this["java.lang.Integer"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Integer", 0); return util.primitive(value); };
+	this["java.lang.Boolean"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Boolean", 0); return util.primitive(value); };
+	this["java.lang.Long"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Long", 0); return util.primitive(value) };
+	this["java.lang.Double"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Double", 0); return util.primitive(value) };
+	this["java.lang.Float"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Float", 0); return util.primitive(value) };
+	this["java.lang.Short"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Short", 0); return util.primitive(value) };
 
 	this["java.util.Date"] = function(_parameterValue) { return convertToSingleValue(_parameterValue, "java.util.Date", 0); };
 

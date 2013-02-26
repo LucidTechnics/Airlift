@@ -112,7 +112,7 @@ exports.createErrorReporter = function()
 
 exports.multiTry = function multiTry(_executable, _tryCount, _message, _completeFailure)
 {
-	var result, success = false;
+	var result, success = false, log;
 
 	for (var i = 0; i < _tryCount && success === false; i++)
 	{
@@ -123,14 +123,25 @@ exports.multiTry = function multiTry(_executable, _tryCount, _message, _complete
 		}
 		catch(e)
 		{
-			var log = web.getLog();
-			log.warning(_message + " " + e.toString());
+			log = log || web.getLog();
+			
+			if (_message)
+			{
+				log.warning(_message + " " + e.toString());
+			}
 
 			if (i >= _tryCount)
 			{
-				_completeFailure && _completeFailure(_tries);
 				log.severe("After this many tries: " + _tryCount + " - " +  e.toString());
-				throw e;
+				
+				if (_completeFailure)
+				{
+					_completeFailure && _completeFailure(_tries, e);
+				}
+				else
+				{
+					throw e;
+				}
 			}
 		}
 	}
@@ -159,18 +170,18 @@ exports.createCalendar = function createCalendar(_config)
 	var date = (_config && _config.date) ? _config.date : null;
 	var dateOffset = (_config && _config.dateOffset) ? _config.dateOffset : 0;
 	var dateOffsetType = (_config && _config.dateOffsetType) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
-	var timeZone = (_config && _config.timeZone) ? _config.timeZone : web.getTimezone();
+	var timezone = (_config && _config.timezone) ? _config.timezone : web.getTimezone();
 	var locale = (_config && _config.locale) ? _config.locale : web.getLocale();
 
 	if (this.hasValue(date) === true)
 	{
-		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
+		var calendar = Packages.java.util.Calendar.getInstance(timezone, locale);
 		calendar.setTime(date);
-		calendar.setTimeZone(timeZone);
+		calendar.setTimeZone(timezone);
 	}
 	else
 	{
-		var calendar = Packages.java.util.Calendar.getInstance(timeZone, locale);
+		var calendar = Packages.java.util.Calendar.getInstance(timezone, locale);
 	}
 
 	calendar.add(dateOffsetType, dateOffset);
@@ -243,4 +254,43 @@ exports.value = function value(_candidate, _default)
 	}
 
 	return candidate;
+};
+
+function PrimitiveConverter()
+{
+	this["java.lang.String"] = function(_value) { return _value };
+	this["java.util.Date"] = function(_value) { return _value };
+
+	this["java.util.List"] = function(_value) { return _value };
+	this["java.util.HashSet"] = this["java.util.List"];
+	this["java.util.Set"] = this["java.util.List"];
+	this["java.util.ArrayList"] = this["java.util.List"];
+	this["java.util.List<java.lang.String>"] = this["java.util.List"];
+	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+	this["java.util.HashSet<java.lang.String>"] = this["java.util.List"];
+	this["java.util.Set<java.lang.String>"] = this["java.util.List"];
+
+	this["java.lang.Integer"] = function(_value) { return (_value && _value.intValue()) || null; };
+	this["java.lang.Boolean"] = function(_value) { return (_value && _value.booleanValue()) || null; };
+	this["java.lang.Long"] = function(_value) { return (_value && _value.longValue()) || null; };
+	this["java.lang.Short"] = function(_value) { return (_value && _value.shortValue()) || null; };
+	this["java.lang.Double"] = function(_value) { return (_value && _value.doubleValue()) || null; };
+	this["java.lang.Float"] = function(_value) { return (_value && _value.floatValue()) || null; };
+	this["java.lang.Character"] = function(_value) { return (_value && _value.charValue()) || null; };
+	this["java.lang.Byte"] = function(_value) { return (_value && _value.byteValue()) || null; };
+}
+
+exports.primitive = function(_value)
+{
+	var primitive = _value;
+
+	if (_value && _value.getClass)
+	{
+		var type = _value.getClass().getName();		
+		var converter = new PrimitiveConverter();
+
+		if (converter[type]) { primitive = converter[type](_value); }
+	}
+
+	return primitive;
 };

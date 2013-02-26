@@ -463,17 +463,3 @@ exports['test reduce'] = function(_assert)
 
 	_assert.eq(10, collection.reduce(set, function(_result, _item, _index, _collection) { return _result + _item.intValue(); }, 0), 'SET: reduced result addition result not correct');
 };
-
-exports['test reduce right'] = function(_assert)
-{
-	_assert.eq('hello20true1', collection.reduceRight(array, function(_result, _item, _index, _collection) { return _result + '' + _item; }, ''), 'ARRAY: reduced result concatenation not correct');
-	_assert.eq('hello20.0true1.0', collection.reduceRight(list, function(_result, _item, _index, _collection) { return _result + '' + _item; }, ''), 'LIST: reduced result concatenation not correct');
-
-	var set = new java.util.HashSet();
-	set.add(1);
-	set.add(2);
-	set.add(3);
-	set.add(4);
-
-	_assert.eq(10, collection.reduceRight(set, function(_result, _item, _index, _collection) { return _result + _item.intValue(); }, 0), 'SET: reduced result addition result not correct');
-};
