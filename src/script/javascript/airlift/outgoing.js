@@ -1,46 +1,12 @@
 var javaArray = require('./javaArray');
+var util = require('./util');
 
-exports.deentify =  = function(_entity, _error, _value, _attributeName)
-
-	var value = _entity.getProperty();
-	var type = this.attributesMetaData.type;
-
-	if (value)
-	{
-		switch(type)
-		{
-			case "java.lang.String":
-				if (value && "com.google.appengine.api.datastore.Text".equalsIgnoreCase(value.class.getName()) === true) { value = value.toString(); }
-				break;
-			case "java.lang.Integer":
-				value = value.intValue();
-				break;
-			case "java.lang.Boolean":
-				value = value.booleanValue();
-				break;
-			case "java.lang.Long":
-				value = value.longValue();
-				break;
-			case "java.lang.Double":
-				value = value.doubleValue();
-				break;
-			case "java.lang.Float":
-				value = value.floatValue();
-				break;
-			case "java.lang.Short":
-				value = value.shortValue();
-				break;
-			case "java.lang.Byte":
-			case "java.lang.Character":				
-				throw new Error("Airlift currently does not support java.lang.Byte or java.lang.Character objects. Try using String instead or file a feature request.");
-				break;
-		}
-	}
-
-	return value;
+exports.deentify =  = function(_entity, _value, _attributeName)
+{
+	return util.primitive(_entity.getProperty());
 };
 
-exports.decrypt = function(_entity, _error, _value, _attributeName)
+exports.decrypt = function(_entity, _value, _attributeName)
 {
 	if (util.isEmpty(_error) === true && this.attributeMetadata.encrypted === true)
 	{
