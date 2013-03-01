@@ -1,4 +1,4 @@
-var util = require('./util');
+var util = require('../util');
 
 var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 var datastore = factory.getAsyncDatastoreService();
@@ -48,10 +48,10 @@ exports.collect = function(_resourceName, _config)
 	var config = _config||{};
 	var offset = config.offset||0;
 	var limit = config.limit||20;
-	var asc = (util.isDefined(config.asc) === true) ? config.asc : true;
+	var asc = (util.hasValue(config.asc) === true) ? config.asc : true;
 	var orderBy = config.orderBy||"auditPutDate";
 	var filterList = config.filterList||[];
-	var keysOnly = (util.isDefined(config.keysOnly) === true) ? config.keysOnly : false;
+	var keysOnly = (util.hasValue(config.keysOnly) === true) ? config.keysOnly : false;
 
 	var Query = Packages.com.google.appengine.api.datastore.Query;
 	var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
@@ -61,7 +61,7 @@ exports.collect = function(_resourceName, _config)
 	var FilterPredicate = com.google.appengine.api.datastore.Query.FilterPredicate;
 	var FilterOperator = com.google.appengine.api.datastore.Query.FilterOperator;
 
-	var filter = new Package.java.util.ArrayList();
+	var filter = new Packages.java.util.ArrayList();
 
 	filterList.forEach(function(_filter)
 	{
@@ -69,11 +69,18 @@ exports.collect = function(_resourceName, _config)
 		var n = _filter.name || _filter.n;
 		var v = _filter.value || filter.v;
 		filter.add(new FilterPredicate(n, FilterOperator[o.toUpperCase()], v));
-	})
+	});
 
-	query.setFilter(filter);
+	if (filterList.length > 1)
+	{
+		query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filter));
+	}
+	else if (filterList.length === 1 )
+	{
+		query.setFilter(filterList.get(0));
+	}
 
-	var entities = this.datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
+	var entities = datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 
 	var iterator = { hasNext: function() { return entities.hasNext(); }, next: function() { return entities.next().getKey(); }, remove: function() { entities.remove(); }};
 	

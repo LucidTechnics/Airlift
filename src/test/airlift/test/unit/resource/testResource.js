@@ -115,6 +115,43 @@ exports['test sequence'] = function(_assert)
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
 };
 
+exports['test json'] = function(_assert)
+{
+	var result = res.json([]);
+	_assert.eq('[]', result, 'JavaScript empty array serialization failed');
+
+	result = res.json(['bediako']);
+	_assert.eq('["bediako"]', result, 'JavaScript array serialization failed');
+
+	result = res.json({});
+	_assert.eq('{}', result, 'JavaScript empty object serialization failed');
+
+	result = res.json({name: "bediako"});
+	_assert.eq('{"name":"bediako"}', result, 'JavaScript object serialization failed');
+
+	result = res.json({name: new Packages.java.lang.String("bediako")});
+	_assert.eq('{"name":"bediako"}', result, 'JavaScript object with Java String serialization failed');
+
+	result = res.json({number: new Packages.java.lang.Integer(1)});
+	_assert.eq('{"number":1}', result, 'JavaScript object with Java Integer serialization failed');
+
+	result = res.json({time: new Date(5)});
+	_assert.eq('{"time":"1970-01-01T00:00:00.005Z"}', result, 'JavaScript object with JavaScript Date serialization failed');
+
+	result = res.json({time: new Packages.java.util.Date(5)});
+	_assert.eq('{"time":"1970-01-01T00:00:00.005Z"}', result, 'JavaScript object with java.util.Date serialization failed');
+
+	var list = new Packages.java.util.ArrayList();
+	list.add("bediako");
+	result = res.json(list);
+	_assert.eq('["bediako"]', result, 'Java ArrayList serialization failed');
+
+	var set = new Packages.java.util.HashSet();
+	set.add("bediako");
+	result = res.json(set);
+	_assert.eq('["bediako"]', result, 'Java HashSet serialization failed');
+};
+
 exports['test compose'] = function(_assert)
 {
 	var results = [];
@@ -151,7 +188,6 @@ exports['test compose'] = function(_assert)
 		attributes.push(_attributeName);
 
 		return 5;
-
 	},
 	function(_value, _attributeName, _resource, _metadata)
 	{

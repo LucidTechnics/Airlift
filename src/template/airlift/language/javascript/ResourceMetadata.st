@@ -1,8 +1,13 @@
 exports.create = function()
 {
-	var metaData = require('airlift/ResourceMetadata').create($config$);
-	metaData.name = '$resourceName$';
-	metaData.attributes = ['$propertyName; separator="', '"$'];
+	var metadata = require('airlift/ResourceMetadata').create($config$);
 
-	return metaData;
+	metadata.name = '$resourceName$';
+	metadata.attributes = ['$propertyName; separator="', '"$'];
+    metadata.foreignKeys = {$foreignKeyName: {f |"$f$": 1}; separator=","$};
+    metadata.indexedProperties = {$indexedProperty: {ip |"$ip$": 1}; separator=","$};
+    metadata.searchProperties = {$searchProperty: {sp |"$sp$": 1}; separator=","$};
+    metadata.encryptedProperties = {$encryptedProperty: {ep |"$ep$": 1}; separator=","$};
+
+	return metadata;
 }

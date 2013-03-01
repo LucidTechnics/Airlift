@@ -140,7 +140,7 @@ var validateNumber = function(_value, _name, _metadata)
 	var errors = [];
 	var value = _value;
 
-	if (_metadata.nullable === true)
+	if (_metadata.nullable === false)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -170,10 +170,10 @@ var validateBoolean = function(_value, _name, _metadata)
 
 	if (_value !== undefined && _value !== null)
 	{
-		value = _value + '';
+		value = _value;
 	}
 
-	if (_metadata.nullable === true)
+	if (_metadata.nullable === false)
 	{
 		var message = isRequired(errors, _metadata, _name, value);
 		message && errors.push(validationError(_name, message));
@@ -187,13 +187,13 @@ var validateCollection = function(_value, _name, _metadata)
 	var errors = [];
 	var collection = _value;
 
-	if (_metadata.nullable === true)
+	if (_metadata.nullable === false)
 	{
 		var message = isRequired(errors, _metadata, _name, collection);
 		message && errors.push(validationError(_name, message));
 	}
 
-	if (errors.length === 0)
+	if (collection && errors.length === 0)
 	{
 		for (var item in Iterator(collection))
 		{
@@ -237,6 +237,7 @@ exports.bookkeeping = function bookkeeping(_entity, _userId, _postDate, _putDate
 	var userId = _userId||web.getUserId()||'user id not provided';
 
 	_entity.setProperty("auditUserId", userId);
+	_entity.setProperty("auditRequestId", web.getRequestId());
 	_entity.setProperty("auditPostDate", _postDate||util.createDate());
 	_entity.setProperty("auditPutDate", _putDate||postDate);
 };
@@ -281,7 +282,8 @@ exports.encrypt = function encrypt(_entity, _value, _attributeName)
 
 var convertToSingleValue = function(_parameterValue, _type, _index)
 {
-	var value = _parameterValue && (util.isWhitespace(_parameterValue) === false) && util.trim(_parameterValue[_index]) || null;
+	util.println('converting single value', _parameterValue && _parameterValue[_index], 'with type', _type);
+	var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
 	return formatUtil.format(convertUtil.convert(value, util.createClass(_type)));
 };
 
@@ -333,7 +335,9 @@ exports.convert = function convert(_value, _attributeName, _resource)
 
 		if (converter[type])
 		{
-			value = converter[type](request.getParameterValues(_attributeName));
+			util.println('converting', _attributeName, 'with type', type);
+			var parameterValue = request.getParameterValues(_attributeName);
+			value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
 		}
 		else
 		{
@@ -342,8 +346,16 @@ exports.convert = function convert(_value, _attributeName, _resource)
 	}
 	catch(e)
 	{
-		this.LOG.info(e.javaException.getMessage());
-		this.reportError(_attributeName, "This value is not correct.", "conversion");
+		if (e.javaException)
+		{
+			this.LOG && this.LOG.info(e.javaException.getMessage());
+		}
+		else
+		{
+			this.LOG && this.LOG.info(e.message);
+		}
+		
+		this.report(_attributeName, "This value is not correct.", "conversion");
 	}
 
 	if (util.isWhitespace(attributesMetadata[_attributeName].mapTo) === true)
@@ -360,6 +372,8 @@ exports.convert = function convert(_value, _attributeName, _resource)
 	}
 
 	_resource[_attributeName] = value;
+
+	return value;
 };
 
 function Validator()
@@ -403,4 +417,6 @@ exports.validate = function validate(_value, _name, _resource, _metadata)
 	{
 		throw 'no validator found for type: ' + type;
 	}
+
+	return _value;
 };

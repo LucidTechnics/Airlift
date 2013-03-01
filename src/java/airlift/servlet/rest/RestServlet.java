@@ -541,8 +541,6 @@ public class RestServlet
 			String errorString = airlift.util.AirliftUtil.serializeStackTrace(t);			
 			log.severe("Airlift prints this stack trace: " + errorString);
 			
-			airlift.util.PropertyUtil propertyUtil = airlift.util.PropertyUtil.getInstance();
-			propertyUtil.loadProperties("/airlift/airlift.properties", "airlift.cfg");
 			String reportJavaException = this.getServletConfig().getInitParameter("a.report.java.exception");
 
 			ContentContext contentContext = new SimpleContentContext();

@@ -10,9 +10,9 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 	context.resourceMetadata = context.resourceMetadata || require('meta/r/' + _resourceName).create();
 	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create();
 	context.foreignKeys = context.attributesMetadata.foreignKeys;
-	context.attributes = this.attributes || context.attributes || context.resourceMeta.attributes;
+	context.attributes = this.attributes || context.attributes || context.resourceMetadata.attributes;
 	context.web = web.init(context.WEB_CONTEXT || _function.WEB_CONTEXT || this.WEB_CONTEXT);
-	context.log = web.log;
+	context.LOG = this.LOG;
 	
 	var reporter = util.createErrorReporter();
 	
@@ -60,16 +60,26 @@ exports.sequence = function sequence()
 	
 	return function()
 	{
-		var args, result;
+		var args = (arguments.length && Array.prototype.slice.call(arguments, 0)) || [];
+		var result;
 
 		for (var i = 0; i < length; i++)
 		{
-			if (i === 0)
+			if (this.resourceName)
 			{
-				args = Array.prototype.slice.call(arguments, 0);
+				if (args.length === 5) //this is reduce
+				{
+					result = functions[i].call(this, args[0], args[3][args[2]], args[2], args[3], args[4]);
+				}
+				else if (args.length === 4) //basically each or map
+				{
+					result = functions[i].call(this, args[2][args[1]], args[1], args[2], args[3]);
+				}
 			}
-
-			result = functions[i].apply(this, args);
+			else //sequence is called outside of resource.each/map/reduce
+			{
+				result = functions[i].apply(this, args);
+			}
 		}
 
 		return result;
@@ -87,16 +97,11 @@ exports.compose = function compose()
 	
 	return function()
 	{
-		var args;
+		var args = Array.prototype.slice.call(arguments, 0);
 		
 		for (var i = 0; i < length; i++)
-		{
-			if (i === 0)
-			{
-				args = Array.prototype.slice.call(arguments, 0);
-			}
- 
-			args[0] = functions[i].apply(this, args);
+		{			
+			args[0] = functions[i].apply(this, args); //replace first argument of args with the result of this execution.
 		}
 
 		return args[0];
@@ -188,13 +193,13 @@ var replacer = function replacer(_key, _value)
 	}
 	else if (_value instanceof java.util.Date)
 	{
-		replacement = Date(_value.getTime());
+		replacement = new Date(_value.getTime()).toJSON();
 	}
 	else if (_value instanceof java.lang.String)
 	{
 		replacement = new String(_value);
 	}
-	else if (_value.length && _value.getClass() &&
+	else if (_value.length && _value.getClass && _value.getClass() &&
 			 _value.getClass().getComponentType() &&
 			 "java.lang.String".equals(_value.getClass().getComponentType().getName()) === true)
 	{

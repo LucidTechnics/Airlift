@@ -19,7 +19,7 @@ var contentContext;
 var productionMode;
 var handlerName;
 var servlet;
-var log;
+var webRequestId;
 
 exports.getServlet = function()
 {
@@ -361,4 +361,31 @@ exports.init = function(_webContext)
 	if (!_webContext) { throw "web context needs to be passed in order to initialize web utility object"; }
 
 	this.WEB_CONTEXT = _webContext;
+
+	return this;
+};
+
+exports.getWebRequestId = function()
+{
+	if (!webRequestId)
+	{ 
+		webRequestId = Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
+	}
+
+	return webRequestId;
+};
+
+exports.setResponseCode = function(_code)
+{
+	this.getContentContext().setResponseCode(_code);
+};
+
+exports.setContent = function(_content)
+{
+	this.getContentContext().setContent(_content);
+};
+
+exports.setType = function(_type)
+{
+	this.getContentContext().setType(_type);
 };

@@ -70,6 +70,31 @@ public class JavaScriptGenerator
 		{
 			Attribute attribute = (Attribute) attributes.next();
 			resourceMetadataStringTemplate.setAttribute("propertyName", attribute.getName());
+
+			for (Annotation annotation: _resourceModel.getAttributeAnnotationSetMap().get(attribute))
+			{
+				for (Map.Entry<String, Object> entry: annotation.getParameterMap().entrySet())
+				{
+					String name = entry.getKey();
+
+					if ("isIndexable".equalsIgnoreCase(name) == true && ((Boolean)entry.getValue()) == true)
+					{
+						resourceMetadataStringTemplate.setAttribute("indexedProperty", attribute.getName());
+					}
+					else if ("isSearchable".equalsIgnoreCase(name) == true && ((Boolean)entry.getValue()) == true)
+					{
+						resourceMetadataStringTemplate.setAttribute("searchProperty", attribute.getName());
+					}
+					else if ("encrypted".equalsIgnoreCase(name) == true && ((Boolean)entry.getValue()) == true)
+					{
+						resourceMetadataStringTemplate.setAttribute("encryptedProperty", attribute.getName());
+					}
+					else if ("mapTo".equalsIgnoreCase(name) == true)
+					{
+						resourceMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length() - 2)));
+					}
+				}
+			}
 		}
 
 		return resourceMetadataStringTemplate.toString();
@@ -93,9 +118,6 @@ public class JavaScriptGenerator
 		{
 			Attribute attribute = (Attribute) attributes.next();
 
-			System.out.println(attribute);
-			System.out.println(_resourceModel.getAttributeAnnotationSetMap().get(attribute));
-
 			StringTemplate configTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/JavaScriptObject");
 			configTemplate.setAttribute("name", "name");
 			configTemplate.setAttribute("value", "\"" + attribute.getName() + "\"");
@@ -112,10 +134,8 @@ public class JavaScriptGenerator
 					configTemplate.setAttribute("name", name);
 					configTemplate.setAttribute("value", entry.getValue());
 
-					System.out.println("Christmas processing name:" + name + ":"+ entry.getValue() + ":" + attribute.getName());
 					if ("mapTo".equalsIgnoreCase(name) == true)
 					{
-						System.out.println("Found MAP TO");
 						attributeMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length() - 2)));
 					}
 				}
