@@ -1,4 +1,5 @@
 var timezone;
+var user;
 var userId;
 var userEmail;
 var userName;
@@ -20,6 +21,8 @@ var productionMode;
 var handlerName;
 var servlet;
 var webRequestId;
+var restContext;
+var locale;
 
 exports.getServlet = function()
 {
@@ -111,7 +114,7 @@ exports.getPath = function()
 		var pathInfo = ((request.getPathInfo() == null) && ("".equals(request.getPathInfo()) == false)) ? "" : request.getPathInfo();
 		var path = request.getServletPath() + pathInfo;
 
-		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
+		path = path.replaceAll("/$", "").replaceAll("^/", "");
 	}
 
 	return path;
@@ -231,7 +234,19 @@ exports.getServletName = function()
 
 exports.getLocale = function()
 {
-	return this.getRequest().getLocale();
+	if (!locale)
+	{
+		if (this.getRequest())
+		{
+			locale = this.getRequest().getLocale();
+		}
+		else
+		{
+			locale = new Packages.java.util.Locale.getDefault();
+		}
+	}
+
+	return locale;
 };
 
 exports.getUser = function()
@@ -296,7 +311,14 @@ exports.getAppProfile = function()
 
 exports.getInitParameter = function(_name)
 {
-	return this.getServlet().getServletConfig().getInitParameter(_name);
+	var parameterValue = null, servlet = this.getServlet();
+	
+	if (servlet)
+	{
+		parameterValue = servlet.getServletConfig().getInitParameter(_name);
+	}
+	
+	return parameterValue;
 };
 
 exports.getRootPackageName = function()
@@ -336,7 +358,7 @@ exports.getTimezone = function()
 		var request = this.getRequest();
 		var servlet = this.getServlet();
 		
-		timezone = (request.getParameter("a.timezone") != null) ? request.getParameter("a.timezone") : this.getInitParameter("a.timezone");
+		timezone = (request && request.getParameter("a.timezone") != null) ? request.getParameter("a.timezone") : this.getInitParameter("a.timezone");
 		timezone = (!timezone) ?  "UTC" : timezone;
 	}
 
@@ -356,12 +378,8 @@ exports.getResourceBindings = function()
 	return resourceBindings;
 };
 
-exports.init = function(_webContext)
+exports.init = function()
 {
-	if (!_webContext) { throw "web context needs to be passed in order to initialize web utility object"; }
-
-	this.WEB_CONTEXT = _webContext;
-
 	return this;
 };
 
@@ -388,4 +406,9 @@ exports.setContent = function(_content)
 exports.setType = function(_type)
 {
 	this.getContentContext().setType(_type);
+};
+
+exports.getLog = function()
+{
+	return this.LOG;
 };

@@ -1,2 +1,0 @@
-SELECT $fieldName; separator=", "$ FROM  ( SELECT $fieldName; separator=", "$ FROM $tableName$ WHERE createDate BETWEEN :beginDate AND :endDate AND createDate = lastUpdateDate UNION ALL SELECT $fieldName; separator=", "$ FROM (SELECT $fieldName; separator=", "$ ROW_NUMBER() OVER (ORDER BY $primaryKey$) R FROM $tableName$ WHERE lastUpdateDate BETWEEN :rBeginDate AND :rEndDate AND createDate != lastUpdateDate) WHERE R BETWEEN (:offset + 1) AND (:limit + :offset) ORDER BY R)) ChangeFeed ORDER BY createDate, lastUpdateDate
-

@@ -77,6 +77,7 @@ public class RestfulAuditContext
 		entity.setProperty("userId", _auditTrail.getUserId());
 		entity.setProperty("actionDate", _auditTrail.getActionDate());
 		entity.setProperty("recordDate", _auditTrail.getRecordDate());
+		entity.setProperty("requestId", _auditTrail.getRequestId());
 
 		return entity;
 	}
@@ -134,7 +135,7 @@ public class RestfulAuditContext
 	public String insert(AirliftAuditTrail _auditTrail)
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
-		Object transaction = datastore.getCurrentTransaction(null);
+		com.google.appengine.api.datastore.Transaction transaction = datastore.getCurrentTransaction(null);
 
 		if (transaction == null)
 		{
@@ -148,7 +149,7 @@ public class RestfulAuditContext
 			_auditTrail.setRequestId((String)com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id"));
 
 			com.google.appengine.api.datastore.Entity entity = copyAuditTrailToEntity(_auditTrail);
-			datastore.put(entity);
+			datastore.put(transaction, entity);
 		}
 		catch(Throwable t)
 		{

@@ -44,9 +44,9 @@ exports['test encrypt CANNOT BE TESTED without integration'] = function(_assert)
 
 exports['test validator'] = function(_assert)
 {
-	var errors, bediakoCopy = res.map('person', bediako, res.clone, context);
+	var errors, bediakoCopy = res.map('person', bediako, res.clone, undefined, context);
 	
-	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), context);
+	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 
 	_assert.eq(true, !!errors, 'error object not returned');
 	_assert.eq(true, util.isEmpty(errors), 'validation failed unexpectedly');
@@ -54,7 +54,7 @@ exports['test validator'] = function(_assert)
 	bediakoCopy.fullName = null;
 	errors = undefined;
 	
-	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), context);
+	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 
 	_assert.eq(true, !!errors, 'error object not returned');
 	_assert.eq(false, util.isEmpty(errors), 'validation error not reported');
@@ -63,7 +63,7 @@ exports['test validator'] = function(_assert)
 	bediakoCopy.fullName = new Packages.java.lang.String("skdasakld sklah lsak dklslk skajd asjkd kjsad jksan kjsadn ksajdb askjdb kjsd ksjadb sakjbd sakjdb kjasdb ksabd ksajdb kasjdb kasjdb sakjdb lksd hkjsad kajsd asd skdasakld sklah lsak dklslk skajd asjkd kjsad jksan kjsadn ksajdb askjdb kjsd ksjadb sakjbd sakjdb kjasdb ksabd ksajdb kasjdb kasjdb sakjdb lksd hkjsad kajsd asd skdasakld sklah lsak dklslk skajd asjkd kjsad jksan kjsadn ksajdb askjdb kjsd ksjadb sakjbd sakjdb kjasdb ksabd ksajdb kasjdb kasjdb sakjdb lksd hkjsad kajsd asd skdasakld sklah lsak dklslk skajd asjkd kjsad jksan kjsadn ksajdb askjdb kjsd ksjadb sakjbd sakjdb kjasdb ksabd ksajdb kasjdb kasjdb sakjdb lksd hkjsad kajsd asd");
 	errors = undefined;
 	
-	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), context);
+	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 	
 	_assert.eq(true, !!errors, 'error object not returned');
 	_assert.eq(false, util.isEmpty(errors), 'validation error not reported');
@@ -72,7 +72,7 @@ exports['test validator'] = function(_assert)
 	bediakoCopy.age = new Packages.java.lang.Integer(2000).intValue();
 	errors = undefined;
 
-	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), context);
+	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 
 	_assert.eq(true, !!errors, 'error object not returned');
 	_assert.eq(false, util.isEmpty(errors), 'validation error not reported');
@@ -82,7 +82,7 @@ exports['test validator'] = function(_assert)
 	bediakoCopy.age = new Packages.java.lang.Integer(5).intValue();
 	errors = undefined;
 
-	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), context);
+	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 
 	_assert.eq(true, !!errors, 'error object not returned');
 	_assert.eq(false, util.isEmpty(errors), 'validation error not reported');

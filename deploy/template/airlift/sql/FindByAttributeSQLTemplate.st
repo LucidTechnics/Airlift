@@ -1,1 +1,0 @@
-SELECT FROM $tableName$ WHERE $attribute$ == :attribute

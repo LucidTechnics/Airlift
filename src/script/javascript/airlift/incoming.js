@@ -3,6 +3,11 @@ var util = require('./util');
 var web = require('./web');
 
 var convertUtil = Packages.org.apache.commons.beanutils.ConvertUtils;
+var dateConverter = new Packages.org.apache.commons.beanutils.converters.DateConverter();
+dateConverter.setLocale(web.getLocale());
+dateConverter.setTimeZone(java.util.TimeZone.getTimeZone(web.getTimezone()));
+convertUtil.register(dateConverter, util.createClass("java.util.Date"));
+
 var formatUtil = Packages.airlift.util.FormatUtil;
 
 var validationError = function(_name, _message)
@@ -237,36 +242,36 @@ exports.bookkeeping = function bookkeeping(_entity, _userId, _postDate, _putDate
 	var userId = _userId||web.getUserId()||'user id not provided';
 
 	_entity.setProperty("auditUserId", userId);
-	_entity.setProperty("auditRequestId", web.getRequestId());
+	_entity.setProperty("auditRequestId", web.getWebRequestId());
 	_entity.setProperty("auditPostDate", _postDate||util.createDate());
-	_entity.setProperty("auditPutDate", _putDate||postDate);
+	_entity.setProperty("auditPutDate", _putDate||_postDate);
 };
 
-exports.entify = function entify(_entity, _value, _attributeName)
+exports.entify = function entify(_entity, _value, _attributeName, _resource, _attributeMetadata)
 {
 	if (util.isEmpty(this.allErrors()) === true && "id".equalsIgnoreCase(_attributeName) === false)
 	{
-		var isIndexable = attributesMetaData[_attributeName].isIndexable;
-		var type = attributesMetaData[_attributeName].type;
+		var isIndexable = _attributeMetadata.isIndexable;
+		var type = _attributeMetadata.type;
 		var value = _value;
 
 		if (type === 'java.lang.String')
 		{
-				//500 is the Google App Engine limitation for Strings
-				//persisted to the datastore.
-			if (attributesMetaData.maxLength > 500)
+			//500 is the Google App Engine limitation for Strings
+			//persisted to the datastore.
+			if (_attributeMetadata.maxLength > 500)
 			{
 				value = new Package.com.google.appengine.api.datastore.Text(value);
 			}
 		}
 
-		(isIndexable === true) ? _entity.setProperty(_value) : _entity.setUnindexedProperty(_value);
+		(isIndexable === true) ? _entity.setProperty(_attributeName, _value) : _entity.setUnindexedProperty(_attributeName, _value);
 	}
 };
 
-exports.encrypt = function encrypt(_entity, _value, _attributeName)
+exports.encrypt = function encrypt(_entity, _value, _attributeName, _resource, _attributeMetadata)
 {
-	if (util.isEmpty(this.allErrors()) === true && this.attributeMetadata.encrypted === true)
+	if (util.isEmpty(this.allErrors()) === true && _attributeMetadata.encrypted === true)
 	{
 		var password = web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
 		var initialVector = web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
@@ -284,7 +289,7 @@ var convertToSingleValue = function(_parameterValue, _type, _index)
 {
 	util.println('converting single value', _parameterValue && _parameterValue[_index], 'with type', _type);
 	var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
-	return formatUtil.format(convertUtil.convert(value, util.createClass(_type)));
+	return convertUtil.convert(value, util.createClass(_type));
 };
 
 var convertToMultiValue = function(_parameterValue, _collection)
@@ -293,6 +298,8 @@ var convertToMultiValue = function(_parameterValue, _collection)
 	{
 		for (var i = 0, length = _parameterValue.length; i < length; i++) { _collection.add(convertToSingleValue(_parameterValue, "java.lang.String", i)) }
 	}
+
+	return _collection;
 };
 	
 function Converter()

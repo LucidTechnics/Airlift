@@ -36,9 +36,22 @@ exports['test each'] = function(_assert)
 		attributes.push(_attributeName);
 		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 		
-	}, context);
+	}, undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
+
+	attributes = [];
+	var callbackResult = [];
+	
+	res.each('person', bediako, function(_value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+	}, function() {callbackResult.push(this.resourceName)}, context);
+
+	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct with callback');
+	_assert.deepEqual(callbackResult, ['person'], 'callback result list is not correct');
 };
 
 exports['test map'] = function(_assert)
@@ -54,7 +67,7 @@ exports['test map'] = function(_assert)
 
 		return _value;
 
-	}, context);
+	}, undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
 
@@ -66,7 +79,32 @@ exports['test map'] = function(_assert)
 		_assert.eq(bediako[_attributeName], _value, 'value for: ' + _attributeName + ' is not correct');
 		_assert.eq(bediako[_attributeName], _resource[_attributeName], 'resource attribute value for: ' + _attributeName + ' is not correct');
 
-	}, context);
+	}, undefined, context);
+
+	attributes = [];
+	var callbackResult = [];
+
+	person = res.map('person', bediako, function(_value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+		return _value;
+	}, function() {callbackResult.push(this.resourceName)}, context);
+
+	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct with callback');
+	_assert.deepEqual(callbackResult, ['person'], 'callback result list is not correct');
+
+	//test that the person resource is the same as the bediako resource ...
+	res.each('person', person, function(_value, _attributeName, _resource)
+	{
+		attributes.push(_attributeName);
+
+		_assert.eq(bediako[_attributeName], _value, 'value for: ' + _attributeName + ' is not correct');
+		_assert.eq(bediako[_attributeName], _resource[_attributeName], 'resource attribute value for: ' + _attributeName + ' is not correct');
+
+	}, undefined, context);
 };
 
 exports['test reduce'] = function(_assert)
@@ -81,10 +119,26 @@ exports['test reduce'] = function(_assert)
 
 		var formattedValue = Packages.airlift.util.FormatUtil.format(_value||"");
 		return _base + ':' + _attributeName + '=' + formattedValue;		
-	}, context);
+	}, undefined, context);
 
 	_assert.eq("person::fullName=Bediako George:shortName=Bediako:status=middle aged:birthDate=01-01-1970:age=43.0:friendList=[\"friend1\",\"friend2\",\"friend3\"]:familySet=[\"family1\"]:auditPostDate=:auditPutDate=:auditUserId=:id=6524d6f79d19",
 			   reducedResult, 'unexpected reduced result');
+
+	attributes = [];
+	var callbackResult = [];
+	reducedResult = res.reduce('person:', 'person', bediako, function(_base, _value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+		var formattedValue = Packages.airlift.util.FormatUtil.format(_value||"");
+		return _base + ':' + _attributeName + '=' + formattedValue;		
+	}, function() { callbackResult.push(this.resourceName) }, context);
+
+	_assert.eq("person::fullName=Bediako George:shortName=Bediako:status=middle aged:birthDate=01-01-1970:age=43.0:friendList=[\"friend1\",\"friend2\",\"friend3\"]:familySet=[\"family1\"]:auditPostDate=:auditPutDate=:auditUserId=:id=6524d6f79d19",
+			   reducedResult, 'unexpected reduced result with callback');
+
 };
 
 exports['test sequence'] = function(_assert)
@@ -110,7 +164,7 @@ exports['test sequence'] = function(_assert)
 
 		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
-	}), context);
+	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
 };
@@ -175,7 +229,7 @@ exports['test compose'] = function(_assert)
 
 		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
 
-	}), context);
+	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
 
@@ -195,7 +249,7 @@ exports['test compose'] = function(_assert)
 		_assert.eq(results.length > 0, _value === 5, 'subsequent function value argument is not correct');
 		results = [];
 		
-	}), context);
+	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct after second compose test');
 };
@@ -214,7 +268,7 @@ exports['test watch'] = function(_assert)
 	};
 	
 	var watch = res.watch('birthDate', 'age', watchFunction);
-	res.each('person', bediako, watch, context);
+	res.each('person', bediako, watch, undefined, context);
 	var result = {age: 1};
 	
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
@@ -225,7 +279,7 @@ exports['test watch'] = function(_assert)
 	result = {age: 1};
 	
 	var watch = res.watch('birthDate', watchFunction, 'age');
-	res.each('person', bediako, watch, context);
+	res.each('person', bediako, watch, undefined, context);
 
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution when order is unorthodox');
 	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once when order is unorthodox.');
@@ -235,7 +289,7 @@ exports['test watch'] = function(_assert)
 	result = {id: 1};
 
 	watch = res.watch(watchFunction);
-	res.each('person', bediako, watch, context);
+	res.each('person', bediako, watch, undefined, context);
 	
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
 	_assert.eq(1, executionTest.length, 'watch allowed execution to occur more than once.');
@@ -245,7 +299,7 @@ exports['test watch'] = function(_assert)
 	result = {age: 1};
 	
 	watch = res.watch(['birthDate', 'age'], watchFunction);
-	res.each('person', bediako, watch, context);
+	res.each('person', bediako, watch, undefined, context);
 	var result = {age: 1};
 
 	_assert.deepEqual(result, attributes, 'wrong attributes visited before watch execution');
@@ -256,7 +310,7 @@ exports['test copy'] = function(_assert)
 {
 	var target = {};
 	
-	res.each('person', bediako, res.copy.partial(target), context);
+	res.each('person', bediako, res.copy.partial(target), undefined, context);
 
 	_assert.eq(bediako.id, target.id, 'id not equal');
 	_assert.eq(bediako.fullName, target.fullName, 'fullName not equal');
@@ -270,7 +324,7 @@ exports['test copy'] = function(_assert)
 
 exports['test clone'] = function(_assert)
 {
-	var target = res.map('person', bediako, res.clone, context);
+	var target = res.map('person', bediako, res.clone, undefined, context);
 
 	_assert.eq(bediako.id, target.id, 'id not equal');
 	_assert.eq(bediako.fullName, target.fullName, 'fullName not equal');

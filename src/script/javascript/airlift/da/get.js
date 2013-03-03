@@ -1,6 +1,6 @@
-var egest = require('../egest');
-var resource = require('../res');
+var outgoing = require('../outgoing');
 var util = require('../util');
+var res = require('../resource');
 
 var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 var datastore = factory.getAsyncDatastoreService();
@@ -26,12 +26,12 @@ var getFromCache = function(_key)
 
 var getAllFromCache = function(_keys)
 {
-	return cache.getAll(new Packages.java.lang.Iterable({iterator: function() { return keys; } }));
+	return cache.getAll(_keys);
 };
 
 exports.get = function(_resourceName, _id)
 {
-	return util.multiTry(function()
+	var entity = util.multiTry(function()
 	{
 		try
 		{
@@ -42,7 +42,7 @@ exports.get = function(_resourceName, _id)
 		{
 			if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 			{
-				this.LOG.warning("No resource of type: " + _resourceName + " exists for the provided key: " + _id);
+				util.warning("No resource of type:", _resourceName, "exists for the provided key:", _id);
 			}
 			else
 			{
@@ -52,40 +52,51 @@ exports.get = function(_resourceName, _id)
 
 		return result;
 	},
-	5, "Encountered this error while getting " + _resourceName + " identified by: " + _id);
+	5, function(_tries, _e) { util.severe("Encountered this error while getting", _resourceName, "identified by:", _id); });
 
-
-	return res.map(_resourceName, null, egest.deentify(entity));
+	return res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
 };
 
-exports.getAll = function(_resourceName, _keys)
+exports.getAll = function(_resourceName, _entityList)
 {
-	var copyKeyList = new Packages.java.util.ArrayList();
+	var copy = util.list(_entityList);
 
 	return util.multiTry(function()
 	{
-		var results = new Packages.java.util.HashMap();
+		var results = util.map();
 
 		try
 		{
-			var resultMap = getAllFromCache(util.callbackIterator(keys, function(_next) { copyKeyList.add(_next); }));
-			copyKeyList.removeAll(resultMap.keySet());
+			var resultMap = getAllFromCache(util.createKeysCollection(_entityList));
 
-			if (copyKeyList.size() > 0)
+			copy.removeAll(resultMap.values());
+
+			if (copy.size() > 0)
 			{
-				resultMap.putAll(populateCacheFromMap(datastore.get(copyKeyList).get()));
+				resultMap.putAll(populateCacheFromMap(datastore.get(util.createKeysCollection(copy)).get()));
 			}
 
-			for (var key in Iterator(_keyList))
+			util.println('Result map', resultMap);
+			
+			for (var key in Iterator(util.createKeysCollection(_entityList)))
 			{
-				results.put(key, res.map(_resourceName, null, egest.deentify(resultMap.get(key))));
+				util.println('processing key', key);
+				
+				var entity = resultMap.get(key);
+
+				util.println('got entity', entity);
+				
+				if (entity)
+				{
+					results.put(key, res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity))));
+				}
 			}
 		}
 		catch(e if e.javaException instanceof Packages.java.util.concurrent.ExecutionException)
 		{
 			if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 			{
-				this.LOG.warning("No resources of type: "  + _resourceName + " exists for at least some of the provided keys: " + _keyList);
+				util.warning("No resources of type:", _resourceName, " exists for at least some of the provided keys:", _entityList);
 			}
 			else
 			{
@@ -95,5 +106,5 @@ exports.getAll = function(_resourceName, _keys)
 
 		return results;
 	},
-	5, "Encountered this error while getting multiple " + _resourceName + " resources identified by: " + _keyList);
+	5, function(_tries, _e) { util.severe("Encountered this error while getting multiple", _resourceName, " resources identified by:", _entityList, _e) });
 };

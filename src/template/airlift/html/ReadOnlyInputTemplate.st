@@ -1,1 +1,0 @@
-<input type="$type$" name="$name$" value="$value$" maxlength="$maxLength$" size="$displayLength$" id="$id$" readonly="readonly" class="$inputClass$" />

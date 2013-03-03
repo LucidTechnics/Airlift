@@ -1,5 +1,5 @@
-var res = require('../res');
-var ingest = require('../ingest');
+var res = require('../resource');
+var incoming = require('../incoming');
 var util = require('../util');
 var web = require('../web');
 
@@ -9,7 +9,9 @@ var cache = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.ge
 
 exports.provideUniqueId = function(_resourceName)
 {
-	var test = function(_tries)
+	var LOG = this.LOG;
+	
+	var test = function(_tries, e)
 	{
 		var id = Packages.airlift.util.IdGenerator.generate(12);
 			//Make sure this randomly generated id has not already been
@@ -28,26 +30,52 @@ exports.provideUniqueId = function(_resourceName)
 		return id;
 	}
 
-	return util.multiTry(test, 100, "After 100 tries, we were unable to generate a random unique id for creation of resource: " + _resourceName + ".  Are ids saturated?");
+	return util.multiTry(test, 100, function() { util.severe("After 100 tries, we were unable to generate a random unique id for creation of resource:", _resourceName + '.', "Are ids saturated?"); });
 };
 
-exports.insert = function(_resourceName, _resource, _partialSequence)
+exports.insert = function(_resourceName, _resource, _function)
 {
-	var sequence = _partialSequence || res.seq.partial({});
-	
-	res.bookkeeping(_resource);
-	var id = this.provideUniqueId(_resourceName);
-	var entity = ingest.createEntity(_resourceName, id);
-
-	res.each(_resourceName, _resource, sequence(ingest.entify.partial(entity), ingest.encrypt.partial(entity)));
-
-	if (util.isEmpty(sequence.errors) == true)
+	try
 	{
-		var written = util.multiTry(function() { datastore.put(entity); return true; }, 5, "Encountered this error while accessing the datastore for " + _resourceName + " insert");
-		if (util.isDefined(written) === true) { cache.put(key, entity); }
+		var transaction = datastore.getCurrentTransaction(null);
 
-		res.audit({entity: entity, action: 'INSERT'});
+		if (!transaction)
+		{
+			transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+		}
+
+		var sequence = _function && res.sequence.partial(_function) || res.sequence;
+
+		var id = this.provideUniqueId(_resourceName);
+		var entity = incoming.createEntity(_resourceName, id);
+		var result = {};
+
+		res.each(_resourceName, _resource, sequence(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), function()
+		{
+			result.id = id;
+			result.errors = this.allErrors();
+
+			incoming.bookkeeping(entity);
+
+			if (util.isEmpty(result.errors) === true)
+			{
+				var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
+											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", _resourceName, "insert", _e); });
+				if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
+
+				res.audit({entity: entity, action: 'INSERT'});
+			}
+		});
+	}
+	catch(e)
+	{
+		if (transaction) { transaction.rollbackAsync(); }
+		throw e;
+	}
+	finally
+	{
+		if (transaction) { transaction.commitAsync(); } 
 	}
 
-	return {id: id, errors: sequence.errors};
+	return result;
 };

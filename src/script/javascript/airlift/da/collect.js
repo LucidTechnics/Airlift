@@ -3,10 +3,9 @@ var util = require('../util');
 var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 var datastore = factory.getAsyncDatastoreService();
 
-function QueryResultIterator(_keys, _keysOnly)
+function QueryResultIterator(_resourceName, _entities, _keysOnly)
 {
-	var keyList;
-	var keys = _keys;
+	var keys = util.createKeysCollection(_entities).iterator();
 	var keysOnly = _keysOnly;
 	var fetchedResources;
 	var next;
@@ -22,16 +21,19 @@ function QueryResultIterator(_keys, _keysOnly)
 		
 		if (!keysOnly && !fetchedResources)
 		{
-			keyList = new Packages.java.util.ArrayList(); 
-			fetchedResources = require('./get').getAll(util.callbackIterator(keys, function(_next) { keyList.add(_next)}));
-			keys = keyList.iterator();
+			fetchedResources = require('./get').getAll(_resourceName, _entities);
+
+			util.println('fetch resource is', fetchedResources);
 		}
 
-		result = next = keys.next();
+		result = keys.next();
+
+		util.info('result is', result);
 		
 		if (!keysOnly)
 		{
-			result = fetchedResources.get(next);
+			result = fetchedResources.get(result);
+			util.info('now result is', result);
 		}
 		
 		return result;
@@ -80,11 +82,9 @@ exports.collect = function(_resourceName, _config)
 		query.setFilter(filterList.get(0));
 	}
 
-	var entities = datastore.prepare(query).asIterator(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
-
-	var iterator = { hasNext: function() { return entities.hasNext(); }, next: function() { return entities.next().getKey(); }, remove: function() { entities.remove(); }};
+	var entities = datastore.prepare(query).asList(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
 	
-	return new java.util.Iterator(new QueryResultIterator(new java.util.Iterator(iterator), keysOnly));
+	return new java.util.Iterator(new QueryResultIterator(_resourceName, entities, keysOnly));
 };
 
 exports.collectBy = function(_resourceName, _attributeName, _value, _config)

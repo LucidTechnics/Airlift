@@ -25,22 +25,6 @@ public class IdGenerator
 	private static final Logger log = Logger.getLogger(IdGenerator.class.getName());
 
 	/**
-	 * Generates a UUID with a length based on an Airlift property file.
-	 *
-	 * @return the string
-	 */
-	public static String generate()
-	{
-		airlift.util.PropertyUtil.getInstance().loadProperties("/airlift/airlift.properties", "airlift.cfg");
-
-		String lengthString = airlift.util.PropertyUtil.getInstance().getProperty("airlift.cfg", "airlift.truncated.sha1.id.length");
-
-		int length = (lengthString != null && !org.apache.commons.lang.StringUtils.isWhitespace(lengthString)) ? Integer.valueOf(lengthString) : 10;
-
-		return generate(length);
-	}
-
-	/**
 	 * Generate.
 	 *
 	 * @param _length the _length

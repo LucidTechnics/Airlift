@@ -1,1 +1,0 @@
-SELECT 1 FROM $tableName$ WHERE $primaryKey; separator=" AND "$

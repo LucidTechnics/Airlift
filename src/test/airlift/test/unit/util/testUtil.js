@@ -49,9 +49,38 @@ exports['test create error reporter'] = function(_assert)
 					  errorReporter.allErrors(), 'report error is not reporting errors correctly' );
 };
 
-exports['test multi-try NEEDS TO BE CREATED ONCE MOCKUPS WORKS'] = function(_assert)
+exports['test multi-try'] = function(_assert)
 {
-	_assert.eq(true, true);
+	var list = util.list();
+	util.multiTry(function() { list.add('stuff'); }, 5);
+	
+	_assert.eq(list.size(), 1, 'multi try should succeed once');
+
+	var result = util.multiTry(function() { return 7 }, 5);
+
+	_assert.eq(result, 7, 'test multi try should return value');
+
+	list = util.list();
+	util.multiTry(function(_tries) { list.add('stuff'); if (_tries < 5) throw 'error'; }, 5);
+
+	_assert.eq(list.size(), 5, 'multi try should succeed five times');
+
+	list = util.list();
+	util.multiTry(function(_tries) { list.add('stuff'); if (_tries < 6) throw 'error'; },
+				  5,
+				  function(_tries, _exception) { list.add('stuff'); }
+				 );
+
+	_assert.eq(list.size(), 6, 'multi try should succeed five times then the complete failure should add a sixth');
+
+	list = util.list();
+	_assert.throws(function()
+	{
+		util.multiTry(function(_tries, _exception) { list.add('stuff'); if (_tries < 6) throw 'error'; }, 5);
+	},
+	'multi try should throw an exception');
+		
+	_assert.eq(list.size(), 5, 'multi try should have succeeded five times after throwing an exception');
 };
 
 exports['test create date'] = function(_assert)
@@ -148,4 +177,21 @@ exports['test primitive'] = function(_assert)
 	_assert.eq(!!util.primitive(character).charValue, false, 'character is not a primitive');
 	_assert.eq(!!util.primitive(boolean).booleanValue, false, 'boolean is not a primitive');
 	_assert.eq(!!util.primitive(byte).byteValue, false, 'boolean is not a primitive');
+};
+
+exports["test callback iterator"] = function(_assert)
+{
+	var list = util.list();
+	list.add('fuzzy');
+	list.add('insurance');
+	list.add('whatchamacallit');
+
+	var copyList = util.list();
+
+	var iterator = list.iterator();
+	var callbackIterator = util.callbackIterator(iterator, function(_next) { copyList.add(_next); });
+
+	for (var item in Iterator(callbackIterator)) {} //exercise the iterator
+	
+	_assert.eq(copyList, list, 'call back iterator not working correctly');
 };

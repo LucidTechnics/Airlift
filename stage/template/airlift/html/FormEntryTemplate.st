@@ -1,1 +1,0 @@
-<li id="$count$"><label for="$name$" class="$emClass; separator=" "$"> $label$  <em id="$emId$" class="$emClass; separator=" "$"> $message$</em></label> $input$ </li>

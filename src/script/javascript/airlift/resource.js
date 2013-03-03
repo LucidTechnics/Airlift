@@ -2,10 +2,11 @@ var web = require('./web');
 var util = require('./util');
 var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
-exports.each = function each(_resourceName, _resource, _function, _context)
+exports.each = function each(_resourceName, _resource, _function, _callback, _context)
 {
 	var context = _context || {};
 
+	context.resource = _resource||{};
 	context.resourceName = context.resourceName || _resourceName;
 	context.resourceMetadata = context.resourceMetadata || require('meta/r/' + _resourceName).create();
 	context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create();
@@ -25,28 +26,33 @@ exports.each = function each(_resourceName, _resource, _function, _context)
 	for (var i = 0; i < length; i++)
 	{
 		var name = context.attributes[i];		
-		_function.call(context, _resource[name], name, _resource, context.attributesMetadata.attributes[name]);
+		_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
+	}
+
+	if (_callback)
+	{
+		_callback.call(context, _resourceName, _resource);
 	}
 };
 
-exports.map = function map(_resourceName, _resource, _function, _context)
+exports.map = function map(_resourceName, _resource, _function, _callback, _context)
 {
 	var result = {};
 
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
 	{
 		result[_attributeName] = _function.call(this, _value, _attributeName, _resource, _metadata);
-	}, _context);
+	}, _callback, _context);
 
 	return result;
 };
 
-exports.reduce = function reduce(_base, _resourceName, _resource, _function, _context)
+exports.reduce = function reduce(_base, _resourceName, _resource, _function, _callback, _context)
 {
 	this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
 	{
 		_base = _function.call(this, _base, _value, _attributeName, _resource, _metadata);
-	}, _context);
+	}, _callback, _context);
 
 	return _base;
 };
@@ -191,6 +197,17 @@ var replacer = function replacer(_key, _value)
 
 		replacement = list;
 	}
+	else if (_value instanceof java.util.Map)
+	{
+		var map = {};
+
+		for (var item in Iterator(_value.keySet()))
+		{
+			map[item] = _value.get(item);
+		}
+
+		replacement = map;
+	}
 	else if (_value instanceof java.util.Date)
 	{
 		replacement = new Date(_value.getTime()).toJSON();
@@ -199,7 +216,7 @@ var replacer = function replacer(_key, _value)
 	{
 		replacement = new String(_value);
 	}
-	else if (_value.length && _value.getClass && _value.getClass() &&
+	else if (_value && _value.getClass && _value.getClass().isArray() &&
 			 _value.getClass().getComponentType() &&
 			 "java.lang.String".equals(_value.getClass().getComponentType().getName()) === true)
 	{
@@ -211,6 +228,10 @@ var replacer = function replacer(_key, _value)
 		}
 		
 		replacement = list;
+	}
+	else if (_value && _value.getClass && _value.getClass().isArray() === true) //arrays other than java.lang.String[] are not supported
+	{
+		replacement = undefined;
 	}
 	else if (_value instanceof java.lang.Number)
 	{
@@ -239,8 +260,7 @@ exports.audit = function audit(_config)
 	var entity = _config.entity;
 	var id = _config.id||_config.entity && _config.entity.getKey().getName();
 	var action = _config.action;
-	var actionDate = _config.actionDate||_entity.getProperty("auditPutDate")||util.createDate();
-	var resourceName = _config.resourceName||_config.entity.getKind();	
+	var resourceName = _config.resourceName||entity.getKind();	
 	var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
 
 	auditTrail.id = util.guid();
@@ -248,25 +268,30 @@ exports.audit = function audit(_config)
 	
 	if (entity)
 	{
-		var propertiesMap = _entity.getProperties();
+		var propertiesMap = new Packages.java.util.HashMap(entity.getProperties());
 		propertiesMap.put('AIRLIFT_RESOURCE_NAME', resourceName);
-		auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(Packages.airlift.util.AirliftUtil.toJson(propertiesMap));
+		auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(this.json(propertiesMap));
 	}
 	else
 	{
 		auditTrail.data = null;
 	}
+
+	var currentDate = util.createDate();
 	
-	auditTrail.action = _action;
-	auditTrail.method = web.getMethod();
-	auditTrail.resourceName = resourceName;
-	auditTrail.uri = web.getUri();
-	auditTrail.handlerName = web.getHandlerName();
-	auditTrail.userId = web.getUserId();
-	auditTrail.actionDate = actionDate;
-	auditTrail.recordDate = util.createDate();
+	auditTrail.setAction(action);
+	auditTrail.setMethod(web.getMethod());
+	auditTrail.setResource(resourceName);
+	auditTrail.setUri(web.getUri());
+	auditTrail.setHandlerName(web.getHandlerName());
+	auditTrail.setUserId(web.getUserId());
+	auditTrail.setActionDate(currentDate);
+	auditTrail.setRecordDate(currentDate);
+	auditTrail.requestId = com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 
 	web.getAuditContext().insert(auditTrail);
+
+	util.println('Finished audit');
 };
 
 exports.copy = function copy(_target, _value, _attributeName)

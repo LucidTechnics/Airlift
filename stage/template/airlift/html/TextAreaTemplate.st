@@ -1,1 +1,0 @@
-<textarea id="$id$" class="$inputClass; separator=" "$" name="$name$" rows="$rows$" cols="$cols$" >$value$</textarea>

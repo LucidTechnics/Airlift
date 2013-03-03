@@ -110,39 +110,40 @@ exports.createErrorReporter = function()
 	return new ErrorReporter();
 }
 
-exports.multiTry = function multiTry(_executable, _tryCount, _message, _completeFailure)
+exports.multiTry = function multiTry(_executable, _tryCount, _callback)
 {
-	var result, success = false, log;
+	var result, success = false;
+	var lastException;
 
 	for (var i = 0; i < _tryCount && success === false; i++)
 	{
-		try
+		if (i < _tryCount)
 		{
-			result = _executable(i);
-			success = true;
-		}
-		catch(e)
-		{
-			log = log || web.getLog();
-			
-			if (_message)
+			try
 			{
-				log.warning(_message + " " + e.toString());
+				result = _executable(i + 1);
+				success = true;
 			}
-
-			if (i >= _tryCount)
+			catch(e)
 			{
-				log.severe("After this many tries: " + _tryCount + " - " +  e.toString());
+				lastException = e;
 				
-				if (_completeFailure)
-				{
-					_completeFailure && _completeFailure(_tries, e);
-				}
-				else
-				{
-					throw e;
-				}
+				if (!_callback) { exports.warning('multitry:', lastException.toString()); }
 			}
+		}
+	}
+
+	if (!success)
+	{
+		exports.severe("After this many tries:", _tryCount, " - ", lastException.toString());
+
+		if (_callback)
+		{
+			_callback(_tryCount, lastException);
+		}
+		else
+		{
+			throw lastException;
 		}
 	}
 
@@ -191,8 +192,25 @@ exports.createCalendar = function createCalendar(_config)
 
 exports.guid = function guid(_length)
 {
-	if (_length) { var id = Packages.airlift.util.IdGenerator.generate(_length); }
-	else { var id = Packages.airlift.util.IdGenerator.generate(); }
+	var id;
+	
+	if (_length)
+	{
+		id = Packages.airlift.util.IdGenerator.generate(_length);
+	}
+	else
+	{
+		var length = web.getInitParameter("airlift.truncated.sha1.id.length");
+
+		if (length)
+		{
+			id = Packages.airlift.util.IdGenerator.generate(parseInt(length, 10));
+		}
+		else
+		{
+			id = Packages.airlift.util.IdGenerator.generate(32);
+		}
+	}
 
 	return id; 
 };
@@ -238,6 +256,47 @@ exports.println = function println()
 	exports.print.apply(this, args);
 	
 	Packages.java.lang.System.out.println('');
+};
+
+var message = function message()
+{
+	var args = Array.prototype.slice.call(arguments, 0);
+	var message;
+
+	for (var i = 0, length = args.length; i < length; i++)
+	{
+		if (i === 0)
+		{
+			message = args[i]||'';
+		}
+		else
+		{
+			message += ' ' + args[i]||'';
+		}
+	}
+
+	return message;
+};
+
+exports.info = function info()
+{
+	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
+
+	this.LOG.info(info);
+};
+
+exports.warning = function warning()
+{
+	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
+
+	this.LOG.warning(info);
+};
+
+exports.severe = function severe()
+{
+	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
+
+	this.LOG.severe(info);
 };
 
 exports.value = function value(_candidate, _default)
@@ -293,4 +352,107 @@ exports.primitive = function(_value)
 	}
 
 	return primitive;
+};
+
+exports.callbackIterator = function callbackIterator(_iterator, _callback)
+{
+	var iterator = {
+		hasNext: function() { return _iterator.hasNext(); },
+		next: function() { var next = _iterator.next(); _callback(next); return next; },
+		remove: function() { _iterator.remove(); }
+	};
+
+	return new Packages.java.util.Iterator(iterator);
+};
+
+exports.list = function list(_parameter)
+{
+	var list;
+
+	if (exports.hasValue(_parameter) === true)
+	{
+		list = new Packages.java.util.ArrayList(_parameter);
+	}
+	else
+	{
+		list = new Packages.java.util.ArrayList();
+	}
+
+	return list;
+};
+
+exports.set = function set(_parameter)
+{
+	var set;
+
+	if (exports.hasValue(_parameter) === true)
+	{
+		set= new Packages.java.util.HashSet(_parameter);
+	}
+	else
+	{
+		set= new Packages.java.util.HashSet();
+	}
+
+	return set;
+};
+
+exports.map = function map(_parameter)
+{
+	var map;
+
+	if (exports.hasValue(_parameter) === true)
+	{
+		map = new Packages.java.util.HashMap(_parameter);
+	}
+	else
+	{
+		map = new Packages.java.util.HashMap();
+	}
+
+	return map;
+};
+
+
+function KeysIterator(_entityList)
+{
+	var iterator = _entityList.iterator();
+
+	this.hasNext = function() { return iterator.hasNext(); };
+	this.next = function() { return iterator.next().getKey(); };
+	this.remove = function() { iterator.remove(); };
+};
+
+exports.createKeysIterator = function createKeysIterator(_entityList)
+{
+	return new Packages.java.util.Iterator(new KeysIterator(_entityList));
+};
+
+function KeysCollection(_entityList)
+{
+	this.iterator = function()
+	{
+		return new KeysIterator(_entityList);
+	};
+
+	this.isEmpty = function() { return _entityList.isEmpty(); };
+	this.size = function() { return _entityList.size(); }
+
+	this.toArray = function() { return _entityList.toArray(); };
+	this.add = function() { throw 'add not supported in this collection'; };
+	this.addAll = function() { throw 'addAll not supported in this collection'; };
+	this.clear = function() { _entityList.clear(); };
+	this.contains = function(_object) { return contains(_object); };
+	this.containsAll = function(_collection) { return _entityList.containsAll(_collection); };
+	this.equals = function(_object) { return _entityList.equals(_object); };
+	this.hashCode = function() { return _entityList.hashCode() };
+
+	this.remove = function(_object) { _entityList.remove(_object) };
+	this.removeAll = function(_collection) { _entityList.removeAll(_entityList); };
+	this.retainAll = function(_collection) { _entityList.retainAll(_collection); };
+};
+
+exports.createKeysCollection = function createKeysCollection(_entityList)
+{
+	return new java.util.Collection(new KeysCollection(_entityList));
 };
