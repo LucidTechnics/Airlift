@@ -287,7 +287,6 @@ exports.encrypt = function encrypt(_entity, _value, _attributeName, _resource, _
 
 var convertToSingleValue = function(_parameterValue, _type, _index)
 {
-	util.println('converting single value', _parameterValue && _parameterValue[_index], 'with type', _type);
 	var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
 	return convertUtil.convert(value, util.createClass(_type));
 };
@@ -344,7 +343,6 @@ exports.convert = function convert(_value, _attributeName, _resource)
 		{
 			if (converter[type])
 			{
-				util.println('converting', _attributeName, 'with type', type);
 				var parameterValue = request.getParameterValues(_attributeName);
 				value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
 			}

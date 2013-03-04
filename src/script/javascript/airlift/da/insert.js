@@ -33,27 +33,21 @@ exports.provideUniqueId = function(_resourceName)
 	return util.multiTry(test, 100, function() { util.severe("After 100 tries, we were unable to generate a random unique id for creation of resource:", _resourceName + '.', "Are ids saturated?"); });
 };
 
-exports.insert = function(_resourceName, _resource, _function)
+exports.insert = function(_resourceName, _resource, _pre, _post)
 {
 	var errorStatus = false;
 	
 	try
 	{
+		util.info('Here 1');
 		var transaction = datastore.getCurrentTransaction(null);
 
-		if (!transaction)
+		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
+
+		util.info('Here 2');
+		var callback = function()
 		{
-			transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
-		}
-
-		var sequence = _function && res.sequence.partial(_function) || res.sequence;
-
-		var id = this.provideUniqueId(_resourceName);
-		var entity = incoming.createEntity(_resourceName, id);
-		var result = {};
-
-		res.each(_resourceName, _resource, sequence(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), function()
-		{
+			util.info('Here 3');
 			result.id = id;
 			result.errors = this.allErrors();
 
@@ -61,16 +55,41 @@ exports.insert = function(_resourceName, _resource, _function)
 
 			if (util.isEmpty(result.errors) === true)
 			{
+				util.info('Here 4');
+				if (!transaction && this.resourceMetadata.isAudited === true)
+				{
+					util.info('Here 5');
+					transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+				}
+
+				util.info('Here 6');
 				var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
 											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", _resourceName, "insert", _e); });
-				if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
 
-				res.audit({entity: entity, action: 'INSERT'});
+				util.info('Here 7');
+				if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
+				util.info('Here 8');
+
+				if (this.resourceMetadata.isAudited === true)
+				{
+					util.info('Here 9');
+					res.audit({entity: entity, action: 'INSERT'});
+				}
+				util.info('Here 10');
 			}
-		});
+		};
+		
+		//var post = _post && res.sequence.partial(callback, _post) || res.sequence.partial(callback);
+
+		var id = this.provideUniqueId(_resourceName);
+		var entity = incoming.createEntity(_resourceName, id);
+		var result = {};
+
+		res.each(_resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
 	}
 	catch(e)
 	{
+		util.severe('Encountered exception', e);
 		errorStatus = true;
 		if (transaction) { transaction.rollbackAsync(); }
 		throw e;

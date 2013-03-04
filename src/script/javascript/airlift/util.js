@@ -456,3 +456,13 @@ exports.createKeysCollection = function createKeysCollection(_entityList)
 {
 	return new java.util.Collection(new KeysCollection(_entityList));
 };
+
+exports.getResourceMetadata = function(_name)
+{
+	return require('meta/r/' + _name).create();
+};
+
+exports.getAttributesMetadata = function(_name)
+{
+	return require('meta/a/' + _name).create();
+};
