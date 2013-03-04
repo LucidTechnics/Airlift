@@ -31,6 +31,8 @@ var getAllFromCache = function(_keys)
 
 exports.get = function(_resourceName, _id)
 {
+	var result;
+	
 	var entity = util.multiTry(function()
 	{
 		try
@@ -54,7 +56,9 @@ exports.get = function(_resourceName, _id)
 	},
 	5, function(_tries, _e) { util.severe("Encountered this error while getting", _resourceName, "identified by:", _id); });
 
-	return res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
+	result = entity && res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
+
+	return result;
 };
 
 exports.getAll = function(_resourceName, _entityList)
