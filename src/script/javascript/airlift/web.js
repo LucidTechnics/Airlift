@@ -1,414 +1,414 @@
-var timezone;
-var user;
-var userId;
-var userEmail;
-var userName;
-var uriBase;
-var path;
-var uri;
-var resourcePath;
-var id;
-var resourceName;
-var hasId;
-var resourcePathMap;
-var appProfile;
-var auditContext;
-var request;
-var response;
-var restcontext;
-var contentContext;
-var productionMode;
-var handlerName;
-var servlet;
-var webRequestId;
-var restContext;
-var locale;
-
-exports.getServlet = function()
+function Web(WEB_CONTEXT)
 {
-	if (!servlet)
+	var timezone;
+	var user;
+	var userId;
+	var userEmail;
+	var userName;
+	var uriBase;
+	var path;
+	var uri;
+	var resourcePath;
+	var id;
+	var resourceName;
+	var hasId;
+	var resourcePathMap;
+	var appProfile;
+	var auditContext;
+	var request;
+	var response;
+	var restcontext;
+	var contentContext;
+	var productionMode;
+	var handlerName;
+	var servlet;
+	var webRequestId;
+	var restContext;
+	var locale;
+
+	this.getServlet = function()
 	{
-		servlet = this.WEB_CONTEXT.SERVLET;
-	}
-
-	return servlet;
-};
-
-exports.getProductionMode = function()
-{
-	if (!productionMode)
-	{
-		productionMode = this.WEB_CONTEXT.PRODUCTION_MODE;
-	}
-
-	return productionMode;
-};
-
-exports.getHandlerName = function()
-{
-	if (!handlerName)
-	{
-		handlerName = this.WEB_CONTEXT.HANDLER_NAME;
-	}
-
-	return handlerName;
-};
-
-exports.getRequest = function()
-{
-	if (!request)
-	{
-		request = this.WEB_CONTEXT.REQUEST;
-	}
-
-	return request;
-};
-
-exports.getResponse = function()
-{
-	if (!response)
-	{
-		response = this.WEB_CONTEXT.RESPONSE;
-	}
-
-	return response;
-};
-
-exports.getRestContext = function()
-{
-	if (!restContext)
-	{
-		restContext = this.WEB_CONTEXT.REST_CONTEXT;
-	}
-
-	return restContext;
-};
-
-exports.getContentContext = function()
-{
-	if (!contentContext)
-	{
-		contentContext = this.WEB_CONTEXT.CONTENT_CONTEXT;
-	}
-
-	return contentContext;
-}
-
-exports.getUriBase = function()
-{
-	if (!uriBase)
-	{
-		var request = this.getRequest();
-		uriBase = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/";
-	}
-	
-	return uriBase; 
-};
-
-exports.getPath = function()
-{
-	if (!path)
-	{
-		var request = this.getRequest();
-
-		var pathInfo = ((request.getPathInfo() == null) && ("".equals(request.getPathInfo()) == false)) ? "" : request.getPathInfo();
-		var path = request.getServletPath() + pathInfo;
-
-		path = path.replaceAll("/$", "").replaceAll("^/", "");
-	}
-
-	return path;
-};
-
-exports.getUri = function()
-{
-	if (!uri)
-	{
-		uri = this.getUriBase() + this.getPath();
-	}
-	
-	return uri; 
-};
-
-exports.getQueryString = function()
-{
-	return this.getRequest().getQueryString();
-};
-
-exports.getMethod = function()
-{
-	return this.getRequest().getMethod();
-};
-
-exports.getAuditContext = function()
-{
-	if (!auditContext)
-	{
-		auditContext = new Packages.airlift.servlet.rest.RestfulAuditContext();
-	}
-
-	return auditContext;
-};
-
-exports.getSecurityContext = function()
-{
-	return this.getRestContext().getSecurityContext();
-};
-
-exports.getResourcePath = function()
-{
-	if (!resourcePath)
-	{
-		resourcePath = this.getResourceName();
-		var id = this.getId();
-
-		if ("POST".equals(this.getMethod()) === false && id !== null && "".equalsIgnoreCase(id) === false)
+		if (!servlet)
 		{
-			resourcePath = resourcePath + "/" + id;
+			servlet = WEB_CONTEXT.SERVLET;
 		}
-	}
-	
-	return resourcePath;
-};
 
-exports.getId = function()
-{
-	if (!id)
+		return servlet;
+	};
+
+	this.getProductionMode = function()
 	{
-		id = this.getRestContext().constructDomainId();
-	}
-
-	return id;
-};
-
-exports.getResourceName = function()
-{
-	if (!resourceName)
-	{
-		resourceName = this.getRestContext().getThisDomain();
-	}
-
-	return resourceName;
-};
-
-exports.hasId = function()
-{
-	if (hasId === null || hasId === undefined)
-	{
-		hasId = this.getRestContext().hasIdentifier();
-	}
-
-	return hasId;
-};
-
-exports.getResourcePathMap = function()
-{
-	if (!resourcePathMap)
-	{
-		resourcePathMap = this.getRestContext().extractDomainObjectPaths(this.getPath());
-	}
-
-	return resourcePathMap;
-};
-
-exports.getTitle = function()
-{
-	if (!title)
-	{
-		title = this.getResourceName();
-		var id = this.getId();
-
-		if ("".equals(id) == false)
+		if (!productionMode)
 		{
-			title = title + "-" + id;
+			productionMode = WEB_CONTEXT.PRODUCTION_MODE;
 		}
-	}
 
-	return title;
-};
+		return productionMode;
+	};
 
-exports.getServletName = function()
-{
-	return this.getServlet().getServletName();
-};
-
-exports.getLocale = function()
-{
-	if (!locale)
+	this.getHandlerName = function()
 	{
-		if (this.getRequest())
+		if (!handlerName)
 		{
-			locale = this.getRequest().getLocale();
+			handlerName = WEB_CONTEXT.HANDLER_NAME;
 		}
-		else
+
+		return handlerName;
+	};
+
+	this.getRequest = function()
+	{
+		if (!request)
 		{
-			locale = new Packages.java.util.Locale.getDefault();
+			request = WEB_CONTEXT.REQUEST;
 		}
-	}
-
-	return locale;
-};
-
-exports.getUser = function()
-{
-	if (user === undefined)
-	{
-		user = this.getRestContext().getUser();
-
-		if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
-	}
-
-	return user;
-};
-
-exports.getUserId = function()
-{
-	if (userId === undefined)
-	{
-		var user = this.getUser();
-		userId = (user != null) ? user.getId() : null;
-	}
-
-	return userId;
-};
-
-exports.getUserName = function()
-{
-	if (userName === undefined)
-	{
-		var user = this.getUser();
-		userName = (user != null) ? user.getFullName() : null;
-	}
-
-	return userName;
-};
-
-exports.getUserEmail = function()
-{
-	if (userEmail === undefined)
-	{
-		var user = this.getUser();
-		userEmail = (user != null && user.getEmail() != null) ? user.getEmail().toLowerCase() : null;
-	}
-
-	return userEmail;
-};
-
-exports.getUserService = function()
-{
-	return this.getServlet().getUserService(this.getRequest());
-}
-
-exports.getAppProfile = function()
-{
-	if (!appProfile)
-	{
-		appProfile = airlift.app.AppProfile.class.newInstance();
-	}
-
-	return appProfile;
-};
-
-exports.getInitParameter = function(_name)
-{
-	var parameterValue = null, servlet = this.getServlet();
-	
-	if (servlet)
-	{
-		parameterValue = servlet.getServletConfig().getInitParameter(_name);
-	}
-	
-	return parameterValue;
-};
-
-exports.getRootPackageName = function()
-{
-	return this.getInitParameter("a.root.package.name");
-};
-
-exports.auditInserts = function()
-{
-	return this.getInitParameter("a.auditing.insert");
-};
-
-exports.auditGets = function()
-{
-	this.getInitParameter("a.auditing.get");
-};
-
-exports.auditUpdates = function()
-{
-	this.getInitParameter("a.auditing.update");
-};
-
-exports.auditDeletes = function()
-{
-	this.getInitParameter("a.auditing.delete");
-};
-
-exports.getCachingContext = function()
-{
-	return this.getRestContext().getCachingContextMap();
-};
-
-exports.getTimezone = function()
-{
-	if (!timezone)
-	{
-		var request = this.getRequest();
-		var servlet = this.getServlet();
 		
-		timezone = (request && request.getParameter("a.timezone") != null) ? request.getParameter("a.timezone") : this.getInitParameter("a.timezone");
-		timezone = (!timezone) ?  "UTC" : timezone;
-	}
+		return request;
+	};
 
-	return timezone;
-};
-
-exports.getResourceBindings = function()
-{
-	var resourceBindings;
-	
-	for (var resourceName in Iterator(this.getRestContext().getDomainIds()))
+	this.getResponse = function()
 	{
-		var key = resourceName.replaceAll("\\.", "_").toUpperCase();
-		resourceBindings[key] =  this.getRestContext().getIdValue(resourceName);
+		if (!response)
+		{
+			response = WEB_CONTEXT.RESPONSE;
+		}
+
+		return response;
+	};
+
+	this.getRestContext = function()
+	{
+		if (!restContext)
+		{
+			restContext = WEB_CONTEXT.REST_CONTEXT;
+		}
+
+		return restContext;
+	};
+
+	this.getContentContext = function()
+	{
+		if (!contentContext)
+		{
+			contentContext = WEB_CONTEXT.CONTENT_CONTEXT;
+		}
+
+		return contentContext;
 	}
 
-	return resourceBindings;
-};
+	this.getUriBase = function()
+	{
+		if (!uriBase)
+		{
+			var request = this.getRequest();
+			uriBase = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/";
+		}
 
-exports.init = function()
-{
-	return this;
-};
+		return uriBase; 
+	};
 
-exports.getWebRequestId = function()
-{
-	if (!webRequestId)
-	{ 
-		webRequestId = Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
+	this.getPath = function()
+	{
+		if (!path)
+		{
+			var request = this.getRequest();
+
+			var pathInfo = ((request.getPathInfo() == null) && ("".equals(request.getPathInfo()) == false)) ? "" : request.getPathInfo();
+			var path = request.getServletPath() + pathInfo;
+
+			path = path.replaceAll("/$", "").replaceAll("^/", "");
+		}
+
+		return path;
+	};
+
+	this.getUri = function()
+	{
+		if (!uri)
+		{
+			uri = this.getUriBase() + this.getPath();
+		}
+
+		return uri; 
+	};
+
+	this.getQueryString = function()
+	{
+		return this.getRequest().getQueryString();
+	};
+
+	this.getMethod = function()
+	{
+		return this.getRequest().getMethod();
+	};
+
+	this.getAuditContext = function()
+	{
+		if (!auditContext)
+		{
+			auditContext = new Packages.airlift.servlet.rest.RestfulAuditContext();
+		}
+
+		return auditContext;
+	};
+
+	this.getSecurityContext = function()
+	{
+		return this.getRestContext().getSecurityContext();
+	};
+
+	this.getResourcePath = function()
+	{
+		if (!resourcePath)
+		{
+			resourcePath = this.getResourceName();
+			var id = this.getId();
+
+			if ("POST".equals(this.getMethod()) === false && id !== null && "".equalsIgnoreCase(id) === false)
+			{
+				resourcePath = resourcePath + "/" + id;
+			}
+		}
+
+		return resourcePath;
+	};
+
+	this.getId = function()
+	{
+		if (!id)
+		{
+			id = this.getRestContext().constructDomainId();
+		}
+
+		return id;
+	};
+
+	this.getResourceName = function()
+	{
+		if (!resourceName)
+		{
+			resourceName = this.getRestContext().getThisDomain();
+		}
+
+		return resourceName;
+	};
+
+	this.hasId = function()
+	{
+		if (hasId === null || hasId === undefined)
+		{
+			hasId = this.getRestContext().hasIdentifier();
+		}
+
+		return hasId;
+	};
+
+	this.getResourcePathMap = function()
+	{
+		if (!resourcePathMap)
+		{
+			resourcePathMap = this.getRestContext().extractDomainObjectPaths(this.getPath());
+		}
+
+		return resourcePathMap;
+	};
+
+	this.getTitle = function()
+	{
+		if (!title)
+		{
+			title = this.getResourceName();
+			var id = this.getId();
+
+			if ("".equals(id) == false)
+			{
+				title = title + "-" + id;
+			}
+		}
+
+		return title;
+	};
+
+	this.getServletName = function()
+	{
+		return this.getServlet().getServletName();
+	};
+
+	this.getLocale = function()
+	{
+		if (!locale)
+		{
+			if (this.getRequest())
+			{
+				locale = this.getRequest().getLocale();
+			}
+			else
+			{
+				locale = new Packages.java.util.Locale.getDefault();
+			}
+		}
+
+		return locale;
+	};
+
+	this.getUser = function()
+	{
+		if (user === undefined)
+		{
+			user = this.getRestContext().getUser();
+
+			if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
+		}
+
+		return user;
+	};
+
+	this.getUserId = function()
+	{
+		if (userId === undefined)
+		{
+			var user = this.getUser();
+			userId = (user != null) ? user.getId() : null;
+		}
+
+		return userId;
+	};
+
+	this.getUserName = function()
+	{
+		if (userName === undefined)
+		{
+			var user = this.getUser();
+			userName = (user != null) ? user.getFullName() : null;
+		}
+
+		return userName;
+	};
+
+	this.getUserEmail = function()
+	{
+		if (userEmail === undefined)
+		{
+			var user = this.getUser();
+			userEmail = (user != null && user.getEmail() != null) ? user.getEmail().toLowerCase() : null;
+		}
+
+		return userEmail;
+	};
+
+	this.getUserService = function()
+	{
+		return this.getServlet().getUserService(this.getRequest());
 	}
 
-	return webRequestId;
-};
+	this.getAppProfile = function()
+	{
+		if (!appProfile)
+		{
+			appProfile = airlift.app.AppProfile.class.newInstance();
+		}
 
-exports.setResponseCode = function(_code)
-{
-	this.getContentContext().setResponseCode(_code);
-};
+		return appProfile;
+	};
 
-exports.setContent = function(_content)
-{
-	this.getContentContext().setContent(_content);
-};
+	this.getInitParameter = function(_name)
+	{
+		var parameterValue = null, servlet = this.getServlet();
 
-exports.setType = function(_type)
-{
-	this.getContentContext().setType(_type);
-};
+		if (servlet)
+		{
+			parameterValue = servlet.getServletConfig().getInitParameter(_name);
+		}
 
-exports.getLog = function()
+		return parameterValue;
+	};
+
+	this.getRootPackageName = function()
+	{
+		return this.getInitParameter("a.root.package.name");
+	};
+
+	this.auditInserts = function()
+	{
+		return this.getInitParameter("a.auditing.insert");
+	};
+
+	this.auditGets = function()
+	{
+		this.getInitParameter("a.auditing.get");
+	};
+
+	this.auditUpdates = function()
+	{
+		this.getInitParameter("a.auditing.update");
+	};
+
+	this.auditDeletes = function()
+	{
+		this.getInitParameter("a.auditing.delete");
+	};
+
+	this.getCachingContext = function()
+	{
+		return this.getRestContext().getCachingContextMap();
+	};
+
+	this.getTimezone = function()
+	{
+		if (!timezone)
+		{
+			var request = this.getRequest();
+			var servlet = this.getServlet();
+
+			timezone = (request && request.getParameter("a.timezone") != null) ? request.getParameter("a.timezone") : this.getInitParameter("a.timezone");
+			timezone = (!timezone) ?  "UTC" : timezone;
+		}
+
+		return timezone;
+	};
+
+	this.getResourceBindings = function()
+	{
+		var resourceBindings;
+
+		for (var resourceName in Iterator(this.getRestContext().getDomainIds()))
+		{
+			var key = resourceName.replaceAll("\\.", "_").toUpperCase();
+			resourceBindings[key] =  this.getRestContext().getIdValue(resourceName);
+		}
+
+		return resourceBindings;
+	};
+
+	this.getWebRequestId = function()
+	{
+		if (!webRequestId)
+		{ 
+			webRequestId = Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
+		}
+
+		return webRequestId;
+	};
+
+	this.setResponseCode = function(_code)
+	{
+		this.getContentContext().setResponseCode(_code);
+	};
+
+	this.setContent = function(_content)
+	{
+		this.getContentContext().setContent(_content);
+	};
+
+	this.setType = function(_type)
+	{
+		this.getContentContext().setType(_type);
+	};
+}
+
+exports.create = function(WEB_CONTEXT)
 {
-	return this.LOG;
+	if (!WEB_CONTEXT) { throw 'Unable to create web module without a web context' }
+
+	return new Web(WEB_CONTEXT);
 };

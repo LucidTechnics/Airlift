@@ -1,11 +1,13 @@
-var res = require('airlift/resource');
+var mockWebContext = require('./mockWebContext').create({productionMode: false});
+
+var res = require('airlift/resource').create(mockWebContext);
 var util = require('airlift/util');
 
-var web = require('./mockWeb').create(),
+var web = require('airlift/web').create(mockWebContext),
 context = require('./mockContext').person(),
 bediako = require('./mockPerson').create("6524d6f79d19", "Bediako George", 'middle aged', '01/01/1970', 43);
 
-context.WEB_CONTEXT = require('./mockWebContext').create({productionMode: false});
+context.WEB_CONTEXT = mockWebContext;
 
 var assertContextIsOK = function(_assert, _resourceName, _value, _attributeName, _resource, _metadata, _context)
 {

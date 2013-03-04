@@ -1,5 +1,7 @@
-var incoming = require('airlift/incoming'),
-res = require('airlift/resource'),
+var mockWebContext = require('./mockWebContext').create({productionMode: false});
+
+var incoming = require('airlift/incoming').create(mockWebContext),
+res = require('airlift/resource').create(mockWebContext),
 context = require('./mockContext').person(),
 bediako = require('./mockPerson').create("6524d6f79d19", "Bediako George", 'middle aged', '01/01/1970', 43),
 util = require('airlift/util');

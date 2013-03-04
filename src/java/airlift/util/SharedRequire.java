@@ -113,6 +113,8 @@ public class SharedRequire
 					throw new IllegalStateException(
 							"Attempt to set main module after it was loaded");
 				}
+
+				System.out.println("MODULE is cached: " + id);
 				return exports;
 			}
 			// Check if it is currently being loaded on the current thread
@@ -121,10 +123,12 @@ public class SharedRequire
 			if(threadLoadingModules != null) {
 				exports = threadLoadingModules.get(id);
 				if(exports != null) {
+					System.out.println("MODULE is currently being loaded: " + id);
 					return exports;
 				}
 			}
 		}
+
         // The requested module is neither already loaded, nor is it being
         // loaded on the current thread. End of fast path. We must synchronize
         // now, as we have to guarantee that at most one thread can load
@@ -142,9 +146,13 @@ public class SharedRequire
 				exports = exportedModuleInterfaces.get(id);
 			}
 			
-            if(exports != null) {
+			if(exports != null) {
+				System.out.println("MODULE is cached: " + id);
                 return exports;
-            }
+			}
+
+			System.out.println("module is NOT CACHED: " + id);
+			
             // Nope, still not loaded; we're loading it then.
             final ModuleScript moduleScript = getModule(cx, id, uri, base);
             if (sandboxed && !moduleScript.isSandboxed()) {

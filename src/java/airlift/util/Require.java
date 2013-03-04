@@ -95,7 +95,9 @@ public class Require extends BaseFunction
                     "require() needs one argument");
         }
 
-        String id = (String)Context.jsToJava(args[0], String.class);
+		String id = (String)Context.jsToJava(args[0], String.class);
+
+		System.out.println("REQUIRING: " + id);
         URI uri = null;
         URI base = null;
 
@@ -134,21 +136,6 @@ public class Require extends BaseFunction
 		
 		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 
-		if (id != null && id.contains("extlib/") == false)
-		{
-			Scriptable webContext = cx.newObject(scope);
-
-			for (String key: this.bindings.keySet())
-			{
-				Object object = Context.javaToJS(this.bindings.get(key), scope);
-				ScriptableObject.putConstProperty(webContext, key, object);
-			}
-
-			ScriptableObject.putConstProperty(exportedModuleInterface, "WEB_CONTEXT", webContext);
-			
-			Object log = Context.javaToJS(java.util.logging.Logger.getLogger(id), scope);
-			ScriptableObject.putConstProperty(exportedModuleInterface, "LOG", log);
-		}
 
 		return exportedModuleInterface;
     }

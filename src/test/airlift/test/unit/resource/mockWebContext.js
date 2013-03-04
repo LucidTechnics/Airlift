@@ -1,32 +1,20 @@
 var util = require('airlift/util');
 var javaArray = require('airlift/javaArray');
 var bediako = require('./mockPerson').create("6524d6f79d19", "Bediako George", 'middle aged', '01/01/1970', 43);
-var res = require('airlift/resource');
 var collection = require('airlift/collection');
 
-exports.CONTENT_CONTEXT = new Packages.airlift.servlet.rest.SimpleContentContext("", "text/html");
-
-exports.SERVLET = {};
-
-exports.RESPONSE = {};
-
-exports.REQUEST = {};
-
-exports.REST_CONTEXT = {};
-
-exports.PRODUCTION_MODE = {};
-
-exports.create = function(_config)
+function MockWebContext(_config)
 {
 	var config = _config||{};
-	
+
+	this.CONTENT_CONTEXT = new Packages.airlift.servlet.rest.SimpleContentContext("", "text/html");
 	this.PRODUCTION_MODE = util.hasValue(_config.productionMode) || true;
 
 	var resourceId = config.resourceId || null;
 	var resourceName = config.resourceName || 'person';
 	var resourceIdMap = {};
 	resourceIdMap[resourceName] = resourceId;
-	
+
 	var serverName = config.serverName || "www.example.com";
 	var scheme = config.scheme || "http";
 	var serverPort = config.serverPort || new Packages.java.lang.Integer(80).intValue();
@@ -39,16 +27,16 @@ exports.create = function(_config)
 	for (var name in bediako)
 	{
 		var value = bediako[name];
-		
+
 		if (value instanceof Packages.java.util.Collection)
 		{
 			var initializer = [];
-			
+
 			collection.each(value, function(_value, _index, _collection)
 			{
 				initializer.push(_value);
 			});
-			
+
 			parameters[name] = javaArray.stringArray(value.size(), initializer);
 		}
 		else
@@ -60,8 +48,8 @@ exports.create = function(_config)
 	var restParameters = {
 		'person.id': resourceId
 	};
-	
-	var locale = config.locale || Packages.java.util.Locale.US;
+
+	var locale = config.locale || Packages.java.util.Locale.getDefault();
 	var cachingContextMap = new Packages.java.util.HashMap();
 
 	var domainIds = new Packages.java.util.HashSet();
@@ -70,9 +58,8 @@ exports.create = function(_config)
 	this.SERVLET = {
 		getServletName: function() { return "Mock Servlet"; }
 	};
-	
+
 	this.REQUEST = {
-		
 		getServerName: function() { return serverName; },
 		getServerPort: function() { return serverPort; },
 		getScheme: function() { return scheme; },
@@ -103,4 +90,9 @@ exports.create = function(_config)
 		getIdValue: function(_name) { return resourceIdMap[_name]; },
 		getParameter: function(_name) { return restParameters[_name]; }
 	};
+}
+
+exports.create = function(_config)
+{
+	return new MockWebContext(_config);
 };

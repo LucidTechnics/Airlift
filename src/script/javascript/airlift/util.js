@@ -1,4 +1,4 @@
-var web = require('./web');
+var log = Packages.java.util.logging.Logger.getLogger('airlift');
 
 exports.typeOf = function typeOf(value)
 {
@@ -171,8 +171,8 @@ exports.createCalendar = function createCalendar(_config)
 	var date = (_config && _config.date) ? _config.date : null;
 	var dateOffset = (_config && _config.dateOffset) ? _config.dateOffset : 0;
 	var dateOffsetType = (_config && _config.dateOffsetType) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
-	var timezone = (_config && _config.timezone) ? _config.timezone : web.getTimezone();
-	var locale = (_config && _config.locale) ? _config.locale : web.getLocale();
+	var timezone = (_config && _config.timezone) ? _config.timezone : "UTC";
+	var locale = (_config && _config.locale) ? _config.locale : Packages.java.util.Locale.getDefault();
 
 	if (this.hasValue(date) === true)
 	{
@@ -200,16 +200,7 @@ exports.guid = function guid(_length)
 	}
 	else
 	{
-		var length = web.getInitParameter("airlift.truncated.sha1.id.length");
-
-		if (length)
-		{
-			id = Packages.airlift.util.IdGenerator.generate(parseInt(length, 10));
-		}
-		else
-		{
-			id = Packages.airlift.util.IdGenerator.generate(32);
-		}
+		id = Packages.airlift.util.IdGenerator.generate(32);
 	}
 
 	return id; 
@@ -281,22 +272,19 @@ var message = function message()
 exports.info = function info()
 {
 	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
-
-	this.LOG.info(info);
+	log.info(info);
 };
 
 exports.warning = function warning()
 {
-	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
-
-	this.LOG.warning(info);
+	var warning = message.apply(this, Array.prototype.slice.call(arguments, 0));
+	log.warning(warning);
 };
 
 exports.severe = function severe()
 {
-	var info = message.apply(this, Array.prototype.slice.call(arguments, 0));
-
-	this.LOG.severe(info);
+	var severe = message.apply(this, Array.prototype.slice.call(arguments, 0));
+	log.severe(severe);
 };
 
 exports.value = function value(_candidate, _default)
@@ -465,4 +453,9 @@ exports.getResourceMetadata = function(_name)
 exports.getAttributesMetadata = function(_name)
 {
 	return require('meta/a/' + _name).create();
+};
+
+exports.getWebRequestId = function(_name)
+{
+	return Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 };

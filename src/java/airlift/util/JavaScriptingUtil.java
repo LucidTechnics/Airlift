@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 public class JavaScriptingUtil
 {
@@ -286,7 +288,7 @@ public class JavaScriptingUtil
 		try
 		{
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
-			String handler = "require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle();";
+			String requireHandler = "var handle = require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle;";
 
 			log.info("getting require: " + System.currentTimeMillis()); 
 			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(getScope(), "require");
@@ -300,13 +302,29 @@ public class JavaScriptingUtil
 			log.info("installed new require: " + System.currentTimeMillis());
 			log.info("_scriptResource: " + _scriptResource);
 			log.info("scriptResource: " + scriptResource);
-			log.info("handle script: " + handler);
+			log.info("handle script: " + requireHandler);
 
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
-			log.info("executing handler string: " + System.currentTimeMillis());
-			_context.evaluateString(getScope(), handler,scriptResource, 1, null);
-			log.info("executed handler string: " + System.currentTimeMillis());
+			log.info("requiring handler: " + System.currentTimeMillis());
+			_context.evaluateString(getScope(), requireHandler,scriptResource, 1, null);
+			log.info("handler string required: " + System.currentTimeMillis());
+
+			Object handle = scope.get("handle", getScope());
+			java.util.ArrayList argumentList = new java.util.ArrayList();
+
+			Scriptable webContext = _context.newObject(scope);
+
+			for (String key: this.bindingsMap.keySet())
+			{
+				Object object = Context.javaToJS(this.bindingsMap.get(key), scope);
+				ScriptableObject.putConstProperty(webContext, key, object);
+			}
+
+			argumentList.add(webContext);
+			Object[] arguments = argumentList.toArray();
+			
+			((Function)handle).call(_context, getScope(), getScope(), arguments);
 		}
 		finally
 		{
