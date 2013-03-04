@@ -82,15 +82,9 @@ function Get(WEB_CONTEXT)
 					resultMap.putAll(populateCacheFromMap(datastore.get(util.createKeysCollection(copy)).get()));
 				}
 
-				util.println('Result map', resultMap);
-
 				for (var key in Iterator(util.createKeysCollection(_entityList)))
 				{
-					util.println('processing key', key);
-
 					var entity = resultMap.get(key);
-
-					util.println('got entity', entity);
 
 					if (entity)
 					{

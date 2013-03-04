@@ -97,7 +97,6 @@ public class Require extends BaseFunction
 
 		String id = (String)Context.jsToJava(args[0], String.class);
 
-		System.out.println("REQUIRING: " + id);
         URI uri = null;
         URI base = null;
 

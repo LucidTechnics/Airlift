@@ -24,18 +24,13 @@ function Collect(WEB_CONTEXT)
 			if (!keysOnly && !fetchedResources)
 			{
 				fetchedResources = require('./get').create(WEB_CONTEXT).getAll(_resourceName, _entities);
-
-				util.println('fetched resource is', fetchedResources);
 			}
 
 			result = keys.next();
 
-			util.info('result is', result);
-
 			if (!keysOnly)
 			{
 				result = fetchedResources.get(result);
-				util.info('now result is', result);
 			}
 
 			return result;

@@ -51,15 +51,12 @@ public class JavaScriptingUtil
 
 	static
 	{
-		log.info("running static");
 		Context context = (new ContextFactory()).enterContext();
 		
 		try
 		{
 			sharedScope = context.initStandardObjects();
 			context.evaluateString(sharedScope, shim, "JavaScriptingUtil initialization", 1, null);
-
-			log.info("loading require for the first time into the shared scope: " + System.currentTimeMillis());
 
 			java.util.Set uris = new java.util.HashSet();
 
@@ -87,9 +84,7 @@ public class JavaScriptingUtil
 		}
 		finally
 		{
-			log.info("Closing static context");
 			context.exit();
-			log.info("Done closing static context");
 		}
 	}
 	
@@ -155,8 +150,6 @@ public class JavaScriptingUtil
 				ScriptableObject.putProperty(getScope(), key, object);
 			}
 
-			log.info("script is running this scope object: " + getScope().getIds().length);
-
 			if (_timeScript == true)
 			{
 				startTime = System.currentTimeMillis();
@@ -168,7 +161,7 @@ public class JavaScriptingUtil
 			if (_timeScript == true)
 			{
 				long total = System.currentTimeMillis() - startTime;
-				log.info("Script: " + _scriptResource + " took this many milliseconds to run: " + total);
+				log.info("Handler took this many milliseconds to run: " + total);
 			}
 		}
 		catch(RuntimeException h)
@@ -177,7 +170,7 @@ public class JavaScriptingUtil
 		}
 		catch(Throwable t)
 		{
-			throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
+			throw new RuntimeException("Unable to execute handler for this reason: " + t.toString(), t);
 		}
 		finally
 		{
@@ -229,7 +222,7 @@ public class JavaScriptingUtil
 				if (_timeScripts)
 				{
 					long total = System.currentTimeMillis() - startTime;
-					log.info("Script: " + _scriptResources[i] + " took this many milliseconds to run: " + total);
+					log.info("Handler took this many milliseconds to run: " + total);
 				}
 			}
 		}
@@ -240,7 +233,7 @@ public class JavaScriptingUtil
 		}
 		catch(Throwable t)
 		{
-			throw new RuntimeException("Unable to execute script: " + _scriptResources[i] + " for this reason: " + t.toString(), t);
+			throw new RuntimeException("Unable to execute handler for this reason: " + t.toString(), t);
 		}
 		finally
 		{
@@ -266,8 +259,6 @@ public class JavaScriptingUtil
 		context.setLanguageVersion(180);
 		context.setOptimizationLevel(-1);   //in app engine it turns out that interpreted mode is fastest for handler execution.
 
-		log.info("Using context: " + context); 
-		
 		return context;
 	}
 
@@ -290,25 +281,14 @@ public class JavaScriptingUtil
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
 			String requireHandler = "var handle = require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle;";
 
-			log.info("getting require: " + System.currentTimeMillis()); 
 			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(getScope(), "require");
-			log.info("got require: " + System.currentTimeMillis());
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
-			//Require require = new Require(getScope(), sharedRequire, getBindingsMap(), true);
-			log.info("constructed new require: " + System.currentTimeMillis());
 			require.install(getScope());
 			
-			log.info("installed new require: " + System.currentTimeMillis());
-			log.info("_scriptResource: " + _scriptResource);
-			log.info("scriptResource: " + scriptResource);
-			log.info("handle script: " + requireHandler);
-
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
-			log.info("requiring handler: " + System.currentTimeMillis());
 			_context.evaluateString(getScope(), requireHandler,scriptResource, 1, null);
-			log.info("handler string required: " + System.currentTimeMillis());
 
 			Object handle = scope.get("handle", getScope());
 			java.util.ArrayList argumentList = new java.util.ArrayList();

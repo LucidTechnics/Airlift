@@ -457,36 +457,21 @@ exports.partition = function(_collection, _attribute)
 exports.reduce = function(_collection, _function, _initialValue, _this)
 {
 	var result, iterator;
-	
-	if (_collection && _collection.hasNext && _collection.next)
+
+	if (_collection && _collection instanceof java.util.Iterator)
 	{
 		iterator = _collection;
 	}
-	else if (_collection && _collection.iterator)
+	else if (_collection && _collection instanceof java.lang.Iterable)
 	{
 		iterator = _collection.iterator();
 	}
-
-	var util = require('./util');
-	
-	if (iterator && iterator.hasNext() === false && util.hasValue(_initialValue) === false)
-	{
-		throw TypeError('Collection is empty ... Must provide initial value or a non empty collection');
-	}
-	
+		
 	if (iterator)
 	{
 		var index = 0;
 		
-		if (util.hasValue(_initialValue) === true)
-		{
-			result = _initialValue;
-		}
-		else if (iterator.hasNext() === true)
-		{
-			result = iterator.next();
-			index++;
-		}
+		result = _initialValue;
 		
 		while (iterator.hasNext() === true)
 		{
@@ -496,7 +481,11 @@ exports.reduce = function(_collection, _function, _initialValue, _this)
 	}
 	else if (_collection && _collection.reduce)
 	{
-		result = _collection.reduce(_function);
+		result = _collection.reduce(_function, _initialValue);
+	}
+	else
+	{
+		throw TypeError('Must provide a JavaScript array, java.util.Collection, java.lang.Iterable, or java.util.Iterator');
 	}
 	
 	return result;

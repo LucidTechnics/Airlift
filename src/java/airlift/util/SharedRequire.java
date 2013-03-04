@@ -114,7 +114,6 @@ public class SharedRequire
 							"Attempt to set main module after it was loaded");
 				}
 
-				System.out.println("MODULE is cached: " + id);
 				return exports;
 			}
 			// Check if it is currently being loaded on the current thread
@@ -123,7 +122,6 @@ public class SharedRequire
 			if(threadLoadingModules != null) {
 				exports = threadLoadingModules.get(id);
 				if(exports != null) {
-					System.out.println("MODULE is currently being loaded: " + id);
 					return exports;
 				}
 			}
@@ -147,11 +145,9 @@ public class SharedRequire
 			}
 			
 			if(exports != null) {
-				System.out.println("MODULE is cached: " + id);
                 return exports;
 			}
 
-			System.out.println("module is NOT CACHED: " + id);
 			
             // Nope, still not loaded; we're loading it then.
             final ModuleScript moduleScript = getModule(cx, id, uri, base);
