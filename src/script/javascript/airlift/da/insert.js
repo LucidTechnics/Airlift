@@ -35,6 +35,8 @@ exports.provideUniqueId = function(_resourceName)
 
 exports.insert = function(_resourceName, _resource, _function)
 {
+	var errorStatus = false;
+	
 	try
 	{
 		var transaction = datastore.getCurrentTransaction(null);
@@ -69,12 +71,13 @@ exports.insert = function(_resourceName, _resource, _function)
 	}
 	catch(e)
 	{
+		errorStatus = true;
 		if (transaction) { transaction.rollbackAsync(); }
 		throw e;
 	}
 	finally
 	{
-		if (transaction) { transaction.commitAsync(); } 
+		if (transaction && !errorStatus) { transaction.commitAsync(); } 
 	}
 
 	return result;

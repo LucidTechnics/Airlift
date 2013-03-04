@@ -336,46 +336,56 @@ exports.convert = function convert(_value, _attributeName, _resource)
 	var attributesMetadata = require('meta/a/' + resourceName).create().attributes;
 	var value;
 
-	try
-	{
-		var type = attributesMetadata[_attributeName].type;
+	var type = attributesMetadata[_attributeName].type;
 
-		if (converter[type])
+	if ("id".equals(_attributeName) !== true)
+	{
+		try
 		{
-			util.println('converting', _attributeName, 'with type', type);
-			var parameterValue = request.getParameterValues(_attributeName);
+			if (converter[type])
+			{
+				util.println('converting', _attributeName, 'with type', type);
+				var parameterValue = request.getParameterValues(_attributeName);
+				value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+			}
+			else
+			{
+				throw new Error('no converter found for type: ' + type);
+			}
+		}
+		catch(e)
+		{
+			if (e.javaException)
+			{
+				this.LOG && this.LOG.info(e.javaException.getMessage());
+			}
+			else
+			{
+				this.LOG && this.LOG.info(e.message);
+			}
+
+			this.report(_attributeName, "This value is not correct.", "conversion");
+		}
+
+		if (util.isWhitespace(attributesMetadata[_attributeName].mapTo) === true)
+		{
+			/* Form value overrides what is in the URI.  This is done for
+			 * security reasons.  The foreign key may be protected via TLS
+			 * by including it in the form and not in the URI.  If it is
+			 * included in the form the expectation is that the URI should
+			 * be overridden.
+			 */
+
+			var restContext = web.getRestContext();
+			var parameterValue = restContext.getParameter(_attributeName.replace('id$', '.id'));
 			value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
 		}
-		else
-		{
-			throw new Error('no converter found for type: ' + type);
-		}
 	}
-	catch(e)
+	else
 	{
-		if (e.javaException)
-		{
-			this.LOG && this.LOG.info(e.javaException.getMessage());
-		}
-		else
-		{
-			this.LOG && this.LOG.info(e.message);
-		}
-		
-		this.report(_attributeName, "This value is not correct.", "conversion");
-	}
-
-	if (util.isWhitespace(attributesMetadata[_attributeName].mapTo) === true)
-	{
-		/* Form value overrides what is in the URI.  This is done for
-		 * security reasons.  The foreign key may be protected via TLS
-		 * by including it in the form and not in the URI.  If it is
-		 * included in the form the expectation is that the URI should
-		 * be overridden.
-		 */
-
 		var restContext = web.getRestContext();
-		value = value || restContext.getParameter(_attributeName.replace('id$', '.id'));
+		var parameterValue = restContext.getParameter(resourceName + ".id");
+		value = (util.hasValue(parameterValue) && converter[type]([ parameterValue ])) || null;
 	}
 
 	_resource[_attributeName] = value;

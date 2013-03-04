@@ -195,3 +195,44 @@ exports["test callback iterator"] = function(_assert)
 	
 	_assert.eq(copyList, list, 'call back iterator not working correctly');
 };
+
+exports['test create list'] = function(_assert)
+{
+	var list = util.list();
+	_assert.ok(list instanceof java.util.ArrayList, 'list is not an ArrayList');
+
+	list = util.list(1);
+
+	list.add('element');
+
+	var copy = util.list(list);
+
+	_assert.eq(copy, list, 'list was not copied correctly');
+};
+
+exports['test create set'] = function(_assert)
+{
+	var set = util.set();
+	_assert.ok(set instanceof java.util.HashSet, 'set is not a HashSet');
+
+	set = util.set(1);
+	
+	set.add('element');
+
+	var copy = util.set(set);
+
+	_assert.eq(copy, set, 'set was not copied correctly');
+};
+
+exports['test create map'] = function(_assert)
+{
+	var map = util.map();
+	_assert.ok(map instanceof java.util.HashMap, 'map is not a HashMap');
+
+	map = util.map(1);
+	map.put('element', 1);
+
+	var copy = util.map(map);
+
+	_assert.eq(copy, map, 'map was not copied correctly');
+};
