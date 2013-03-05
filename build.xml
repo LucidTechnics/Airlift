@@ -27,6 +27,7 @@
 	<property name="junit-result" location="result" />
 	<property name="runtime.lib" location="runtime-lib" />
 	<property name="build.only.lib" location="build-only-lib" />
+	<property name="env" location="env" />
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="src.shl" location="${src}/shl" />
@@ -200,7 +201,6 @@
 
 		<replace dir="${stage}" propertyFile="token.properties">
 		  <include name="**/*.*"/>
-		  <replacefilter token="@DEPLOY.DIR@" property="DEPLOY.DIR"/>
 		  <replacefilter token="@LOG4J.JAR@" property="LOG4J.JAR"/>
 		  <replacefilter token="@VERSION@" property="VERSION"/>
 		  <replacefilter token="@APPNAME@" property="APPNAME"/>
@@ -295,6 +295,19 @@
 			<fileset dir="${src.images}" includes="**/*.*" />
 		</copy>
 		
+	</target>
+
+	<target name="env" depends="redeploy" >
+		<delete>
+			<fileset dir="${env}/war/WEB-INF" includes="airlift-*core.jar"/>
+		</delete>
+
+		<copy todir="${env}/war/WEB-INF/lib">
+			<fileset dir="${dist}/lib/" includes="${jar}-core.jar" />
+		</copy>
+
+		<zip destfile="${dist}/airlift-env-latest.zip" basedir="${env}" />
+	
 	</target>
 
 	<target name="createRootPackageDirProperty" >

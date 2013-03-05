@@ -5,7 +5,7 @@
 ##
 ## appName and package name are pushed via token replacement into web.xml.
 ##
-package=org.${appName}
+package=com.${appName}
 
 description=${appName} is a web application.
 
@@ -30,7 +30,9 @@ airlift.timezone=America/New_York
 ## Session duration in seconds. If not set Airlift defaults to 1200
 ## seconds or 20 minutes
 ##
-airlift.session.timeout.duration=1200
+## Setting time out to two days ...
+##
+airlift.session.timeout.duration=172800
 
 ##
 ## Use the following to set the length of the truncated SHA1
@@ -44,39 +46,49 @@ airlift.truncated.sha1.id.length=10
 
 airlift.report.java.exception=no
 
-#Airlift will support symmetric encryption and decryption 
-airlift.cipher.password=popcorn5relishe$
-airlift.initial.vector=@fuzzymonkeyw1n5
+##
+##Airlift supports symmetric encryption and decryption 
+##
+airlift.cipher.password=
+airlift.initial.vector=
 
 ##
-##Airlift will automatically turn off caching of templates, content,
-##and will not compile JavaScript scripts when not in production mode.  For
-##optimal performance set this parameter to yes.
+##Airlift will not compile JavaScript scripts when not in production
+##mode.  For optimal performance set this parameter to yes.
 ##
-
-airlift.application=airliftlabs
-airlift.application.version=testing-09282011-0
-airlift.base=http://localhost:8080
-#airlift.base=https://${airlift.application}.appspot.com:443
 airlift.production.mode=no
-#Development user security is only turned off when production mode is not "yes"
-#this makes it easy to bypass security in development but not in
-#production.
-airlift.dev.user.security=yes
-#Replace the default user service with your own user service
+
+##
+##Development user security is only turned off when production mode
+##is not "yes" this makes it easy to bypass security in development
+##but not in production.  To turn off user security in development 
+##but not in production, simply set this parameter to 'no'.
+##
+airlift.dev.user.security=no
+
+##
+## Sets the application version on upload
+##
+airlift.application=airliftlabs
+airlift.application.version=dev-12202012-0
+airlift.base=http://localhost:8080
+
+##
+##Replace the default user service with your own user service
+##
 airlift.user.service=airlift.servlet.rest.GoogleUserService
 
 ##
-## Specify these values for your java doc 
+## Airlift automatic auditing
 ##
-javadoc.java.version=http://java.sun.com/j2se/1.6.0/docs/api/
-javadoc.footer.tag.info=Copyright 2009. All Rights Reserved
-
-# set this to zero for unlimited field lengths
-airlift.search.index.max.field.length=0
-
-#airlift auditing
 airlift.auditing.insert=on
 airlift.auditing.get=off
 airlift.auditing.update=on
 airlift.auditing.delete=on
+
+##
+## Airlift is a threadsafe application by default.  set to false
+## if you are doing something that makes your application not
+## threadsafe
+##
+airlift.threadsafe=true

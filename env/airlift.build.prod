@@ -49,8 +49,8 @@ airlift.report.java.exception=no
 ##
 ##Airlift supports symmetric encryption and decryption 
 ##
-airlift.cipher.password=popcorn5relishe$
-airlift.initial.vector=@fuzzymonkeyw1n5
+airlift.cipher.password=
+airlift.initial.vector=
 
 ##
 ##Airlift will not compile JavaScript scripts when not in production
@@ -77,17 +77,6 @@ airlift.base=https://${airlift.application}.appspot.com:443
 ##Replace the default user service with your own user service
 ##
 airlift.user.service=airlift.servlet.rest.GoogleUserService
-
-##
-## Specify these values for your java doc 
-##
-javadoc.java.version=http://java.sun.com/j2se/1.6.0/docs/api/
-javadoc.footer.tag.info=Copyright 2012. All Rights Reserved
-
-##
-## set this to zero for unlimited search index field lengths
-##
-airlift.search.index.max.field.length=0
 
 ##
 ## Airlift automatic auditing
