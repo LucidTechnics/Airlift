@@ -28,6 +28,7 @@
 	<property name="runtime.lib" location="runtime-lib" />
 	<property name="build.only.lib" location="build-only-lib" />
 	<property name="env" location="env" />
+	<property name="downloads" location="downloads" />
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="src.shl" location="${src}/shl" />
@@ -306,7 +307,7 @@
 			<fileset dir="${dist}/lib/" includes="${jar}-core.jar" />
 		</copy>
 
-		<zip destfile="${dist}/airlift-env-latest.zip" basedir="${env}" />
+		<zip destfile="${downloads}/airlift-env-latest.zip" basedir="${env}" />
 	
 	</target>
 
