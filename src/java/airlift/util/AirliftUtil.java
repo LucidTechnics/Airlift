@@ -14,7 +14,6 @@
 package airlift.util;
 
 import airlift.rest.Route;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -94,51 +93,6 @@ public class AirliftUtil
 		}
 
 		return errorString;
-	}
-
-	/**
-	 * Convert a java.util.Map to JSON.
-	 *
-	 * @param _map the _map
-	 * @return the string
-	 */
-	public static String toJson(java.util.Map _map)
-	{
-		return new GsonBuilder().create().toJson(_map);
-	}
-
-	/**
-	 * Convert a java.util.List to JSON.
-	 *
-	 * @param _list the _list
-	 * @return the string
-	 */
-	public static String toJson(java.util.List _list)
-	{
-		return new GsonBuilder().create().toJson(_list);
-	}
-
-	/**
-	 * Convert object to JSON.
-	 *
-	 * @param _object the _object
-	 * @return the string
-	 */
-	public static String toJson(Object _object)
-	{
-		return new GsonBuilder().create().toJson(_object);
-	}
-
-	/**
-	 * Convert object from JSON.
-	 *
-	 * @param _json the _json
-	 * @param _class the _class
-	 * @return the object
-	 */
-	public static Object fromJson(String _json, Class _class)
-	{
-		return new GsonBuilder().create().fromJson(_json, _class);
 	}
 
 	/**
@@ -263,9 +217,9 @@ public class AirliftUtil
 
 		try
 		{
-			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName(_rootPackageName + ".AppProfile").newInstance();
+			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
 
-			isDomainName = appProfile.isValidDomain(_domainName);
+			isDomainName = appProfile.isValidResource(_domainName);
 		}
 		catch(Throwable t)
 		{
@@ -756,136 +710,5 @@ public class AirliftUtil
 	{
 		String convertedBytes = convertToString(_byteArray);
 		return (StringUtils.isNumeric(convertedBytes) == true && StringUtils.isWhitespace(convertedBytes) == false) ? new java.util.Date(Long.parseLong(convertedBytes)) : null;
-	}
-	
-	/**
-	 * Describes a domain object by returning a Map with description and values.
-	 *
-	 * @param _do the _do
-	 * @param _interfaceClass the _interface class
-	 * @return Map of domain object with descriptions and values
-	 */
-	public static java.util.Map<String, Object> describe(Object _do, Class _interfaceClass)
-	{
-		java.util.Map<String, Object> descriptionMap = new java.util.HashMap<String, Object>();
-
-		try
-		{
-			org.apache.commons.beanutils.PropertyUtilsBean propertyUtilsBean = new org.apache.commons.beanutils.PropertyUtilsBean();
-
-			java.beans.PropertyDescriptor[] descriptorArray = propertyUtilsBean.getPropertyDescriptors(_do);
-
-			for (java.beans.PropertyDescriptor propertyDescriptor: descriptorArray)
-			{
-				if ("class".equalsIgnoreCase(propertyDescriptor.getName()) == false)
-				{
-					java.lang.reflect.Method getter = propertyDescriptor.getReadMethod();
-
-					Object rawValue = getter.invoke(_do, new Object[0]);
-					Object value = null;
-
-					if (java.sql.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
-					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Datable.class);
-
-						String mask = "MM-dd-yyyy";
-
-						if (datable != null)
-						{
-							String[] datePatternArray = datable.dateTimePatterns();
-
-							if (datePatternArray != null && datePatternArray.length > 0)
-							{
-								mask = datePatternArray[0];
-							}
-						}
-
-						value = airlift.util.FormatUtil.format((java.util.Date)rawValue, mask);
-					}
-					else if (java.util.Date.class.equals(propertyDescriptor.getPropertyType()) == true)
-					{
-						airlift.generator.Presentable presentable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Presentable.class);
-
-						String mask = "MM-dd-yyyy";
-
-						if (presentable != null)
-						{
-							String pattern = presentable.dateTimePattern();
-
-							if (pattern != null)
-							{
-								mask = pattern;
-							}
-						}
-
-						value = airlift.util.FormatUtil.format((java.util.Date) rawValue, mask);
-
-					}
-					else if (java.sql.Timestamp.class.equals(propertyDescriptor.getPropertyType()) == true)
-					{
-						airlift.generator.Datable datable = airlift.util.AirliftUtil.getMethodAnnotation(_interfaceClass, propertyDescriptor.getName(), airlift.generator.Datable.class);
-
-						String mask = "MM-dd-yyyy HH:mm:ss";
-
-						if (datable != null)
-						{
-							String[] patternArray = datable.dateTimePatterns();
-
-							if (patternArray != null && patternArray.length > 0)
-							{
-								mask = patternArray[0];
-							}
-						}
-
-						value = airlift.util.FormatUtil.format((java.sql.Timestamp) rawValue, mask);
-					}
-					else if (java.util.ArrayList.class.equals(propertyDescriptor.getPropertyType()) == true ||
-							java.util.HashSet.class.equals(propertyDescriptor.getPropertyType()) == true)
-					{
-						value = (rawValue == null) ? null : rawValue;
-					}
-					else
-					{
-						value = (rawValue == null) ? null : rawValue.toString();
-					}
-
-					descriptionMap.put(propertyDescriptor.getName(), value);
-				}
-			}
-
-			return descriptionMap;
-		}		
-		catch(Throwable t)
-		{
-			throw  new RuntimeException(t);
-		}
-	}
-
-	/**
-	 * The Class SqlDateInstanceCreator.
-	 */
-	protected static class SqlDateInstanceCreator
-			implements com.google.gson.InstanceCreator<java.sql.Date> {
-		
-		/* (non-Javadoc)
-		 * @see com.google.gson.InstanceCreator#createInstance(java.lang.reflect.Type)
-		 */
-		public java.sql.Date createInstance(Type type) {
-			return new java.sql.Date(1L);
-		}
-	}
-
-	/**
-	 * The Class SqlTimestampInstanceCreator.
-	 */
-	protected static class SqlTimestampInstanceCreator
-			implements com.google.gson.InstanceCreator<java.sql.Timestamp> {
-		
-		/* (non-Javadoc)
-		 * @see com.google.gson.InstanceCreator#createInstance(java.lang.reflect.Type)
-		 */
-		public java.sql.Timestamp createInstance(Type type) {
-			return new java.sql.Timestamp(1L);
-		}
 	}
 }

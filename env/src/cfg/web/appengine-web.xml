@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not change this file!  Use the appropriate
+airlift.build.{env} script instead! - Bediako -->
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+  <application>@AIRLIFT_APPLICATION@</application>
+  <version>@AIRLIFT_APPLICATION_VERSION@</version>
+  <threadsafe>@AIRLIFT_THREAD_SAFE@</threadsafe>
+</appengine-web-app>

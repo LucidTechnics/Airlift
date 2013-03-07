@@ -1,0 +1,11 @@
+language: java
+jdk:
+  - openjdk6
+# whitelist
+branches:
+  only:
+    - airlift_2.0_development
+
+notifications:
+  email:
+    - ci@lucidtechnics.com

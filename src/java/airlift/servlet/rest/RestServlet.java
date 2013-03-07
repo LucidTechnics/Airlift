@@ -87,12 +87,12 @@ public class RestServlet
 		cachingContextMap.put("user.session", new RestfulCachingContext("user.session", true, duration, true));
 
 		//For each domain create the relevant caching context.
-		for (String domainName: getAppProfile().getValidDomains())
+		for (String domainName: getAppProfile().getValidResources())
 		{
 			if (cachingContextMap.containsKey(domainName) != true)
 			{
-				airlift.generator.Cacheable cacheableAnnotation = (airlift.generator.Cacheable) getAppProfile().getAnnotation(domainName, airlift.generator.Cacheable.class);
-				cachingContextMap.put(domainName, new RestfulCachingContext(domainName, cacheableAnnotation.isCacheable(), cacheableAnnotation.life(), cacheableAnnotation.cacheCollections()));
+//				airlift.generator.Cacheable cacheableAnnotation = (airlift.generator.Cacheable) getAppProfile().getAnnotation(domainName, airlift.generator.Cacheable.class);
+//				cachingContextMap.put(domainName, new RestfulCachingContext(domainName, cacheableAnnotation.isCacheable(), cacheableAnnotation.life(), cacheableAnnotation.cacheCollections()));
 			}
 		}
 	}
@@ -473,8 +473,7 @@ public class RestServlet
 				{
 				    contentContext = getHandlerContext().execute(appName,
 									_restContext, _method, this, _httpServletRequest,
-									_httpServletResponse, _uriParameterMap,
-						null);
+									_httpServletResponse, _uriParameterMap);
 				}
 				catch(airlift.servlet.rest.HandlerException _handlerException)
 				{
@@ -542,8 +541,6 @@ public class RestServlet
 			String errorString = airlift.util.AirliftUtil.serializeStackTrace(t);			
 			log.severe("Airlift prints this stack trace: " + errorString);
 			
-			airlift.util.PropertyUtil propertyUtil = airlift.util.PropertyUtil.getInstance();
-			propertyUtil.loadProperties("/airlift/airlift.properties", "airlift.cfg");
 			String reportJavaException = this.getServletConfig().getInitParameter("a.report.java.exception");
 
 			ContentContext contentContext = new SimpleContentContext();
@@ -777,27 +774,27 @@ public class RestServlet
 			//special suffixes (xml, xhtml, html, json, html, text) takes precedence over Accept:
 			if ("xml".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/application/xml/" + extensionPrefix + ".js");
 			}
 			else if ("pdf".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/application/pdf/" + extensionPrefix + ".js");
 			}
 			else if ("xhtml".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
 			}
 			else if ("json".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/application/json/" + extensionPrefix + ".js");
 			}
 			else if ("html".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
 			}
 			else if ("text".equalsIgnoreCase(suffix) == true)
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/text/plain/" + extensionPrefix + ".js");
 			}
 			else
 			{
@@ -805,7 +802,7 @@ public class RestServlet
 
 				if (mimetype != null)
 				{
-					restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + mimetype + "/" + extensionPrefix + ".js");
+					restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + mimetype + "/" + extensionPrefix + ".js");
 				}
 			}
 
@@ -820,7 +817,7 @@ public class RestServlet
 				   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
 				   _acceptValueList.contains("text/plain") == true))
 			{
-				restContext.addHandlerPath("/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
 			}
 
 			//Otherwise if the Accept is specifically set for one mime type
@@ -829,7 +826,7 @@ public class RestServlet
 			//service.
 			for(String acceptValue: _acceptValueList)
 			{
-				handlerPath = "/" + _appName  + "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
+				handlerPath = "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
 				restContext.addHandlerPath(handlerPath);
 			}
 		}
@@ -999,7 +996,7 @@ public class RestServlet
 		{
 			if (appProfile == null)
 			{
-				this.appProfile = (airlift.AppProfile) Class.forName(getServletConfig().getInitParameter("a.root.package.name") + ".AppProfile").newInstance();
+				this.appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
 			}
 		}
 		catch (Throwable t)

@@ -1,9 +1,5 @@
 package $package$.airlift.domain;
 
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PersistenceCapable;
-
 @javax.annotation.Generated
 (
 	value="airlift.generator.Generator",
@@ -12,8 +8,7 @@ import javax.jdo.annotations.PersistenceCapable;
 )
 
 @PersistenceCapable
-public class $className$Impl
-	implements $package$.airlift.domain.$className$
+public class $className$
 {
 	$attributes$
 	
@@ -21,13 +16,13 @@ public class $className$Impl
 	
 	$attributeSetters$
 
-	public $className$Impl() {}
+	public $className$() {}
 	
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();
 
-		stringBuffer.append("[** $className$Impl ... $className$").append("\n");
+		stringBuffer.append("[** $className$ ... $className$").append("\n");
 		$attributeStringBufferAppends$
 		stringBuffer.append("**]\n");
 		

@@ -14,8 +14,7 @@
 
 package airlift.servlet.rest;
 
-import airlift.domain.DomainConfiguration;
-import airlift.util.JavascriptingUtil;
+import airlift.util.JavaScriptingUtil;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,153 +62,29 @@ public class SimpleHandlerContext
 							RestServlet _httpServlet,
 							HttpServletRequest _httpServletRequest,
 							HttpServletResponse _httpServletResponse,
-							Map _uriParameterMap, DomainConfiguration _domainConfiguration)
+							Map _uriParameterMap)
     {
-		StringTemplateGroup stringTemplateGroup = new StringTemplateGroup(_appName);
-		String rootPackageName = _httpServlet.getServletConfig().getInitParameter("a.root.package.name");
-		String auditingInsert = _httpServlet.getServletConfig().getInitParameter("a.auditing.insert");
-		String auditingGet = _httpServlet.getServletConfig().getInitParameter("a.auditing.get");
-		String auditingUpdate = _httpServlet.getServletConfig().getInitParameter("a.auditing.update");
-		String auditingDelete = _httpServlet.getServletConfig().getInitParameter("a.auditing.delete");
-
 		String defaultMimeType = (_httpServlet.getServletConfig().getInitParameter("a.default.mime.type") != null) ? _httpServlet.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
 		ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
 
-		String servletName = _httpServlet.getServletName();
-
-		String base = _httpServletRequest.getScheme() + "://" + _httpServletRequest.getServerName() + ":" +
-					  _httpServletRequest.getServerPort() + "/";
-
-		String pathInfo = ((_httpServletRequest.getPathInfo() == null) &&
-						  ("".equals(_httpServletRequest.getPathInfo()) == false)) ? "" : _httpServletRequest.getPathInfo();
-		String path = _httpServletRequest.getServletPath() + pathInfo;
-		path = path.replaceFirst("/$", "").replaceFirst("^/", "");
-
-		String queryString = _httpServletRequest.getQueryString();
-				
-		String domainName = _restContext.getThisDomain();
-		Boolean domainHasId = _restContext.hasIdentifier();
-		String id = _restContext.constructDomainId();
-		String persistPath = domainName;
-		
-		if ("POST".equals(_method) == false &&
-		   id != null && "".equalsIgnoreCase(id) == false)
-		{
-			persistPath = persistPath + "/" + id;
-		}
-
-		String title = domainName;
-		
-		if ("".equals(id) == false)
-		{
-			title = domainName + "-" + id;
-		}
-
-		Map<String, String> domainPathMap = _restContext.extractDomainObjectPaths(path);
-
-		AbstractUser user = _restContext.getUser();
-
-		if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
-		
-		String userName = (user != null) ? user.getFullName() : null;
-		String userEmail = (user != null && user.getEmail() != null) ? user.getEmail().toLowerCase() : null;
-
-		airlift.AppProfile appProfile = null;
-		
-		try
-		{
-			appProfile = (airlift.AppProfile) Class.forName(rootPackageName + ".AppProfile").newInstance();
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-
-		JavascriptingUtil scriptingUtil = new JavascriptingUtil(this.productionMode);
+		JavaScriptingUtil scriptingUtil = new JavaScriptingUtil(this.productionMode);
 
 		org.mozilla.javascript.Context scriptingContext = scriptingUtil.createContext();
 		
 		try
 		{
 			log.info("Starting binding");
-			scriptingUtil.bind("APP_NAME", _appName);
-			scriptingUtil.bind("OUT", System.out);
-			scriptingUtil.bind("LOG", log);
 			scriptingUtil.bind("CONTENT_CONTEXT", contentContext);
-			scriptingUtil.bind("SECURITY_CONTEXT", _restContext.getSecurityContext());
-			scriptingUtil.bind("AUDIT_CONTEXT", new airlift.servlet.rest.RestfulAuditContext());
-			scriptingUtil.bind("BASE", base);
-			scriptingUtil.bind("PATH", path);
-			scriptingUtil.bind("URI", base + path);
-			scriptingUtil.bind("QUERY_STRING", queryString);
-			scriptingUtil.bind("METHOD", _method);
-			scriptingUtil.bind("PERSIST_PATH", persistPath);
-			scriptingUtil.bind("DOMAIN_NAME", domainName);
-			scriptingUtil.bind("DOMAIN_HAS_ID", domainHasId);
-			scriptingUtil.bind("DOMAIN_OBJECT_PATHS", domainPathMap);
-			scriptingUtil.bind("ID", id);
-			scriptingUtil.bind("TITLE", title);
-			scriptingUtil.bind("SERVLET_NAME", servletName);
 			scriptingUtil.bind("SERVLET", _httpServlet);
 			scriptingUtil.bind("RESPONSE", _httpServletResponse);
 			scriptingUtil.bind("REQUEST", _httpServletRequest);
-			scriptingUtil.bind("LOCALE", _httpServletRequest.getLocale());
 			scriptingUtil.bind("REST_CONTEXT", _restContext);
-			scriptingUtil.bind("SCRIPTING", scriptingUtil);
-			scriptingUtil.bind("TEMPLATE", stringTemplateGroup);
-			scriptingUtil.bind("USER", user);
-			scriptingUtil.bind("USER_NAME", userName);
-			scriptingUtil.bind("USER_EMAIL", userEmail);
-			scriptingUtil.bind("USER_SERVICE", _httpServlet.getUserService(_httpServletRequest));
-			scriptingUtil.bind("APP_PROFILE", appProfile);
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
-			scriptingUtil.bind("AUDITING_INSERT", auditingInsert);
-			scriptingUtil.bind("AUDITING_GET", auditingGet);
-			scriptingUtil.bind("AUDITING_UPDATE", auditingUpdate);
-			scriptingUtil.bind("AUDITING_DELETE", auditingDelete);
-			scriptingUtil.bind("CACHING_CONTEXT", _restContext.getCachingContextMap());
 
 			log.info("URI Parameter map is: " + _restContext.getUriParameterMap());
 			log.info("Domain ids are:" + _restContext.getDomainIds());
-			
-			for (String restContextDomainName: _restContext.getDomainIds())
-			{
-				String key = restContextDomainName.replaceAll("\\.", "_").toUpperCase();
-				log.info("binding this: " + key);
-				scriptingUtil.bind(key, _restContext.getIdValue(restContextDomainName));
-			}
-
-			
-			String timezone = (_httpServletRequest.getParameter("a.timezone") != null) ? _httpServletRequest.getParameter("a.timezone") : _httpServlet.getServletConfig().getInitParameter("a.timezone");
-			timezone = (timezone == null) ?  "UTC" : timezone;
-
-			log.info("Timezone - a.timezone: " + _httpServletRequest.getParameter("a.timezone"));
-			log.info("Timezone - web.xml a.timezone: " + _httpServlet.getServletConfig().getInitParameter("a.timezone"));
-			log.info("Bound timezone - web.xml a.timezone: " + timezone);
-			
-			scriptingUtil.bind("TIMEZONE", java.util.TimeZone.getTimeZone(timezone));
-			
+						
 			String[] scriptResources = new String[8];
-
-			scriptResources[0] = "/airlift/util/douglasCrockford.js";
-			scriptResources[1] = "/airlift/util/json2.js";
-			scriptResources[2] = "/airlift/util/validate.js";
-			scriptResources[3] = "/airlift/util/util.js";
-			scriptResources[4] = "/airlift/util/error.js";
-			scriptResources[5] = "/airlift/util/handler.js";
-			scriptResources[6] = "/airlift/util/HtmlUtil.js";
-			scriptResources[7] = "/" + _appName.toLowerCase() + "/airlift/DomainConstructors.js";
-			
-			try
-			{
-				log.info("Executing airlift resource scripts");
-				scriptingUtil.executeScript(scriptResources, false, scriptingContext);
-				log.info("Completed airlift resource script execution:");
-			}
-			catch(Throwable t)
-			{
-				throw new RuntimeException(t);
-			}
 
 			boolean handlerExecutionSuccessful = false;
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <!-- Deployed when we finalize schedule <cron>
+       <url>/a/scheduledjob/is/accountingquickbookspaymentsjob</url>
+       <description>Generate Quickbooks Invoices</description>
+   	 <target>accounting</target> 
+     <schedule>2 of month 02:00</schedule>
+   </cron>
+-->
+    <cron>
+      <url>/a/scheduledjob/is/accountingquickbooksinvoicesjob</url>
+      <description>Generate Quickbooks Invoices</description>
+  	 <target>accounting</target>
+      <schedule>2 of month 02:00</schedule>
+    </cron>
+  <cron>
+      <url>/a/scheduledjob/is/accountingencountersjob</url>
+  		<target>accounting</target>
+      <description>Process Encounters for Organizations and Interpreters for Accounting</description>
+      <schedule>every 1 hours synchronized</schedule>
+  </cron>
+  <cron>
+      <url>/a/scheduledjob/is/accountingcancelledrequestsjob</url>
+  	  <target>accounting</target>
+      <description>Process Cancelled Requests for Organizations and Interpreters for Accounting</description>
+      <schedule>every 1 hours synchronized</schedule>
+   </cron>
+  <cron>
+      <url>/a/scheduledjob/is/schedulerscurrentrequestsspreadsheetjob</url>
+  	  <target>accounting</target>
+      <description>Create Live Google Spreadsheet of Requests for Schedulers</description>
+      <schedule>every 1 hours synchronized</schedule>
+   </cron>
+
+</cronentries>

@@ -18,43 +18,6 @@ public class FormatUtil
 {
 	public static final String DEFAULT_DATE_FORMAT = "MM-dd-yyyy";
 	public static final String DEFAULT_TIMESTAMP_FORMAT = "EEE d, MMM yyyy HH:mm:ss";
-
-	public static String format(Object _object)
-	{
-		String className = _object.getClass().getName();
-		String format = "";
-		
-		if ("java.lang.String".equals(className) == true)
-		{
-			format = format((java.lang.String)_object);
-		}
-		else if ("java.lang.Boolean".equals(className) == true)
-		{
-			format = format((java.lang.Boolean)_object);
-		}
-		else if ("java.lang.Byte".equals(className) == true)
-		{
-			format = format((java.lang.Byte)_object);
-		}
-		else if ("java.lang.Character".equals(className) == true)
-		{
-			format = format((java.lang.Character)_object);
-		}
-		else if ("java.lang.Short".equals(className) == true ||
-				 "java.lang.Long".equals(className) == true ||
-				 "java.lang.Double".equals(className) == true ||
-				 "java.lang.Integer".equals(className) == true ||
-				 "java.lang.Float".equals(className) == true)
-		{
-			format = format((java.lang.Number)_object);
-		}
-		else
-		{
-			throw new RuntimeException("Unknown class name:  " + className);
-		}
-
-		return format;
-	}
 	
 	public static String format(String _string)
 	{
@@ -68,31 +31,7 @@ public class FormatUtil
 		return string;
 	}
 	
-	public static String format(String[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i]));
-				
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(java.util.Collection<Object> _collection)
+	public static String format(java.util.Collection<String> _collection)
 	{
 		StringBuffer stringBuffer = new StringBuffer("[");
 
@@ -100,7 +39,7 @@ public class FormatUtil
 		{
 			int index = 0;
 			
-			for (Object object: _collection)
+			for (String object: _collection)
 			{
 				stringBuffer.append("\"").append(format(object));
 
@@ -114,78 +53,6 @@ public class FormatUtil
 				}
 
 				index++;
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(Character _character)
-	{
-		String character = "";
-
-		if (_character != null)
-		{
-			character = _character.toString();
-		}
-
-		return character;
-	}
-	
-	public static String format(Character[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i]));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(Byte _byte)
-	{
-		String byteString = "";
-
-		if (_byte != null)
-		{
-			byteString =  _byte.toString();
-		}
-
-		return byteString;
-	}
-
-	public static String format(Byte[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i]));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
 			}
 		}
 
@@ -295,130 +162,19 @@ public class FormatUtil
 
 		return stringBuffer.toString();
 	}
-
-	public static String format(java.sql.Timestamp _timestamp)
+	
+	public static String format(java.lang.Number _number)
 	{
-		return format(_timestamp, FormatUtil.DEFAULT_TIMESTAMP_FORMAT);
-	}
-
-	public static String format(java.sql.Timestamp[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i], FormatUtil.DEFAULT_TIMESTAMP_FORMAT));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(java.sql.Timestamp _timestamp, String _pattern)
-	{
-		return format((java.util.Date) _timestamp, _pattern);
-	}
-
-	public static String format(java.sql.Timestamp[] _array, String _pattern)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i], _pattern));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(java.sql.Timestamp _timestamp, String _pattern, java.util.TimeZone _timeZone)
-	{
-		return format((java.util.Date) _timestamp, _pattern, _timeZone);
-	}
-
-	public static String format(java.sql.Timestamp[] _array, String _pattern, java.util.TimeZone _timeZone)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i], _pattern, _timeZone));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
-	}
-
-	public static String format(Number _number)
-	{
-		String number = "";
+		String numberString = "";
 
 		if (_number != null)
 		{
-			number = _number.toString();
-		}
-		
-		return number;
-	}
-
-	public static String format(Number[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i]));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
+			numberString = _number.toString();
 		}
 
-		return stringBuffer.toString();
+		return numberString;
 	}
-	
+
 	public static String format(Boolean _boolean)
 	{
 		String booleanString = "";
@@ -429,29 +185,5 @@ public class FormatUtil
 		}
 
 		return booleanString;
-	}
-
-	public static String format(Boolean[] _array)
-	{
-		StringBuffer stringBuffer = new StringBuffer("[");
-
-		if (_array != null)
-		{
-			for (int i = 0; i < _array.length; i++)
-			{
-				stringBuffer.append("\"").append(format(_array[i]));
-
-				if (i == (_array.length - 1))
-				{
-					stringBuffer.append("\"]");
-				}
-				else
-				{
-					stringBuffer.append("\",");
-				}
-			}
-		}
-
-		return stringBuffer.toString();
 	}
 }

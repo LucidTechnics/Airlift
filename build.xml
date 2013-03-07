@@ -27,6 +27,8 @@
 	<property name="junit-result" location="result" />
 	<property name="runtime.lib" location="runtime-lib" />
 	<property name="build.only.lib" location="build-only-lib" />
+	<property name="env" location="env" />
+	<property name="downloads" location="downloads" />
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="src.shl" location="${src}/shl" />
@@ -37,14 +39,8 @@
 	<property name="src.test" location="${src}/test" />
 	<property name="src.doc" location="${src}/doc" />
 	<property name="src.cfg" location="${src}/cfg" />
-	<property name="src.html" location="${src}/html" />
 	<property name="src.images" location="${src}/images" />
-	<property name="src.css" location="${src}/css" />
 	<property name="src.script" location="${src}/script" />
-	<property name="src.webapp" location="${src}/webapp" />
-	<property name="src.webinf" location="${src.webapp}/WEB-INF" />
-	<property name="src.php" location="${src}/php" />
-	
 	
 	<property name="stage" location="stage" />
 	<property name="stage.shl" location="${stage}/shl" />
@@ -62,13 +58,9 @@
 	<property name="deployDir.java" location="${deployDir}/java" />
 	<property name="deployDir.template" location="${deployDir}/template" />
 	<property name="deployDir.test" location="${deployDir}/test" />
-	<property name="deployDir.cfg" location="${deployDir}/cfg" />
-	<property name="deployDir.html" location="${deployDir}/html" />
 	<property name="deployDir.javascript" location="${deployDir}/html" />
 	<property name="deployDir.images" location="${deployDir}/images" />
-	<property name="deployDir.css" location="${deployDir}/css" />
 	<property name="deployDir.script" location="${deployDir}/script" />
-	<property name="deployDir.sequence" location="${deployDir}/sequence" />
 	<property name="deployDir.workspace" location="${deployDir}/workspace" />
 	<property name="deployDir.bin" location="${deployDir}/bin" />
 	<property name="deployDir.lib" location="${deployDir}/lib" />
@@ -99,6 +91,10 @@
 	</path>
 
 	<path id="test.class.path">
+	   	<fileset dir="${deployDir.lib}">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
 		<fileset dir="${runtime.lib}">
 			<include name="**/*.jar"/>
 			<include name="**/*.zip"/>
@@ -110,8 +106,6 @@
 		<fileset dir="${dist}">
 			<include name="**/*Test*.jar"/>
 		</fileset>
-		<pathelement path="${src.cfg}"/>
-		<pathelement location="certs"/>
 	</path>
 
 	<!-- Make sure findbugs-ant.jar is included in your ant lib directory
@@ -142,6 +136,7 @@
 		<delete dir="${deployDir.lib}" />
 		<delete dir="${deployDir.cfg}" />
 		<delete dir="${deployDir.log}" />
+		<delete dir="${deployDir.html}" />
 		<delete dir="${stage}" />
 
 	</target>
@@ -160,15 +155,11 @@
 		
 		<mkdir dir="${stage}" />
 		<mkdir dir="${stage.shl}" />
-		<mkdir dir="${stage.html}" />
 		<mkdir dir="${stage.template}" />
 		<mkdir dir="${stage.test}" />
-		<mkdir dir="${stage.cfg}" />
 		<mkdir dir="${stage.images}" />
-		<mkdir dir="${stage.css}" />
 		<mkdir dir="${stage.script}" />
 		<mkdir dir="${stage.javascript}" />
-		<mkdir dir="${stage.cfg}/${appName}" />
 
 		<mkdir dir="${src}" />
 		<mkdir dir="${src.shl}" />
@@ -177,31 +168,18 @@
 		<mkdir dir="${src.template}" />
 		<mkdir dir="${src.test}" />
 		<mkdir dir="${src.doc}" />
-		<mkdir dir="${src.cfg}" />
-		<mkdir dir="${src.html}" />
 		<mkdir dir="${src.images}" />
-		<mkdir dir="${src.css}" />
 		<mkdir dir="${src.script}" />
-		<mkdir dir="${src.webapp}" />
-		<mkdir dir="${src.webinf}" />
-		<mkdir dir="${src.php}" />		
 
 		<mkdir dir="${deployDir}" />
 		<mkdir dir="${deployDir.lib}" />
 		<mkdir dir="${deployDir.bin}" />
 		<mkdir dir="${deployDir.log}" />
-		<mkdir dir="${deployDir.sequence}" />
 		<mkdir dir="${deployDir.shl}" />
-		<mkdir dir="${deployDir.html}" />
 		<mkdir dir="${deployDir.template}" />
-		<mkdir dir="${deployDir.javascript}" />
 		<mkdir dir="${deployDir.test}" />
-		<mkdir dir="${deployDir.cfg}" />
-		<mkdir dir="${deployDir.html}" />
 		<mkdir dir="${deployDir.images}" />
-		<mkdir dir="${deployDir.css}" />
 		<mkdir dir="${deployDir.script}" />
-		<mkdir dir="${deployDir.cfg}/${appName}" />
 
 		<mkdir dir="${classes}" />
 		<mkdir dir="${workspace}" />
@@ -223,7 +201,6 @@
 
 		<replace dir="${stage}" propertyFile="token.properties">
 		  <include name="**/*.*"/>
-		  <replacefilter token="@DEPLOY.DIR@" property="DEPLOY.DIR"/>
 		  <replacefilter token="@LOG4J.JAR@" property="LOG4J.JAR"/>
 		  <replacefilter token="@VERSION@" property="VERSION"/>
 		  <replacefilter token="@APPNAME@" property="APPNAME"/>
@@ -255,7 +232,7 @@
 
 		 <jar destfile="${dist}/lib/${jar}-core.jar"
 		       basedir="${classes}"
-			   excludes="**\*Test.class,**\*TestSuite.class, **\*spring*\, **\*php\"
+			   excludes="**\*Test.class,**\*TestSuite.class"
 		  />
 
 		<jar destfile="${dist}/lib/${testJar}-core.jar"
@@ -269,6 +246,16 @@
 
 		<jar destfile="${dist}/lib/${jar}-core.jar"
 		       basedir="${src.script}/javascript"
+			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift/test"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift"
+			   includes="harness.js"
 			   update="true"
 		  />
 
@@ -296,50 +283,27 @@
 		<!-- Make application shell scripts executable -->
 		<chmod dir="${deployDir.bin}" includes="**/*.sh"  perm="ugo+rx"/>
 
-		<!-- copy config files -->
-		<copy todir="${deployDir.cfg}">
-			<fileset dir="${stage.cfg}" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${deployDir.html}">
-			<fileset dir="${src.html}" includes="**/*.*" />
-		</copy>
-
 		<copy todir="${deployDir.template}">
 			<fileset dir="${src.template}" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${deployDir.javascript}">
-			<fileset dir="${src.javascript}" includes="**/*.js*" />
 		</copy>
 
 		<copy todir="${deployDir.images}">
 			<fileset dir="${src.images}" includes="**/*.*" />
 		</copy>
-
-		<copy todir="${deployDir.css}">
-			<fileset dir="${src.css}" includes="**/*.*" />
-		</copy>
 		
 	</target>
 
-	<target name="hardRedeploy"  depends="redeploy, startup" />
+	<target name="env" depends="redeploy" >
+		<delete>
+			<fileset dir="${env}/war/WEB-INF" includes="airlift-*core.jar"/>
+		</delete>
 
-	<target name="hardDeploy"  depends="deploy, startup" />
+		<copy todir="${env}/war/WEB-INF/lib">
+			<fileset dir="${dist}/lib/" includes="${jar}-core.jar" />
+		</copy>
 
-	<target name="buildWar" depends="deploy" >
-		<war destfile="${archive}/${appName}.war" webxml="${deployDir.cfg}/**/web.xml">
-		   
-			<zipfileset dir="${deployDir.html}" prefix="html"/>
-			<zipfileset dir="${deployDir.javascript}" prefix="javascript"/>
-			<zipfileset dir="${deployDir.template}" prefix="template" />
-			<zipfileset dir="${deployDir.css}" prefix="css" />
-			<zipfileset dir="${stage.images}" prefix="images" />
-			<zipfileset dir="${deployDir.script}" prefix="WEB-INF/script" />
-			
-			<lib dir="${deployDir.lib}" />
-			<classes dir="${classes}"/>
-		</war>
+		<zip destfile="${downloads}/airlift-env-latest.zip" basedir="${env}" />
+	
 	</target>
 
 	<target name="createRootPackageDirProperty" >
@@ -371,118 +335,7 @@
 		<mkdir dir="${java.package.dir}/servlet" />
 		
 	</target>
-	
-	<target name="deployWebApp" depends="buildWar" >
 	   
-	</target>
-	
-	<!-- Start -->
-	<target name="startup" depends="jetty-start">
-		<echo>Starting server instance</echo>
-	</target>
-
-	<target name="shutdown" depends="jetty-stop">
-		<echo>Stopping server instance</echo>
-	</target>	
-
-	<target name="unit-test" depends="compile, jar">
-
-		<property name="test.class.path" refId="test.class.path"/>
-		<echo message="Class path is:  ${test.class.path}"/>
-
-		<junit printsummary="yes" haltonfailure="no">
-			<!--<jvmarg value="-Xmx512m -Xmn512m"/>-->
-			<classpath>
-				<pathelement path="${test.class.path}"/>
-			</classpath>
-			<formatter type="plain"/>
-
-			<batchtest fork="yes" todir="${junit-result}">
-				<fileset dir="${src.test}">
-					<include name="**/*Test.java"/>
-					<exclude name="**/*TestSuite.java"/>
-				</fileset>
-			</batchtest>
-		</junit>
-	</target>
-
-	<taskdef resource="checkstyletask.properties"
-         classpath="/home/bediako/app/checkstyle/checkstyle-5.0/checkstyle-all-5.0.jar"/>
-
-	<macrodef name="jetty-start">
-		<attribute name="arg1" default=""/>
-		<attribute name="arg2" default=""/>
-		<sequential>
-			<antcall target="jetty-stop"/>
-			<java jar="${jettyHome}/start.jar" fork="true" spawn="yes" dir="${jettyHome}">
-				<jvmarg value="-Dfile.encoding=UTF-8"/>
-				<jvmarg value="-DSTOP.PORT=8079"/>
-				<jvmarg value="-DSTOP.KEY=secret"/>
-				<jvmarg value="@{arg1}"/>
-				<jvmarg value="@{arg2}"/>
-			</java>
-		</sequential>
-	</macrodef>
-
-	<target name="jetty-check-status">
-		<condition property="jetty.started">
-			<socket server="localhost" port="8080"/>
-		</condition>
-	</target>
-
-	<target name="jetty-start" depends="deploy">
-		<jetty-start/>
-	</target>
-
-	<target name="jetty-start-debug" depends="deploy">
-		<jetty-start
-			arg1="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
-			arg2="-Xdebug"/>
-	</target> 
-
-	<target name="jetty-stop" depends="jetty-check-status" if="jetty.started">
-		<java jar="${jettyHome}/start.jar" fork="true" spawn="yes" dir="${jettyHome}">
-			<jvmarg value="-DSTOP.PORT=8079"/>
-			<jvmarg value="-DSTOP.KEY=secret"/>
-			<arg value="--stop"/>
-		</java>
-		<sleep seconds="2"/>
-	</target>
-
-
-    <!-- =================================
-         Installs ivy with magic
-         ================================= -->
-    <property name="ivy.install.version" value="2.0.0-alpha-2-incubating" />
-	<property name="ivy.jar.dir" value="${basedir}/ivy" />
-	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
-    <property name="build.dir" value="build" />                       
-
-    <target name="install-ivy" description="--> install ivy">
-    	<mkdir dir="${ivy.jar.dir}"/>
-		<!-- download Ivy from web site so that it can be used even without any special installation -->
-		<echo message="installing ivy..."/>
-    	<get src="http://people.apache.org/~xavier/ivy/${ivy.install.version}/ivy.jar"
-    		 dest="${ivy.jar.file}" usetimestamp="true"/>
-
-    	<!-- try to load ivy here from local ivy dir, in case the user has not already dropped
-    	      it into ant's lib dir (note that the latter copy will always take precedence).
-    	      We will not fail as long as local lib dir exists (it may be empty) and
-    	      ivy is in at least one of ant's lib dir or the local lib dir. -->
-    	<path id="ivy.lib.path">
-    	    <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-    	</path>
-    	<taskdef resource="org/apache/ivy/ant/antlib.xml"
-    	          uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-
-    <!-- =================================
-        target: resolve
-         ================================= -->
-    <target name="resolve" depends="install-ivy" description="--> retreive dependencies with ivy">
-        <ivy:retrieve/>
-    </target>  
-
 	<target name="cleanProject" >
 		<delete dir="${workspace}/build/" />
 	</target>
@@ -582,5 +435,13 @@
 	   </javadoc>
 	</target>
 
-    
+	<target name="test" depends="redeploy">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="test.js">
+		    <classpath refid="test.class.path"/>			
+		</script>
+	</target>
+
+	
 </project>

@@ -14,81 +14,10 @@
 
 package airlift; 
 
-// TODO: Auto-generated Javadoc
-/**
- * The Interface AppProfile.
- */
 public interface AppProfile
 {
-	
-	/**
-	 * Gets the app name.
-	 *
-	 * @return the app name
-	 */
 	public String getAppName();
-	
-	/**
-	 * Gets the root package name.
-	 *
-	 * @return the root package name
-	 */
-	public String getRootPackageName();
-	
-	/**
-	 * Gets the domain short class name.
-	 *
-	 * @param _domainName the _domain name
-	 * @return the domain short class name
-	 */
-	public String getDomainShortClassName(String _domainName);
-	
-	/**
-	 * Gets the fully qualified class name.
-	 *
-	 * @param _domainName the _domain name
-	 * @return the fully qualified class name
-	 */
-	public String getFullyQualifiedClassName(String _domainName);
-	
-	/**
-	 * Gets the annotation.
-	 *
-	 * @param _domainName the _domain name
-	 * @param _annotationClass the _annotation class
-	 * @return the annotation
-	 */
-	public java.lang.annotation.Annotation getAnnotation(String _domainName, Class _annotationClass);
-	
-	/**
-	 * Gets the valid domains.
-	 *
-	 * @return the valid domains
-	 */
-	public java.util.Collection<String> getValidDomains();
-	
-	/**
-	 * Checks if is valid domain.
-	 *
-	 * @param _domainName the _domain name
-	 * @return true, if is valid domain
-	 */
-	public boolean isValidDomain(String _domainName);
-	
-	/**
-	 * Gets the attribute type.
-	 *
-	 * @param _domainName the _domain name
-	 * @param _attributeName the _attribute name
-	 * @return the attribute type
-	 */
-	public String getAttributeType(String _domainName, String _attributeName);
-	
-	/**
-	 * Gets the concept.
-	 *
-	 * @param _domainName the _domain name
-	 * @return the concept
-	 */
-	public String getConcept(String _domainName);
+	public java.util.Set<String> getValidResources();
+	public boolean isValidResource(String _resourceName);
+	public java.util.Map<String, java.util.Set<String>> getSecurityRoles(String _resourceName);
 }
