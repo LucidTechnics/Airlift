@@ -1,7 +1,7 @@
-function Delete(WEB_CONTEXT)
+function Delete(_web)
 {
-	var res = require('../resource').create(WEB_CONTEXT);
-	var incoming = require('../incoming').create(WEB_CONTEXT);
+	var res = require('../resource').create(_web);
+	var incoming = require('../incoming').create(_web);
 	var util = require('../util');
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -67,9 +67,9 @@ function Delete(WEB_CONTEXT)
 	this['delete'] = this.del;
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create delete module without a web context' }
+	if (!_web) { throw 'Unable to create delete module without an airlift/web object' }
 
-	return new Delete(WEB_CONTEXT);
+	return new Delete(_web);
 };

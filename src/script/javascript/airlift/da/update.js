@@ -1,10 +1,9 @@
-function Update(WEB_CONTEXT)
+function Update(_web)
 {
-	var res = require('../resource').create(WEB_CONTEXT);
-	var incoming = require('../incoming').create(WEB_CONTEXT);
+	var res = require('../resource').create(_web);
+	var incoming = require('../incoming').create(_web);
 	var util = require('../util');
-	var getter = require('./get').create(WEB_CONTEXT);
-	var web = require('../web').create(WEB_CONTEXT);
+	var getter = require('./get').create(_web);
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
@@ -33,7 +32,7 @@ function Update(WEB_CONTEXT)
 
 			if (previousRecord)
 			{
-				incoming.bookkeeping(entity, web.getUserId()||null, previousRecord.auditPostDate, util.createDate());
+				incoming.bookkeeping(entity, _web.getUserId()||null, previousRecord.auditPostDate, util.createDate());
 			}
 			else
 			{
@@ -81,9 +80,9 @@ function Update(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create update module without a web context' }
+	if (!_web) { throw 'Unable to create update module without an airlift/web object' }
 
-	return new Update(WEB_CONTEXT);
+	return new Update(_web);
 };

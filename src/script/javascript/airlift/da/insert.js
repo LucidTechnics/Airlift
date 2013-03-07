@@ -1,7 +1,7 @@
-function Insert(WEB_CONTEXT)
+function Insert(_web)
 {
-	var res = require('../resource').create(WEB_CONTEXT);
-	var incoming = require('../incoming').create(WEB_CONTEXT);
+	var res = require('../resource').create(_web);
+	var incoming = require('../incoming').create(_web);
 	var util = require('../util');
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -92,9 +92,9 @@ function Insert(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create insert module without a web context' }
+	if (!_web) { throw 'Unable to create insert module without an airlift/web object' }
 
-	return new Insert(WEB_CONTEXT);
+	return new Insert(_web);
 };

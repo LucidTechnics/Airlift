@@ -26,6 +26,8 @@ function Web(WEB_CONTEXT)
 	var restContext;
 	var locale;
 
+	this.WEB_CONTEXT = WEB_CONTEXT;
+	
 	this.getServlet = function()
 	{
 		if (!servlet)

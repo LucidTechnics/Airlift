@@ -268,36 +268,28 @@ public class JavaScriptingUtil
 		return s.hasNext() ? s.next() : "";
 	}
 
-	/**
-	 * Compile script.
-	 *
-	 * @param _scriptResource the _script resource
-	 * @return the script
-	 */
 	public void executeHandler(String _scriptResource, Context _context)
 	{
 		try
 		{
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
-			String requireHandler = "var handle = require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle;";
-
-			Object requireFunction = org.mozilla.javascript.ScriptableObject.getProperty(getScope(), "require");
+			String requireHandler = "var handle = function(_WEB_CONTEXT) { var web = require('airlift/web').create(_WEB_CONTEXT); require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle(web); }";
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
 			require.install(getScope());
 			
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
-			_context.evaluateString(getScope(), requireHandler,scriptResource, 1, null);
+			_context.evaluateString(getScope(), requireHandler, scriptResource, 1, null);
 
-			Object handle = scope.get("handle", getScope());
+			Object handle = getScope().get("handle", getScope());
 			java.util.ArrayList argumentList = new java.util.ArrayList();
 
-			Scriptable webContext = _context.newObject(scope);
+			Scriptable webContext = _context.newObject(getScope());
 
 			for (String key: this.bindingsMap.keySet())
 			{
-				Object object = Context.javaToJS(this.bindingsMap.get(key), scope);
+				Object object = Context.javaToJS(this.bindingsMap.get(key), getScope());
 				ScriptableObject.putConstProperty(webContext, key, object);
 			}
 

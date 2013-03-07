@@ -1,4 +1,4 @@
-function Collect(WEB_CONTEXT)
+function Collect(_web)
 {
 	var util = require('airlift/util');
 
@@ -23,7 +23,7 @@ function Collect(WEB_CONTEXT)
 
 			if (!keysOnly && !fetchedResources)
 			{
-				fetchedResources = require('./get').create(WEB_CONTEXT).getAll(_resourceName, _entities);
+				fetchedResources = require('./get').create(_web).getAll(_resourceName, _entities);
 			}
 
 			result = keys.next();
@@ -108,9 +108,9 @@ function Collect(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create collect module without a web context' }
+	if (!_web) { throw 'Unable to create collect module without an airlift/web context' }
 
-	return new Collect(WEB_CONTEXT);
+	return new Collect(_web);
 };

@@ -1,12 +1,12 @@
 var collection = require('airlift/collection');
 var util = require('airlift/util');
 
-exports.handle = function(WEB_CONTEXT)
+exports.handle = function(_web)
 {
 	util.info("IN COLLECT HANDLER: " + Packages.java.lang.System.currentTimeMillis());
 	
-	var da = require('airlift/da/collect').create(WEB_CONTEXT);
-	var res = require('airlift/resource').create(WEB_CONTEXT);
+	var da = require('airlift/da/collect').create(_web);
+	var res = require('airlift/resource').create(_web);
 
 	util.info("START COLLECT: " + Packages.java.lang.System.currentTimeMillis());
 	var persons = da.collect('person', {limit: 1000});
@@ -56,9 +56,8 @@ exports.handle = function(WEB_CONTEXT)
 
 	util.info("END REDUCE: " + Packages.java.lang.System.currentTimeMillis());
 
-	var web = require('airlift/web').create(WEB_CONTEXT);
-	web.setContent(content + "]");
-	web.setType('application/json');
+	_web.setContent(content + "]");
+	_web.setType('application/json');
 	
 	util.info("OUT COLLECT HANDLER: " + Packages.java.lang.System.currentTimeMillis());
 };

@@ -459,3 +459,8 @@ exports.getWebRequestId = function(_name)
 {
 	return Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 };
+
+exports.string = function(_stringOrJavaByteArray)
+{
+	return new Packages.java.lang.String(_stringOrJavaByteArray);
+};

@@ -236,3 +236,12 @@ exports['test create map'] = function(_assert)
 
 	_assert.eq(copy, map, 'map was not copied correctly');
 };
+
+exports['test convert JavaScript string to Java string'] = function(_assert)
+{
+	var string = new String('Hello');
+	var javaString = util.string(string);
+
+	_assert.eq(new Packages.java.lang.String(string), javaString, 'string conversion not correct');
+	_assert.eq("java.lang.String", javaString.getClass().getName(), 'string conversion did not produce java.lang.String');
+};

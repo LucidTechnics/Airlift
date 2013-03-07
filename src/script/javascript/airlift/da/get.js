@@ -1,8 +1,8 @@
-function Get(WEB_CONTEXT)
+function Get(_web)
 {
-	var outgoing = require('../outgoing').create(WEB_CONTEXT);
+	var outgoing = require('../outgoing').create(_web);
 	var util = require('../util');
-	var res = require('../resource').create(WEB_CONTEXT);
+	var res = require('../resource').create(_web);
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
@@ -110,9 +110,9 @@ function Get(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create get module without a web context' }
+	if (!_web) { throw 'Unable to create get module without an airlift/web context' }
 
-	return new Get(WEB_CONTEXT);
+	return new Get(_web);
 };

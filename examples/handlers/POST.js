@@ -1,13 +1,11 @@
 var u = require('airlift/util');
 
-exports.handle = function(WEB_CONTEXT)
+exports.handle = function(_web)
 {
-	var web = require('airlift/web').create(WEB_CONTEXT);
-
 	u.info("IN HANDLER: " + Packages.java.lang.System.currentTimeMillis());
 	
-	var res = require('airlift/resource').create(WEB_CONTEXT);
-	var incoming = require('airlift/incoming').create(WEB_CONTEXT);
+	var res = require('airlift/resource').create(_web);
+	var incoming = require('airlift/incoming').create(_web);
 
 	var errors;
 
@@ -17,14 +15,14 @@ exports.handle = function(WEB_CONTEXT)
 
 		if (u.isEmpty(errors) === true)
 		{
-			var da = require('airlift/da/insert').create(WEB_CONTEXT);
+			var da = require('airlift/da/insert').create(_web);
 			da.insert('person', this.resource);
-			web.setResponseCode('200');
+			_web.setResponseCode('200');
 		}
 		else
 		{
 			u.severe('POST ERRORS: ' + res.json(errors));
-			web.setResponseCode('400');
+			_web.setResponseCode('400');
 		}
 	};
 

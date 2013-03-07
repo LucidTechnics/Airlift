@@ -1,6 +1,5 @@
-function Resource(WEB_CONTEXT)
+function Resource(_web)
 {
-	var web = require('./web').create(WEB_CONTEXT);
 	var util = require('./util');
 	
 	var constructors = {}; //a cache for Java String, Collection, and primitive constructors
@@ -15,8 +14,8 @@ function Resource(WEB_CONTEXT)
 		context.attributesMetadata = context.attributesMetadata || require('meta/a/' + _resourceName).create();
 		context.foreignKeys = context.attributesMetadata.foreignKeys;
 		context.attributes = this.attributes || context.attributes || context.resourceMetadata.attributes;
-		context.web = web;
-		context.WEB_CONTEXT = WEB_CONTEXT;
+		context.web = _web;
+		context.WEB_CONTEXT = _web.WEB_CONTEXT;
 
 		var reporter = util.createErrorReporter();
 
@@ -283,16 +282,16 @@ function Resource(WEB_CONTEXT)
 		var currentDate = util.createDate();
 
 		auditTrail.setAction(action);
-		auditTrail.setMethod(web.getMethod());
+		auditTrail.setMethod(_web.getMethod());
 		auditTrail.setResource(resourceName);
-		auditTrail.setUri(web.getUri());
-		auditTrail.setHandlerName(web.getHandlerName());
-		auditTrail.setUserId(web.getUserId());
+		auditTrail.setUri(_web.getUri());
+		auditTrail.setHandlerName(_web.getHandlerName());
+		auditTrail.setUserId(_web.getUserId());
 		auditTrail.setActionDate(currentDate);
 		auditTrail.setRecordDate(currentDate);
 		auditTrail.requestId = com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 
-		web.getAuditContext().insert(auditTrail);
+		_web.getAuditContext().insert(auditTrail);
 
 		util.println('Finished audit');
 	};
@@ -308,9 +307,9 @@ function Resource(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create resource module without a web context' }
+	if (!_web) { throw 'Unable to create resource module without an airlift/web object' }
 
-	return new Resource(WEB_CONTEXT);
+	return new Resource(_web);
 };

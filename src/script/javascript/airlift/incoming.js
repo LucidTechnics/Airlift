@@ -1,14 +1,13 @@
-function Incoming(WEB_CONTEXT)
+function Incoming(_web)
 {
 	var util = require('./util');
-	var web = require('./web').create(WEB_CONTEXT);
 	
 	var formatUtil = Packages.airlift.util.FormatUtil;
 
 	var convertUtil = Packages.org.apache.commons.beanutils.ConvertUtils;
 	var dateConverter = new Packages.org.apache.commons.beanutils.converters.DateConverter();
-	dateConverter.setLocale(web.getLocale());
-	dateConverter.setTimeZone(java.util.TimeZone.getTimeZone(web.getTimezone()));
+	dateConverter.setLocale(_web.getLocale());
+	dateConverter.setTimeZone(java.util.TimeZone.getTimeZone(_web.getTimezone()));
 	convertUtil.register(dateConverter, util.createClass("java.util.Date"));
 
 	var validationError = function(_name, _message)
@@ -240,7 +239,7 @@ function Incoming(WEB_CONTEXT)
 
 	this.bookkeeping = function bookkeeping(_entity, _userId, _postDate, _putDate)
 	{
-		var user = web.getUser();
+		var user = _web.getUser();
 		var userId = _userId||user && user.getId()||'user id not provided';
 
 		_entity.setProperty("auditUserId", userId);
@@ -275,9 +274,9 @@ function Incoming(WEB_CONTEXT)
 	{
 		if (util.isEmpty(this.allErrors()) === true && _attributeMetadata.encrypted === true)
 		{
-			var password = web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
-			var initialVector = web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
-			var revolutions = web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
+			var password = _web.getServlet().getServletConfig().getInitParameter("a.cipher.password");
+			var initialVector = _web.getServlet().getServletConfig().getInitParameter("a.cipher.initial.vector");
+			var revolutions = _web.getServlet().getServletConfig().getInitParameter("a.cipher.revolutions")||20;
 
 			var encryptedAttribute = new Packages.com.google.appengine.api.datastore.Blob(Packages.airlift.util.AirliftUtil.encrypt(Packages.airlift.util.AirliftUtil.convert(_entity.getProperty(_attributeName)||javaArray.byteArray(0)), password, initialVector, null, null, null, null, revolutions));
 			var attributeEncryptedName = _attributeName + "Encrypted";
@@ -333,7 +332,7 @@ function Incoming(WEB_CONTEXT)
 
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
 	{
-		var request = web.getRequest();
+		var request = _web.getRequest();
 
 		util.info('request parameters', request.getParameterMap());
 
@@ -379,14 +378,14 @@ function Incoming(WEB_CONTEXT)
 				 * be overridden.
 				 */
 
-				var restContext = web.getRestContext();
+				var restContext = _web.getRestContext();
 				var parameterValue = restContext.getParameter(_attributeName.replace('id$', '.id'));
 				value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
 			}
 		}
 		else
 		{
-			var restContext = web.getRestContext();
+			var restContext = _web.getRestContext();
 			var parameterValue = restContext.getParameter(resourceName + ".id");
 			value = (util.hasValue(parameterValue) && converter[type]([ parameterValue ])) || null;
 		}
@@ -442,9 +441,9 @@ function Incoming(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create incoming module without a web context' }
+	if (!_web) { throw 'Unable to create incoming module without an airlift/web object' }
 
-	return new Incoming(WEB_CONTEXT);
+	return new Incoming(_web);
 };

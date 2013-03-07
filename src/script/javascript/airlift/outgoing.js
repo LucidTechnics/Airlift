@@ -1,12 +1,11 @@
-function Outgoing(WEB_CONTEXT)
+function Outgoing(_web)
 {
 	var javaArray = require('./javaArray');
 	var util = require('./util');
-	var web = require('./web').create(WEB_CONTEXT);
 
-	var password = web.getInitParameter("a.cipher.password");
-	var initialVector = web.getInitParameter("a.cipher.initial.vector");
-	var revolutions = web.getInitParameter("a.cipher.revolutions")||20;
+	var password = _web.getInitParameter("a.cipher.password");
+	var initialVector = _web.getInitParameter("a.cipher.initial.vector");
+	var revolutions = _web.getInitParameter("a.cipher.revolutions")||20;
 
 	this.deentify = function deentify(_entity, _value, _attributeName)
 	{
@@ -30,9 +29,9 @@ function Outgoing(WEB_CONTEXT)
 	};
 }
 
-exports.create = function(WEB_CONTEXT)
+exports.create = function(_web)
 {
-	if (!WEB_CONTEXT) { throw 'Unable to create outgoing module without a web context' }
+	if (!_web) { throw 'Unable to create outgoing module without a airlift/web object' }
 
-	return new Outgoing(WEB_CONTEXT);
+	return new Outgoing(_web);
 };
