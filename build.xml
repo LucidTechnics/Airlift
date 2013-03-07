@@ -136,7 +136,6 @@
 		<delete dir="${deployDir.lib}" />
 		<delete dir="${deployDir.cfg}" />
 		<delete dir="${deployDir.log}" />
-
 		<delete dir="${deployDir.html}" />
 		<delete dir="${stage}" />
 

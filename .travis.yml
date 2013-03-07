@@ -4,6 +4,7 @@ jdk:
 # whitelist
 branches:
   only:
+    - master
     - airlift_2.0_development
 
 notifications:
