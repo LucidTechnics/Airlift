@@ -42,7 +42,6 @@
 	<property name="src.images" location="${src}/images" />
 	<property name="src.script" location="${src}/script" />
 	
-	
 	<property name="stage" location="stage" />
 	<property name="stage.shl" location="${stage}/shl" />
 	<property name="stage.java" location="${stage}/java" />
@@ -137,6 +136,7 @@
 		<delete dir="${deployDir.lib}" />
 		<delete dir="${deployDir.cfg}" />
 		<delete dir="${deployDir.log}" />
+		<delete dir="${deployDir.html}" />
 		<delete dir="${stage}" />
 
 	</target>
@@ -177,7 +177,6 @@
 		<mkdir dir="${deployDir.log}" />
 		<mkdir dir="${deployDir.shl}" />
 		<mkdir dir="${deployDir.template}" />
-		<mkdir dir="${deployDir.javascript}" />
 		<mkdir dir="${deployDir.test}" />
 		<mkdir dir="${deployDir.images}" />
 		<mkdir dir="${deployDir.script}" />
@@ -286,10 +285,6 @@
 
 		<copy todir="${deployDir.template}">
 			<fileset dir="${src.template}" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${deployDir.javascript}">
-			<fileset dir="${src.javascript}" includes="**/*.js*" />
 		</copy>
 
 		<copy todir="${deployDir.images}">
