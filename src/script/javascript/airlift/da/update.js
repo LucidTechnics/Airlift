@@ -66,8 +66,13 @@ function Update(_web)
 		}
 		catch(e)
 		{
+			util.severe(_resourceName, 'encountered exception', e);
+			util.severe('... while inserting', res.json(_resource));
+			if (e.javaException)
+			{
+				e.javaException.printStackTrace();
+			}
 			errorStatus = true;
-			util.severe('Update experienced exception', e.toString(), e.message, e.javaException||'');
 			if (transaction) { transaction.rollbackAsync(); }
 			throw e;
 		}

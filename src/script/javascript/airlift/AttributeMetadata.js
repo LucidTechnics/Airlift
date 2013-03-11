@@ -32,7 +32,8 @@ var AttributeMetadata = function(_config)
 	this.minValue = util.value(_config.minValue, null);
 	this.maxValue = util.value(_config.maxValue, null);
 	this.encrypted = util.value(_config.encrypted, false);
-	this.semanticType = util.value(_config.semanticType, 'NONE');	
+	this.semanticType = util.value(_config.semanticType, 'NONE');
+	this.mapTo = util.value(_config.mapTo, null);
 };
 
 exports.create = function(_config)

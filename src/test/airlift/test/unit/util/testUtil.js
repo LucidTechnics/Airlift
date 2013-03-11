@@ -245,3 +245,57 @@ exports['test convert JavaScript string to Java string'] = function(_assert)
 	_assert.eq(new Packages.java.lang.String(string), javaString, 'string conversion not correct');
 	_assert.eq("java.lang.String", javaString.getClass().getName(), 'string conversion did not produce java.lang.String');
 };
+
+exports['test convert JavaScript number to Java int'] = function(_assert)
+{
+	var number = 5;
+	var javaNumber = util['int'](number);
+
+	_assert.eq(new Packages.java.lang.Integer(number).intValue(), javaNumber, 'int conversion not correct');
+};
+
+exports['test convert JavaScript number to Java double'] = function(_assert)
+{
+	var number = 5.2;
+	var javaNumber = util['double'](number);
+
+	_assert.eq(new Packages.java.lang.Double(number).doubleValue(), javaNumber, 'double conversion not correct');
+};
+
+exports['test convert JavaScript number to Java long'] = function(_assert)
+{
+	var number = 232423232323232;
+	var javaNumber = util['long'](number);
+
+	_assert.eq(new Packages.java.lang.Long(number).longValue(), javaNumber, 'long conversion not correct');
+};
+
+exports['test convert JavaScript number to Java short'] = function(_assert)
+{
+	var number = 2;
+	var javaNumber = util['short'](number);
+
+	_assert.eq(new Packages.java.lang.Short(number).shortValue(), javaNumber, 'short conversion not correct');
+};
+
+exports['test convert JavaScript number to Java float'] = function(_assert)
+{
+	var number = 5.2;
+	var javaNumber = util['float'](number);
+
+	_assert.eq(new Packages.java.lang.Float(number).floatValue(), javaNumber, 'float conversion not correct');
+};
+
+exports['test padding'] = function(_assert)
+{
+	var string1 = '9';
+	var string2 = new Packages.java.lang.String('9');
+
+	_assert.eq('00009', util.leftPad(string1, 5, '0'), 'left pad of JavaScript string with 4 zeroes failed');
+	_assert.eq(util.string('00009'), util.leftPad(string2, 5, '0'), 'left pad of Java string with 4 zeroes failed');
+	_assert.eq(util.string(util.leftPad(string1, 5, '0')), '' + util.leftPad(string2, 5, '0'), 'left pad JavaScript string and Java string failed');
+
+	_assert.eq('90000', util.rightPad(string1, 5, '0'), 'right pad of JavaScript string with 4 zeroes failed');
+	_assert.eq(util.string('90000'), util.rightPad(string2, 5, '0'), 'right pad of Java string with 4 zeroes failed');
+	_assert.eq(util.string(util.rightPad(string1, 5, '0')), '' + util.rightPad(string2, 5, '0'), 'right pad JavaScript string and Java string failed');
+};

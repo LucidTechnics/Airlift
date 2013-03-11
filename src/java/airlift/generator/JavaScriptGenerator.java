@@ -91,7 +91,7 @@ public class JavaScriptGenerator
 					}
 					else if ("mapTo".equalsIgnoreCase(name) == true)
 					{
-						resourceMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length() - 2)));
+						resourceMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName());
 					}
 				}
 			}

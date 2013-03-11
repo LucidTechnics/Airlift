@@ -33,7 +33,7 @@ function Resource(_web)
 
 		if (_callback)
 		{
-			_callback.call(context, _resourceName, _resource);
+			_callback.call(context, _resourceName, context.resource);
 		}
 	};
 

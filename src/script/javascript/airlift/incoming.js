@@ -1,13 +1,15 @@
+var util = require('./util');
+var javaArray = require('./javaArray');
+
 function Incoming(_web)
 {
-	var util = require('./util');
-	
 	var formatUtil = Packages.airlift.util.FormatUtil;
 
 	var convertUtil = Packages.org.apache.commons.beanutils.ConvertUtils;
 	var dateConverter = new Packages.org.apache.commons.beanutils.converters.DateConverter();
 	dateConverter.setLocale(_web.getLocale());
 	dateConverter.setTimeZone(java.util.TimeZone.getTimeZone(_web.getTimezone()));
+	dateConverter.setPatterns(javaArray.stringArray(4, ['MM-dd-yyyy', 'MM/dd/yyyy', 'EEE, dd MMM yyyy HH:MM:ss z', "yyyy-MM-ddTHH:mm:ss.SSS'Z'"]));
 	convertUtil.register(dateConverter, util.createClass("java.util.Date"));
 
 	var validationError = function(_name, _message)
@@ -245,7 +247,7 @@ function Incoming(_web)
 		_entity.setProperty("auditUserId", userId);
 		_entity.setProperty("auditRequestId", util.getWebRequestId());
 		_entity.setProperty("auditPostDate", _postDate||util.createDate());
-		_entity.setProperty("auditPutDate", _putDate||_postDate);
+		_entity.setProperty("auditPutDate", _putDate||_entity.getProperty("auditPostDate"));
 	};
 
 	this.entify = function entify(_entity, _value, _attributeName, _resource, _attributeMetadata)
@@ -262,11 +264,11 @@ function Incoming(_web)
 				//persisted to the datastore.
 				if (_attributeMetadata.maxLength > 500)
 				{
-					value = new Package.com.google.appengine.api.datastore.Text(value);
+					value = new Packages.com.google.appengine.api.datastore.Text(value);
 				}
 			}
 
-			(isIndexable === true) ? _entity.setProperty(_attributeName, _value) : _entity.setUnindexedProperty(_attributeName, _value);
+			(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
 		}
 	};
 
@@ -334,8 +336,6 @@ function Incoming(_web)
 	{
 		var request = _web.getRequest();
 
-		util.info('request parameters', request.getParameterMap());
-
 		var resourceName = this.resourceName;
 		var value;
 
@@ -368,8 +368,8 @@ function Incoming(_web)
 
 				this.report(_attributeName, "This value is not correct.", "conversion");
 			}
-
-			if (util.isWhitespace(_attributeMetadata.mapTo) === true)
+			
+			if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
 			{
 				/* Form value overrides what is in the URI.  This is done for
 				 * security reasons.  The foreign key may be protected via TLS
@@ -379,8 +379,8 @@ function Incoming(_web)
 				 */
 
 				var restContext = _web.getRestContext();
-				var parameterValue = restContext.getParameter(_attributeName.replace('id$', '.id'));
-				value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+				var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+				value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
 			}
 		}
 		else
@@ -389,8 +389,10 @@ function Incoming(_web)
 			var parameterValue = restContext.getParameter(resourceName + ".id");
 			value = (util.hasValue(parameterValue) && converter[type]([ parameterValue ])) || null;
 		}
-
+		
 		_resource[_attributeName] = value;
+
+		var res = require('airlift/resource').create(_web);
 
 		return value;
 	};

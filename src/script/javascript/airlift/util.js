@@ -464,3 +464,67 @@ exports.string = function(_stringOrJavaByteArray)
 {
 	return new Packages.java.lang.String(_stringOrJavaByteArray);
 };
+
+exports['int'] = function(_number)
+{
+	return new Packages.java.lang.Integer(_number).intValue();
+}
+
+exports['double'] = function(_number)
+{
+	return new Packages.java.lang.Double(_number).doubleValue();
+}
+
+exports['short'] = function(_number)
+{
+	return new Packages.java.lang.Short(_number).shortValue();
+}
+
+exports['float'] = function(_number)
+{
+	return new Packages.java.lang.Float(_number).floatValue();
+}
+
+exports['long'] = function(_number)
+{
+	return new Packages.java.lang.Long(_number).longValue();
+}
+
+exports.leftPad = function(_item, _digits, _pad)
+{
+	var item = _item + '';
+	var pad = _pad + '';
+
+	while (item.length < _digits)
+	{
+		item = pad + item;
+	}
+
+	if (_item instanceof java.lang.String) { item = exports.string(item); }
+	
+	return item;
+};
+
+exports.rightPad = function(_item, _digits, _pad)
+{
+	var item = _item + '';
+	var pad = _pad + '';
+
+	while (item.length < _digits)
+	{
+		item = item + pad;
+	}
+
+	if (_item instanceof java.lang.String) { item = exports.string(item); }
+	
+	return item;
+};
+
+exports.hash = function(_algorithm, _message, _length)
+{
+	var hash = Packages.airlift.util.IdGenerator.hash(_algorithm, _message);
+
+	var length = (hash.length() > _length) ? _length : (hash.length() - 1);
+
+	return hash.substring(hash.length() - length, hash.length());
+}

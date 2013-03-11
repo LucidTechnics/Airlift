@@ -42,6 +42,19 @@ function Insert(_web)
 
 			var pre = _pre && res.sequence.partial(_pre) || res.sequence;
 
+			/*
+			 * Important functionality of insert.  If the resource has
+			 * an id, insert acts as if the resource did not previously
+			 * exist.  As such it will clobber and existing entity in
+			 * the database.  This functionality is in place to support
+			 * use cases when the client is responsible for providing
+			 * the identifier for the resource.
+			 */
+
+			var id = _resource.id || this.provideUniqueId(_resourceName);
+			var entity = incoming.createEntity(_resourceName, id);
+			var result = {};
+
 			var callback = function()
 			{
 				result.id = id;
@@ -69,16 +82,16 @@ function Insert(_web)
 			};
 
 			//var post = _post && res.sequence.partial(callback, _post) || res.sequence.partial(callback);
-
-			var id = this.provideUniqueId(_resourceName);
-			var entity = incoming.createEntity(_resourceName, id);
-			var result = {};
-
 			res.each(_resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
 		}
 		catch(e)
 		{
-			util.severe('Encountered exception', e);
+			util.severe(_resourceName, 'encountered exception', e);
+			util.severe('... while inserting', res.json(_resource));
+			if (e.javaException)
+			{
+				e.javaException.printStackTrace();
+			}
 			errorStatus = true;
 			if (transaction) { transaction.rollbackAsync(); }
 			throw e;
