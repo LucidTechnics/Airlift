@@ -11,7 +11,11 @@ function Outgoing(_web)
 	{
 		var value = _entity.getProperty(_attributeName);
 
-		if ("id".equals(_attributeName) === true)
+		if (value instanceof com.google.appengine.api.datastore.Text)
+		{
+			value = value.getValue();
+		}
+		else if ("id".equals(_attributeName) === true)
 		{
 			value = _entity.getKey().getName();
 		}

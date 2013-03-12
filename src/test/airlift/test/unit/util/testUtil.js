@@ -299,3 +299,10 @@ exports['test padding'] = function(_assert)
 	_assert.eq(util.string('90000'), util.rightPad(string2, 5, '0'), 'right pad of Java string with 4 zeroes failed');
 	_assert.eq(util.string(util.rightPad(string1, 5, '0')), '' + util.rightPad(string2, 5, '0'), 'right pad JavaScript string and Java string failed');
 };
+
+exports['test load resource'] = function(_assert)
+{
+	var assertResourceString = util.load('airlift/assert.js');
+
+	_assert.eq(assertResourceString.substring(0, 14), "// http://wiki", 'unable to load correct resource');
+};

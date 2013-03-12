@@ -1,16 +1,30 @@
+var util = require('../util');
+var service = require('../service');
+
 function Collect(_web)
 {
-	var util = require('airlift/util');
-
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
 
-	function QueryResultIterator(_resourceName, _entities, _keysOnly)
+	function QueryResultIterator(_resourceName, _entities, _keysOnly, _originalQueryConfigOptions)
 	{
 		var keys = util.createKeysCollection(_entities).iterator();
 		var keysOnly = _keysOnly;
 		var fetchedResources;
+		var cursor = _entities.getCursor();
+		var originalQueryConfigOptions = _originalQueryConfigOptions;
 		var next;
+
+		this.cursor = function()
+		{
+			var guid = 'cursor:' + util.guid(32);
+			
+			originalQueryConfigOptions.cursorId = cursor.toWebSafeString();
+			//save guid and cursor to memcache
+			service.getCacheService().put(guid, JSON.stringify(originalQueryConfigOptions));
+			
+			return guid;
+		};
 
 		this.hasNext = function()
 		{
@@ -44,8 +58,16 @@ function Collect(_web)
 
 	this.collect = function(_resourceName, _config)
 	{
-		var config = _config||{};
-		var offset = config.offset||0;
+		var originalConfig;
+		
+		if (_config.cursorId)
+		{
+			var originalConfig = service.getCacheService().get(config.cursorId);
+			if (!originalConfig) { throw 'unable to find cursor identified by: ' + config.cursorId; }
+			originalConfig = JSON.parse(originalConfig);
+		}
+		
+		var config = originalConfig||_config||{};
 		var limit = config.limit||20;
 		var asc = (util.hasValue(config.asc) === true) ? config.asc : true;
 		var orderBy = config.orderBy||"auditPutDate";
@@ -79,9 +101,23 @@ function Collect(_web)
 			query.setFilter(filterList.get(0));
 		}
 
-		var entities = datastore.prepare(query).asList(Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).offset(offset));
+		var fetchOptions;
+		
+		if (config.cursorId)
+		{
+			var decodedCursor = com.google.appengine.api.datastore.Cursor.forWebSafeString(config.cursorId);
+			delete config.cursorId;
+			
+			fetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).cursor(decodedCursor);
+		}
+		else
+		{
+			fetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit);
+		}
 
-		return new java.util.Iterator(new QueryResultIterator(_resourceName, entities, keysOnly));
+		var entities = datastore.prepare(query).asQueryResultList(fetchOptions);
+
+		return new java.util.Iterator(new QueryResultIterator(_resourceName, entities, keysOnly, config));
 	};
 
 	this.collectBy = function(_resourceName, _attributeName, _value, _config)

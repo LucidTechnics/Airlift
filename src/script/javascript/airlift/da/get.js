@@ -1,12 +1,14 @@
+var service = require('airlift/service');
+
 function Get(_web)
 {
-	var outgoing = require('../outgoing').create(_web);
-	var util = require('../util');
-	var res = require('../resource').create(_web);
-
+	var outgoing = require('airlift/outgoing').create(_web);
+	var util = require('airlift/util');
+	var res = require('airlift/resource').create(_web);
+	
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
-	var cache = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService(); 
+	var cache = service.getCacheService(); 
 
 	var populateCache = function(_key, _value)
 	{

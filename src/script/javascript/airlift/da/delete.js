@@ -1,12 +1,14 @@
+var service = require('airlift/service');
+var util = require('airlift/util');
+
 function Delete(_web)
 {
-	var res = require('../resource').create(_web);
-	var incoming = require('../incoming').create(_web);
-	var util = require('../util');
+	var res = require('airlift/resource').create(_web);
+	var incoming = require('airlift/incoming').create(_web);
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
-	var cache = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+	var cache = service.getCacheService();
 
 	this.del = function del(_resourceName, _id)
 	{

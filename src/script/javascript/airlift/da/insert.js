@@ -1,12 +1,14 @@
+var util = require('../util');
+var service = require('../service');
+
 function Insert(_web)
 {
 	var res = require('../resource').create(_web);
 	var incoming = require('../incoming').create(_web);
-	var util = require('../util');
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
-	var cache = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+	var cache = service.getCacheService();
 
 	this.provideUniqueId = function(_resourceName)
 	{

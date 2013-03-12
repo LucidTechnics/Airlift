@@ -1,7 +1,7 @@
 function AppIdentityService()
 {
 	var service = com.google.appengine.api.appidentity.AppIdentityServiceFactory.getAppIdentityService();
-	var appInfo = service.ParsedAppId		;
+	var appInfo = service.ParsedAppId;
 	
 	this.getAppId = function()
 	{
@@ -17,6 +17,11 @@ function AppIdentityService()
 	{
 		return appInfo.getPartition();
 	};
+
+	this.service = function()
+	{
+		return service;
+	}
 }
 
 function QueueService(_name, _method)
@@ -39,6 +44,41 @@ function QueueService(_name, _method)
 
 		queue.add(taskOptions);
 	};
+
+	this.service = function()
+	{
+		return queue;
+	}
+}
+
+function CacheService()
+{
+	var service = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+	
+	this.get = function(_key)
+	{
+		return service.get(_key);
+	};
+
+	this.getAll = function(_keys)
+	{
+		return service.getAll(_keys);
+	};
+
+	this.put = function(_key, _value)
+	{
+		service.put(_key, _value);
+	};
+
+	this.putAll = function(_map)
+	{
+		service.putAll(_map);
+	};
+
+	this.service = function()
+	{
+		return service;
+	};
 }
 
 exports.getQueueService = function(_name)
@@ -50,3 +90,8 @@ exports.getAppIdentityService = function()
 {
 	return new AppIdentityService();
 };
+
+exports.getCacheService = function()
+{
+	return 	new CacheService();
+}

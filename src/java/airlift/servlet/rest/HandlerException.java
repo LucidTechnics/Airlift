@@ -22,14 +22,7 @@ public class HandlerException
    extends RuntimeException
 {
 	
-	/**
-	 * The Enum ErrorCode.
-	 */
-	public enum ErrorCode { 
- /** The N o_ erro r_ code. */
- NO_ERROR_CODE, 
- /** The HANDLE r_ no t_ found. */
- HANDLER_NOT_FOUND }
+	public enum ErrorCode { NO_ERROR_CODE, HANDLER_NOT_FOUND, RESOURCE_NOT_FOUND }
 
 	/** The error code. */
 	protected ErrorCode errorCode = ErrorCode.NO_ERROR_CODE;

@@ -161,7 +161,7 @@ public class JavaScriptingUtil
 			if (_timeScript == true)
 			{
 				long total = System.currentTimeMillis() - startTime;
-				log.info("Handler took this many milliseconds to run: " + total);
+				log.info("Handler: " + _scriptResource + " took this many milliseconds to run: " + total);
 			}
 		}
 		catch(RuntimeException h)
@@ -222,7 +222,7 @@ public class JavaScriptingUtil
 				if (_timeScripts)
 				{
 					long total = System.currentTimeMillis() - startTime;
-					log.info("Handler took this many milliseconds to run: " + total);
+					log.info("Handler: " + _scriptResources[i] + " took this many milliseconds to run: " + total);
 				}
 			}
 		}

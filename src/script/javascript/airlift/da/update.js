@@ -1,13 +1,15 @@
+var util = require('../util');
+var service = require('../service');
+
 function Update(_web)
 {
 	var res = require('../resource').create(_web);
 	var incoming = require('../incoming').create(_web);
-	var util = require('../util');
 	var getter = require('./get').create(_web);
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
-	var cache = Packages.com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService();
+	var cache = service.getCacheService();
 
 	this.update = function(_resourceName, _resource, _pre, _post)
 	{

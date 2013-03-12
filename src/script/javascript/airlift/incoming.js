@@ -264,6 +264,7 @@ function Incoming(_web)
 				//persisted to the datastore.
 				if (_attributeMetadata.maxLength > 500)
 				{
+					isIndexable = false;
 					value = new Packages.com.google.appengine.api.datastore.Text(value);
 				}
 			}

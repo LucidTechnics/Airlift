@@ -287,6 +287,7 @@ exports.severe = function severe()
 	log.severe(severe);
 };
 
+
 exports.value = function value(_candidate, _default)
 {
 	var candidate;
@@ -400,7 +401,6 @@ exports.map = function map(_parameter)
 
 	return map;
 };
-
 
 function KeysIterator(_entityList)
 {
@@ -527,4 +527,9 @@ exports.hash = function(_algorithm, _message, _length)
 	var length = (hash.length() > _length) ? _length : (hash.length() - 1);
 
 	return hash.substring(hash.length() - length, hash.length());
-}
+};
+
+exports.load = function(_resourcePath)
+{
+	return (new Packages.airlift.util.ResourceUtil).load(_resourcePath);
+};
