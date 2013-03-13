@@ -809,25 +809,36 @@ public class RestServlet
 			//If you get like a bunch of "Accept" header values than it is
 			//most likely a web browser (IE for instance) so set all
 			//HTML like requests to the default method handlers.
-			if (_acceptValueList.isEmpty() == true ||
-				  _acceptValueList.size() > 1 ||
-				  (_acceptValueList.contains("application/xml") == true ||
-				   _acceptValueList.contains("application/xhtml+xml") == true ||
-				   _acceptValueList.contains("text/html") == true ||
-				   _acceptValueList.contains("application/x-www-form-urlencoded") == true ||
-				   _acceptValueList.contains("text/plain") == true))
-			{
-				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
-			}
 
 			//Otherwise if the Accept is specifically set for one mime type
 			//then call that handler.  This is because this is most
 			//likely an AJAX call or a client calling on this resource as a web
 			//service.
+
+			if (_acceptValueList.isEmpty() == true)
+			{
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + prefix + ".js");
+			}
+
 			for(String acceptValue: _acceptValueList)
 			{
-				handlerPath = "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
-				restContext.addHandlerPath(handlerPath);
+				String acceptHandlerPath = null;
+				
+				if (_acceptValueList.contains("application/xml") == true ||
+					_acceptValueList.contains("application/xhtml+xml") == true ||
+					_acceptValueList.contains("text/html") == true ||
+					_acceptValueList.contains("application/x-www-form-urlencoded") == true ||
+					_acceptValueList.contains("text/plain") == true ||
+				    _acceptValueList.contains("*/*") == true)
+				{
+					acceptHandlerPath = "/handler/" + domainName.toLowerCase() + "/" + prefix + ".js";
+				}
+				else
+				{
+					acceptHandlerPath = "/handler/" + domainName.toLowerCase() + "/" + acceptValue + "/" + prefix + ".js";
+				}
+				
+				restContext.addHandlerPath(acceptHandlerPath);
 			}
 		}
 
