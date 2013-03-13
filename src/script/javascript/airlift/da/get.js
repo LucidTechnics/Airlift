@@ -36,7 +36,7 @@ function Get(_web)
 	this.get = function(_resourceName, _id)
 	{
 		var result;
-
+		
 		var entity = util.multiTry(function()
 		{
 			try
@@ -61,7 +61,7 @@ function Get(_web)
 		5, function(_tries, _e) { util.severe("Encountered this error while getting", _resourceName, "identified by:", _id); });
 
 		result = entity && res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
-
+		
 		return result;
 	};
 

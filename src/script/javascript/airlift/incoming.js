@@ -381,14 +381,16 @@ function Incoming(_web)
 
 				var restContext = _web.getRestContext();
 				var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
-				value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
+				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 			}
 		}
 		else
 		{
 			var restContext = _web.getRestContext();
 			var parameterValue = restContext.getParameter(resourceName + ".id");
-			value = (util.hasValue(parameterValue) && converter[type]([ parameterValue ])) || null;
+			//convert only works for the first id.  Multiple puts not
+			//supported at this time - Bediako
+			value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 		}
 		
 		_resource[_attributeName] = value;

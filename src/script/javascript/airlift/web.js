@@ -9,7 +9,8 @@ function Web(WEB_CONTEXT)
 	var path;
 	var uri;
 	var resourcePath;
-	var id;
+	var ids;
+	var entities;
 	var resourceName;
 	var hasId;
 	var resourcePathMap;
@@ -159,16 +160,28 @@ function Web(WEB_CONTEXT)
 		return this.getRestContext().getSecurityContext();
 	};
 
+	this.convertToString = function(_ids)
+	{
+		var buffer = new Packages.java.lang.StringBuffer();
+		
+		for (var id in Iterator(_ids))
+		{
+			buffer.append(id + ',');
+		}
+
+		return buffer.toString().replaceAll(",$", "");
+	};
+			
 	this.getResourcePath = function()
 	{
 		if (!resourcePath)
 		{
 			resourcePath = this.getResourceName();
-			var id = this.getId();
+			var ids = this.getIds();
 
-			if ("POST".equals(this.getMethod()) === false && id !== null && "".equalsIgnoreCase(id) === false)
+			if ("POST".equals(this.getMethod()) === false && ids !== null && ids.isEmpty() === false)
 			{
-				resourcePath = resourcePath + "/" + id;
+				resourcePath = resourcePath + "/" + this.convertToString(ids);
 			}
 		}
 
@@ -177,12 +190,54 @@ function Web(WEB_CONTEXT)
 
 	this.getId = function()
 	{
-		if (!id)
+		if (!ids)
 		{
-			id = this.getRestContext().constructDomainId();
+			ids = this.getRestContext().constructDomainIds();
+		}
+		
+		return ids && ids.get(0);
+	};
+
+	this.getIds = function()
+	{
+		if (!ids)
+		{
+			ids = this.getRestContext().constructDomainIds();
 		}
 
-		return id;
+		return ids;
+	};
+
+	this.getEntity = function()
+	{
+		if (!entities)
+		{
+			entities = this.getRestContext().constructKeys();
+		}
+
+		return entities && entities.get(0);
+	};
+
+	this.getEntities = function()
+	{
+		if (!entities)
+		{
+			entities = this.getRestContext().constructKeys();
+		}
+
+		return entities;
+	};
+
+	this.getForeignKey = function(_resourceName)
+	{
+		if (!_resourceName)
+		{
+			throw 'getForeignKeys expects resource name to be defined';
+		}
+		
+		var foreignKeyList = this.getRestContext().getParameter(_resourceName.toLowerCase() + '.id');
+
+		return foreignKeyList && foreignKeyList.get(0);
 	};
 
 	this.getResourceName = function()
@@ -220,11 +275,11 @@ function Web(WEB_CONTEXT)
 		if (!title)
 		{
 			title = this.getResourceName();
-			var id = this.getId();
+			var ids = this.getIds();
 
-			if ("".equals(id) == false)
+			if (ids.isEmpty() == false)
 			{
-				title = title + "-" + id;
+				title = title + "-" + this.convertToString(ids);
 			}
 		}
 

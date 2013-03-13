@@ -23,80 +23,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class Route.
- */
 public class Route
 {
-	
-	/** The log. */
 	private static Logger log = Logger.getLogger(Route.class.getName());
 
-	/** The Constant LABEL. */
 	public static final int LABEL = 0;
-	
-	/** The Constant VARIABLE_PARENT. */
 	public static final int VARIABLE_PARENT = 1;
-	
-	/** The Constant VARIABLE. */
 	public static final int VARIABLE = 2;
-	
-	/** The name. */
 	private String name;
-	
-	/** The type. */
 	private int type;
-	
-	/** The parent. */
 	private Route parent;
-	
-	/** The route map. */
 	private Map<String, Route> routeMap;
-	
-	/** The handler name. */
 	private String handlerName;
 
-	/**
-	 * Gets the name.
-	 *
-	 * @return the name
-	 */
 	public String getName() { return name; }
-	
-	/**
-	 * Gets the type.
-	 *
-	 * @return the type
-	 */
 	public int getType() { return type; }
-	
-	/**
-	 * Gets the parent.
-	 *
-	 * @return the parent
-	 */
 	public Route getParent() { return parent; }
-	
-	/**
-	 * Gets the route map.
-	 *
-	 * @return the route map
-	 */
 	public Map<String, Route> getRouteMap() { return routeMap; }
-	
-	/**
-	 * Gets the handler name.
-	 *
-	 * @return the handler name
-	 */
 	public String getHandlerName() { return handlerName; }
-	
-	/**
-	 * Sets the name.
-	 *
-	 * @param _name the new name
-	 */
 	public void setName(String _name)
 	{
 		if ((_name == null) || (_name != null && "".equals(_name) == true))
@@ -112,37 +56,12 @@ public class Route
 		name = _name;
 	}
 
-	/**
-	 * Sets the type.
-	 *
-	 * @param _type the new type
-	 */
 	public void setType(int _type) { type = _type; }
-	
-	/**
-	 * Sets the parent.
-	 *
-	 * @param _parent the new parent
-	 */
 	public void setParent(Route _parent) { parent = _parent; }
-	
-	/**
-	 * Sets the route map.
-	 *
-	 * @param _routeMap the _route map
-	 */
 	public void setRouteMap(Map<String, Route> _routeMap) { routeMap = _routeMap; }
 	
-	/**
-	 * Sets the handler name.
-	 *
-	 * @param _handlerName the new handler name
-	 */
 	public void setHandlerName(String _handlerName) { handlerName = _handlerName; }
 	
-	/**
-	 * Instantiates a new route.
-	 */
 	public Route()
 	{
 		setParent(this);
@@ -150,23 +69,12 @@ public class Route
 		setRouteMap(new HashMap<String, Route>());
 	}
 
-	/**
-	 * Instantiates a new route.
-	 *
-	 * @param _name the _name
-	 */
 	public Route(String _name)
 	{
 		this();
 		setName(_name);
 	}
 
-	/**
-	 * Adds the.
-	 *
-	 * @param _route the _route
-	 * @return the route
-	 */
 	public Route add(Route _route)
 	{
 		Route addedRoute = null;
@@ -210,13 +118,6 @@ public class Route
 		return addedRoute;
 	}
 
-	/**
-	 * Find.
-	 *
-	 * @param _route the _route
-	 * @param _bindings the _bindings
-	 * @return the route
-	 */
 	public Route find(String _route, Map _bindings)
 	{
 		Route find = null;
@@ -252,15 +153,6 @@ public class Route
 		return find;
 	}
 
-	/**
-	 * Find.
-	 *
-	 * @param _level the _level
-	 * @param _tokenArray the _token array
-	 * @param _route the _route
-	 * @param _bindings the _bindings
-	 * @return the route
-	 */
 	private Route find(int _level, String[] _tokenArray, Route _route, Map _bindings)
 	{
 		if (_route == null)
@@ -305,12 +197,6 @@ public class Route
 		return find;
 	}
 
-	/**
-	 * Adds the domain name.
-	 *
-	 * @param _bindings the _bindings
-	 * @param _domainName the _domain name
-	 */
 	public static void addDomainName(Map _bindings, String _domainName)
 	{
 		List<String> domainList = (List<String>) _bindings.get("a.domain.list");
@@ -329,52 +215,40 @@ public class Route
 		}
 	}
 
-	/**
-	 * Adds the suffix.
-	 *
-	 * @param _bindings the _bindings
-	 * @param _suffix the _suffix
-	 */
 	public static void addSuffix(Map _bindings, String _suffix)
 	{
 		_bindings.put("a.suffix", _suffix);
 	}
 
-	/**
-	 * Adds the bindings.
-	 *
-	 * @param _bindings the _bindings
-	 * @param _parentName the _parent name
-	 * @param _name the _name
-	 * @param _value the _value
-	 */
 	public static void addBindings(Map _bindings, String _parentName, String _name, String _value)
 	{
 		String token = "[,;]";
 		
-		String[] tokenArray = _name.split(token);
 		String[] valueArray = _value.split(token);
 
-		if (valueArray.length != tokenArray.length)
+		List valueList = new ArrayList();
+		List entityList = new ArrayList();
+
+		String resourceName = _parentName.toLowerCase();
+		String name = resourceName + ".id";
+		String entityName = "entity." + name;
+		
+		for (int i = 0; i < valueArray.length; i++)
 		{
-			throw new RuntimeException("Expected this number of tokens: " + tokenArray.length);
+			String value = (valueArray[i] == null) ? "" : valueArray[i].trim(); 
+			valueList.add(value);
+
+			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(resourceName, value);
+			com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(key);
+			entityList.add(entity); 
 		}
 
-		for (int i = 0; i < tokenArray.length; i++)
-		{
-			String name = _parentName.toLowerCase() + "." + strip(tokenArray[i]);
-			_bindings.put(name, (valueArray[i] == null ? "" : valueArray[i].trim()));
-		}
-
+		_bindings.put(name, valueList);
+		_bindings.put(entityName, entityList);
+		
 		addDomainName(_bindings, _parentName);
 	}
 
-	/**
-	 * Strip.
-	 *
-	 * @param _variable the _variable
-	 * @return the string
-	 */
 	public static String strip(String _variable)
 	{
 		String variable = null;
@@ -387,11 +261,6 @@ public class Route
 		return variable;
 	}
 
-	/**
-	 * Gets the variable route.
-	 *
-	 * @return the variable route
-	 */
 	private Route getVariableRoute()
 	{	
 		Route variableRoute = null;
@@ -404,20 +273,11 @@ public class Route
 		return variableRoute;
 	}
 
-	/**
-	 * Exists.
-	 *
-	 * @param _route the _route
-	 * @return true, if successful
-	 */
 	public boolean exists(String _route)
 	{
 		return (find(_route, null) != null);
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString()
 	{
 		StringBuffer stringBuffer = new StringBuffer();

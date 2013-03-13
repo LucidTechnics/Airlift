@@ -334,14 +334,14 @@ public class RestContext
 		return Boolean.valueOf((getThisDomainIds().isEmpty() == false));
 	}
 
-	public String getParameter(String _id)
+	public List getParameter(String _id)
 	{
 		return getIdValue(_id);
 	}
 
-	public String getIdValue(String _id)
+	public List getIdValue(String _id)
 	{
-		return (String)getUriParameterMap().get(_id.toLowerCase());
+		return (List)getUriParameterMap().get(_id.toLowerCase());
 	}
 
 	/**
@@ -349,19 +349,28 @@ public class RestContext
 	 *
 	 * @return the string
 	 */
-	public String constructDomainId()
+	public List constructDomainIds()
 	{
-		String domainId = null;
-		
-		Iterator ids = getThisDomainIds().iterator();	
-		StringBuffer id = (ids.hasNext() == true) ? new StringBuffer(getIdValue((String)ids.next())) : new StringBuffer();
+		String domainName = getThisDomain();
 
-		while (ids.hasNext() == true)
+		if ("airlift.not.found.domain.name".equalsIgnoreCase(domainName) == true)
 		{
-			id.append(",").append(getIdValue((String)ids.next()));
+			throw new RuntimeException("no domain for this uri");
 		}
 
-		return id.toString();
+		return getIdValue(domainName.toLowerCase() + ".id");
+	}
+
+	public List constructKeys()
+	{
+		String domainName = getThisDomain();
+
+		if ("airlift.not.found.domain.name".equalsIgnoreCase(domainName) == true)
+		{
+			throw new RuntimeException("no domain for this uri");
+		}
+
+		return getIdValue("entity." + domainName.toLowerCase() + ".id");
 	}
 
 	/**
