@@ -90,7 +90,7 @@ function Get(_web)
 
 					if (entity)
 					{
-						results.put(key, res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity))));
+						results.put(key.getName(), res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity))));
 					}
 				}
 			}

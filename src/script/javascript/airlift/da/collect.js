@@ -46,7 +46,7 @@ function Collect(_web)
 
 			if (!keysOnly)
 			{
-				result = fetchedResources.get(result);
+				result = fetchedResources.get(result.getName());
 			}
 
 			return result;
