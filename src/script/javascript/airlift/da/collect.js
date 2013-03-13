@@ -62,7 +62,7 @@ function Collect(_web)
 	{
 		var originalConfig;
 		
-		if (_config.cursorId)
+		if (_config.cursorId && util.isWhitespace(_config.cursorId) === false)
 		{
 			var originalConfig = service.getCacheService().get(new Packages.java.lang.String("cursor: ") + new Packages.java.lang.String(_config.cursorId));
 			if (!originalConfig) { throw 'unable to find cursor identified by: ' + _config.cursorId; }
@@ -106,7 +106,7 @@ function Collect(_web)
 
 		var fetchOptions;
 		
-		if (config.cursorId)
+		if (config.cursorId && util.isWhitespace(config.cursorId) === false)
 		{
 			var decodedCursor = com.google.appengine.api.datastore.Cursor.fromWebSafeString(config.cursorId);
 			delete config.cursorId;
