@@ -257,15 +257,8 @@ function Resource(_web)
 	};
 
 	this.json = function json(_resource, _replacer)
-	{
-		util.info('START JSON');
-		for (var item in _resource)
-		{
-			util.info('resource item', item, _resource[item], _resource[item] && _resource[item].getClass && _resource[item].getClass());
-		}
-		
+	{		
 		var result = JSON.stringify(_resource, _replacer || replacer);
-		util.info('END JSON');
 		
 		return result;
 	};

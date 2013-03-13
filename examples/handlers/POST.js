@@ -25,8 +25,6 @@ exports.handle = function(_web)
 			_web.setResponseCode('400');
 		}
 	};
-
-	u.info('Bediako here we are Christmas!!!!!');
 	
 	var seq = res.sequence(incoming.convert, incoming.validate);
 
