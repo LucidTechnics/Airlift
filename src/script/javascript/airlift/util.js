@@ -533,3 +533,8 @@ exports.load = function(_resourcePath)
 {
 	return (new Packages.airlift.util.ResourceUtil).load(_resourcePath);
 };
+
+exports.stringBuffer = function(_string)
+{
+	return new Packages.java.lang.StringBuffer(_string);
+};

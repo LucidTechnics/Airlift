@@ -17,11 +17,13 @@ function Collect(_web)
 
 		this.cursor = function()
 		{
-			var guid = 'cursor:' + util.guid(32);
+			var res = require('airlift/resource').create(_web);
+			var guid = new Packages.java.lang.String(util.guid(32));
+			var key = new Packages.java.lang.String("cursor: ") + guid;
 			
 			originalQueryConfigOptions.cursorId = cursor.toWebSafeString();
 			//save guid and cursor to memcache
-			service.getCacheService().put(guid, JSON.stringify(originalQueryConfigOptions));
+			service.getCacheService().put(key, res.json(originalQueryConfigOptions));
 			
 			return guid;
 		};
@@ -55,15 +57,15 @@ function Collect(_web)
 			keys.remove();
 		}
 	};
-
+	
 	this.collect = function(_resourceName, _config)
 	{
 		var originalConfig;
 		
 		if (_config.cursorId)
 		{
-			var originalConfig = service.getCacheService().get(config.cursorId);
-			if (!originalConfig) { throw 'unable to find cursor identified by: ' + config.cursorId; }
+			var originalConfig = service.getCacheService().get(new Packages.java.lang.String("cursor: ") + new Packages.java.lang.String(_config.cursorId));
+			if (!originalConfig) { throw 'unable to find cursor identified by: ' + _config.cursorId; }
 			originalConfig = JSON.parse(originalConfig);
 		}
 		
@@ -86,9 +88,10 @@ function Collect(_web)
 
 		filterList.forEach(function(_filter)
 		{
-			var o = _filter.op || _filter.o || _filter.c || 'EQUAL';
+			var o = _filter.operator || _filter.op || _filter.o || _filter.c || 'EQUAL';
 			var n = _filter.name || _filter.n;
-			var v = _filter.value || filter.v;
+			var v = _filter.value || _filter.v;
+
 			filter.add(new FilterPredicate(n, FilterOperator[o.toUpperCase()], v));
 		});
 
@@ -98,14 +101,14 @@ function Collect(_web)
 		}
 		else if (filterList.length === 1 )
 		{
-			query.setFilter(filterList.get(0));
+			query.setFilter(filter.get(0));
 		}
 
 		var fetchOptions;
 		
 		if (config.cursorId)
 		{
-			var decodedCursor = com.google.appengine.api.datastore.Cursor.forWebSafeString(config.cursorId);
+			var decodedCursor = com.google.appengine.api.datastore.Cursor.fromWebSafeString(config.cursorId);
 			delete config.cursorId;
 			
 			fetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).cursor(decodedCursor);

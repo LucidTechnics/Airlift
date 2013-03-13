@@ -248,13 +248,26 @@ function Resource(_web)
 			//do not show a property with this type.
 			replacement = undefined;
 		}
-
+		else if (_value && _value.getClass)  
+		{
+			util.info('No replacement for:', _value.getClass());
+		}
+		
 		return replacement;
 	};
 
 	this.json = function json(_resource, _replacer)
 	{
-		return JSON.stringify(_resource, _replacer || replacer);
+		util.info('START JSON');
+		for (var item in _resource)
+		{
+			util.info('resource item', item, _resource[item], _resource[item] && _resource[item].getClass && _resource[item].getClass());
+		}
+		
+		var result = JSON.stringify(_resource, _replacer || replacer);
+		util.info('END JSON');
+		
+		return result;
 	};
 
 	this.audit = function audit(_config)

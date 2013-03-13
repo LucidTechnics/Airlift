@@ -306,3 +306,11 @@ exports['test load resource'] = function(_assert)
 
 	_assert.eq(assertResourceString.substring(0, 14), "// http://wiki", 'unable to load correct resource');
 };
+
+exports['test create StringBuffer'] = function(_assert)
+{
+	var stringBuffer = util.stringBuffer('Hello');
+
+	_assert.ok((stringBuffer instanceof java.lang.StringBuffer), 'string buffer not created');
+	_assert.eq(stringBuffer.toString(), "Hello", 'string buffer and string are not equal');
+};
