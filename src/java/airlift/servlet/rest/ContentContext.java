@@ -48,6 +48,8 @@ public abstract class ContentContext
 	/** The header map. */
 	public java.util.Map<String, String> headerMap = new java.util.HashMap<String, String>();
 
+	public boolean streamed = false;
+	
 	/**
 	 * Gets the redirect uri.
 	 *

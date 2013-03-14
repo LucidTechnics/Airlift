@@ -311,6 +311,29 @@ function Resource(_web)
 	{
 		return _value;
 	};
+
+	this.stream = function(_iterator, _serialize, _write, _separators)
+	{
+		var separators = _separators||["[", ",", "]"];
+		
+		var start = separators[0]||"[";
+		var delimeter = separators[1]||",";
+		var end = separators[2]||"]";
+		
+		_write(start);
+		
+		if (_iterator.hasNext() === true)
+		{
+			_write(_serialize(_iterator.next()));
+		}
+
+		while (_iterator.hasNext() === true)
+		{
+			_write(delimeter + _serialize(_iterator.next()));
+		}
+
+		_write(end);
+	};
 }
 
 exports.create = function(_web)

@@ -461,6 +461,75 @@ function Web(WEB_CONTEXT)
 	{
 		this.getContentContext().setType(_type);
 	};
+
+	this.stream = function(_streamer, _type, _headers, _responseCode)
+	{
+		if (!_streamer || typeof _streamer !== 'function') throw 'Streamer is expected to be a function';
+		
+		var contentContext = this.getContentContext();
+		contentContext.streamed = true;
+		this.setResponseCode(_responseCode||contentContext.getResponseCode());
+		
+		var response = this.getResponse();
+		
+		if (_type) { this.setType(_type); }
+
+		if (_headers)
+		{
+			for (var header in _headers)
+			{
+				contentContext.addHeader(header, _headers[header]);
+			}
+		}
+		
+		for (var header in Iterator(contentContext.getHeaderMap().entrySet()))
+		{
+			response.addHeader(header.getKey(), header.getValue());
+		}
+
+		response.status = Packages.java.lang.Integer.parseInt(contentContext.getResponseCode());
+		response.setContentType(contentContext.getType());
+
+		function Writer()
+		{
+			var byteArrayOutputStream = new Packages.java.io.ByteArrayOutputStream();
+			var outputStream = response.getOutputStream();
+			var flushed = false;
+			
+			this.write = function(_content)
+			{
+				if (_content)
+				{
+					var content = _content;
+
+					if (content.length !== undefined && content.length !== null && typeof content.length !== 'function')
+					{
+						//this is a byte array or JavaScript String.
+						content = new Packages.java.lang.String(_content);
+					}
+
+					content = content.getBytes();
+						
+					byteArrayOutputStream.write(content, 0, content.length);
+					byteArrayOutputStream.writeTo(outputStream);
+					byteArrayOutputStream.flush();
+					byteArrayOutputStream.reset();					
+				}
+			};
+
+			this.end = function()
+			{
+				try { byteArrayOutputStream && byteArrayOutputStream.close(); } catch(e) { util.warning('Exception occurred closing byte array output stream'); }
+				try { outputStream && outputStream.flush(); outputStream && outputStream.close(); } catch (e) { util.warning('Exception occurred while flushing and closing response output stream'); }
+			};
+		};
+
+		var writer = new Writer();
+
+		_streamer.call(null, writer.write);
+
+		writer.end();
+	};
 }
 
 exports.create = function(WEB_CONTEXT)

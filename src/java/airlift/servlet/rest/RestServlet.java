@@ -504,26 +504,29 @@ public class RestServlet
 				}
 				else
 				{
-					if (responseCode < 400)
+					if (contentContext.streamed != true)
 					{
-						for (java.util.Map.Entry<String, String> header: contentContext.getHeaderMap().entrySet())
+						if (responseCode < 400)
 						{
-							_httpServletResponse.addHeader(header.getKey(), header.getValue());
-						}
-						
-						_httpServletResponse.setContentType(contentContext.getType());
-						byte[] content = contentContext.getContent();
-						_httpServletResponse.setContentLength(content.length);
+							for (java.util.Map.Entry<String, String> header: contentContext.getHeaderMap().entrySet())
+							{
+								_httpServletResponse.addHeader(header.getKey(), header.getValue());
+							}
 
-						java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
-						byteArrayOutputStream.write(content, 0, content.length);
-						byteArrayOutputStream.writeTo(_httpServletResponse.getOutputStream());
-						byteArrayOutputStream.flush();
-						_httpServletResponse.getOutputStream().flush();
-					}
-					else
-					{
-						sendCodedPage(contentContext.getResponseCode(), "", _httpServletResponse);
+							_httpServletResponse.setContentType(contentContext.getType());
+							byte[] content = contentContext.getContent();
+							_httpServletResponse.setContentLength(content.length);
+
+							java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+							byteArrayOutputStream.write(content, 0, content.length);
+							byteArrayOutputStream.writeTo(_httpServletResponse.getOutputStream());
+							byteArrayOutputStream.flush();
+							_httpServletResponse.getOutputStream().flush();
+						}
+						else
+						{
+							sendCodedPage(contentContext.getResponseCode(), "", _httpServletResponse);
+						}
 					}
 				}
 			}
