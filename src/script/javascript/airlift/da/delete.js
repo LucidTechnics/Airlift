@@ -12,29 +12,31 @@ function Delete(_web)
 
 	this.del = function del(_resourceName, _id)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+
 		var errorStatus = false, key = incoming.createKey(_resourceName, _id);
 
 		try
 		{
-			var resourceMetadata = util.getResourceMetadata(_resourceName);
-
 			var transaction = datastore.getCurrentTransaction(null);
 
-			if (!transaction && resourceMetadata.isAudited === true)
+			if (!transaction && metadata.isAudited === true)
 			{
 				transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
 			}
 
 			util.multiTry(function() { if (transaction) { datastore['delete'](transaction, key); } else { datastore['delete'](key); } },
 						  5,
-						  function(_tries, _e) { util.severe("Encountered this error while deleting", _resourceName, "identified by:", _id); }
+						  function(_tries, _e) { util.severe("Encountered this error while deleting", resourceName, "identified by:", _id); }
 			);
 
 			cache['delete'](key);
 
-			if (resourceMetadata.isAudited === true)
+			if (metadata.isAudited === true)
 			{
-				res.audit({id: _id, action: 'DELETE', createDate: util.createDate(), resourceName: _resourceName});
+				res.audit({id: _id, action: 'DELETE', createDate: util.createDate(), resourceName: resourceName});
 			}
 		}
 		catch(e if e.javaException instanceof Packages.java.util.concurrent.ExecutionException)

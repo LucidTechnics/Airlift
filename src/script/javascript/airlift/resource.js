@@ -49,6 +49,19 @@ function Resource(_web)
 		return result;
 	};
 
+	this.transform = function transform(_dictionary, _resourceName, _resource, _function, _callback, _context)
+	{
+		var result = {};
+
+		this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
+		{
+			var transformedAttributeName = _dictionary[_attributeName]||_attributeName;
+			result[transformedAttributeName] = _function.call(this, _value, _attributeName, _resource, _metadata);
+		}, _callback, _context);
+
+		return result;
+	};
+
 	this.reduce = function reduce(_base, _resourceName, _resource, _function, _callback, _context)
 	{
 		this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)

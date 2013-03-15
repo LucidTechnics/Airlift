@@ -173,13 +173,15 @@ public abstract class ContentContext
 		addHeader("Pragma",  "no-cache");
 	}
 
-	/**
-	 * Checks if is cacheable.
-	 */
-	public void isCacheable()
+	public void setCacheable(Integer _seconds)
 	{
+		int seconds = 172800;
+
+		if (_seconds != null) { seconds = _seconds.intValue(); }
+
+		String cacheControl = "max-age=" + 172800 + ", public, must-revalidate";
 		//This basically says it has never been modified.
-		addHeader("Last-Modified", "Sat, 1 Jan 2005 00:00:00 GMT");
+		addHeader("Cache-Control", cacheControl);
 	}
 
 	/**

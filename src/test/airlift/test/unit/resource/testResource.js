@@ -109,6 +109,63 @@ exports['test map'] = function(_assert)
 	}, undefined, context);
 };
 
+
+exports['test transform'] = function(_assert)
+{
+	var attributes = [];
+	var dictionary = {fullName: 'name'};
+	
+	//create a person resource using map ...
+	var person = res.transform(dictionary, 'person', bediako, function(_value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+		return _value;
+
+	}, undefined, context);
+
+	_assert.deepEqual(attributes, context.attributes, 'transformed attribute list is not correct');
+
+	//test that the transformed person resource is the same as the bediako resource ...
+	res.each('person', bediako, function(_value, _attributeName, _resource)
+	{
+		attributes.push(_attributeName);
+
+		var transformedAttributeName = dictionary[_attributeName]||_attributeName;
+		_assert.eq(person[transformedAttributeName], _value, 'transformed value for: ' + _attributeName + ' is not correct');
+		_assert.eq(person[transformedAttributeName], _resource[_attributeName], 'transformed resource attribute value for: ' + transformedAttributeName + ' is not correct');
+
+	}, undefined, context);
+
+	attributes = [];
+	var callbackResult = [];
+
+	person = res.transform(dictionary, 'person', bediako, function(_value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+		return _value;
+	}, function() {callbackResult.push(this.resourceName)}, context);
+
+	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct with callback');
+	_assert.deepEqual(callbackResult, ['person'], 'callback result list is not correct');
+
+	//test that the transformed person resource is the same as the bediako resource ...
+	res.each('person', bediako, function(_value, _attributeName, _resource)
+	{
+		attributes.push(_attributeName);
+
+		var transformedAttributeName = dictionary[_attributeName]||_attributeName;
+		_assert.eq(person[transformedAttributeName], _value, 'transformed value for: ' + _attributeName + ' is not correct');
+		_assert.eq(person[transformedAttributeName], _resource[_attributeName], 'transformed resource attribute value for: ' + transformedAttributeName + ' is not correct');
+
+	}, undefined, context);
+};
+
 exports['test reduce'] = function(_assert)
 {
 	var attributes = [];

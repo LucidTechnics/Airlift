@@ -35,20 +35,24 @@ function Get(_web)
 
 	this.get = function(_resourceName, _id)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+
 		var result;
 		
 		var entity = util.multiTry(function()
 		{
 			try
 			{
-				var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, _id);
+				var key = Packages.com.google.appengine.api.datastore.KeyFactory.createKey(resourceName, _id);
 				var result = getFromCache(key)||populateCache(key, datastore.get(key).get());
 			}
 			catch(e if e.javaException instanceof Packages.java.util.concurrent.ExecutionException)
 			{
 				if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 				{
-					util.warning("No resource of type:", _resourceName, "exists for the provided key:", _id);
+					util.warning("No resource of type:", resourceName, "exists for the provided key:", _id);
 				}
 				else
 				{
@@ -58,15 +62,19 @@ function Get(_web)
 
 			return result;
 		},
-		5, function(_tries, _e) { util.severe("Encountered this error while getting", _resourceName, "identified by:", _id); });
+		5, function(_tries, _e) { util.severe("Encountered this error while getting", resourceName, "identified by:", _id); });
 
-		result = entity && res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
+		result = entity && res.map(resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity)));
 		
 		return result;
 	};
 
 	this.getAll = function(_resourceName, _entityList)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+
 		var copy = util.list(_entityList);
 
 		return util.multiTry(function()
@@ -90,7 +98,7 @@ function Get(_web)
 
 					if (entity)
 					{
-						results.put(key.getName(), res.map(_resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity))));
+						results.put(key.getName(), res.map(resourceName, null, res.sequence(outgoing.decrypt, outgoing.deentify.partial(entity))));
 					}
 				}
 			}
@@ -98,7 +106,7 @@ function Get(_web)
 			{
 				if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 				{
-					util.warning("No resources of type:", _resourceName, " exists for at least some of the provided keys:", _entityList);
+					util.warning("No resources of type:", resourceName, " exists for at least some of the provided keys:", _entityList);
 				}
 				else
 				{
@@ -108,7 +116,7 @@ function Get(_web)
 
 			return results;
 		},
-		5, function(_tries, _e) { util.severe("Encountered this error while getting multiple", _resourceName, " resources identified by:", _entityList, _e) });
+		5, function(_tries, _e) { util.severe("Encountered this error while getting multiple", resourceName, " resources identified by:", _entityList, _e) });
 	};
 }
 

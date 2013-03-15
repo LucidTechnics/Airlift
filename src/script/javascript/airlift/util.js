@@ -465,6 +465,18 @@ exports.string = function(_stringOrJavaByteArray)
 	return new Packages.java.lang.String(_stringOrJavaByteArray);
 };
 
+exports.boolean = function(_booleanString)
+{
+	var boolean = false;
+	
+	if (exports.hasValue(_booleanString) === true)
+	{
+		boolean = new Packages.java.lang.Boolean(_booleanString).booleanValue();
+	}
+
+	return boolean;
+};
+
 exports['int'] = function(_number)
 {
 	return new Packages.java.lang.Integer(_number).intValue();

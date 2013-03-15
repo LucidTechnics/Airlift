@@ -246,6 +246,16 @@ exports['test convert JavaScript string to Java string'] = function(_assert)
 	_assert.eq("java.lang.String", javaString.getClass().getName(), 'string conversion did not produce java.lang.String');
 };
 
+exports['test convert JavaScript string to Java boolean'] = function(_assert)
+{
+	var boolean = new Packages.java.lang.Boolean(true).booleanValue();
+	var javaBoolean = util.boolean('true');
+
+	_assert.eq(boolean, javaBoolean, 'boolean conversion not correct');
+	_assert.eq(false, util.boolean(undefined), 'boolean undefined conversion not correct');
+	_assert.eq(false, util.boolean(null), 'boolean null conversion not correct');
+};
+
 exports['test convert JavaScript number to Java int'] = function(_assert)
 {
 	var number = 5;

@@ -22,9 +22,11 @@ public class ResourceModel
 	private String buildPackageName;
 	private String className;
 	private String appName;
+	private boolean isView;
 	private boolean isAbstract;
 	private boolean isReferenced;
 	private boolean isAudited;
+	private String lookingAt;
 	
 	private Map<String, Annotation> resourceAnnotationMap;
 	private Map<Attribute, Set<Annotation>> attributeAnnotationSetMap;
@@ -46,12 +48,16 @@ public class ResourceModel
 	public String getClassName() { return upperTheFirstCharacter(className); }
 	
 	public String getAppName() { return appName; }
+
+	public boolean getIsView() { return isView; }
 	
 	public boolean getIsAbstract() { return isAbstract; }
 	
 	public boolean getIsReferenced() { return isReferenced; }
 	
 	public boolean getIsAudited() { return isAudited; }
+
+	public String getLookingAt() { return lookingAt; }
 	
 	public Map<String, Annotation> getResourceAnnotationMap() { return resourceAnnotationMap; }
 	
@@ -80,12 +86,16 @@ public class ResourceModel
 	public void setClassName(String _className) { className = upperTheFirstCharacter(_className); }
 	
 	public void setAppName(String _appName) { appName = _appName; }
+
+	public void setIsView(boolean _isView) { isView = _isView; }
 	
 	public void setIsAbstract(boolean _isAbstract) { isAbstract = _isAbstract; }
 	
 	public void setIsReferenced(boolean _isReferenced) { isReferenced = _isReferenced; }
 	
 	public void setIsAudited(boolean _isAudited) { isAudited = _isAudited; }
+
+	public void setLookingAt(String _lookingAt) { lookingAt = _lookingAt; }
 	
 	public void setResourceAnnotationMap(Map<String, Annotation> _resourceAnnotationMap) { resourceAnnotationMap = _resourceAnnotationMap; }
 	
@@ -324,6 +334,11 @@ public class ResourceModel
 	public boolean isAuditedResource()
 	{
 		return isAudited;
+	}
+
+	public boolean isViewResource()
+	{
+		return isView;
 	}
 
 }	

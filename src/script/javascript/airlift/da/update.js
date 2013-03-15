@@ -13,12 +13,16 @@ function Update(_web)
 
 	this.update = function(_resourceName, _resource, _pre, _post)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+
 		//_post functionality not yet implemented
 		var errorStatus = false;
 
 		if (util.hasValue(_resource.id) !== true)
 		{
-			throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(_resourceName, _resource) };
+			throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(resourceName, _resource) };
 		}
 
 		try
@@ -28,9 +32,9 @@ function Update(_web)
 			var id = _resource.id;
 			var pre = _pre && res.sequence.partial(_pre) || res.sequence;
 			//var post = _post && res.sequence.partial(undefined, _post) || res.sequence;
-			var previousRecord = getter.get(_resourceName, _resource.id);
+			var previousRecord = getter.get(resourceName, _resource.id);
 
-			var entity = incoming.createEntity(_resourceName, id);
+			var entity = incoming.createEntity(resourceName, id);
 
 			if (previousRecord)
 			{
@@ -38,10 +42,10 @@ function Update(_web)
 			}
 			else
 			{
-				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Trying to update a resource that does not exist: " + res.toString(_resourceName, _resource) };
+				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Trying to update a resource that does not exist: " + res.toString(resourceName, _resource) };
 			}
 
-			res.each(_resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), function()
+			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), function()
 			{
 				result.id = id;
 				result.errors = this.allErrors();
@@ -56,7 +60,7 @@ function Update(_web)
 					}
 
 					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
-								function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", _resourceName, "update", _e); });
+								function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "update", _e); });
 					if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
 
 					if (this.resourceMetadata.isAudited === true)
@@ -68,7 +72,7 @@ function Update(_web)
 		}
 		catch(e)
 		{
-			util.severe(_resourceName, 'encountered exception', e);
+			util.severe(resourceName, 'encountered exception', e);
 			util.severe('... while inserting', res.json(_resource));
 			if (e.javaException)
 			{

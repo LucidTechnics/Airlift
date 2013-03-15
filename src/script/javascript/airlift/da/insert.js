@@ -10,7 +10,7 @@ function Insert(_web)
 	var datastore = factory.getAsyncDatastoreService();
 	var cache = service.getCacheService();
 
-	this.provideUniqueId = function(_resourceName)
+	var provideUniqueId = function(_resourceName)
 	{
 		var test = function(_tries, e)
 		{
@@ -36,6 +36,10 @@ function Insert(_web)
 
 	this.insert = function(_resourceName, _resource, _pre, _post)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+
 		var errorStatus = false;
 
 		try
@@ -53,8 +57,8 @@ function Insert(_web)
 			 * the identifier for the resource.
 			 */
 
-			var id = _resource.id || this.provideUniqueId(_resourceName);
-			var entity = incoming.createEntity(_resourceName, id);
+			var id = _resource.id || provideUniqueId(resourceName);
+			var entity = incoming.createEntity(resourceName, id);
 			var result = {};
 
 			var callback = function()
@@ -72,7 +76,7 @@ function Insert(_web)
 					}
 
 					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
-												function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", _resourceName, "insert", _e); });
+												function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
 
 					if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
 
@@ -84,11 +88,11 @@ function Insert(_web)
 			};
 
 			//var post = _post && res.sequence.partial(callback, _post) || res.sequence.partial(callback);
-			res.each(_resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
+			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
 		}
 		catch(e)
 		{
-			util.severe(_resourceName, 'encountered exception', e);
+			util.severe(resourceName, 'encountered exception', e);
 			util.severe('... while inserting', res.json(_resource));
 			if (e.javaException)
 			{

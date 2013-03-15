@@ -530,6 +530,11 @@ function Web(WEB_CONTEXT)
 
 		writer.end();
 	};
+
+	this.setCacheable = function(_seconds)
+	{
+		this.getContentContext().setCacheable(_seconds||172800);
+	};
 }
 
 exports.create = function(WEB_CONTEXT)

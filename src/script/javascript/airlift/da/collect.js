@@ -6,6 +6,11 @@ function Collect(_web)
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
 
+	var createCursorKey = function(_resourceName, _guid)
+	{
+		return util.string("cursor:") + util.string(_resourceName) + util.string(":") + util.string(_guid);
+	}
+
 	function QueryResultIterator(_resourceName, _entities, _keysOnly, _originalQueryConfigOptions)
 	{
 		var keys = util.createKeysCollection(_entities).iterator();
@@ -18,14 +23,14 @@ function Collect(_web)
 		this.cursor = function()
 		{
 			var res = require('airlift/resource').create(_web);
-			var guid = new Packages.java.lang.String(util.guid(32));
-			var key = new Packages.java.lang.String("cursor: ") + guid;
+			var guid = util.guid(32);
+			var key = createCursorKey(_resourceName, guid);
 			
 			originalQueryConfigOptions.cursorId = cursor.toWebSafeString();
-			//save guid and cursor to memcache
+			//save key and cursor to memcache
 			service.getCacheService().put(key, res.json(originalQueryConfigOptions));
 			
-			return guid;
+			return key;
 		};
 
 		this.hasNext = function()
@@ -42,11 +47,11 @@ function Collect(_web)
 				fetchedResources = require('./get').create(_web).getAll(_resourceName, _entities);
 			}
 
-			result = keys.next();
+			result = keys.next().getName();
 
 			if (!keysOnly)
 			{
-				result = fetchedResources.get(result.getName());
+				result = fetchedResources.get(result);
 			}
 
 			return result;
@@ -60,11 +65,15 @@ function Collect(_web)
 	
 	this.collect = function(_resourceName, _config)
 	{
+		var resourceName = _resourceName;
+		var metadata = util.getResourceMetadata(resourceName);
+		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+		
 		var originalConfig;
 		
 		if (_config.cursorId && util.isWhitespace(_config.cursorId) === false)
 		{
-			var originalConfig = service.getCacheService().get(new Packages.java.lang.String("cursor: ") + new Packages.java.lang.String(_config.cursorId));
+			var originalConfig = service.getCacheService().get(_config.cursorId);
 			if (!originalConfig) { throw 'unable to find cursor identified by: ' + _config.cursorId; }
 			originalConfig = JSON.parse(originalConfig);
 		}
@@ -79,7 +88,7 @@ function Collect(_web)
 		var Query = Packages.com.google.appengine.api.datastore.Query;
 		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-		var query = new Query(_resourceName).addSort(orderBy, sort).setKeysOnly();
+		var query = new Query(resourceName).addSort(orderBy, sort).setKeysOnly();
 
 		var FilterPredicate = com.google.appengine.api.datastore.Query.FilterPredicate;
 		var FilterOperator = com.google.appengine.api.datastore.Query.FilterOperator;
@@ -120,7 +129,7 @@ function Collect(_web)
 
 		var entities = datastore.prepare(query).asQueryResultList(fetchOptions);
 
-		return new java.util.Iterator(new QueryResultIterator(_resourceName, entities, keysOnly, config));
+		return new java.util.Iterator(new QueryResultIterator(resourceName, entities, keysOnly, config));
 	};
 
 	this.collectBy = function(_resourceName, _attributeName, _value, _config)

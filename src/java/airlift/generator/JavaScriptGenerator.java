@@ -60,6 +60,12 @@ public class JavaScriptGenerator
 			configTemplate.setAttribute("name", annotationName.toLowerCase());
 			configTemplate.setAttribute("value", "true");
 		}
+
+		if (_resourceModel.getLookingAt() != null)
+		{
+			configTemplate.setAttribute("name", "lookingat");
+			configTemplate.setAttribute("value", "\"" + _resourceModel.getLookingAt().toLowerCase() + "\"");
+		}
 		
 		resourceMetadataStringTemplate.setAttribute("resourceName", resourceName);
 		resourceMetadataStringTemplate.setAttribute("config", configTemplate.toString());
