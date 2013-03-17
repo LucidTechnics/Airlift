@@ -235,7 +235,7 @@ function Web(WEB_CONTEXT)
 			throw 'getForeignKeys expects resource name to be defined';
 		}
 		
-		var foreignKeyList = this.getRestContext().getParameter(_resourceName.toLowerCase() + '.id');
+		var foreignKeyList = this.getRestContext().getParameter(_resourceName.toLowerCase());
 
 		return foreignKeyList && foreignKeyList.get(0);
 	};
