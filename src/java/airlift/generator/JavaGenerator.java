@@ -73,6 +73,12 @@ public class JavaGenerator
 				String resourceName = resourceModel.getClassName().toLowerCase();
 				template.setAttribute("resourceName", resourceName);
 
+				if (resourceModel.getIsView() == true)
+				{
+					template.setAttribute("viewName", resourceName);
+					template.setAttribute("viewResourceName", resourceModel.getLookingAt());
+				}
+
 				Annotation securable = resourceModel.getResourceAnnotationMap().get("securable");
 				//[script] parameterMap --> {collectRoles="all",
 				//putRoles="all", postRoles="all", headRoles="all", getRoles="all"}

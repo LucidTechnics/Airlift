@@ -358,7 +358,7 @@ public class RestContext
 			throw new RuntimeException("no domain for this uri");
 		}
 
-		return getIdValue(domainName.toLowerCase() + ".id");
+		return getIdValue(domainName.toLowerCase());
 	}
 
 	public List constructKeys()
@@ -370,7 +370,7 @@ public class RestContext
 			throw new RuntimeException("no domain for this uri");
 		}
 
-		return getIdValue("entity." + domainName.toLowerCase() + ".id");
+		return getIdValue("entity." + domainName.toLowerCase());
 	}
 
 	/**

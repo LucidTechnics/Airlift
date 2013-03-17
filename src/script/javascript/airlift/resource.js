@@ -6,6 +6,11 @@ function Resource(_web)
 
 	this.each = function each(_resourceName, _resource, _function, _callback, _context)
 	{
+		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
+		{
+			throw 'Resource name must be a valid resource';
+		}
+		
 		var context = _context || {};
 
 		context.resource = _resource||{};

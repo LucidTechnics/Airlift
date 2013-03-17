@@ -34,6 +34,7 @@ var AttributeMetadata = function(_config)
 	this.encrypted = util.value(_config.encrypted, false);
 	this.semanticType = util.value(_config.semanticType, 'NONE');
 	this.mapTo = util.value(_config.mapTo, null);
+	this.mapToMany = util.value(_config.mapToMany, null);
 };
 
 exports.create = function(_config)

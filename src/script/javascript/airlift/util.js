@@ -550,3 +550,8 @@ exports.stringBuffer = function(_string)
 {
 	return new Packages.java.lang.StringBuffer(_string);
 };
+
+exports.appProfile = function()
+{
+	return new Packages.airlift.app.AppProfile();
+};

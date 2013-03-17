@@ -1,5 +1,6 @@
 function Outgoing(_web)
 {
+	var that = this;
 	var javaArray = require('./javaArray');
 	var util = require('./util');
 
@@ -7,7 +8,7 @@ function Outgoing(_web)
 	var initialVector = _web.getInitParameter("a.cipher.initial.vector");
 	var revolutions = _web.getInitParameter("a.cipher.revolutions")||20;
 
-	this.deentify = function deentify(_entity, _value, _attributeName)
+	this.deentify = function deentify(_entity, _value, _attributeName, _attributeMetadata)
 	{
 		var value = _entity.getProperty(_attributeName);
 
@@ -18,6 +19,31 @@ function Outgoing(_web)
 		else if ("id".equals(_attributeName) === true)
 		{
 			value = _entity.getKey().getName();
+		}
+		else if (value instanceof com.google.appengine.api.datastore.EmbeddedEntity)
+		{
+			var object = {};
+
+			var resourceName = util.string(_attributeMetadata.mapTo).split("\.")[0];
+			res.each(resourceName, object, that.deentify.partial(value));
+			value = object;
+		}
+		else if (value instanceof java.util.Collection && value.isEmpty() === false)
+		{
+			if (value.get(0) instanceof com.google.appengine.api.datastore.EmbeddedEntity)
+			{
+				var resourceName = util.string(_attributeMetadata.mapTo).split("\.")[0];
+				var objectList = new Packages.java.util.ArrayList();
+				
+				for (var embeddedEntity in Iterator(value))
+				{
+					var object = {};
+					res.each(resourceName, object, that.deentify.partial(embeddedEntity));
+					objectList.add(object);
+				}
+
+				value = objectList;
+			}
 		}
 
 		return value;

@@ -9,7 +9,7 @@ var ResourceMetadata = function(_config)
 	this.isSecured = util.value(_config.securable, true);
 	this.isAudited = util.value(_config.auditable, false);
 
-	this.lookingAt = util.value(_config.lookingAt, undefined);
+	this.lookingAt = util.value(_config.lookingat, undefined);
 };
 
 exports.create = function(_config)

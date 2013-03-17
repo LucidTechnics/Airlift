@@ -99,6 +99,11 @@ public class JavaScriptGenerator
 					{
 						resourceMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName());
 					}
+					else if ("mapToMany".equalsIgnoreCase(name) == true)
+					{
+						resourceMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName());
+					}
+
 				}
 			}
 		}
@@ -142,8 +147,13 @@ public class JavaScriptGenerator
 
 					if ("mapTo".equalsIgnoreCase(name) == true)
 					{
-						attributeMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length() - 2)));
+						attributeMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length())));
 					}
+					else if ("mapToMany".equalsIgnoreCase(name) == true)
+					{
+						attributeMetadataStringTemplate.setAttribute("foreignKeyName", attribute.getName().substring(0, (attribute.getName().length())));
+					}
+
 				}
 			}
 

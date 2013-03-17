@@ -11,9 +11,14 @@ public class AppProfile
    implements airlift.AppProfile
 {
 	public static final java.util.Map<String, java.util.Map<String, java.util.Set<String>>> resourceSecurityMetadataMap = new java.util.HashMap<String, java.util.Map<String, java.util.Set<String>>>();
-				
+	public static final java.util.Map<String, String> viewMap = new java.util.HashMap<String, String>();
+	public static final java.util.Set<String> viewSet = new java.util.HashSet<String>();
+	
 	static
-	{		
+	{
+		$viewName, viewResourceName : {v, vr | viewMap.put("$v$", "$vr$"); }; separator="\n"$
+		$viewName : {v | viewSet.add("$v$"); }; separator="\n"$
+		
 		$resourceName : {d | resourceSecurityMetadataMap.put("$d$", new java.util.HashMap<String, java.util.Set<String>>()); }; separator="\n"$
 
 		$methodResourceName, methodName: {r,m | resourceSecurityMetadataMap.get("$r$").put("$m$", new java.util.HashSet<String>()); }; separator="\n"$
@@ -30,6 +35,16 @@ public class AppProfile
 		return appName;
 	}
 
+	public boolean isView(String _resourceName)
+	{
+		return viewSet.contains(_resourceName.toLowerCase());
+	}
+
+	public String getLookingAt(String _resourceName)
+	{
+		return viewMap.get(_resourceName.toLowerCase());
+	}
+	
 	public java.util.Set<String> getValidResources()
 	{
 		return resourceSecurityMetadataMap.keySet();

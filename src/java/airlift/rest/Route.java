@@ -222,31 +222,45 @@ public class Route
 
 	public static void addBindings(Map _bindings, String _parentName, String _name, String _value)
 	{
-		String token = "[,;]";
-		
-		String[] valueArray = _value.split(token);
-
-		List valueList = new ArrayList();
-		List entityList = new ArrayList();
-
-		String resourceName = _parentName.toLowerCase();
-		String name = resourceName + ".id";
-		String entityName = "entity." + name;
-		
-		for (int i = 0; i < valueArray.length; i++)
+		try
 		{
-			String value = (valueArray[i] == null) ? "" : valueArray[i].trim(); 
-			valueList.add(value);
+			String token = "[,;]";
 
-			com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(resourceName, value);
-			com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(key);
-			entityList.add(entity); 
+			String[] valueArray = _value.split(token);
+
+			List valueList = new ArrayList();
+			List entityList = new ArrayList();
+
+			String resourceName = _parentName.toLowerCase();
+			String name = resourceName;
+			String entityName = "entity." + name;
+
+			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
+			String kind = resourceName;
+			if (appProfile.isView(resourceName) == true)
+			{
+				kind = appProfile.getLookingAt(resourceName);
+			}
+
+			for (int i = 0; i < valueArray.length; i++)
+			{
+				String value = (valueArray[i] == null) ? "" : valueArray[i].trim(); 
+				valueList.add(value);
+
+				com.google.appengine.api.datastore.Key key = com.google.appengine.api.datastore.KeyFactory.createKey(kind, value);
+				com.google.appengine.api.datastore.Entity entity = new com.google.appengine.api.datastore.Entity(key);
+				entityList.add(entity); 
+			}
+
+			_bindings.put(name, valueList);
+			_bindings.put(entityName, entityList);
+
+			addDomainName(_bindings, _parentName);
 		}
-
-		_bindings.put(name, valueList);
-		_bindings.put(entityName, entityList);
-		
-		addDomainName(_bindings, _parentName);
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
 	}
 
 	public static String strip(String _variable)

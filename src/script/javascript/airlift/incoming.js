@@ -1,8 +1,11 @@
-var util = require('./util');
-var javaArray = require('./javaArray');
+var util = require('airlift/util');
+var javaArray = require('airlift/javaArray');
 
 function Incoming(_web)
 {
+	var that = this;
+	var res = require('airlift/resource').create(_web);
+	
 	var formatUtil = Packages.airlift.util.FormatUtil;
 
 	var convertUtil = Packages.org.apache.commons.beanutils.ConvertUtils;
@@ -255,21 +258,70 @@ function Incoming(_web)
 		if (util.isEmpty(this.allErrors()) === true && "id".equalsIgnoreCase(_attributeName) === false)
 		{
 			var isIndexable = _attributeMetadata.isIndexable;
-			var type = _attributeMetadata.type;
 			var value = _value;
-
-			if (type === 'java.lang.String')
+			var type = _attributeMetadata.type;
+			
+			if (util.hasValue(value) && util.hasValue(_attributeMetadata.mapTo) === false && util.hasValue(_attributeMetadata.mapToMany) === false)
 			{
-				//500 is the Google App Engine limitation for Strings
-				//persisted to the datastore.
-				if (_attributeMetadata.maxLength > 500)
+				if (type === 'java.lang.String')
 				{
-					isIndexable = false;
-					value = new Packages.com.google.appengine.api.datastore.Text(value);
+					//500 is the Google App Engine limitation for Strings
+					//persisted to the datastore.
+					if (_attributeMetadata.maxLength > 500)
+					{
+						isIndexable = false;
+						value = new Packages.com.google.appengine.api.datastore.Text(value);
+					}
+				}
+
+				(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
+			}
+			else if (util.hasValue(value) && util.hasValue(_attributeMetadata.mapTo) === true)
+			{
+				if (value && (value instanceof java.lang.String || typeof value === 'string'))
+				{
+					_entity.setProperty(_attributeName, value);
+				}
+				else
+				{
+					var embeddedEntity = new Packages.com.google.appengine.api.datastore.EmbeddedEntity();
+					res.each(_attributeMetadata.mapTo, value, that.entify.partial(embeddedEntity));
+					_entity.setUnindexedProperty(_attributeName, embeddedEntity);
 				}
 			}
+			else if (util.hasValue(_attributeMetadata.mapToMany) === true)
+			{				
+				if (value instanceof java.util.Collection === false) { throw 'Map to many property must be a java.util.Collection'; }
+				
+				if (value.isEmpty() === false)
+				{
+					var firstItem = value.get(0);
+					
+					if (typeof firstItem !== 'object')
+					{
+						_entity.setProperty(_attributeName, value);
+					}
+					else
+					{
+						var embeddedEntity;
+						var embeddedEntityList = new Packages.java.util.ArrayList();
+						
+						for (var item in Iterator(value))
+						{
+							embeddedEntity = new Packages.com.google.appengine.api.datastore.EmbeddedEntity();
+							res.each(_attributeMetadata.mapToMany, item, that.entify.partial(embeddedEntity));
+							_entity.setUnindexedProperty(_attributeName, embeddedEntity);
+							embeddedEntityList.add(embeddedEntity);
+						}
 
-			(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
+						_entity.setUnindexedProperty(_attributeName, embeddedEntityList);
+					}
+				}
+				else
+				{
+					_entity.setProperty(_attributeName, value);
+				}
+			}
 		}
 	};
 
@@ -383,11 +435,15 @@ function Incoming(_web)
 				var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
 				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 			}
+
+			/* There is no way to represent mapToMany in a URI
+			 * therefore the form value is taken. 
+			 */
 		}
 		else
 		{
 			var restContext = _web.getRestContext();
-			var parameterValue = restContext.getParameter(resourceName + ".id");
+			var parameterValue = restContext.getParameter(resourceName);
 			//convert only works for the first id.  Multiple puts not
 			//supported at this time - Bediako
 			value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
