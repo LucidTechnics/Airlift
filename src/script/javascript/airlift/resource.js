@@ -27,12 +27,22 @@ function Resource(_web)
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
-
+		
+		if (util.typeOf(context.attributes) === 'object')
+		{
+			var attributes = [];
+			for (item in context.attributes)
+			{
+				attributes.push(item);
+			}
+			context.attributes = attributes;
+		}
+		
 		var length = (context.attributes && context.attributes.length)||0;
 
 		for (var i = 0; i < length; i++)
 		{
-			var name = context.attributes[i];		
+			var name = context.attributes[i];
 			_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
 		}
 

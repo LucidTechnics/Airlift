@@ -54,6 +54,21 @@ exports['test each'] = function(_assert)
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct with callback');
 	_assert.deepEqual(callbackResult, ['person'], 'callback result list is not correct');
+
+
+	attributes = [];
+	callbackResult = [];
+	context.resourceMetadata.attributes = context.attributesMap;
+	
+	res.each('person', bediako, function(_value, _attributeName, _resource, _metadata)
+	{
+		attributes.push(_attributeName);
+		assertContextIsOK(_assert, 'person', _value, _attributeName, _resource, _metadata, this);
+
+	}, function() {callbackResult.push(this.resourceName)}, context);
+
+	_assert.deepEqual(attributes, context.attributes, 'using attributes map results in attribute list not correct with callback');
+	_assert.deepEqual(callbackResult, ['person'], 'using attributes map results in callback result list not correct');
 };
 
 exports['test map'] = function(_assert)
