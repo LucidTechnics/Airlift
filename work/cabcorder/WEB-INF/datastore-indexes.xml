@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes  autoGenerate="true">
+
+   <datastore-index kind="JobInterest" ancestor="false" source="manual">
+        <property name="jobId" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+   </datastore-index>
+
+   <datastore-index kind="DriversLicense" ancestor="false" source="manual">
+        <property name="number" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+   </datastore-index>
+
+   <datastore-index kind="HackLicense" ancestor="false" source="manual">
+        <property name="number" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+   </datastore-index>
+
+   <datastore-index kind="CabbieMobilePhone" ancestor="false" source="manual">
+        <property name="deviceId" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="CabbieMobilePhone" ancestor="false" source="manual">
+        <property name="number" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="CabbieMobilePhone" ancestor="false" source="manual">
+        <property name="registrationCode" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="CustomerMobilePhone" ancestor="false" source="manual">
+        <property name="deviceId" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="CustomerMobilePhone" ancestor="false" source="manual">
+        <property name="number" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="CustomerMobilePhone" ancestor="false" source="manual">
+        <property name="registrationCode" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="AdminMobilePhone" ancestor="false" source="manual">
+        <property name="deviceId" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="AdminMobilePhone" ancestor="false" source="manual">
+        <property name="number" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="AdminMobilePhone" ancestor="false" source="manual">
+        <property name="registrationCode" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="Request" ancestor="false" source="manual">
+        <property name="point" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="JobAward" ancestor="false" source="manual">
+        <property name="cabbieMobilePhoneId" direction="asc"/>
+        <property name="status" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="JobAward" ancestor="false" source="manual">
+        <property name="cabbieMobilePhoneId" direction="asc"/>
+        <property name="auditPutDate" direction="desc"/>
+    </datastore-index>
+
+	<datastore-index kind="DutyStatus" ancestor="false" source="manual">
+		<property name="cabbieMobilePhoneId" direction="asc"/>
+		<property name="worstRating" direction="asc"/>
+    </datastore-index>
+
+	<datastore-index kind="DutyStatus" ancestor="false" source="manual">
+        <property name="point" direction="asc"/>
+        <property name="auditPutDate" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

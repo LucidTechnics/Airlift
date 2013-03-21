@@ -20,6 +20,9 @@ exports['test create class'] = function(_assert)
 {
 	_assert.eq(new Packages.java.lang.String().getClass(), util.createClass('java.lang.String'), 'createClass does not create the right class');
 	_assert.eq(new Packages.java.util.Date().getClass(), util.createClass('java.util.Date'), 'createClass does not create the right class');
+
+
+	util.info('UTIL TEST classloader', new Packages.airlift.util.JavaScriptingUtil().getClass().getClassLoader());
 	_assert.eq(new Packages.airlift.util.JavaScriptingUtil().getClass(), util.createClass('airlift.util.JavaScriptingUtil'), 'createClass does not create the right class');
 }
 

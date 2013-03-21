@@ -65,20 +65,22 @@ function Collect(_web)
 	
 	this.collect = function(_resourceName, _config)
 	{
+		var config = _config||{};
+		
 		var resourceName = _resourceName;
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 		
 		var originalConfig;
 		
-		if (_config.cursorId && util.isWhitespace(_config.cursorId) === false)
+		if (config.cursorId && util.isWhitespace(config.cursorId) === false)
 		{
-			var originalConfig = service.getCacheService().get(_config.cursorId);
-			if (!originalConfig) { throw 'unable to find cursor identified by: ' + _config.cursorId; }
+			var originalConfig = service.getCacheService().get(config.cursorId);
+			if (!originalConfig) { throw 'unable to find cursor identified by: ' + config.cursorId; }
 			originalConfig = JSON.parse(originalConfig);
 		}
 		
-		var config = originalConfig||_config||{};
+		var config = originalConfig||config||{};
 		var limit = config.limit||20;
 		var asc = (util.hasValue(config.asc) === true) ? config.asc : true;
 		var orderBy = config.orderBy||"auditPutDate";

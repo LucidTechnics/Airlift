@@ -1,0 +1,336 @@
+/*======================================
+	  WELCOME TO THE STYLESHEET
+--------------------------------------		
+	 Copyright Mike Crittenden
+	  Author: Mike Crittenden
+======================================*/
+ 
+/**************************************\
+|------------COLOR SCHEME--------------|
+|--------------------------------------|
+- black		#000
+- white		#fff
+\**************************************/
+
+/*
+Override the auto setting in the screen.css.
+This stops the centering of the container and
+set the container 10 pixels from the left of the
+body.
+
+.container {width:950px;margin:0 auto;}
+	
+TODO: Need to check how this looks in Internet Explorer
+and look at ie.css.
+Bediako
+*/
+
+.container{width:950px;margin:0 0 0 10px;}
+
+.container .paragraphHeader
+{
+	color: #545351;  
+	margin: 0;
+}
+
+.container fieldset ol, .container ol
+{  
+	padding: 0 0 0 5px;  
+	margin: 0;
+	list-style: none;
+	border: none;
+}
+
+.container fieldset ol, .container ol
+{
+	list-style-position: outside;
+	list-style-type: none;
+}
+
+.container form
+{
+	padding: 0 0 .5em 0;
+	margin: 0;
+}
+
+.container fieldset
+{
+	color: #cc5c5c;
+	border-style: solid;
+	margin: 1em 0;
+	padding:1em 0;
+	border-width: 2px;
+	border-left: 2px;
+	border-right: none;
+	border-bottom: none;
+}
+
+.container input
+{
+	color: #2b3840;
+	font-size: 13px;
+	font-family: "Lucida Grande", arial, sans-serif;
+	text-shadow: 0 1px 1px #fff;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddeefe), to(#bfe0f1));
+	border: 1px solid #acc3ec;
+	border-top-color: #c0d9e9;
+	padding: 2px 7px 2px 10px;
+	width:310px; /* span-12*/
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	height:20px;
+	box-shadow: 0 1px 1px #e4edf2;
+	-webkit-box-shadow: 0 1px 1px #e4edf2;
+	-moz-box-shadow: 0 1px 1px #e4edf2;
+}
+
+.container textarea
+{
+	color: #2b3840;
+	font-size: 13px;
+	font-family: "Lucida Grande", arial, sans-serif;
+	text-shadow: 0 1px 1px #fff;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddeefe), to(#bfe0f1));
+	border: 1px solid #acc3ec;
+	border-top-color: #c0d9e9;
+	padding: 2px 7px 2px 10px;
+	width:310px; /* span-12*/
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	box-shadow: 0 1px 1px #e4edf2;
+	-webkit-box-shadow: 0 1px 1px #e4edf2;
+	-moz-box-shadow: 0 1px 1px #e4edf2;
+}
+
+.container input.submit
+{
+	color: #990000;
+	font-weight:bold;
+	font-size:1em;
+	font-family: "Lucida Grande", arial, sans-serif;
+	text-shadow: 0 1px 1px #fff;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddeefe), to(#bfe0f1));
+	padding: 2px 7px 2px 10px;
+	width: auto;
+	border-style: none;
+	border: none;
+}
+
+.container span.checked
+{
+	padding: 10px;
+	vertical-align: top;
+}
+
+.container input.checked
+{
+	color: #990000;
+	font-weight:bold;
+	font-size:1em;
+	font-family: "Lucida Grande", arial, sans-serif;
+	text-shadow: 0 1px 1px #fff;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddeefe), to(#bfe0f1));
+	padding: 0px 7px 2px 10px;
+	width: 10px;
+	border-style: none;
+	border: none;
+}
+
+.container legend
+{
+	color: #990000;
+	font-weight: bold;
+	font-size: 20px;
+	border:none;
+	font-family: "Lucida Grande", arial, sans-serif;
+	padding-left: 0;
+}
+
+fieldset li
+{
+	padding-bottom: .5em;
+	border: none;
+}
+
+label
+{
+	color: #545351;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+}
+
+label em
+{
+	color: #316678;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+}
+
+.section em
+{
+	color: #316678;
+	font-size: 1.3em;
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+}
+
+.section
+{
+	color: #545351;
+	font-size: 1em;
+}
+
+.dateHeader
+{
+	color: #990000;
+	font-size: 1.3em;
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	margin: 10px 0 0 0;
+}
+
+.listItem
+{
+	margin: 0 0 10px 0;
+}
+
+.listHeader
+{
+	border-style: solid;
+	border-width: 2px 0 0 0;
+	border-color: #990000;
+	margin: 10px 0 0 0;
+	padding: 5px 0;
+}
+
+.sectionHeader
+{
+	color: #990000;
+	font-size: 1.1em;
+	border-style: solid;
+	border-width: 0 0 1px 0;
+	border-color: #990000;
+}
+
+.sectionTopHeader
+{
+	color: #990000;
+	font-size: 1.1em;
+	border-style: solid;
+	border-width: 0 0 1px 0;
+	border-color: #990000;
+}
+
+.section ol
+{
+	padding: 0 0 0 5px;  
+	margin: 0;
+	list-style: none;
+	border: none;
+}
+
+.container .error
+{
+	color: #ag1310;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+	background: none;
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.container .success
+{
+	color: #006600;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+	background: none;
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.container .emphasize
+{
+	color: #990000;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	background: none;
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.container .errorMessage
+{
+	color: #ag1310;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+	background: none;
+	border-style: none;
+	border-color: #ag1310;
+	margin: 0px;
+	padding: 0px;
+}
+
+.container .successMessage
+{
+	color: #316678;  
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+	display: block;
+	background: none;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #006600;
+	width: auto;
+	margin: 0px;
+	padding: 0px;
+}
+
+.headerBlock
+{
+	color: #990000;
+	border: 2px solid #990000;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	/*border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;*/
+}
+
+span a
+{
+	font-size: 1em;
+	font-weight: bold;
+	font-family: "Lucida Grande", arial, sans-serif;
+}
+
+/**************************************/
+/*				GLOBALS				  */
+/**************************************/
+
+/**************************************/
+/*				HEADER				  */
+/**************************************/
+
+/**************************************/
+/*			   NAVIGATION			  */
+/**************************************/
+
+/**************************************/
+/*			  MAIN CONTENT			  */
+/**************************************/
+
+/**************************************/
+/*				 FOOTER				  */
+/**************************************/

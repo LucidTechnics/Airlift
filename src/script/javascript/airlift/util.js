@@ -49,7 +49,7 @@ exports.isEmpty = function isEmpty(o)
 };
 
 exports.createClass = function createClass(_className)
-{
+{	
 	return Packages.java.lang.Class.forName(_className);
 };
 
