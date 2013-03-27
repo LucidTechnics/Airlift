@@ -62,9 +62,10 @@ public class JavaScriptingUtil
 
 			try
 			{
-					//Note that we are really not calling out to the
-					//http ... we ultimately just use the path of this
-					//URI to find the resource in the jar.
+				//Note that we are really not calling out to the
+				//http ... we ultimately just use the path of this
+				//URI to find the resource in the jar.
+
 				uris.add(new java.net.URI("http://localhost:80/handler/"));
 				uris.add(new java.net.URI("http://localhost:80/lib/"));
 				uris.add(new java.net.URI("http://localhost:80/gen/"));

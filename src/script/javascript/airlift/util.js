@@ -555,3 +555,22 @@ exports.appProfile = function()
 {
 	return new Packages.airlift.app.AppProfile();
 };
+
+exports.sanitize = function(_resource)
+{
+	_resource.auditUserId = undefined;
+	_resource.auditRequestId = undefined;
+	_resource.auditPostDate = undefined;
+	_resource.auditPutDate = undefined;
+
+	return _resource;
+};
+
+exports.printStackTraceToString = function(_throwable)
+{
+	var stringWriter = new Packages.java.util.StringWriter();
+	var printWriter = new Packages.java.io.PrintWriter(stringWriter);
+	_throwable.printStackTrace(printWriter);
+
+	return stringWriter.toString();
+};

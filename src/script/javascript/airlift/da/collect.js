@@ -138,9 +138,9 @@ function Collect(_web)
 	{
 		var config = _config || {}; 
 		config.filterList = config.filterList || [];
-		config.filterList.add({name: _attributeName, value: _value});
+		config.filterList.push({name: _attributeName, value: _value});
 
-		return collect(_resourceName, config);
+		return this.collect(_resourceName, config);
 	};
 
 	this.collectByMembership = function(_resourceName, _attributeName, _membershipList, _config)
@@ -152,9 +152,9 @@ function Collect(_web)
 
 		var config = _config || {}; 
 		config.filterList = config.filterList || [];
-		config.filterList.add({name: _attributeName, op: 'IN', value: _membershipList});
+		config.filterList.push({name: _attributeName, op: 'IN', value: _membershipList});
 
-		return collect(_resourceName, config);
+		return this.collect(_resourceName, config);
 	};
 }
 

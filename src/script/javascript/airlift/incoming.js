@@ -412,11 +412,11 @@ function Incoming(_web)
 			{
 				if (e.javaException)
 				{
-					util.info(e.javaException.getMessage());
+					util.warning(e.javaException.getMessage());
 				}
 				else
 				{
-					util.info(e.message);
+					util.warning(e.message);
 				}
 
 				this.report(_attributeName, "This value is not correct.", "conversion");
