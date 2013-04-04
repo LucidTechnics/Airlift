@@ -39,14 +39,14 @@ function Delete(_web)
 				res.audit({id: _id, action: 'DELETE', createDate: util.createDate(), resourceName: resourceName});
 			}
 		}
-		catch(e if e.javaException instanceof Packages.java.util.concurrent.ExecutionException)
+		catch(e if util.getJavaException(e) instanceof Packages.java.util.concurrent.ExecutionException)
 		{
 			util.warning('Exception encountered', e);
 
 			errorStatus = true;
 			if (transaction) { transaction.rollbackAsync(); }
 
-			if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
+			if (util.getJavaException(e).getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 			{
 				util.warning("Unable to delete. No resource of type:", _resourceName, "exists for the provided key:", _id);
 			}

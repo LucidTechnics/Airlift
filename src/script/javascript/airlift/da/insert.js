@@ -94,10 +94,9 @@ function Insert(_web)
 		{
 			util.severe(resourceName, 'encountered exception', e);
 			util.severe('... while inserting', res.json(_resource));
-			if (e.javaException)
-			{
-				e.javaException.printStackTrace();
-			}
+			
+			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));
+
 			errorStatus = true;
 			if (transaction) { transaction.rollbackAsync(); }
 			throw e;

@@ -84,12 +84,11 @@ function Get(_web)
 			try
 			{
 				var resultMap = getAllFromCache(util.createKeysCollection(_entityList));
-
 				copy.removeAll(resultMap.values());
 
 				if (copy.size() > 0)
 				{
-					resultMap.putAll(populateCacheFromMap(datastore.get(util.createKeysCollection(copy)).get()));
+					resultMap.putAll(populateCacheFromMap(datastore.get(util.createKeysIterable(copy)).get()));
 				}
 
 				for (var key in Iterator(util.createKeysCollection(_entityList)))
@@ -102,9 +101,10 @@ function Get(_web)
 					}
 				}
 			}
-			catch(e if e.javaException instanceof Packages.java.util.concurrent.ExecutionException)
+			catch(e if util.getJavaException(e) instanceof Packages.java.util.concurrent.ExecutionException)
 			{
-				if (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
+				
+				if (util.getJavaException(e).getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException)
 				{
 					util.warning("No resources of type:", resourceName, " exists for at least some of the provided keys:", _entityList);
 				}
@@ -116,7 +116,13 @@ function Get(_web)
 
 			return results;
 		},
-		5, function(_tries, _e) { util.severe("Encountered this error while getting multiple", resourceName, " resources identified by:", _entityList, _e) });
+		5,
+		function(_tries, _e)
+		{
+			util.severe("Encountered this error while getting multiple", resourceName, " resources identified by:", _entityList, _e);
+
+			util.getJavaException(_e) && util.severe(util.printStackTraceToString(util.getJavaException(_e)));
+		});
 	};
 }
 

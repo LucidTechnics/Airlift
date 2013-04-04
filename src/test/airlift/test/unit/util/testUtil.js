@@ -327,3 +327,40 @@ exports['test create StringBuffer'] = function(_assert)
 	_assert.ok((stringBuffer instanceof java.lang.StringBuffer), 'string buffer not created');
 	_assert.eq(stringBuffer.toString(), "Hello", 'string buffer and string are not equal');
 };
+
+exports['test get java exception'] = function(_assert)
+{
+	try
+	{
+		throw new Packages.java.lang.RuntimeException();
+	}
+	catch (e)
+	{
+		var exception = util.getJavaException(e);
+		_assert.ok((exception instanceof java.lang.RuntimeException), 'java runtime exception was not returned');
+	}
+
+	try
+	{
+		var error = {message: 'error', javaException: new Packages.java.lang.RuntimeException()};
+		throw error;
+	}
+	catch (e)
+	{
+		var exception = util.getJavaException(e);
+		_assert.ok((exception instanceof java.lang.RuntimeException), 'embedded java runtime exception was not returned');
+	}	
+};
+
+exports['test print stack trace to string'] = function(_assert)
+{
+	try
+	{
+		throw new Packages.java.lang.RuntimeException();
+	}
+	catch (e)
+	{
+		var stackTrace = util.printStackTraceToString(e);
+		_assert.ok(/java\.lang\.RuntimeException/gi.test(stackTrace), 'stack trace was not found');
+	}
+};

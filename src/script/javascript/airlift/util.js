@@ -128,7 +128,7 @@ exports.multiTry = function multiTry(_executable, _tryCount, _callback)
 			{
 				lastException = e;
 				
-				if (!_callback) { exports.warning('multitry:', lastException.toString()); }
+				exports.warning('multitry:', lastException.toString());
 			}
 		}
 	}
@@ -143,6 +143,7 @@ exports.multiTry = function multiTry(_executable, _tryCount, _callback)
 		}
 		else
 		{
+			
 			throw lastException;
 		}
 	}
@@ -405,7 +406,7 @@ exports.map = function map(_parameter)
 function KeysIterator(_entityList)
 {
 	var iterator = _entityList.iterator();
-
+	
 	this.hasNext = function() { return iterator.hasNext(); };
 	this.next = function() { return iterator.next().getKey(); };
 	this.remove = function() { iterator.remove(); };
@@ -420,13 +421,28 @@ function KeysCollection(_entityList)
 {
 	this.iterator = function()
 	{
-		return new KeysIterator(_entityList);
+		return exports.createKeysIterator(_entityList);
 	};
 
 	this.isEmpty = function() { return _entityList.isEmpty(); };
 	this.size = function() { return _entityList.size(); }
 
-	this.toArray = function() { return _entityList.toArray(); };
+	this.toArray = function()
+	{
+		var entities = _entityList.toArray();
+		var length = entities.length;
+		var ja = require('airlift/javaArray');
+		
+		var keys = ja.createArray(length, Packages.com.google.appengine.api.datastore.Key);
+		
+		for (var i = 0; i < length; i++)
+		{
+			keys[i] = entities[i].getKey();
+		}
+
+		return keys;
+	};
+	
 	this.add = function() { throw 'add not supported in this collection'; };
 	this.addAll = function() { throw 'addAll not supported in this collection'; };
 	this.clear = function() { _entityList.clear(); };
@@ -442,7 +458,20 @@ function KeysCollection(_entityList)
 
 exports.createKeysCollection = function createKeysCollection(_entityList)
 {
-	return new java.util.Collection(new KeysCollection(_entityList));
+	return new Packages.java.util.Collection(new KeysCollection(_entityList));
+};
+
+function KeysIterable(_entityList)
+{
+	this.iterator = function()
+	{
+		return exports.createKeysIterator(_entityList);
+	};
+};
+
+exports.createKeysIterable = function createKeysIterable(_entityList)
+{
+	return new Packages.java.lang.Iterable(new KeysIterable(_entityList));
 };
 
 exports.getResourceMetadata = function(_name)
@@ -568,9 +597,14 @@ exports.sanitize = function(_resource)
 
 exports.printStackTraceToString = function(_throwable)
 {
-	var stringWriter = new Packages.java.util.StringWriter();
+	var stringWriter = new Packages.java.io.StringWriter();
 	var printWriter = new Packages.java.io.PrintWriter(stringWriter);
 	_throwable.printStackTrace(printWriter);
 
 	return stringWriter.toString();
+};
+
+exports.getJavaException = function(_exception)
+{
+	return ((_exception instanceof java.lang.Throwable) && _exception)||_exception.javaException;
 };
