@@ -215,13 +215,13 @@
 		<property name="build.class.path" refId="build.class.path"/>
 		<echo message="${build.class.path}"/>
 
-		<javac destdir="${classes}" debug="on">
+		<javac includeantruntime="false" destdir="${classes}" debug="on">
 			<classpath refid="build.class.path"/>
 			<src path="${src.java}"/>
 			<compilerarg line="-version" compiler="modern" />
 		</javac>
 
-		<javac destdir="${classes}" debug="on">
+		<javac includeantruntime="false" destdir="${classes}" debug="on">
 			<classpath refid="build.class.path"/>
 			<src path="${src.test}"/>
 		</javac>
