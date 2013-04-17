@@ -75,6 +75,11 @@ function CacheService()
 		service.putAll(_map);
 	};
 
+    this.delete = function(_key)
+    {
+        service.delete(_key);
+    };
+
 	this.service = function()
 	{
 		return service;
