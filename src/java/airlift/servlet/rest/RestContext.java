@@ -334,6 +334,20 @@ public class RestContext
 		return Boolean.valueOf((getThisDomainIds().isEmpty() == false));
 	}
 
+	public String getParameterValue(String _id)
+	{
+		String value = null;
+		List list = getIdValue(_id);
+
+		if (list.isEmpty() == false)
+		{
+			java.util.ArrayList arrayList = new java.util.ArrayList(list);
+			value = (String)arrayList.get(0);
+		}
+
+		return value;
+	}
+
 	public List getParameter(String _id)
 	{
 		return getIdValue(_id);

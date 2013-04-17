@@ -47,7 +47,7 @@ public class JavaScriptingUtil
 	public java.util.List scriptStack = new java.util.ArrayList();
 	private boolean cacheScript = false;
 
-	public static final String shim = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; return fn.apply(this, args.concat(remainingArgs));	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
+	public static final String shim = "Function.prototype.partial = function() { var fn = this, args = Array.prototype.slice.call(arguments); return function() { var arg = 0, length = args.length; var newArgs = Array.prototype.slice.call(arguments); for (var i = 0; i < args.length && arg < newArgs.length; i++ ) { if (args[i] === undefined){ args[i] = newArgs[arg++]; }} var remainingArgs = newArgs.slice(arg)||[]; return fn.apply(this, args.concat(remainingArgs));	};}; String.prototype.equalsIgnoreCase = function(_string) { return new Packages.java.lang.String(this).equalsIgnoreCase(_string); }; String.prototype.contains = function(_string) { return new Packages.java.lang.String(this).contains(_string); }; String.prototype.replaceAll = function(_regex, _replacement) { return new Packages.java.lang.String(this).replaceAll(_regex, _replacement); };";
 
 	static
 	{
@@ -78,7 +78,8 @@ public class JavaScriptingUtil
 				throw new RuntimeException(t);
 			}
 
-			sharedRequire = new SharedRequire(context, sharedScope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(null, uris)), null, null, false);			//Cannot seem to safely execute scripts to be made available at the
+			sharedRequire = new SharedRequire(context, sharedScope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(null, uris)), null, null, false);
+			//Cannot seem to safely execute scripts to be made available at the
 			//shared scope level. :(   Never mind ... eliminating the
 			//initStandardObjects call over and over saves quite a bit
 			//of time on its own ...
@@ -269,7 +270,7 @@ public class JavaScriptingUtil
 		return s.hasNext() ? s.next() : "";
 	}
 
-	public void executeHandler(String _scriptResource, Context _context)
+	private void executeHandler(String _scriptResource, Context _context)
 	{
 		try
 		{

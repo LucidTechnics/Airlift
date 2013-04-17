@@ -587,10 +587,10 @@ exports.appProfile = function()
 
 exports.sanitize = function(_resource)
 {
-	_resource.auditUserId = undefined;
-	_resource.auditRequestId = undefined;
-	_resource.auditPostDate = undefined;
-	_resource.auditPutDate = undefined;
+	delete _resource.auditUserId;
+	delete _resource.auditRequestId;
+	delete _resource.auditPostDate;
+	delete _resource.auditPutDate;
 
 	return _resource;
 };
@@ -607,4 +607,9 @@ exports.printStackTraceToString = function(_throwable)
 exports.getJavaException = function(_exception)
 {
 	return ((_exception instanceof java.lang.Throwable) && _exception)||_exception.javaException;
+};
+
+exports.now = function()
+{
+	return Packages.java.lang.System.currentTimeMillis();
 };

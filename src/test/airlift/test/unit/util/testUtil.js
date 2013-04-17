@@ -20,9 +20,6 @@ exports['test create class'] = function(_assert)
 {
 	_assert.eq(new Packages.java.lang.String().getClass(), util.createClass('java.lang.String'), 'createClass does not create the right class');
 	_assert.eq(new Packages.java.util.Date().getClass(), util.createClass('java.util.Date'), 'createClass does not create the right class');
-
-
-	util.info('UTIL TEST classloader', new Packages.airlift.util.JavaScriptingUtil().getClass().getClassLoader());
 	_assert.eq(new Packages.airlift.util.JavaScriptingUtil().getClass(), util.createClass('airlift.util.JavaScriptingUtil'), 'createClass does not create the right class');
 }
 
@@ -363,4 +360,12 @@ exports['test print stack trace to string'] = function(_assert)
 		var stackTrace = util.printStackTraceToString(e);
 		_assert.ok(/java\.lang\.RuntimeException/gi.test(stackTrace), 'stack trace was not found');
 	}
+};
+
+exports['test now'] = function(_assert)
+{
+	var then = Packages.java.lang.System.currentTimeMillis();
+	var now = util.now();
+
+	_assert.ok(now >= then, 'now does not seem to be working correctly');
 };

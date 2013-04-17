@@ -39,7 +39,7 @@ function QueueService(_name, _method)
 		
 		for (parameter in _parameters)
 		{
-			taskOptions = taskOptions.param(parameter, _parameters[parameter]);
+			taskOptions = taskOptions.param(parameter, _parameters[parameter] + new Packages.java.lang.String(''));
 		}
 
 		queue.add(taskOptions);

@@ -81,7 +81,7 @@ function Collect(_web)
 		}
 		
 		var config = originalConfig||config||{};
-		var limit = config.limit||20;
+		var limit = util.value(config.limit, 0);
 		var asc = (util.hasValue(config.asc) === true) ? config.asc : true;
 		var orderBy = config.orderBy||"auditPutDate";
 		var filterList = config.filterList||[];
@@ -115,18 +115,15 @@ function Collect(_web)
 			query.setFilter(filter.get(0));
 		}
 
-		var fetchOptions;
-		
+		var FetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions;
+		var fetchOptions = (limit && FetchOptions.Builder.withLimit(limit))||FetchOptions.Builder.withDefaults();
+
 		if (config.cursorId && util.isWhitespace(config.cursorId) === false)
 		{
 			var decodedCursor = com.google.appengine.api.datastore.Cursor.fromWebSafeString(config.cursorId);
 			delete config.cursorId;
-			
-			fetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit).cursor(decodedCursor);
-		}
-		else
-		{
-			fetchOptions = Packages.com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(limit);
+
+			fetchOptions = fetchOptions.cursor(decodedCursor);
 		}
 
 		var entities = datastore.prepare(query).asQueryResultList(fetchOptions);
