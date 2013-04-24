@@ -121,10 +121,33 @@ function Incoming(_web)
 
 			if (value)
 			{
-				errors = maxLength(errors, _metadata, _name, value);
+				errors = maxLength(errors, _metadata, _name, value); //limitation of a Blob attribute set by datastore
 				errors = minLength(errors, _metadata, _name, value);
 				errors = (_metadata.maxValue && maxValue(errors, _metadata, _name, value)) || errors;
 				errors = (_metadata.minValue && minValue(errors, _metadata, _name, value)) || errors;
+			}
+		}
+
+		return errors;
+	};
+
+	var validateBytes = function(_value, _name, _metadata)
+	{
+		var errors = [];
+		var value = _value;
+
+		if (_metadata.nullable === false)
+		{
+			var message = isRequired(errors, _metadata, _name, value);
+			message && errors.push(validationError(_name, message));
+		}
+
+		if (errors.length === 0)
+		{
+			if (value)
+			{
+				errors = maxLength(errors, {maxLength: 1024000}, _name, value);
+				errors = minLength(errors, _metadata, _name, value);
 			}
 		}
 
@@ -273,6 +296,11 @@ function Incoming(_web)
 						value = new Packages.com.google.appengine.api.datastore.Text(value);
 					}
 				}
+				else if (type === 'bytes')
+				{
+					isIndexable = false;
+					value = new Packages.com.google.appengine.api.datastore.Blob(value);					
+				}
 
 				(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
 			}
@@ -348,6 +376,13 @@ function Incoming(_web)
 		return convertUtil.convert(value, util.createClass(_type));
 	};
 
+	var convertToByteArray  = function(_parameterValue, _type, _index)
+	{
+		var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
+
+		return value.getBytes('UTF-8');
+	};
+	
 	var convertToMultiValue = function(_parameterValue, _collection)
 	{
 		if (_parameterValue)
@@ -370,6 +405,8 @@ function Incoming(_web)
 
 		this["java.util.Date"] = function(_parameterValue) { return convertToSingleValue(_parameterValue, "java.util.Date", 0); };
 
+		this["bytes"] = function(_parameterValue) { return convertToByteArray(_parameterValue); };
+		
 		this["java.lang.Byte"] = function() { throw new Error("Airlift currently does not support java.lang.Byte. Try using String instead or file a feature request."); };
 		this["java.lang.Character"] = function() { throw new Error("Airlift currently does not support java.lang.Character objects. Try using String instead or file a feature request."); };
 
@@ -467,6 +504,8 @@ function Incoming(_web)
 		this["java.lang.Short"] = this["java.lang.Integer"];
 		this["java.lang.Float"] = this["java.lang.Integer"];
 
+		this["bytes"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateBytes(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
+		
 		this["java.lang.Character"] = function() { throw new Error("Airlift currently does not support java.lang.Character. Try using String instead or file a feature request."); };
 		this["java.lang.Byte"] = function() { throw new Error("Airlift currently does not support java.lang.Byte. Try using String instead or file a feature request."); };
 

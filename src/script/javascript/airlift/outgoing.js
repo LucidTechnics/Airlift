@@ -18,6 +18,10 @@ function Outgoing(_web)
 		{
 			value = value.getValue();
 		}
+		else if (value instanceof com.google.appengine.api.datastore.Blob)
+		{
+			value = value.getBytes();
+		}
 		else if ("id".equals(_attributeName) === true)
 		{
 			var key = _entity.getKey();
@@ -43,6 +47,10 @@ function Outgoing(_web)
 				}
 				value = objectList;
 			}
+		}
+		else
+		{
+			value = util.primitive(value);
 		}
 
 		_resource[_attributeName] = value;
