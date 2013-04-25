@@ -88,21 +88,40 @@ exports['test create date'] = function(_assert)
 	var date = new Packages.java.util.Date();
 	var javaScriptDate = new Date();
 	
-	_assert.eq(date, util.createDate(date.getTime()), 'create date does not create the right date');
+	_assert.eq(date, util.date(date.getTime()), 'create date does not create the right date');
 	_assert.eq(javaScriptDate.getTime(), util.createDate(javaScriptDate.getTime()).getTime(), 'createDate will create right java.util.Date from milliseconds from a JavaScript date');
 	_assert.eq(util.createClass('java.util.Date'), util.createDate().getClass(), 'create date initializes to a java.util.Date');
 };
 
-exports['test create calendar NEEDS TO BE CREATED ONCE MOCKUPS WORKS'] = function(_assert)
+exports['test create timezone'] = function(_assert)
+{
+	var timezone1 = Packages.java.util.TimeZone.getTimeZone('America/New_York');
+	var timezone2 = util.timezone('America/New_York');
+	var date = util.date();
+
+	_assert.eq(timezone1.getOffset(date.getTime()), timezone2.getOffset(date.getTime()), 'create timezone did not create the right timezone object');
+};
+
+exports['test adjust UTC date'] = function(_assert)
+{
+	var date = util.date();
+	var timezone = util.timezone('America/New_York');
+	var offset = timezone.getOffset(date.getTime());
+	var newDate = util.date(date.getTime() + offset);
+
+	var adjustedDate = util.adjustUTCDate(date, 'America/New_York');
+
+	_assert.eq(newDate, adjustedDate, 'adjust UTC date did not create the right date object');
+};
+
+exports['test create calendar'] = function(_assert)
 {
 	_assert.eq(true, true);
 	
-	/*
 	var date = new Packages.java.util.Date();
 	var javaScriptDate = new Date();
 
 	_assert.eq(date, util.createCalendar({date: date}).getTime(), 'create calendar did not create the right calendar object');
-	*/
 };
 
 exports['test guid creation'] = function(_assert)

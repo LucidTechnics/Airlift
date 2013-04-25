@@ -167,14 +167,39 @@ exports.createDate = function createDate(_milliseconds)
 	return date; 
 };
 
+exports.date = function date(_milliseconds)
+{
+	return exports.createDate(_milliseconds);
+};
+
+exports.createTimezone = function createTimezone(_timezoneString)
+{
+	return Packages.java.util.TimeZone.getTimeZone(_timezoneString);
+};
+
+exports.timezone = function timezone(_timezoneString)
+{
+	return exports.createTimezone(_timezoneString);
+};
+
+exports.formatDate = function formatDate(_utcDate, _formatString, _timezoneString)
+{
+	var timezoneString = _timezoneString || 'UTC';
+	return Packages.airlift.util.FormatUtil().format(exports.adjustUTCDate(_utcDate, _timezoneString), _formatString);
+};
+
+exports.adjustUTCDate = function adjustUTCDate(_utcDate, _timezone)
+{
+	var timezone = exports.timezone(_timezone);
+	return exports.createDate(_utcDate.getTime() + timezone.getOffset(_utcDate.getTime()));
+};
+
 exports.createCalendar = function createCalendar(_config)
 {
 	var date = (_config && _config.date) ? _config.date : null;
-	var dateOffset = (_config && _config.dateOffset) ? _config.dateOffset : 0;
-	var dateOffsetType = (_config && _config.dateOffsetType) ? _config.dateOffsetType : Packages.java.util.Calendar.MILLISECOND;
-	var timezone = (_config && _config.timezone) ? _config.timezone : "UTC";
+	var timezone = (_config && _config.timezone) ? exports.timezone(_config.timezone) : exports.timezone('UTC');
 	var locale = (_config && _config.locale) ? _config.locale : Packages.java.util.Locale.getDefault();
-
+	
 	if (this.hasValue(date) === true)
 	{
 		var calendar = Packages.java.util.Calendar.getInstance(timezone, locale);
@@ -186,9 +211,12 @@ exports.createCalendar = function createCalendar(_config)
 		var calendar = Packages.java.util.Calendar.getInstance(timezone, locale);
 	}
 
-	calendar.add(dateOffsetType, dateOffset);
-
 	return calendar;
+};
+
+exports.calendar = function calendar(_config)
+{
+	return exports.createCalendar(_config);
 };
 
 exports.guid = function guid(_length)

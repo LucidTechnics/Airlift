@@ -105,11 +105,12 @@ function Resource(_web)
 				{
 					if (args.length === 5) //this is reduce
 					{
-						result = functions[i].call(this, args[0], args[3][args[2]], args[2], args[3], args[4]);
+						
+						result = functions[i].apply(this, [args[0], args[3][args[2]], args[2], args[3], args[4]]);
 					}
 					else if (args.length === 4) //basically each or map
 					{
-						result = functions[i].call(this, args[2][args[1]], args[1], args[2], args[3]);
+						result = functions[i].apply(this, [args[2][args[1]], args[1], args[2], args[3]]);
 					}
 				}
 				else //sequence is called outside of resource.each/map/reduce
@@ -286,9 +287,7 @@ function Resource(_web)
 
 	this.json = function json(_resource, _replacer)
 	{		
-		var result = JSON.stringify(_resource, _replacer || replacer);
-		
-		return result;
+		return JSON.stringify(_resource);
 	};
 
 	this.audit = function audit(_config)
