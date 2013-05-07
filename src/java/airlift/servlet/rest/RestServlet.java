@@ -785,6 +785,7 @@ public class RestServlet
 			}
 			else if ("xhtml".equalsIgnoreCase(suffix) == true)
 			{
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + extensionPrefix + ".js");
 				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/application/xhtml+xml/" + extensionPrefix + ".js");
 			}
 			else if ("json".equalsIgnoreCase(suffix) == true)
@@ -793,6 +794,7 @@ public class RestServlet
 			}
 			else if ("html".equalsIgnoreCase(suffix) == true)
 			{
+				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/" + extensionPrefix + ".js");
 				restContext.addHandlerPath("/handler/" + domainName.toLowerCase() + "/text/html/" + extensionPrefix + ".js");
 			}
 			else if ("text".equalsIgnoreCase(suffix) == true)

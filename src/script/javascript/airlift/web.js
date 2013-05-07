@@ -533,7 +533,7 @@ function Web(WEB_CONTEXT)
 
 	this.setCacheable = function(_seconds)
 	{
-		this.getContentContext().setCacheable(_seconds||172800);
+		this.getContentContext().setCacheable(_seconds||86400);
 	};
 }
 

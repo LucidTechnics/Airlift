@@ -161,11 +161,11 @@ exports['test primitive'] = function(_assert)
 {
 	var list = new Packages.java.util.ArrayList();
 	var set = new Packages.java.util.HashSet();
-	var integer = new Packages.java.lang.Integer(1);
-	var long = new Packages.java.lang.Long(1);
-	var double = new Packages.java.lang.Double(1);
-	var float = new Packages.java.lang.Float(1);
-	var short = new Packages.java.lang.Short(1);
+	var integer = new Packages.java.lang.Integer(0);
+	var long = new Packages.java.lang.Long(0);
+	var double = new Packages.java.lang.Double(0);
+	var float = new Packages.java.lang.Float(0);
+	var short = new Packages.java.lang.Short(0);
 	var character = new Packages.java.lang.Character(Packages.java.lang.Character.MAX_VALUE);
 	var boolean = new Packages.java.lang.Boolean(true);
 	var string = new Packages.java.lang.String('hello');
@@ -179,11 +179,11 @@ exports['test primitive'] = function(_assert)
 	_assert.eq(util.primitive(jsString), jsString, 'jsString has changed');
 	_assert.eq(util.primitive(jsNumber), jsNumber, 'jsNumber has changed');
 
-	_assert.eq(util.primitive(integer), 1, 'integer is incorrect');
-	_assert.eq(util.primitive(long), 1, 'long is incorrect');
-	_assert.eq(util.primitive(double), 1, 'double is incorrect');
-	_assert.eq(util.primitive(float), 1, 'float is incorrect');
-	_assert.eq(util.primitive(short), 1, 'short is incorrect');
+	_assert.eq(util.primitive(integer), 0, 'zero integer is incorrect');
+	_assert.eq(util.primitive(long),  0, 'zero long is incorrect');
+	_assert.eq(util.primitive(double), 0, 'zero double is incorrect');
+	_assert.eq(util.primitive(float), 0, 'zero float is incorrect');
+	_assert.eq(util.primitive(short), 0, 'zero short is incorrect');
 	_assert.eq(util.primitive(character), Packages.java.lang.Character.MAX_VALUE, 'character is incorrect');
 	_assert.eq(util.primitive(boolean), true, 'boolean is incorrect');
 	_assert.eq(util.primitive(byte), Packages.java.lang.Byte.MAX_VALUE, 'byte is incorrect');

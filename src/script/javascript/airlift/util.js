@@ -191,7 +191,7 @@ exports.formatDate = function formatDate(_utcDate, _formatString, _timezoneStrin
 exports.adjustUTCDate = function adjustUTCDate(_utcDate, _timezone)
 {
 	var timezone = exports.timezone(_timezone);
-	return exports.createDate(_utcDate.getTime() + timezone.getOffset(_utcDate.getTime()));
+	return exports.createDate(_utcDate.getTime() + new Packages.airlift.util.TimeZoneWrapper(timezone).getOffset(_utcDate.getTime()));
 };
 
 exports.createCalendar = function createCalendar(_config)
@@ -335,26 +335,14 @@ exports.value = function value(_candidate, _default)
 
 function PrimitiveConverter()
 {
-	this["java.lang.String"] = function(_value) { return _value };
-	this["java.util.Date"] = function(_value) { return _value };
-
-	this["java.util.List"] = function(_value) { return _value };
-	this["java.util.HashSet"] = this["java.util.List"];
-	this["java.util.Set"] = this["java.util.List"];
-	this["java.util.ArrayList"] = this["java.util.List"];
-	this["java.util.List<java.lang.String>"] = this["java.util.List"];
-	this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
-	this["java.util.HashSet<java.lang.String>"] = this["java.util.List"];
-	this["java.util.Set<java.lang.String>"] = this["java.util.List"];
-
-	this["java.lang.Integer"] = function(_value) { return (_value && _value.intValue()) || null; };
-	this["java.lang.Boolean"] = function(_value) { return (_value && _value.booleanValue()) || null; };
-	this["java.lang.Long"] = function(_value) { return (_value && _value.longValue()) || null; };
-	this["java.lang.Short"] = function(_value) { return (_value && _value.shortValue()) || null; };
-	this["java.lang.Double"] = function(_value) { return (_value && _value.doubleValue()) || null; };
-	this["java.lang.Float"] = function(_value) { return (_value && _value.floatValue()) || null; };
-	this["java.lang.Character"] = function(_value) { return (_value && _value.charValue()) || null; };
-	this["java.lang.Byte"] = function(_value) { return (_value && _value.byteValue()) || null; };
+	this["java.lang.Integer"] = function(_value) { return (exports.hasValue(_value) === true) ?  _value.intValue() : null; };
+	this["java.lang.Boolean"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.booleanValue() : null; };
+	this["java.lang.Long"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.longValue() : null; };
+	this["java.lang.Short"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.shortValue() : null; };
+	this["java.lang.Double"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.doubleValue() : null; };
+	this["java.lang.Float"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.floatValue() : null; };
+	this["java.lang.Character"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.charValue() : null; };
+	this["java.lang.Byte"] = function(_value) { return (exports.hasValue(_value) === true) ? _value.byteValue() : null; };
 }
 
 exports.primitive = function(_value)
@@ -363,7 +351,7 @@ exports.primitive = function(_value)
 
 	if (_value && _value.getClass)
 	{
-		var type = _value.getClass().getName();		
+		var type = _value.getClass().getName();
 		var converter = new PrimitiveConverter();
 
 		if (converter[type]) { primitive = converter[type](_value); }
