@@ -50,7 +50,9 @@ public class Require extends BaseFunction
 	private static Logger log = Logger.getLogger(Require.class.getName());
     private final Map<String, Object> bindings;
 	private SharedRequire require;
+	private ResourceUtil resourceUtil;
 	private boolean cachingEnabled = true;
+	private java.util.regex.Pattern mainScriptPattern = java.util.regex.Pattern.compile("\"main\"\\s*:\\s*\"([^\"]+)\\.js");
 	
     /**
      * Creates a new instance of the require() function. Upon constructing it,
@@ -73,6 +75,7 @@ public class Require extends BaseFunction
 	public Require(Scriptable _nativeScope, SharedRequire _require, Map<String, Object> _bindings, boolean _cachingEnabled)
 	{
 		require = _require;
+		resourceUtil = new ResourceUtil(_cachingEnabled);
 		bindings = _bindings;
 		cachingEnabled = _cachingEnabled;
 		setPrototype(ScriptableObject.getFunctionPrototype(_nativeScope));
@@ -85,7 +88,41 @@ public class Require extends BaseFunction
      */
     public void install(Scriptable scope) {
         ScriptableObject.putProperty(scope, "require", this);
-    }
+	}
+
+	private String checkId(String _id, URI _uri, Context _context, Scriptable _scope)
+	{
+		if (_id.charAt(0) == '.') {
+			// resulting URI is not contained in base,
+			// throw error or make absolute depending on sandbox flag.
+			if (this.require.sandboxed)
+			{
+				throw ScriptRuntime.throwError(_context, _scope, "Module \"" + _id + "\" is not contained in sandbox.");
+			}
+			else
+			{
+				_id = _uri.toString();
+			}
+		}
+
+		return _id;
+	}
+
+	private String determineId(String _id, URI _uri, URI _base, URI _current)
+	{
+		String id = null;
+		
+		if (_base == null) {
+				// calling module is absolute, resolve to absolute URI
+				// (but without file extension)
+			id = _uri.toString();
+		} else {
+				// try to convert to a relative URI rooted on base
+			id = _base.relativize(_current).resolve(_id).toString();
+		}
+
+		return id;
+	}
 
     public Object call(Context cx, Scriptable scope, Scriptable thisObj,
             Object[] args)
@@ -95,46 +132,71 @@ public class Require extends BaseFunction
                     "require() needs one argument");
         }
 
-		String id = (String)Context.jsToJava(args[0], String.class);
+		String originalId = (String)Context.jsToJava(args[0], String.class);
+		
+		URI uri = null;
+		URI base = null;
+		String id = originalId;
 
-        URI uri = null;
-        URI base = null;
-
-		if (id.startsWith("./") || id.startsWith("../"))
+		if (originalId.startsWith("./") || originalId.startsWith("../"))
 		{
             if (!(thisObj instanceof ModuleScope)) {
                 throw ScriptRuntime.throwError(cx, scope,
-                        "Can't resolve relative module ID \"" + id +
+                        "Can't resolve relative module ID \"" + originalId +
                                 "\" when require() is used outside of a module");
             }
 
             ModuleScope moduleScope = (ModuleScope) thisObj;
             base = moduleScope.getBase();
             URI current = moduleScope.getUri();
-            uri = current.resolve(id);
-
-            if (base == null) {
-                // calling module is absolute, resolve to absolute URI
-                // (but without file extension)
-                id = uri.toString();
-            } else {
-                // try to convert to a relative URI rooted on base
-                id = base.relativize(current).resolve(id).toString();
-                if (id.charAt(0) == '.') {
-                    // resulting URI is not contained in base,
-                    // throw error or make absolute depending on sandbox flag.
-                    if (this.require.sandboxed) {
-                        throw ScriptRuntime.throwError(cx, scope,
-                            "Module \"" + id + "\" is not contained in sandbox.");
-                    } else {
-                        id = uri.toString();
-                    }
-                }
-            }
+			uri = current.resolve(originalId);
+			id = determineId(originalId, uri, base, current);
+			id = checkId(id, uri, cx, scope);
 		}
-		
-		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 
+		Scriptable exportedModuleInterface = null;
+		
+		try
+		{
+			 exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
+		}
+		catch(Throwable t)
+		{
+			log.warning("cannot find script for module identified by id: " + id);
+		}
+
+		if (exportedModuleInterface == null)
+		{
+			//find and load package.json from directory in node modules
+			String packageJson = resourceUtil.load("node_modules/" + originalId + "/package.json");
+
+			if (packageJson != null)
+			{
+				//npm installed module
+				String npmModuleName = "index";
+
+				java.util.regex.Matcher matcher = mainScriptPattern.matcher(packageJson);
+
+				if (matcher.find() == true)
+				{
+					npmModuleName = matcher.group(1);
+				}
+
+				log.info("NPM module name is: " + npmModuleName);
+
+				id = "node_modules/" + originalId + "/" + npmModuleName;
+				
+				try
+				{
+					exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
+				}
+				catch(Throwable t)
+				{
+					log.warning("cannot find npm named script for module identified by id: " + id);
+					throw new java.lang.RuntimeException(t);
+				}
+			}
+		}
 
 		return exportedModuleInterface;
     }

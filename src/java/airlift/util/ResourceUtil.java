@@ -59,7 +59,6 @@ public class ResourceUtil
 			}
 			catch(Throwable t)
 			{
-
 				throw new RuntimeException(t);
 			}
 

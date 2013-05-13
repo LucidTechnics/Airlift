@@ -67,6 +67,7 @@ public class JavaScriptingUtil
 				//URI to find the resource in the jar.
 
 				uris.add(new java.net.URI("http://localhost:80/handler/"));
+				uris.add(new java.net.URI("http://localhost:80/extlib/"));
 				uris.add(new java.net.URI("http://localhost:80/lib/"));
 				uris.add(new java.net.URI("http://localhost:80/gen/"));
 				uris.add(new java.net.URI("http://localhost:80/"));
