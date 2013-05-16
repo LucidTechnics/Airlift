@@ -124,8 +124,23 @@ public class Require extends BaseFunction
 		return id;
 	}
 
-    public Object call(Context cx, Scriptable scope, Scriptable thisObj,
-            Object[] args)
+	private String createPackagePath(String[] _tokens, int _length)
+	{
+		String packagePath = "";
+
+		for (int i = 0; i < _length; i++)
+		{
+			String token = _tokens[i];
+			if (token != null && token.length() > 0)
+			{
+				packagePath += "/" + _tokens[i];
+			}
+		}
+
+		return packagePath;
+	}
+
+    public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args)
 	{
         if(args == null || args.length < 1) {
             throw ScriptRuntime.throwError(cx, scope,
@@ -137,16 +152,20 @@ public class Require extends BaseFunction
 		URI uri = null;
 		URI base = null;
 		String id = originalId;
+		boolean isRelative = false;
+		Throwable moduleException = null;
 
 		if (originalId.startsWith("./") || originalId.startsWith("../"))
 		{
+			isRelative = true;
+			
             if (!(thisObj instanceof ModuleScope)) {
                 throw ScriptRuntime.throwError(cx, scope,
                         "Can't resolve relative module ID \"" + originalId +
                                 "\" when require() is used outside of a module");
             }
 
-            ModuleScope moduleScope = (ModuleScope) thisObj;
+			ModuleScope moduleScope = (ModuleScope) thisObj;
             base = moduleScope.getBase();
             URI current = moduleScope.getUri();
 			uri = current.resolve(originalId);
@@ -157,18 +176,54 @@ public class Require extends BaseFunction
 		Scriptable exportedModuleInterface = null;
 		
 		try
-		{
-			 exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
+		{		
+			exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 		}
 		catch(Throwable t)
 		{
-			log.warning("cannot find script for module identified by id: " + id);
+			if (isRelative == true)
+			{
+				throw new RuntimeException(t);
+			}
 		}
 
-		if (exportedModuleInterface == null)
-		{
-			//find and load package.json from directory in node modules
-			String packageJson = resourceUtil.load("node_modules/" + originalId + "/package.json");
+		URI moduleUri = null;
+		
+		if (exportedModuleInterface == null && isRelative == false)
+		{	
+			if (thisObj instanceof ModuleScope)
+			{
+				ModuleScope moduleScope = (ModuleScope) thisObj;
+
+				moduleUri = moduleScope.getUri();
+				base = moduleScope.getBase();			
+			}
+			else
+			{
+				try
+				{
+					moduleUri = new URI("http://localhost:80/node_modules");
+					base = new URI("http://localhost:80");
+				}
+				catch(Throwable t)
+				{
+					throw new RuntimeException(t);
+				}
+			}
+
+			uri = moduleUri.resolve(originalId);
+			String[] tokens = moduleUri.getPath().split("/");
+			String packageJson = null;
+			String packagePath = "";
+			String basePackagePath = "";
+
+			for (int i = 0, length = tokens.length; i < length && packageJson == null; i++)
+			{
+				basePackagePath = createPackagePath(tokens, length - i);
+				basePackagePath += "/node_modules/" + originalId;
+				packagePath = basePackagePath + "/package.json";
+				packageJson = resourceUtil.load(packagePath, false);
+			}
 
 			if (packageJson != null)
 			{
@@ -182,9 +237,17 @@ public class Require extends BaseFunction
 					npmModuleName = matcher.group(1);
 				}
 
-				log.info("NPM module name is: " + npmModuleName);
-
-				id = "node_modules/" + originalId + "/" + npmModuleName;
+				id = basePackagePath + "/" + npmModuleName;
+				id = id.replaceAll("^\\/+", "");
+				
+				try
+				{
+					uri = new URI("http://localhost:80/" + id);
+				}
+				catch(Throwable t)
+				{
+					throw new RuntimeException(t);
+				}
 				
 				try
 				{
@@ -192,9 +255,27 @@ public class Require extends BaseFunction
 				}
 				catch(Throwable t)
 				{
-					log.warning("cannot find npm named script for module identified by id: " + id);
-					throw new java.lang.RuntimeException(t);
+					moduleException = t;
 				}
+			}
+		}
+
+		if (exportedModuleInterface == null)
+		{		
+			if (moduleException != null)
+			{
+				throw new RuntimeException(moduleException);
+			}
+			else
+			{
+				log.severe("Unable to load module identified by: " + id);
+
+				if (moduleUri != null && moduleUri.getPath() != null)
+				{
+					log.severe("with parent module: " + moduleUri.getPath());
+				}
+
+				throw new RuntimeException("Cannot load module identified by: " + id);
 			}
 		}
 

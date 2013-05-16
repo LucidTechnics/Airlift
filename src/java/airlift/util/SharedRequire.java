@@ -148,7 +148,6 @@ public class SharedRequire
                 return exports;
 			}
 
-			
             // Nope, still not loaded; we're loading it then.
 			final ModuleScript moduleScript = getModule(cx, id, uri, base);
 

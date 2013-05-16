@@ -68,7 +68,6 @@ public class JavaScriptingUtil
 
 				uris.add(new java.net.URI("http://localhost:80/handler/"));
 				uris.add(new java.net.URI("http://localhost:80/extlib/"));
-				uris.add(new java.net.URI("http://localhost:80/lib/"));
 				uris.add(new java.net.URI("http://localhost:80/gen/"));
 				uris.add(new java.net.URI("http://localhost:80/"));
 				uris.add(new java.net.URI("http://localhost:80//airlift/lib/"));

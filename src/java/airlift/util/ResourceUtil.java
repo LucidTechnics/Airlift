@@ -45,6 +45,11 @@ public class ResourceUtil
 
 	public String load(String _resource)
 	{
+		return load(_resource, true);
+	}
+	
+	public String load(String _resource, boolean _throwException)
+	{
 		String resource = _resource.replaceAll("^/", "");
 		String resourceString = this.resourceMap.get(resource);
 
@@ -62,40 +67,42 @@ public class ResourceUtil
 				throw new RuntimeException(t);
 			}
 
-			if (inputStream == null)
+			if (inputStream == null && _throwException == true)
 			{
-				log.severe("Cannot find resource: " + resource);
 				throw new airlift.servlet.rest.HandlerException("Unable to find resource using classloader getResourceAsStream(). Is this resource: " + resource + " in the application's classpath?",
 					airlift.servlet.rest.HandlerException.ErrorCode.RESOURCE_NOT_FOUND);
 			}
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-			String line = null;
-
-			do
+			if (inputStream != null)
 			{
-				try
-				{
-					line = reader.readLine();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
-					if (line != null)
+				String line = null;
+
+				do
+				{
+					try
 					{
-						stringBuffer.append(line);
+						line = reader.readLine();
+
+						if (line != null)
+						{
+							stringBuffer.append(line);
+						}
+					}
+					catch(Throwable e)
+					{
+						throw new RuntimeException(e);
 					}
 				}
-				catch(Throwable e)
+				while (line != null);
+
+				resourceString = stringBuffer.toString();
+
+				if (this.cacheResource == true)
 				{
-					throw new RuntimeException(e);
+					resourceMap.put(resource, resourceString);
 				}
-			}
-			while (line != null);
-
-			resourceString = stringBuffer.toString();
-
-			if (this.cacheResource == true)
-			{
-				resourceMap.put(resource, resourceString);
 			}
 		}
 
