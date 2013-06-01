@@ -1,27 +1,35 @@
 <project default="generate" basedir=".">
-	<basename property="appName" file="airliftlabs" />
+	<basename property="appName" file="analytics-web" />
 	<property environment="env"/>
 	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_HOME}" />
 
-	<condition property="airlift.environment" value="airlift.build.peninsula">
-		<and><equals arg1="${airlift.env}" arg2="peninsula" casesensitive="false" trim="true"/></and>
+	<condition property="airlift.production.mode" value="yes">
+		<and><equals arg1="${airlift.cache}" arg2="yes" casesensitive="false" trim="true"/></and>
 	</condition>
-
-	<condition property="airlift.environment" value="airlift.build.prod">
+	
+	<condition property="airlift.environment" value="build/prod.airlift.build">
 		<and><equals arg1="${airlift.env}" arg2="prod" casesensitive="false" trim="true"/></and>
 	</condition>
 
-	<condition property="airlift.environment" value="airlift.build.test">
+	<condition property="airlift.environment" value="build/test.airlift.build">
 		<and><equals arg1="${airlift.env}" arg2="test" casesensitive="false" trim="true"/></and>
 	</condition>
 
-	<condition property="airlift.environment" value="airlift.build.qa">
+	<condition property="airlift.environment" value="build/qa.airlift.build">
 		<and><equals arg1="${airlift.env}" arg2="qa" casesensitive="false" trim="true"/></and>
 	</condition>
 
-	<condition property="airlift.environment" value="airlift.build.dev">
+	<condition property="airlift.environment" value="build/dev.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="dev" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/demo.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="demo" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/desktop.airlift.build">
 		<and>
-		   <not><equals arg1="${airlift.env}" arg2="peninsula" casesensitive="false" trim="true"/></not>
+		   <not><equals arg1="${airlift.env}" arg2="dev" casesensitive="false" trim="true"/></not>
 		   <not><equals arg1="${airlift.env}" arg2="test" casesensitive="false" trim="true"/></not>
 		   <not><equals arg1="${airlift.env}" arg2="prod" casesensitive="false" trim="true"/></not>
 		   <not><equals arg1="${airlift.env}" arg2="qa" casesensitive="false" trim="true"/></not>
@@ -36,6 +44,8 @@
 		<and><os family="windows"/></and>
 	</condition>
 
+	<property name="jar" value="${appName}" />
+	<property name="dist" location="dist" />
 	<property name="archive" location="archive" />
 	<property name="workspace" location="workspace" />
 	<property name="runtime.lib" location="runtime-lib" />
@@ -55,12 +65,6 @@
 	<property name="classes" location="${war}/WEB-INF/classes" />
 	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
 	
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-	  <classpath>
-		<pathelement location="${war}/WEB-INF/lib/ant-contrib-1.0b3.jar"/>
-	  </classpath>
-	</taskdef>
-
 	<import file="${sdk.dir}/config/user/ant-macros.xml" />
   
 	<path id="project.classpath">
@@ -72,6 +76,21 @@
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
 			<include name="appengine-tools-api.jar" />			
+		</fileset>
+	</path>
+
+	<path id="hack.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />			
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
 		</fileset>
 	</path>
 
@@ -87,6 +106,21 @@
 			<include name="airlift-*core.jar" />
 		</fileset>
 	</path>
+	
+	<path id="test.class.path">
+		<!-- pathelement path="${classes}" / --> 
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />			
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
 
 	<target name="init">
 		
@@ -95,6 +129,11 @@
 		<mkdir dir="${src.java}" />
 		<mkdir dir="${src.javascript}" />
 		<mkdir dir="${src.test}" />
+		<mkdir dir="${src.test}/airlift" />
+		<mkdir dir="${src.test}/airlift/test" />
+		<mkdir dir="${src.test}/airlift/test/unit" />
+		<mkdir dir="${src.test}/airlift/test/smoke" />
+		<mkdir dir="${src.test}/airlift/test/integration" />		
 		<mkdir dir="${src.cfg}" />
 		<mkdir dir="${src.cfg}/web" />
 		<mkdir dir="${src.script}" />
@@ -103,6 +142,8 @@
 		<mkdir dir="${war}/WEB-INF/classes/gen/meta/r" />
 		<mkdir dir="${war}/WEB-INF/classes/gen/meta/a" />
 	    <mkdir dir="${war}/gen/javascript/validation" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/lib" />
 
 		<mkdir dir="${classes}" />
 		
@@ -146,8 +187,7 @@
 		
 	</target>
 
-	
-		<!-- Clean -->
+	<!-- Clean -->
 	<target name="clean" depends="init, clean-war, clean-generated" />
 
 	<target name="clean-generated" depends="createPackageStructure, createRootPackageDirProperty">
@@ -164,12 +204,15 @@
 		   <fileset dir="${classes}" >
 			  <exclude name="handler/**/*" />
 			  <exclude name="*lib/**/*" />
+			  <exclude name="node_modules/**/*" />
+			  <exclude name="template/**/*" />
 		   </fileset>
 		</delete>
 		<delete>
 		   <fileset dir="${war}/WEB-INF/" >
 			  <include name="web.xml" />
 			  <include name="appengine-web.xml" />
+			  <include name="queue.xml" />
 		   </fileset>
 		</delete>
 		<delete>
@@ -177,6 +220,12 @@
 			  <include name="**/*.js" />
 		   </fileset>
 		</delete>
+		<delete>
+		   <fileset dir="${dist}" >
+			  <include name="**/*.*" />
+		   </fileset>
+		</delete>
+
 	</target>
 	
 	<target name="copyjars" description="Copies the App Engine jars to the war file.">
@@ -194,7 +243,6 @@
 	</target>		
 
 	<target name="prepareSource" depends="createPackageStructure, generate">
-
 		<replace dir="${war}/WEB-INF" propertyFile="${airlift.environment}">
 			<include name="*.xml"/>
 			
@@ -233,8 +281,17 @@
 			<!-- Thread Safety -->
 			<replacefilter token="@AIRLIFT_THREAD_SAFE@" value="${airlift.threadsafe}"/>
 
+			<!-- Queues -->
+			<replacefilter token="@QUEUE_STORAGE_LIMIT@" value="${queue.storage.limit}"/>
+			<replacefilter token="@QUEUE_RATE@" value="${queue.rate}"/>
+			<replacefilter token="@QUEUE_BUCKET_SIZE@" value="${queue.bucket.size}"/>
+			<replacefilter token="@QUEUE_CONCURRENT_REQUESTS@" value="${queue.concurrent.requests}"/>
+			<replacefilter token="@TASK_RETRY_LIMIT@" value="${task.retry.limit}"/>
+			<replacefilter token="@TASK_AGE_LIMIT@" value="${task.age.limit}"/>
+			<replacefilter token="@TASK_MIN_BACKOFF_SECONDS@" value="${task.min.backoff.seconds}"/>
+			<replacefilter token="@TASK_MAX_BACKOFF_SECONDS@" value="${task.max.backoff.seconds}"/>
+			<replacefilter token="@TASK_MAX_DOUBLINGS@" value="${task.max.doublings}"/>
 		</replace>
-
 	</target>
 
 	<target name="generate" depends="dictate" description="Generates Airlift classes and copies other source files to the WAR.">
@@ -245,16 +302,16 @@
 		</copy>
 	</target>
 
-	<target name="compile" depends="prepareSource"	description="Compiles Java source">
+	<target name="compile" depends="copyjars, prepareSource"	description="Compiles Java source">
 		<javac includeantruntime="false" srcdir="src"	destdir="${classes}" classpathref="project.classpath" debug="on" />
 	</target>
 
-	<target name="runserver" depends= "compile" description="Starts the development server.">
+	<target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
 	   <dev_appserver war="${war}">
 		 <options>
 			    <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
 		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
-				<arg value="--jvm_flag=-Xmx256m"/>
+				<arg value="--jvm_flag=-Xmx1024m"/>
 		 </options>
 	   </dev_appserver>
 	</target>
@@ -278,14 +335,22 @@
 		</appcfg>
 	</target>
 
-	<target name="runScript">
-	   	<property name="run.class.path" refId="project.classpath"/>
+	<target name="runScript" depends="hack-jar">
+	   	<property name="run.class.path" refId="hack.classpath"/>
 		<echo message="${run.class.path}"/>
-		<script language="javascript" src="src/script/javascript/${script}.js">
-		    <classpath refid="project.classpath"/>
-		</script>		
+		<script language="javascript" src="airlift/hack.js">
+		    <classpath refid="hack.classpath"/>			
+		</script>
 	</target>
-	
+
+	<target name="discoverNodeModules" depends="compile" description="discovers all node modules directory paths in classes directory">
+	   	<property name="run.class.path" refId="hack.classpath"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/packages.js">
+		    <classpath refid="hack.classpath"/>			
+		</script>
+	</target>
+
 	<target name="jslint">
 		<pathconvert pathsep=" " property="jsfiles">
 			<fileset dir="${war}/WEB-INF/classes">
@@ -299,10 +364,8 @@
 	
 	<target name="dictate" depends="clean, createPackageStructure">
 	   	<property name="run.class.path" refId="precompile.classpath"/>
-		<var name="dictation.file" value="${appName}.dic" />
-		<var name="dictation.appName" value="${appName}" />
 		<echo message="${run.class.path}"/>
-		<script language="javascript" src="dictate.js">
+		<script language="javascript" src="airlift/dictate.js">
 		    <classpath refid="precompile.classpath"/>			
 		</script>
 	</target>
@@ -313,6 +376,49 @@
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="dictate.js">
 		    <classpath refid="precompile.classpath"/>			
+		</script>
+	</target>
+
+	<!-- Jar -->
+	<target name="test-jar" depends="discoverNodeModules">
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift/test"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift"
+			   includes="harness.js"
+			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${classes}"
+			   includes="**/*.js"
+			   update="true"
+		  />
+
+    </target>
+
+	<target name="hack-jar" depends="compile">
+
+		<jar destfile="${dist}/lib/${jar}-scripts.jar"
+		       basedir="${src}/script/javascript"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-scripts.jar"
+		       basedir="${classes}"
+			   includes="**/*.js"
+			   update="true"
+		  />
+
+    </target>
+
+	<target name="test" depends="test-jar">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/test.js">
+		    <classpath refid="test.class.path"/>			
 		</script>
 	</target>
 

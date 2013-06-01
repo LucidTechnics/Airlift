@@ -342,6 +342,8 @@ public class RestServlet
 			}
 		}
 
+		log.info("Accept header values " + acceptValueList);
+
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();
 		RestContext restContext = prepareRestContext(method, acceptValueList, _request, uriParameterMap, getServletName());

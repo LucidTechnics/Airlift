@@ -1,10 +1,2 @@
 <backends>
-	<backend name="accounting">
-	    <class>B2</class>
-	    <instances>1</instances>
-	    <options>
-	      <fail-fast>true</fail-fast>
-	      <dynamic>true</dynamic>
-	    </options>
-	</backend>
 </backends>

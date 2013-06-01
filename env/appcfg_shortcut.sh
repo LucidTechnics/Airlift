@@ -1,1 +1,0 @@
-$AIRLIFT_APP_ENGINE_HOME/bin/appcfg.sh update war

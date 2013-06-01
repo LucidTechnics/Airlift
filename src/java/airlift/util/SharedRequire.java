@@ -148,9 +148,9 @@ public class SharedRequire
                 return exports;
 			}
 
+			
             // Nope, still not loaded; we're loading it then.
-			final ModuleScript moduleScript = getModule(cx, id, uri, base);
-
+            final ModuleScript moduleScript = getModule(cx, id, uri, base);
             if (sandboxed && !moduleScript.isSandboxed()) {
                 throw ScriptRuntime.throwError(cx, nativeScope, "Module \""
                         + id + "\" is not contained in sandbox.");
@@ -256,7 +256,8 @@ public class SharedRequire
             final ModuleScript moduleScript =
                     moduleScriptProvider.getModuleScript(cx, id, uri, base, paths);
             if (moduleScript == null) {
-                throw ScriptRuntime.throwError(cx, nativeScope, "Module \"" + id + "\" not found.");
+                throw ScriptRuntime.throwError(cx, nativeScope, "Module \""
+                        + id + "\" not found.");
             }
             return moduleScript;
         }

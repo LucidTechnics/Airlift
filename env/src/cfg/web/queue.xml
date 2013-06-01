@@ -1,0 +1,18 @@
+<queue-entries>
+	<total-storage-limit>@QUEUE_STORAGE_LIMIT@</total-storage-limit>
+
+	<queue>
+		<name>ExampleQueue</name>
+		<rate>@QUEUE_RATE@</rate>
+		<bucket-size>@QUEUE_BUCKET_SIZE@</bucket-size>
+		<max-concurrent-requests>@QUEUE_CONCURRENT_REQUESTS@</max-concurrent-requests>
+		<retry-parameters>
+			  <task-retry-limit>@TASK_RETRY_LIMIT@</task-retry-limit>
+			  <task-age-limit>@TASK_AGE_LIMIT@</task-age-limit>
+			  <min-backoff-seconds>@TASK_MIN_BACKOFF_SECONDS@</min-backoff-seconds>
+			  <max-backoff-seconds>@TASK_MAX_BACKOFF_SECONDS@</max-backoff-seconds>
+			  <max-doublings>@TASK_MAX_DOUBLINGS@</max-doublings>
+		</retry-parameters>
+	</queue>
+
+</queue-entries>

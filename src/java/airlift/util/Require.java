@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package airlift.util;
+	package airlift.util;
 
 import java.io.File;
 import java.net.URI;
@@ -46,15 +46,13 @@ import org.mozilla.javascript.commonjs.module.ModuleScope;
  */
 public class Require extends BaseFunction
 {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(Require.class.getName());
-    private final Map<String, Object> bindings;
+	private final Map<String, Object> bindings;
 	private SharedRequire require;
-	private ResourceUtil resourceUtil;
 	private boolean cachingEnabled = true;
-	private java.util.regex.Pattern mainScriptPattern = java.util.regex.Pattern.compile("\"main\"\\s*:\\s*\"([^\"]+)\\.js");
-	
-    /**
+
+	/**
      * Creates a new instance of the require() function. Upon constructing it,
      * you will either want to install it in the global (or some other) scope
      * using {@link #install(Scriptable)}, or alternatively, you can load the
@@ -75,231 +73,90 @@ public class Require extends BaseFunction
 	public Require(Scriptable _nativeScope, SharedRequire _require, Map<String, Object> _bindings, boolean _cachingEnabled)
 	{
 		require = _require;
-		resourceUtil = new ResourceUtil(_cachingEnabled);
 		bindings = _bindings;
 		cachingEnabled = _cachingEnabled;
 		setPrototype(ScriptableObject.getFunctionPrototype(_nativeScope));
-    }
+	}
 
-    /**
+	/**
      * Binds this instance of require() into the specified scope under the
      * property name "require".
      * @param scope the scope where the require() function is to be installed.
      */
-    public void install(Scriptable scope) {
-        ScriptableObject.putProperty(scope, "require", this);
+	public void install(Scriptable scope) {
+		ScriptableObject.putProperty(scope, "require", this);
 	}
 
-	private String checkId(String _id, URI _uri, Context _context, Scriptable _scope)
+	public Object call(Context cx, Scriptable scope, Scriptable thisObj,
+					   Object[] args)
 	{
-		if (_id.charAt(0) == '.') {
-			// resulting URI is not contained in base,
-			// throw error or make absolute depending on sandbox flag.
-			if (this.require.sandboxed)
-			{
-				throw ScriptRuntime.throwError(_context, _scope, "Module \"" + _id + "\" is not contained in sandbox.");
-			}
-			else
-			{
-				_id = _uri.toString();
-			}
+		if(args == null || args.length < 1) {
+			throw ScriptRuntime.throwError(cx, scope,
+										   "require() needs one argument");
 		}
 
-		return _id;
-	}
+		String id = (String)Context.jsToJava(args[0], String.class);
 
-	private String determineId(String _id, URI _uri, URI _base, URI _current)
-	{
-		String id = null;
-		
-		if (_base == null) {
-				// calling module is absolute, resolve to absolute URI
-				// (but without file extension)
-			id = _uri.toString();
-		} else {
-				// try to convert to a relative URI rooted on base
-			id = _base.relativize(_current).resolve(_id).toString();
-		}
-
-		return id;
-	}
-
-	private String createPackagePath(String[] _tokens, int _length)
-	{
-		String packagePath = "";
-
-		for (int i = 0; i < _length; i++)
-		{
-			String token = _tokens[i];
-			if (token != null && token.length() > 0)
-			{
-				packagePath += "/" + _tokens[i];
-			}
-		}
-
-		return packagePath;
-	}
-
-    public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args)
-	{
-        if(args == null || args.length < 1) {
-            throw ScriptRuntime.throwError(cx, scope,
-                    "require() needs one argument");
-        }
-
-		String originalId = (String)Context.jsToJava(args[0], String.class);
-		
 		URI uri = null;
 		URI base = null;
-		String id = originalId;
-		boolean isRelative = false;
-		Throwable moduleException = null;
 
-		if (originalId.startsWith("./") || originalId.startsWith("../"))
+		if (id.startsWith("./") || id.startsWith("../"))
 		{
-			isRelative = true;
-			
-            if (!(thisObj instanceof ModuleScope)) {
-                throw ScriptRuntime.throwError(cx, scope,
-                        "Can't resolve relative module ID \"" + originalId +
-                                "\" when require() is used outside of a module");
-            }
+			if (!(thisObj instanceof ModuleScope)) {
+				throw ScriptRuntime.throwError(cx, scope,
+											   "Can't resolve relative module ID \"" + id +
+											   "\" when require() is used outside of a module");
+			}
 
 			ModuleScope moduleScope = (ModuleScope) thisObj;
-            base = moduleScope.getBase();
-            URI current = moduleScope.getUri();
-			uri = current.resolve(originalId);
-			id = determineId(originalId, uri, base, current);
-			id = checkId(id, uri, cx, scope);
-		}
+			base = moduleScope.getBase();
+			URI current = moduleScope.getUri();
+			uri = current.resolve(id);
 
-		Scriptable exportedModuleInterface = null;
-		
-		try
-		{		
-			exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
-		}
-		catch(Throwable t)
-		{
-			if (isRelative == true)
-			{
-				throw new RuntimeException(t);
-			}
-		}
-
-		URI moduleUri = null;
-		
-		if (exportedModuleInterface == null && isRelative == false)
-		{	
-			if (thisObj instanceof ModuleScope)
-			{
-				ModuleScope moduleScope = (ModuleScope) thisObj;
-
-				moduleUri = moduleScope.getUri();
-				base = moduleScope.getBase();			
-			}
-			else
-			{
-				try
-				{
-					moduleUri = new URI("http://localhost:80/node_modules");
-					base = new URI("http://localhost:80");
-				}
-				catch(Throwable t)
-				{
-					throw new RuntimeException(t);
-				}
-			}
-
-			uri = moduleUri.resolve(originalId);
-			String[] tokens = moduleUri.getPath().split("/");
-			String packageJson = null;
-			String packagePath = "";
-			String basePackagePath = "";
-
-			for (int i = 0, length = tokens.length; i < length && packageJson == null; i++)
-			{
-				basePackagePath = createPackagePath(tokens, length - i);
-				basePackagePath += "/node_modules/" + originalId;
-				packagePath = basePackagePath + "/package.json";
-				packageJson = resourceUtil.load(packagePath, false);
-			}
-
-			if (packageJson != null)
-			{
-				//npm installed module
-				String npmModuleName = "index";
-
-				java.util.regex.Matcher matcher = mainScriptPattern.matcher(packageJson);
-
-				if (matcher.find() == true)
-				{
-					npmModuleName = matcher.group(1);
-				}
-
-				id = basePackagePath + "/" + npmModuleName;
-				id = id.replaceAll("^\\/+", "");
-				
-				try
-				{
-					uri = new URI("http://localhost:80/" + id);
-				}
-				catch(Throwable t)
-				{
-					throw new RuntimeException(t);
-				}
-				
-				try
-				{
-					exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
-				}
-				catch(Throwable t)
-				{
-					moduleException = t;
+			if (base == null) {
+				// calling module is absolute, resolve to absolute URI
+				// (but without file extension)
+				id = uri.toString();
+			} else {
+				// try to convert to a relative URI rooted on base
+				id = base.relativize(current).resolve(id).toString();
+				if (id.charAt(0) == '.') {
+					// resulting URI is not contained in base,
+					// throw error or make absolute depending on sandbox flag.
+					if (this.require.sandboxed) {
+						throw ScriptRuntime.throwError(cx, scope,
+							"Module \"" + id + "\" is not contained in sandbox.");
+					} else {
+						id = uri.toString();
+					}
 				}
 			}
 		}
 
-		if (exportedModuleInterface == null)
-		{		
-			if (moduleException != null)
-			{
-				throw new RuntimeException(moduleException);
-			}
-			else
-			{
-				log.severe("Unable to load module identified by: " + id);
+		Scriptable exportedModuleInterface = require.getExportedModuleInterface(this, cx, id, uri, base, false, this.cachingEnabled);
 
-				if (moduleUri != null && moduleUri.getPath() != null)
-				{
-					log.severe("with parent module: " + moduleUri.getPath());
-				}
-
-				throw new RuntimeException("Cannot load module identified by: " + id);
-			}
-		}
 
 		return exportedModuleInterface;
-    }
+	}
 
 	@Override
-    public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
-        throw ScriptRuntime.throwError(cx, scope,
-                "require() can not be invoked as a constructor");
-    }
+	public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
+		throw ScriptRuntime.throwError(cx, scope,
+									   "require() can not be invoked as a constructor");
+	}
 
-    @Override
-    public String getFunctionName() {
-        return "require";
-    }
+	@Override
+	public String getFunctionName() {
+		return "require";
+	}
 
-    @Override
-    public int getArity() {
-        return 1;
-    }
+	@Override
+	public int getArity() {
+		return 1;
+	}
 
-    @Override
-    public int getLength() {
-        return 1;
-    }
+	@Override
+	public int getLength() {
+		return 1;
+	}
 }

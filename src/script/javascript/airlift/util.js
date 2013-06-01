@@ -393,11 +393,27 @@ exports.set = function set(_parameter)
 
 	if (exports.hasValue(_parameter) === true)
 	{
-		set= new Packages.java.util.HashSet(_parameter);
+		set = new Packages.java.util.HashSet(_parameter);
 	}
 	else
 	{
-		set= new Packages.java.util.HashSet();
+		set = new Packages.java.util.HashSet();
+	}
+
+	return set;
+};
+
+exports.orderedSet = function orderedSet(_parameter)
+{
+	var set;
+
+	if (exports.hasValue(_parameter) === true)
+	{
+		set = new Packages.java.util.TreeSet(_parameter);
+	}
+	else
+	{
+		set = new Packages.java.util.TreeSet();
 	}
 
 	return set;
