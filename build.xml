@@ -108,17 +108,6 @@
 		</fileset>
 	</path>
 
-	<!-- Make sure findbugs-ant.jar is included in your ant lib directory
-	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
-
-	<target name="findbugs" depends="jar">
-		<findbugs home="${findbugs.home}" output="html" outputFile="${junit-result}/findbugs.html" >
-			<sourcePath path="${src.java}" />
-			<class location="${dist}/lib/${jar}-core.jar" />
-		</findbugs>
-	</target>
-	 -->
-
 	<!-- Clean -->
 	<target name="clean" depends="clean-classes, clean-target" />
 
@@ -295,14 +284,14 @@
 
 	<target name="env" depends="redeploy" >
 		<delete>
-			<fileset dir="${env}/war/WEB-INF" includes="airlift-*core.jar"/>
+			<fileset dir="${env}/war/WEB-INF/lib" includes="airlift-*core.jar"/>
 		</delete>
 
 		<copy todir="${env}/war/WEB-INF/lib">
 			<fileset dir="${dist}/lib/" includes="${jar}-core.jar" />
 		</copy>
 
-		<zip destfile="${downloads}/airlift-env-latest.zip" basedir="${env}" />
+		<zip destfile="${downloads}/${jar}-env.zip" basedir="${env}" />
 	
 	</target>
 
@@ -335,85 +324,7 @@
 		<mkdir dir="${java.package.dir}/servlet" />
 		
 	</target>
-	   
-	<target name="cleanProject" >
-		<delete dir="${workspace}/build/" />
-	</target>
-
-	<target name="initProject" depends="redeploy" >
-		<mkdir dir="${workspace}/build/runtime-lib" />
-		<mkdir dir="${workspace}/build/runtime-lib/javascript" />
-		<mkdir dir="${workspace}/build/build-only-lib" />
 		
-		<mkdir dir="${workspace}/build/src" />
-		<mkdir dir="${workspace}/build/src/css" />
-		<mkdir dir="${workspace}/build/src/script" />
-		<mkdir dir="${workspace}/build/src/script/javascript" />
-		<mkdir dir="${workspace}/build/src/script/javascript/hannibal/cfg" />
-		<mkdir dir="${workspace}/build/src/cfg" />
-		<mkdir dir="${workspace}/build/src/cfg/web" />
-		<mkdir dir="${workspace}/build/src/cfg/hannibal" />
-
-		<mkdir dir="${workspace}/src/cfg/web" />
-	</target>
-	
-    <target name="quickProject" depends="cleanProject, initProject" >
-		
-	   	<copy todir="${workspace}/build/src/css">
-			<fileset dir="${project}/artifacts/css" includes="**/*.*" />
-		</copy>
-
-		<copy todir="${workspace}/build/runtime-lib">
-			<fileset dir="${project}/artifacts/runtime-lib" includes="**/*.jar" />
-		</copy>
-
-		<unzip src="${project}/artifacts/apache-tomcat-6.0.20.zip" dest="${workspace}/build/tomcat/" />
-
-		<copy todir="${workspace}/build/tomcat/apache-tomcat-6.0.20/lib" flatten="true">
-			<fileset dir="${workspace}/build/runtime-lib" includes="mysql/**/*.jar, hsqldb/**/*.jar"  />
-		</copy>
-
-		<copy todir="${workspace}/build/tomcat/apache-tomcat-6.0.20/lib">
-			<fileset dir="${dist}/lib/" includes="*.jar" excludes="*est*.jar, *spring*.jar" />
-		</copy>
-
-		<chmod dir="${workspace}/build/tomcat" includes="**/*.sh, **/*.bat"  perm="ugo+rx"/>
-
-		<mkdir dir="${workspace}/build/tomcat/apache-tomcat-6.0.20/logs" />
-		
-		<copy todir="${workspace}/build/build-only-lib">
-			<fileset dir="${project}/artifacts/build-only-lib" includes="**/*.jar" />
-		</copy>
-
-		<copy todir="${workspace}/build/src/script/javascript/hannibal/cfg">
-			<fileset dir="${project}/artifacts/" includes="hannibal.js" />
-		</copy>
-
-		<copy todir="${workspace}/build/src/cfg/hannibal">
-			<fileset dir="${project}/artifacts/" includes="Hannibal.properties" />
-		</copy>
-
-		<copy todir="${workspace}/build/src/cfg/cache">
-			<fileset dir="${project}/artifacts/" includes="cache.ccf" />
-		</copy>
-
-		<copy todir="${workspace}/build/src/cfg/web">
-			<fileset dir="${project}/artifacts/" includes="web.xml, server.xml" />
-		</copy>
-
-		<copy todir="${workspace}/build/">
-			<fileset dir="${project}/artifacts/" includes="hannibal.build, build.xml" />
-		</copy>
-
-		<copy todir="${workspace}/build/runtime-lib/hannibal">
-			<fileset dir="${dist}/lib/" includes="*.jar" />
-		</copy>
-
-		<zip destfile="${dist}/hannibal-quick-project-${version}_${revision}.zip" basedir="${workspace}/build/"
-			 includes="*/, **/*.*" />
-
-    </target>  
-
 	<target name="javadoc">
 	   <javadoc
            destdir="${src.doc}/javadoc"
