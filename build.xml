@@ -11,12 +11,13 @@
  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  specific language governing permissions and limitations under the License.
 -->
-<project name="${appName}" default="createPackageStructure" xmlns:ivy="antlib:org.apache.ivy.ant" basedir=".">
+<project default="createPackageStructure" basedir=".">
 
 	<description>  Build file </description>
   
 	<property file="desktop.build" />
-
+	<property environment="env"/>
+	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_DEV_HOME}" />
 	<property name="rootDir" value="${basedir}" />
 	
 	<property name="project" location="project" />
@@ -130,6 +131,18 @@
 
 	</target>
 
+	<target name="copyjars" description="Copies the App Engine jars to the war file.">
+	    <delete dir="${runtime.lib}/appengine" />
+		<mkdir dir="${runtime.lib}/appengine" />
+		<echo message="${sdk.dir}/lib/user"/>
+		<copy todir="${runtime.lib}/appengine" flatten="true">
+			<fileset dir="${sdk.dir}/lib/user">
+				<include name="**/*.jar" />
+				<exclude name="orm/**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
 	<!-- Init -->
 	<target name="init">
 
@@ -182,7 +195,7 @@
 	</target>
 
 	<!-- Prepare source -->
-	<target name="prepareSource" depends="createPackageStructure">
+	<target name="prepareSource" depends="createPackageStructure, copyjars">
 
 		<copy todir="${stage}" >
 			<fileset dir="${src}" includes="**/*.xml, **/*log4j.properties, **/*.bat, **/*.sh, **/*.0, **/*.cf, **/*.conf, **/*.st" />

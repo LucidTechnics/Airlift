@@ -232,6 +232,7 @@
 		<copy todir="${war}/WEB-INF/lib" flatten="true">
 			<fileset dir="${sdk.dir}/lib/user">
 				<include name="**/*.jar" />
+				<exclude name="orm/**/*.jar" />
 			</fileset>
 		</copy>
 	</target>
