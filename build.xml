@@ -195,7 +195,7 @@
 	</target>
 
 	<!-- Prepare source -->
-	<target name="prepareSource" depends="createPackageStructure, copyjars">
+	<target name="prepareSource" depends="createPackageStructure">
 
 		<copy todir="${stage}" >
 			<fileset dir="${src}" includes="**/*.xml, **/*log4j.properties, **/*.bat, **/*.sh, **/*.0, **/*.cf, **/*.conf, **/*.st" />
