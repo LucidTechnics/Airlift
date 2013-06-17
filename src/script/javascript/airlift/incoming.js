@@ -516,9 +516,9 @@ function Incoming(_web)
 		this["java.util.Date"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateDate(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
 
 		this["java.util.List"] = function(_value, _attributeName, _attributesMetadata, _reportErrors) { var errors = validateCollection(_value, _attributeName, _attributesMetadata); errors.length && _reportErrors(_attributeName, errors); };
-		this["java.util.Set"] = this["java.lang.List"];
-		this["java.util.ArrayList"] = this["java.lang.List"];
-		this["java.util.HashSet"] = this["java.lang.List"];
+		this["java.util.Set"] = this["java.util.List"];
+		this["java.util.ArrayList"] = this["java.util.List"];
+		this["java.util.HashSet"] = this["java.util.List"];
 
 		this["java.util.List<java.lang.String>"] = this["java.util.List"];
 		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
