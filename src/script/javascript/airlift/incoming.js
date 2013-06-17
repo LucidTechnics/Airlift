@@ -318,14 +318,18 @@ function Incoming(_web)
 				}
 			}
 			else if (util.hasValue(_attributeMetadata.mapToMany) === true)
-			{				
+			{
+				util.info('map to many resource', JSON.stringify( _resource));
+				util.info('map to many value is', _attributeName, value);
+				util.info('map to many class is', _attributeName, value && value.getClass && value.getClass());
+				
 				if (value instanceof java.util.Collection === false) { throw 'Map to many property must be a java.util.Collection'; }
 				
 				if (value.isEmpty() === false)
 				{
 					var firstItem = value.get(0);
 					
-					if (typeof firstItem !== 'object')
+					if (firstItem instanceof java.lang.String === true)
 					{
 						_entity.setProperty(_attributeName, value);
 					}
