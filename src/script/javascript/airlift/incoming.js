@@ -422,9 +422,22 @@ function Incoming(_web)
 		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
 		this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
 		this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
-	};
+	}
+
+	function CollectionTypes()
+	{
+		this["java.util.Set"] = 1;
+		this["java.util.HashSet"] = 1;
+		this["java.util.List"] = 1;
+		this["java.util.ArrayList"] = 1;
+		this["java.util.List<java.lang.String>"] = 1;
+		this["java.util.ArrayList<java.lang.String>"] = 1;
+		this["java.util.HashSet<java.lang.String>"] = 1;
+		this["java.util.Set<java.lang.String>"] = 1;
+	}
 
 	var converter = new Converter();
+	var collectionTypes = new CollectionTypes();
 
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
 	{
@@ -442,6 +455,12 @@ function Incoming(_web)
 				if (converter[type])
 				{
 					var parameterValue = request.getParameterValues(_attributeName);
+
+					if (util.hasValue(parameterValue) === false && isCollectionType[type])
+					{
+						parameterValue = request.getParameterValues(_attributeName + '[]');
+					}
+
 					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
 				}
 				else
