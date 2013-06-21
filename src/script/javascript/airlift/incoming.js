@@ -456,7 +456,7 @@ function Incoming(_web)
 				{
 					var parameterValue = request.getParameterValues(_attributeName);
 
-					if (util.hasValue(parameterValue) === false && isCollectionType[type])
+					if (util.hasValue(parameterValue) === false && collectionTypes[type])
 					{
 						parameterValue = request.getParameterValues(_attributeName + '[]');
 					}
