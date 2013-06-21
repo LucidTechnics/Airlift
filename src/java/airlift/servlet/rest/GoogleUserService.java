@@ -56,7 +56,7 @@ public class GoogleUserService
 	/**
 	 * Instantiates a new google user service.
 	 */
-	protected GoogleUserService() { setUserService(com.google.appengine.api.users.UserServiceFactory.getUserService()); }
+	public GoogleUserService() { setUserService(com.google.appengine.api.users.UserServiceFactory.getUserService()); }
 	
 	//Returns a URL that can be used to display a login page to the user.
 	/* (non-Javadoc)
