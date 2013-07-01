@@ -46,7 +46,7 @@ public abstract class ContentContext
 	public String redirectUri;
 	
 	/** The header map. */
-	public java.util.Map<String, String> headerMap = new java.util.HashMap<String, String>();
+	public java.util.Map<String, String[]> headerMap = new java.util.HashMap<String, String[]>();
 
 	public boolean streamed = false;
 	
@@ -62,7 +62,7 @@ public abstract class ContentContext
 	 *
 	 * @return the header map
 	 */
-	public java.util.Map<String, String> getHeaderMap() { return headerMap; }
+	public java.util.Map<String, String[]> getHeaderMap() { return headerMap; }
 	
 	/**
 	 * Sets the redirect uri.
@@ -76,7 +76,7 @@ public abstract class ContentContext
 	 *
 	 * @param _headerMap the _header map
 	 */
-	public void setHeaderMap(java.util.Map<String, String> _headerMap) { headerMap = _headerMap; }
+	public void setHeaderMap(java.util.Map<String, String[]> _headerMap) { headerMap = _headerMap; }
 
 	/**
 	 * Gets the content.
@@ -136,6 +136,12 @@ public abstract class ContentContext
 	{
 		setRedirectUri(_uri);
 		setResponseCode("301");
+	}
+
+	public void redirect(String _uri, String _responseCode)
+	{
+	    setRedirectUri(_uri);
+	    setResponseCode(_responseCode);
 	}
 
 	/**
@@ -232,9 +238,30 @@ public abstract class ContentContext
 	 */
 	public void addHeader(String _key, String _value)
 	{
-		getHeaderMap().put(_key, _value);
+	    String[] valueArray = new String[1];
+	    valueArray[0] = _value;
+	    getHeaderMap().put(_key, valueArray		);
 	}
+
+	public void addHeader(String _key, String[] _value)
+	{
+	    getHeaderMap().put(_key, _value);
+	}
+
+	public void addHeader(String _key, java.util.List<String> _value)
+	{
+	    String[] valueArray = new String[_value.size()];
+	    int	 index = 0;
+	    
+	    for (String value: _value)
+	    {
+		valueArray[index] = value;
+		index++;
+	    }
 	
+	    getHeaderMap().put(_key, valueArray);
+	}
+
 	/**
 	 * Debug.
 	 *

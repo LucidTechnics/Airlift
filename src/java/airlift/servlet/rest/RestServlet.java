@@ -510,9 +510,18 @@ public class RestServlet
 					{
 						if (responseCode < 400)
 						{
-							for (java.util.Map.Entry<String, String> header: contentContext.getHeaderMap().entrySet())
+							for (java.util.Map.Entry<String, String[]> header: contentContext.getHeaderMap().entrySet())
 							{
-								_httpServletResponse.addHeader(header.getKey(), header.getValue());
+
+							    String[] headerValues = header.getValue();
+
+							    if (headerValues != null)
+							    {
+								for (int h = 0; h < headerValues.length; h++)
+								{
+								    _httpServletResponse.addHeader(header.getKey(), headerValues[h]);
+								}
+							    }
 							}
 
 							_httpServletResponse.setContentType(contentContext.getType());
