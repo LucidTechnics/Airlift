@@ -86,7 +86,7 @@ function Insert(_web)
 					    cache.put(entity.getKey(), entity);
 					    }
 					    catch(e){
-						util.info("ERROR IN INSERT.js");
+						util.info("ERROR in insert.js");
 						util.info(e.message, e.stack);
 					    }
 					}

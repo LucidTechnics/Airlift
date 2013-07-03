@@ -56,7 +56,6 @@ function Get(_web)
 				}
 				else
 				{
-				    util.warning("WEIRD ERROR!!");
 					throw e;
 				}
 			}

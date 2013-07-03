@@ -324,7 +324,6 @@ public class RestServlet
 		while (acceptHeaderValues.hasMoreElements() == true)
 		{
 			String acceptHeaderValue = acceptHeaderValues.nextElement();
-			log.info("Accept header is:  " + acceptHeaderValue);
 
 			String[] tokenArray = acceptHeaderValue.split(",");
 
