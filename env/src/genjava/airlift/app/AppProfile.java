@@ -16,7 +16,7 @@ public class AppProfile
 	
 	static
 	{
-		
+		resourceSecurityMetadataMap.put("registration", new java.util.HashMap<String, java.util.Set<String>>()); 
 		resourceSecurityMetadataMap.put("product", new java.util.HashMap<String, java.util.Set<String>>()); 
 		resourceSecurityMetadataMap.put("orderlineitem", new java.util.HashMap<String, java.util.Set<String>>()); 
 		resourceSecurityMetadataMap.put("order", new java.util.HashMap<String, java.util.Set<String>>()); 
@@ -91,6 +91,7 @@ public class AppProfile
 
 	public boolean isValidResource(String _resourceName)
 	{
+	    
 		return resourceSecurityMetadataMap.keySet().contains(_resourceName.toLowerCase());
 	}
 

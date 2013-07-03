@@ -454,7 +454,7 @@ function Incoming(_web)
 			{
 				if (converter[type])
 				{
-					var parameterValue = request.getParameterValues(_attributeName);
+				    var parameterValue = request.getParameterValues(_attributeName);
 
 					if (util.hasValue(parameterValue) === false && collectionTypes[type])
 					{

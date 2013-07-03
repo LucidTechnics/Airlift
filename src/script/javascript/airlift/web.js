@@ -1,3 +1,5 @@
+var util = require('airlift/util');
+
 function Web(WEB_CONTEXT)
 {
 	var timezone;
@@ -242,11 +244,11 @@ function Web(WEB_CONTEXT)
 
 	this.getResourceName = function()
 	{
+
 		if (!resourceName)
 		{
 			resourceName = this.getRestContext().getThisDomain();
 		}
-
 		return resourceName;
 	};
 

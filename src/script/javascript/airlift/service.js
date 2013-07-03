@@ -1,3 +1,5 @@
+var util = require('./util');
+
 function AppIdentityService()
 {
 	var service = com.google.appengine.api.appidentity.AppIdentityServiceFactory.getAppIdentityService();

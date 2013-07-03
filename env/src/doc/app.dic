@@ -23,3 +23,9 @@ A Product
 has a name
 has a cost which has type double
 can be viewed or collected or created or updated by a customer service representative
+
+A Registration
+has a full name
+has an email address
+has a mobile phone number which is not required
+has a "password"
