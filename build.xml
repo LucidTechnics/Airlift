@@ -364,7 +364,7 @@
 	     
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
-	   <!-- <antcall target="exitDev" /> -->
+	   <antcall target="exitDev" />
 	</sequential>
 </parallel>
 
@@ -379,9 +379,9 @@
 </target>
 
 <target name="exitDevWin" depends="checkos" if="isWindows">
-<exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
+<!-- <exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
 	  <arg value="killserver.bat" />
-	</exec>
+	</exec> -->
 </target>
 
 <target name="checkos">

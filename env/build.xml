@@ -429,7 +429,7 @@
 <target name="integrationtest" depends="test-jar">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
-		<sleep seconds="10" />
+		<sleep seconds="60" />
 		<script language="javascript" src="airlift/integrationtest.js">
 		    <classpath refid="test.class.path"/> 			
 		</script>
