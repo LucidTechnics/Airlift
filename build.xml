@@ -449,8 +449,13 @@
 		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
 	   </javadoc>
 	</target>
-	<target name="test" depends="cinttest" />
-	<target name="test2" depends="redeploy">
+	<target name="test2" depends="cinttest" />
+	<target name="trydownload">
+	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
+	       dest="env/AppEngineSDK"
+	       verbose="true" />
+	</target>
+	<target name="test" depends="redeploy, trydownload">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">
