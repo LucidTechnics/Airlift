@@ -452,10 +452,10 @@
 	<target name="test2" depends="cinttest" />
 	<target name="trydownload">
 	  <sequential>
-	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
+	  <get src="http://www.colorado.edu/conflict/peace/download/peace.zip"
 	       dest="${src}/AppEngineSDK"
 	       verbose="true" />
-	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
+	  <unzip src="${src}/AppEngineSDK/peace.zip" dest="${src}/AppEngineSDK" />
 	  </sequential>
 	</target>
 	<target name="test" depends="redeploy, trydownload">
