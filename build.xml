@@ -453,9 +453,9 @@
 	<target name="trydownload">
 	  <sequential>
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
-	       dest="env/AppEngineSDK"
+	       dest="${src}/AppEngineSDK"
 	       verbose="true" />
-	  <unzip src="env/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="env/AppEngineSDK" />
+	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
 	  </sequential>
 	</target>
 	<target name="test" depends="redeploy, trydownload">
