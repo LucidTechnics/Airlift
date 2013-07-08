@@ -6,6 +6,8 @@ branches:
   only:
     - master
     - airlift_2.0_development
+    - testEnhance
+    - testEnhance2
 
 notifications:
   email:

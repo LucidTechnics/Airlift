@@ -308,6 +308,97 @@
 	
 	</target>
 
+	<target name="setUpEnvironment" depends="env" >
+	  <delete dir ="../AntTest/env" />
+	  <mkdir dir="../AntTest/env" />
+	  <unzip src = "${downloads}/${jar}-env.zip" dest = "../AntTest/env" />
+	</target>
+
+	<target name="startserver" depends="setUpEnvironment" description="Starts the new server." >
+	  <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	  <arg value="runserver" />
+	</exec>
+	</target>
+	
+	<target name="inttest" description="Just does the integration test.  NEEDS RUNNING SERVER.">
+	  <sequential>
+	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+	    <and>
+		<http url="http://localhost:8080/_ah/admin/" />
+		<socket server="localhost" port="8080"/>
+	    </and>
+	   </waitfor>
+	   <condition property="isTimeOut"> 
+	      <isset property="timeout" />
+	     </condition>
+	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
+	   <echo message="...The INTEGRATION TEST has BEGUN..." />
+	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	     <arg value="integrationtestns" />
+	   </exec>
+	   <echo message="...The INTEGRATION TEST has ENDED..." />
+	   <!--<antcall target="exitDev" /> -->
+	</sequential>
+	</target>
+
+	<target name="cinttest" depends="setUpEnvironment" description="Starts the new server." >
+ <parallel>
+	<exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	  <arg value="runserver" />
+	</exec>
+	<sequential>
+	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+	    <and>
+		<http url="http://localhost:8080/_ah/admin/" />
+		<socket server="localhost" port="8080"/>
+	    </and>
+	   </waitfor>
+	   <condition property="isTimeOut"> 
+	      <isset property="timeout" />
+	     </condition>
+	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
+	   <echo message="...The TEST SERVER is RUNNING..." />
+	   <echo message="...The INTEGRATION TEST has BEGUN..." />
+	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	     <arg value="integrationtest" />
+	     
+	   </exec>
+	   <echo message="...The INTEGRATION TEST has ENDED..." />
+	   <antcall target="exitDev" />
+	</sequential>
+</parallel>
+
+	</target>
+
+	<target name="exitDev" depends="exitDevML, exitDevWin" />
+
+	<target name="exitDevML" depends="checkos" if="isLinuxMac">
+<exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
+	  <arg value="killserver.sh" />
+	</exec>
+</target>
+
+<target name="exitDevWin" depends="checkos" if="isWindows">
+<!-- <exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
+	  <arg value="killserver.bat" />
+	</exec> -->
+</target>
+
+<target name="checkos">
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
+
+	<condition property="isLinuxMac">
+	  <or>
+		<os family="unix" />
+		<os family="mac" />
+	  </or>
+	</condition>
+
+
+</target>
+
 	<target name="createRootPackageDirProperty" >
 
 	  <pathconvert property="java.package.dir" targetos="${targetOs}" >
@@ -358,8 +449,8 @@
 		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
 	   </javadoc>
 	</target>
-
-	<target name="test" depends="redeploy">
+	<target name="test" depends="cinttest" />
+	<target name="test2" depends="redeploy">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">

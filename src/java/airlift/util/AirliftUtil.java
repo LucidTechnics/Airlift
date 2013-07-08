@@ -218,7 +218,7 @@ public class AirliftUtil
 		try
 		{
 			airlift.AppProfile appProfile = (airlift.AppProfile) Class.forName("airlift.app.AppProfile").newInstance();
-
+			
 			isDomainName = appProfile.isValidResource(_domainName);
 		}
 		catch(Throwable t)
@@ -338,6 +338,7 @@ public class AirliftUtil
 			String candidateToken = token;
 
 			java.util.List<String> tokenList = hasSuffix(token);
+		       
 
 			if (tokenList.isEmpty() == false)
 			{
@@ -346,7 +347,7 @@ public class AirliftUtil
 			}
 
 			if (isDomainName(candidateToken, _rootPackageName) == true || isNewDomainName(candidateToken, _rootPackageName) == true)
-			{				
+			{	
 				Route.addDomainName(_uriParameterMap, candidateToken);
 				parentDomain = candidateToken;
 			}
@@ -354,7 +355,7 @@ public class AirliftUtil
 			{
 				String primaryKeyName = airlift.util.AirliftUtil.determinePrimaryKeyName(parentDomain, _rootPackageName);
 
-                Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, candidateToken);
+				Route.addBindings(_uriParameterMap, parentDomain, primaryKeyName, candidateToken);
 				parentDomain = null;
 			}
 		}

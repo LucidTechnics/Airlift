@@ -311,12 +311,10 @@ public class RestServlet
 		}
 			
 		String namespace = this.getServletConfig().getInitParameter("a.namespace");
-		
 		if (namespace != null && org.apache.commons.lang.StringUtils.isWhitespace(namespace) == false)
 		{
 			com.google.appengine.api.NamespaceManager.set(namespace);
 		}
-		
 		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
 		log.info("RestServlet START " + quotaService.getCpuTimeInMegaCycles());
 		
@@ -326,7 +324,6 @@ public class RestServlet
 		while (acceptHeaderValues.hasMoreElements() == true)
 		{
 			String acceptHeaderValue = acceptHeaderValues.nextElement();
-			log.info("Accept header is:  " + acceptHeaderValue);
 
 			String[] tokenArray = acceptHeaderValue.split(",");
 
@@ -341,8 +338,6 @@ public class RestServlet
 				}
 			}
 		}
-
-		log.info("Accept header values " + acceptValueList);
 
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();

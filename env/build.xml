@@ -61,11 +61,14 @@
 	<property name="src.cfg" location="${src}/cfg" />
 	<property name="src.doc" location="${src}/doc" />
 
+	<property name="timeout" value=""/>
+
 	<property name="war" location="war" />
 	<property name="classes" location="${war}/WEB-INF/classes" />
 	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
 	
-	<import file="${sdk.dir}/config/user/ant-macros.xml" />
+	<import file="../../../apps/appengine/appengine-java-sdk-1.8.0/config/user/ant-macros.xml" />
+	<!-- <import file="${sdk.dir}/config/user/ant-macros.xml" /> -->
   
 	<path id="project.classpath">
 		<pathelement path="${classes}" />
@@ -308,11 +311,12 @@
 	</target>
 
 	<target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
-	   <dev_appserver war="${war}">
+	  <dev_appserver war="${war}">
 		 <options>
 			    <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
 		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
 				<arg value="--jvm_flag=-Xmx1024m"/>
+
 		 </options>
 	   </dev_appserver>
 	</target>
@@ -420,6 +424,23 @@
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="airlift/test.js">
 		    <classpath refid="test.class.path"/>			
+		</script>
+	</target> 
+
+<target name="integrationtest" depends="test-jar">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<sleep seconds="60" />
+		<script language="javascript" src="airlift/integrationtest.js">
+		    <classpath refid="test.class.path"/> 			
+		</script>
+	</target>
+
+<target name="integrationtestns" depends="test-jar">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/integrationtest.js">
+		    <classpath refid="test.class.path"/> 			
 		</script>
 	</target>
 

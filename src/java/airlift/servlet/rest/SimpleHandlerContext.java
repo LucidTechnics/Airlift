@@ -20,6 +20,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
@@ -29,7 +30,8 @@ import java.util.logging.Logger;
 public class SimpleHandlerContext
    extends HandlerContext
 {
-	
+
+    public Map themap = new HashMap();	
 	/** The log. */
 	private Logger log = Logger.getLogger(SimpleHandlerContext.class.getName());
 	
@@ -80,18 +82,17 @@ public class SimpleHandlerContext
 			scriptingUtil.bind("REQUEST", _httpServletRequest);
 			scriptingUtil.bind("REST_CONTEXT", _restContext);
 			scriptingUtil.bind("PRODUCTION_MODE", this.productionMode);
-
-			log.info("URI Parameter map is: " + _restContext.getUriParameterMap());
-			log.info("Domain ids are:" + _restContext.getDomainIds());
-						
+		  		    
 			String[] scriptResources = new String[8];
 
 			boolean handlerExecutionSuccessful = false;
 
-			for (String handlerName: _restContext.getHandlerPathList())
+			for (String handlerName: _restContext.getHandlerPathList()) 
 			{
 				try
 				{
+				 
+	
 					log.info("Executing handler: " + handlerName);
 					scriptingUtil.bind("HANDLER_NAME", handlerName);
 					scriptingUtil.executeScript(handlerName, true, scriptingContext);
@@ -129,7 +130,7 @@ public class SimpleHandlerContext
 				throw new airlift.servlet.rest.HandlerException("Unable to find script resource using classloader getResourceAsStream(). Are any of the rest contexts handlers: " + _restContext.getHandlerPathList() + " in the application's classpath?",
 					airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND);
 			}
-		}
+		} 
 		finally
 		{
 			if (scriptingContext != null) { scriptingContext.exit(); }

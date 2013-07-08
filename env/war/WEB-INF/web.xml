@@ -1,0 +1,153 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">   
+   <servlet>
+		<servlet-name>analytics-web</servlet-name>
+		<servlet-class>airlift.servlet.rest.RestServlet</servlet-class>
+		<init-param>
+			<param-name>a.root.package.name</param-name>
+			<param-value>com.analytics-web</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.namespace</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.production.mode</param-name>
+			<param-value>no</param-value>
+		</init-param>
+		<init-param>
+			<param-name>airlift.truncated.sha1.id.length</param-name>
+			<param-value>10</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.dev.user.security</param-name>
+			<param-value>no</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.session.timeout.duration</param-name>
+			<param-value>172800</param-value>
+		</init-param>		
+		<init-param>
+			<param-name>a.report.java.exception</param-name>
+			<param-value>no</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.cipher.password</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.cipher.initial.vector</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.default.mime.type</param-name>
+			<param-value>text/html</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.auditing.insert</param-name>
+			<param-value>on</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.auditing.get</param-name>
+			<param-value>off</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.auditing.update</param-name>
+			<param-value>on</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.auditing.delete</param-name>
+			<param-value>on</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.extension.xls</param-name>
+			<param-value>application/vnd.ms-excel</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.extension.ics</param-name>
+			<param-value>text/icalendar</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.timezone</param-name>
+			<param-value>America/New_York</param-value>
+		</init-param>
+		<init-param>
+			<param-name>a.user.service</param-name>
+			<param-value>airlift.servlet.rest.GoogleUserService</param-value>
+		</init-param>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>analytics-web</servlet-name>
+		<url-pattern>/a/*</url-pattern>
+	</servlet-mapping>
+
+	<security-constraint>
+        <web-resource-collection>
+            <url-pattern>/a/scheduledjob</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/a/task/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+    </security-constraint>
+		
+	<security-constraint>
+	        <web-resource-collection>
+	            <url-pattern>/a/task/*</url-pattern>
+	        </web-resource-collection>
+	        <auth-constraint>
+	            <role-name>admin</role-name>
+	        </auth-constraint>
+    </security-constraint>
+
+	<error-page>
+	   <error-code>401</error-code>
+	   <location>/a/error</location>
+	</error-page>
+
+	<error-page>
+	   <error-code>403</error-code>
+	   <location>/a/error</location>
+	</error-page>
+
+	<error-page>
+	   <error-code>405</error-code>
+	   <location>/a/error</location>
+	</error-page>
+
+	<error-page>
+	   <error-code>404</error-code>
+	   <location>/a/error</location>
+	</error-page>
+
+	<error-page>
+	   <error-code>500</error-code>
+	   <location>/a/error</location>
+	</error-page>
+
+<!-- remote api installation -->
+
+	<servlet>
+		<display-name>Remote API Servlet</display-name>
+		<servlet-name>RemoteApiServlet</servlet-name>
+		<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RemoteApiServlet</servlet-name>
+		<url-pattern>/remote_api</url-pattern>
+	</servlet-mapping>
+
+</web-app>

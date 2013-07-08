@@ -10,7 +10,7 @@ function Insert(_web)
 	var datastore = factory.getAsyncDatastoreService();
 	var cache = service.getCacheService();
 
-	var provideUniqueId = function(_resourceName)
+	var provideUniqueId = function(_resourceName) 
 	{
 		var test = function(_tries, e)
 		{
@@ -20,6 +20,7 @@ function Insert(_web)
 			try
 			{
 				var result = datastore.get(Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, id)).get();
+
 			}
 			catch(e if e.javaException.getCause && (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException))
 			{
@@ -35,10 +36,12 @@ function Insert(_web)
 	};
 
 	this.insert = function(_resourceName, _resource, _pre, _post)
-	{
+	{	 
 		var resourceName = _resourceName;
 		var metadata = util.getResourceMetadata(resourceName);
-		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
+		if (metadata.isView === true) { 
+		    resourceName = metadata.lookingAt; 
+		}
 
 		var errorStatus = false;
 
@@ -60,13 +63,13 @@ function Insert(_web)
 			var id = _resource.id || provideUniqueId(resourceName);
 			var entity = incoming.createEntity(resourceName, id);
 			var result = {};
-
 			var callback = function()
 			{
-				result.id = id;
+			    result.id = id;
 				result.errors = this.allErrors();
 
 				incoming.bookkeeping(entity);
+			    util.info("bookkeeping completed");
 
 				if (util.isEmpty(result.errors) === true)
 				{
@@ -78,7 +81,15 @@ function Insert(_web)
 					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
 												function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
 
-					if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
+					if (util.hasValue(written) === true) {
+					    try{
+					    cache.put(entity.getKey(), entity);
+					    }
+					    catch(e){
+						util.info("ERROR in insert.js");
+						util.info(e.message, e.stack);
+					    }
+					}
 
 					if (this.resourceMetadata.isAudited === true)
 					{
