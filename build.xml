@@ -451,9 +451,12 @@
 	</target>
 	<target name="test2" depends="cinttest" />
 	<target name="trydownload">
+	  <sequential>
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
 	       dest="env/AppEngineSDK"
 	       verbose="true" />
+	  <unzip src="env/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="env/AppEngineSDK" />
+	  </sequential>
 	</target>
 	<target name="test" depends="redeploy, trydownload">
 	   	<property name="run.class.path" refId="test.class.path"/>
