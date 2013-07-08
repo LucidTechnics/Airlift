@@ -449,13 +449,27 @@
 		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
 	   </javadoc>
 	</target>
+	
 	<target name="test2" depends="cinttest" />
+	
+	<target name="testdirstuff" if="newdir.sdk.present">
+	  <echo message="the DIRECTORY is present" />
+	</target>
+	
+	<target name="testfilestuff" if="newfile.sdk.present">
+	  <echo message="the FILE is present" />
+	</target>
+
 	<target name="trydownload">
 	  <sequential>
-	  <get src="http://www.colorado.edu/conflict/peace/download/peace.zip"
+	 <available file="${src}/AppEngineSDK" type="dir" property="newdir.sdk.present"/>
+	 <antcall target="testdirstuff" />
+	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
 	       dest="${src}/AppEngineSDK"
 	       verbose="true" />
-	  <unzip src="${src}/AppEngineSDK/peace.zip" dest="${src}/AppEngineSDK" />
+	  <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" property="newfile.sdk.present"/>
+	  <antcall target="testfilestuff" />
+	  <!-- <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" /> -->
 	  </sequential>
 	</target>
 	<target name="test" depends="redeploy, trydownload">
