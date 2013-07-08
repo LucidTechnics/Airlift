@@ -449,8 +449,8 @@
 		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
 	   </javadoc>
 	</target>
-
-	<target name="test" depends="redeploy">
+	<target name="test" depends="cinttest" />
+	<target name="test2" depends="redeploy">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">
