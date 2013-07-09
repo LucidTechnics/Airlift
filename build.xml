@@ -462,6 +462,7 @@
 
 	<target name="trydownload">
 	  <sequential>
+	    <mkdir dir="${src}/AppEngineSDK" />
 	 <available file="${src}/AppEngineSDK" type="dir" property="newdir.sdk.present"/>
 	 <antcall target="testdirstuff" />
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
