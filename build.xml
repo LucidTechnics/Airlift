@@ -470,6 +470,7 @@
 
 	<target name="trydownload">
 	  <sequential>
+	    <echo message="Now beginning tests..." />
 	 <mkdir dir="${src}/AppEngineSDK" />
 	 <available file="${src}/AppEngineSDK" type="dir" property="newdir.sdk.present"/>
 	 <antcall target="testdirstuff" />
