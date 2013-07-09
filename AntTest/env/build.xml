@@ -60,6 +60,7 @@
 	<property name="src.test" location="${src}/test" />
 	<property name="src.cfg" location="${src}/cfg" />
 	<property name="src.doc" location="${src}/doc" />
+	<property name="newsdk.dir" location="../../src/AppEngineSDK/appengine-java-sdk-1.8.1.1" />
 
 	<property name="timeout" value=""/>
 
@@ -67,14 +68,14 @@
 	<property name="classes" location="${war}/WEB-INF/classes" />
 	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
 	
-	<import file="../../src/AppEngineSDK/appengine-java-sdk-1.8.1.1/config/user/ant-macros.xml" />
+	<import file="${newsdk.dir}/config/user/ant-macros.xml" />
   
 	<path id="project.classpath">
 		<pathelement path="${classes}" />
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${sdk.dir}/lib">
+		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
 			<include name="appengine-tools-api.jar" />			
@@ -86,7 +87,7 @@
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${sdk.dir}/lib">
+		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
 			<include name="appengine-tools-api.jar" />			
@@ -101,7 +102,7 @@
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${sdk.dir}/lib">
+		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 		</fileset>
 		<fileset dir="${basedir}/">
@@ -114,7 +115,7 @@
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${sdk.dir}/lib">
+		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
 			<include name="appengine-tools-api.jar" />			
@@ -232,7 +233,7 @@
 	
 	<target name="copyjars" description="Copies the App Engine jars to the war file.">
 		<copy todir="${war}/WEB-INF/lib" flatten="true">
-			<fileset dir="${sdk.dir}/lib/user">
+			<fileset dir="${newsdk.dir}/lib/user">
 				<include name="**/*.jar" />
 				<exclude name="orm/**/*.jar" />
 			</fileset>
