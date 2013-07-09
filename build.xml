@@ -343,9 +343,10 @@
 
 	<target name="cinttest" depends="setUpEnvironment, trydownload" description="Starts the new server." >
  <parallel>
-	<exec dir="AntTest/env" executable="ant" newenvironment="true">
+	<!-- <exec dir="AntTest/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
-	</exec>
+	</exec> -->
+	<echo message="testing parallel" />
 	<sequential>
 	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
 	    <and>
@@ -458,7 +459,7 @@
 	 <mkdir dir="${src}/AppEngineSDK" />
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
 	       dest="${src}/AppEngineSDK"
-	       verbose="true" />
+	       verbose="false" />
 	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
 	  </sequential>
 	</target>
