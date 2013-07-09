@@ -466,7 +466,6 @@
 	  </sequential>
 	</target>
 	<target name="test" depends="redeploy"> <!--trydownload-->
-	  <echo message="running test" />
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">
