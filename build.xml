@@ -343,21 +343,21 @@
 
 	<target name="cinttest" depends="setUpEnvironment, trydownload" description="Starts the new server." >
  <parallel>
-	<!-- <exec dir="AntTest/env" executable="ant" newenvironment="true">
+	<exec dir="AntTest/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
-	</exec> -->
-	<echo message="testing parallel" />
+	</exec>
 	<sequential>
-	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+	  <!-- <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
 	    <and>
 		<http url="http://localhost:8080/_ah/admin/" />
 		<socket server="localhost" port="8080"/>
 	    </and>
-	   </waitfor>
-	   <condition property="isTimeOut"> 
+	   </waitfor> -->
+	  <sleep seconds="30" />
+	   <!-- <condition property="isTimeOut"> 
 	      <isset property="timeout" />
-	     </condition>
-	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
+	     </condition> 
+	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" /> -->
 	   <echo message="...The TEST SERVER is RUNNING..." />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
