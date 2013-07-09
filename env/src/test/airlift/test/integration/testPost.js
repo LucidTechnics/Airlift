@@ -4,7 +4,7 @@ var assert = require('airlift/assert');
 exports['testPOST'] = function(_assert)
 {
 
-    var tempString = Packages.java.lang.String("fullName=BBBBBB&emailAddress=emailTest%40gmail.com&mobilePhoneNumber=9999999999&password=AAAAAAAA");
+    var tempString = Packages.java.lang.String("fullName=EEEEEE&emailAddress=emailTest%40gmail.com&mobilePhoneNumber=9999999999&password=AAAAAAAA");
 
         try {
 

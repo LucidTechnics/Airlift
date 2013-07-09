@@ -67,7 +67,7 @@
 	<property name="classes" location="${war}/WEB-INF/classes" />
 	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
 	
-	<import file="AppEngineSDK/appengine-java-sdk-1.8.1.1/config/user/ant-macros.xml" />
+	<import file="../../src/AppEngineSDK/appengine-java-sdk-1.8.1.1/config/user/ant-macros.xml" />
   
 	<path id="project.classpath">
 		<pathelement path="${classes}" />

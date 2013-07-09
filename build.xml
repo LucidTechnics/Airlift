@@ -309,13 +309,13 @@
 	</target>
 
 	<target name="setUpEnvironment" depends="env" >
-	  <delete dir ="../AntTest/env" />
-	  <mkdir dir="../AntTest/env" />
-	  <unzip src = "${downloads}/${jar}-env.zip" dest = "../AntTest/env" />
+	  <delete dir ="AntTest/env" />
+	  <mkdir dir="AntTest/env" />
+	  <unzip src = "${downloads}/${jar}-env.zip" dest = "AntTest/env" />
 	</target>
 
 	<target name="startserver" depends="setUpEnvironment" description="Starts the new server." >
-	  <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	  <exec dir="AntTest/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
 	</exec>
 	</target>
@@ -333,7 +333,7 @@
 	     </condition>
 	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtestns" />
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
@@ -341,9 +341,9 @@
 	</sequential>
 	</target>
 
-	<target name="cinttest" depends="setUpEnvironment" description="Starts the new server." >
+	<target name="cinttest" depends="setUpEnvironment, trydownload" description="Starts the new server." >
  <parallel>
-	<exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	<exec dir="AntTest/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
 	</exec>
 	<sequential>
@@ -359,11 +359,12 @@
 	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
 	   <echo message="...The TEST SERVER is RUNNING..." />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtest" />
 	     
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
+	   <delete dir="${src}/AppEngineSDK" />
 	   <antcall target="exitDev" />
 	</sequential>
 </parallel>
@@ -373,15 +374,15 @@
 	<target name="exitDev" depends="exitDevML, exitDevWin" />
 
 	<target name="exitDevML" depends="checkos" if="isLinuxMac">
-<exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
+	  <exec dir="AntTest/env/src/bash" executable="bash" failonerror="false">
 	  <arg value="killserver.sh" />
 	</exec>
 </target>
 
 <target name="exitDevWin" depends="checkos" if="isWindows">
-<!-- <exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
+<exec dir="AntTest/env/src/bash" executable="bash" failonerror="false">
 	  <arg value="killserver.bat" />
-	</exec> -->
+	</exec>
 </target>
 
 <target name="checkos">
@@ -450,43 +451,18 @@
 	   </javadoc>
 	</target>
 	
-	<target name="test2" depends="cinttest" />
-	
-	<target name="testdirstuff" if="newdir.sdk.present">
-	  <echo message="the DIRECTORY is present" />
-	</target>
-	
-	<target name="testfilestuff" if="newfile.sdk.present">
-	  <echo message="the FILE is present" />
-	</target>
-
-	<target name="testantmacro" if="newantmacro.sdk.present">
-	  <echo message="the UNZIPPED ANT FILE is present" />
-	</target>
-
-	<target name="testunzipfolder" if="unzipfolder.sdk.present">
-	  <echo message="the UNZIPPED ANT FOLDER is present" />
-	</target>
+	<target name="test" depends="cinttest" />
 
 	<target name="trydownload">
 	  <sequential>
-	    <echo message="Now beginning tests..." />
 	 <mkdir dir="${src}/AppEngineSDK" />
-	 <available file="${src}/AppEngineSDK" type="dir" property="newdir.sdk.present"/>
-	 <antcall target="testdirstuff" />
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
 	       dest="${src}/AppEngineSDK"
 	       verbose="true" />
-	  <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" property="newfile.sdk.present"/>
-	  <antcall target="testfilestuff" />
 	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
-	   <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1" type="dir" property="unzipfolder.sdk.present"/>
-	  <antcall target="testunzipfolder" />
-	  <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1/config/user/ant-macros.xml" property="newantmacro.sdk.present"/>
-	  <antcall target="testantmacro" />
 	  </sequential>
 	</target>
-	<target name="test" depends="redeploy, trydownload">
+	<target name="test2" depends="redeploy, trydownload">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">

@@ -4,7 +4,7 @@ var assert = require('airlift/assert');
 exports['testGET'] = function(_assert)
 {
         try {
-	    var url = new Packages.java.net.URL("http://localhost:8080/a/registration/c5760cb47638"); //Insert the URL
+	    var url = new Packages.java.net.URL("http://localhost:8080/a/registration/9c77949d1c53"); //Insert the URL
 	    var Stream = url.openStream();
 	    var InputStreamReader = new Packages.java.io.InputStreamReader(Stream);
 	    var reader = new Packages.java.io.BufferedReader(InputStreamReader);

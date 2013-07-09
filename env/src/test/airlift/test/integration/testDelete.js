@@ -7,7 +7,7 @@ exports['testDELETE'] = function(_assert)
         try {
 	    
 	    var URL = Packages.java.net.URL;
-            var theUrl = new URL("http://localhost:8080/a/registration/97a0c443349f");
+            var theUrl = new URL("http://localhost:8080/a/registration/63dde05dd20b");
             var connection = Packages.java.net.HttpURLConnection(theUrl.openConnection());
             connection.setDoOutput(true);
             connection.setRequestMethod("DELETE");

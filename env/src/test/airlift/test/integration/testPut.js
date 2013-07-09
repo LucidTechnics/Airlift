@@ -9,7 +9,7 @@ exports['testPUT'] = function(_assert)
         try {
 
 	    var URL = Packages.java.net.URL;
-            var theUrl = new URL("http://localhost:8080/a/registration/ca57430d87e2");
+            var theUrl = new URL("http://localhost:8080/a/registration/9c77949d1c53");
             var connection = Packages.java.net.HttpURLConnection(theUrl.openConnection());
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");

@@ -1,0 +1,107 @@
+##
+## Build specific variables
+##
+
+##
+## appName and package name are pushed via token replacement into web.xml.
+##
+package=com.${appName}
+
+description=${appName} is a web application.
+
+deployDir=${basedir}/deploy
+
+version=alpha-0.10
+
+airlift.namespace=
+##
+## Use this field to set the default mime type for your handlers.
+## You can always override this value using the setType method
+## on the handler's CONTENT_CONTEXT.
+##
+airlift.default.mime.type=text/html
+
+##
+## Default time zone for all requests
+##
+airlift.timezone=America/New_York
+
+##
+## Session duration in seconds. If not set Airlift defaults to 1200
+## seconds or 20 minutes
+##
+## Setting time out to two days ...
+##
+airlift.session.timeout.duration=172800
+
+##
+## Use the following to set the length of the truncated SHA1
+## automatically generated GUID.
+##
+airlift.truncated.sha1.id.length=10
+
+#Airlift will report the java exception it encounters directly to
+#the web page. Good for development. you will want to turn this off
+#in Production.
+
+airlift.report.java.exception=no
+
+##
+##Airlift supports symmetric encryption and decryption 
+##
+airlift.cipher.password=
+airlift.initial.vector=
+
+##
+##Airlift will not compile JavaScript scripts when not in production
+##mode.  For optimal performance set this parameter to yes.
+##
+airlift.production.mode=yes
+
+##
+##Development user security is only turned off when production mode
+##is not "yes" this makes it easy to bypass security in development
+##but not in production.  To turn off user security in development 
+##but not in production, simply set this parameter to 'no'.
+##
+airlift.dev.user.security=no
+
+##
+## Sets the application version on upload
+##
+airlift.application=test-airlift-env
+airlift.application.version=test-20130424-0
+airlift.base=http://${airlift.application}.appspot.com
+
+##
+##Replace the default user service with your own user service
+##
+airlift.user.service=airlift.servlet.rest.GoogleUserService
+
+##
+## Airlift automatic auditing
+##
+airlift.auditing.insert=on
+airlift.auditing.get=off
+airlift.auditing.update=on
+airlift.auditing.delete=on
+
+##
+## Currently, Airlift is NOT a threadsafe application by default.  We
+## are working on making it threadsafe.
+##
+airlift.threadsafe=false
+
+##
+## Task queue parameter settings
+##
+
+queue.storage.limit=10G
+queue.rate=500/s
+queue.bucket.size=100
+queue.concurrent.requests=100
+task.retry.limit=5
+task.age.limit=60m
+task.min.backoff.seconds=60
+task.max.backoff.seconds=120
+task.max.doublings=2
