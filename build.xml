@@ -460,9 +460,17 @@
 	  <echo message="the FILE is present" />
 	</target>
 
+	<target name="testantmacro" if="newantmacro.sdk.present">
+	  <echo message="the UNZIPPED ANT FILE is present" />
+	</target>
+
+	<target name="testunzipfolder" if="unzipfolder.sdk.present">
+	  <echo message="the UNZIPPED ANT FOLDER is present" />
+	</target>
+
 	<target name="trydownload">
 	  <sequential>
-	    <mkdir dir="${src}/AppEngineSDK" />
+	 <mkdir dir="${src}/AppEngineSDK" />
 	 <available file="${src}/AppEngineSDK" type="dir" property="newdir.sdk.present"/>
 	 <antcall target="testdirstuff" />
 	  <get src="http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip"
@@ -470,7 +478,11 @@
 	       verbose="true" />
 	  <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" property="newfile.sdk.present"/>
 	  <antcall target="testfilestuff" />
-	  <!-- <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" /> -->
+	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
+	   <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1" type="dir" property="unzipfolder.sdk.present"/>
+	  <antcall target="testunzipfolder" />
+	  <available file="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1/config/user/ant-macros.xml" property="newantmacro.sdk.present"/>
+	  <antcall target="testantmacro" />
 	  </sequential>
 	</target>
 	<target name="test" depends="redeploy, trydownload">
