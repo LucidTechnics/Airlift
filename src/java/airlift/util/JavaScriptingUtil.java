@@ -286,26 +286,31 @@ public class JavaScriptingUtil
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
 			require.install(getScope());
-			
+			log.info("Stop 5.1");
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
 			_context.evaluateString(getScope(), requireHandler, scriptResource, 1, null);
-
+			log.info("Stop 5.2");
 			Object handle = getScope().get("handle", getScope());
 			java.util.ArrayList argumentList = new java.util.ArrayList();
 
 			Scriptable webContext = _context.newObject(getScope());
+			log.info("Stop 5.3");
 
 			for (String key: this.bindingsMap.keySet())
 			{
 				Object object = Context.javaToJS(this.bindingsMap.get(key), getScope());
+				log.info("Stop 5.4");
 				ScriptableObject.putConstProperty(webContext, key, object);
+				log.info("Stop 5.5");
 			}
 
 			argumentList.add(webContext);
+			log.info("Stop 5.6");
 			Object[] arguments = argumentList.toArray();
 			
 			((Function)handle).call(_context, getScope(), getScope(), arguments);
+			log.info("Stop 5.7");
 		}
 		finally
 		{

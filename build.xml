@@ -372,19 +372,35 @@
 	     </condition> 
 	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" /> -->
 	   <echo message="...The TEST SERVER is RUNNING..." />
+	   <antcall target="doExist" />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtest" />
-	     
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	   <delete dir="${src}/AppEngineSDK" />
-	   <!-- <antcall target="exitDev" /> -->
+	   <antcall target="exitDev" />
 	</sequential>
 </parallel>
 
 	</target>
+	<target name="doExist">
+	  <property name="myprop" value="GET.js,POST.js,COLLECT.js,DELETE.js,PUT.js"/>
+<filelist id="my.files" dir="AntTest/env/war/WEB-INF/classes/handler/registration" files="${myprop}" />
 
+<restrict id="missing.files">
+  <filelist refid="my.files"/>
+  <not>
+    <exists/>
+  </not>
+</restrict>
+
+<property name="missing.files" refid="missing.files" />
+<condition property="pathExist" value="true" else="false">
+    <length string="${missing.files}" length="0" />
+</condition>
+<echo message="Files all found: ${pathExist}" />
+	</target>
 	<target name="exitDev" depends="exitDevML, exitDevWin" />
 
 	<target name="exitDevML" depends="checkos" if="isLinuxMac">
