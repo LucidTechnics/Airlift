@@ -136,7 +136,7 @@ public class JavaScriptingUtil
 	public void executeScript(String _scriptResource, boolean _timeScript, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
-		
+		log.info("Stop 1");
 		long startTime = 0l;
 
 		try
@@ -144,12 +144,17 @@ public class JavaScriptingUtil
 			if (getScope() == null)
 			{
 				resetScope(context);
+				log.info("Stop 1.1");
 			}
 			
 			for (String key: getBindingsMap().keySet())
 			{
+			    log.info("Stop 2");
 				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
+				log.info("Stop 3.  The getBindingsMap.get(key) is: " + (getBindingsMap().get(key)) + " and the key is: " + key);
+			     
 				ScriptableObject.putProperty(getScope(), key, object);
+				log.info("Stop 4");
 			}
 
 			if (_timeScript == true)
@@ -158,7 +163,9 @@ public class JavaScriptingUtil
 			}
 
 			scriptStack.add(_scriptResource);
+			log.info("Stop 5");
 			executeHandler(_scriptResource, context);
+			log.info("Stop 6");
 
 			if (_timeScript == true)
 			{

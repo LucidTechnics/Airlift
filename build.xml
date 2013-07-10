@@ -362,11 +362,9 @@
 	   </waitfor> -->
 	  <sleep seconds="30" />
 	  <condition property="isServerRunning">
-	    <or>
-	    <http url="http://127.0.0.1:8080/_ah/admin/" />
+	   <!-- <http url="http://127.0.0.1:8080/_ah/admin/" /> -->
 	    <http url="http://localhost:8080/_ah/admin/" />
-	    <http url="http://localhost:8080/a/registration/" />
-	    </or>
+	   <!-- <http url="http://localhost:8080/a/registration/" /> -->
 	  </condition>
 	  <antcall target="serverRunningTest" />
 	   <!-- <condition property="isTimeOut"> 
@@ -381,7 +379,7 @@
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	   <delete dir="${src}/AppEngineSDK" />
-	   <antcall target="exitDev" />
+	   <!-- <antcall target="exitDev" /> -->
 	</sequential>
 </parallel>
 
