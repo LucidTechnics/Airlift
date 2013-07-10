@@ -385,7 +385,7 @@
 	</target>
 
 	<!-- Jar -->
-	<target name="test-jar" depends="discoverNodeModules">
+	<target name="test-jar"> <!-- temp removed depends="discoverNodeModules" -->
 
 		<jar destfile="${dist}/lib/${jar}-test.jar"
 		       basedir="${src.test}/airlift/test"

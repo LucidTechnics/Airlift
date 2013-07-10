@@ -136,7 +136,6 @@ public class JavaScriptingUtil
 	public void executeScript(String _scriptResource, boolean _timeScript, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
-		log.info("Stop 1");
 		long startTime = 0l;
 
 		try
@@ -144,17 +143,14 @@ public class JavaScriptingUtil
 			if (getScope() == null)
 			{
 				resetScope(context);
-				log.info("Stop 1.1");
 			}
 			
 			for (String key: getBindingsMap().keySet())
 			{
-			    log.info("Stop 2");
 				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
-				log.info("Stop 3.  The getBindingsMap.get(key) is: " + (getBindingsMap().get(key)) + " and the key is: " + key);
+			
 			     
 				ScriptableObject.putProperty(getScope(), key, object);
-				log.info("Stop 4");
 			}
 
 			if (_timeScript == true)
@@ -163,9 +159,7 @@ public class JavaScriptingUtil
 			}
 
 			scriptStack.add(_scriptResource);
-			log.info("Stop 5");
 			executeHandler(_scriptResource, context);
-			log.info("Stop 6");
 
 			if (_timeScript == true)
 			{
@@ -286,31 +280,24 @@ public class JavaScriptingUtil
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
 			require.install(getScope());
-			log.info("Stop 5.1");
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
 			_context.evaluateString(getScope(), requireHandler, scriptResource, 1, null);
-			log.info("Stop 5.2");
 			Object handle = getScope().get("handle", getScope());
 			java.util.ArrayList argumentList = new java.util.ArrayList();
 
 			Scriptable webContext = _context.newObject(getScope());
-			log.info("Stop 5.3");
 
 			for (String key: this.bindingsMap.keySet())
 			{
 				Object object = Context.javaToJS(this.bindingsMap.get(key), getScope());
-				log.info("Stop 5.4");
 				ScriptableObject.putConstProperty(webContext, key, object);
-				log.info("Stop 5.5");
 			}
 
 			argumentList.add(webContext);
-			log.info("Stop 5.6");
 			Object[] arguments = argumentList.toArray();
 			
 			((Function)handle).call(_context, getScope(), getScope(), arguments);
-			log.info("Stop 5.7");
 		}
 		finally
 		{

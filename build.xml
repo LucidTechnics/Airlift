@@ -200,7 +200,6 @@
 		<copy todir="${stage}" >
 			<fileset dir="${src}" includes="**/*.xml, **/*log4j.properties, **/*.bat, **/*.sh, **/*.0, **/*.cf, **/*.conf, **/*.st" />
 		</copy>
-		<sleep seconds="5" />
 
 		<replace dir="${stage}" propertyFile="token.properties">
 		  <include name="**/*.*"/>
@@ -223,13 +222,11 @@
 			<src path="${src.java}"/>
 			<compilerarg line="-version" compiler="modern" />
 		</javac>
-		<sleep seconds="5" />
 
 		<javac includeantruntime="false" destdir="${classes}" debug="on" source="${java.source}" target="${java.target}">
 			<classpath refid="build.class.path"/>
 			<src path="${src.test}"/>
 		</javac>
-		<sleep seconds="5" />
 	</target>
 
 	<!-- Jar -->
@@ -372,9 +369,7 @@
 	   </waitfor> -->
 	  <sleep seconds="30" />
 	  <condition property="isServerRunning">
-	   <!-- <http url="http://127.0.0.1:8080/_ah/admin/" /> -->
 	    <http url="http://localhost:8080/_ah/admin/" />
-	   <!-- <http url="http://localhost:8080/a/registration/" /> -->
 	  </condition>
 	  <antcall target="serverRunningTest" />
 	  <antcall target="checkDir" />
