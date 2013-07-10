@@ -312,6 +312,12 @@
 	  <delete dir ="AntTest/env" />
 	  <mkdir dir="AntTest/env" />
 	  <unzip src = "${downloads}/${jar}-env.zip" dest = "AntTest/env" />
+	  <!-- temporary code -->
+	  <mkdir dir="AntTest/env/war/WEB-INF/classes/handler/registration" />
+	  <copy todir="AntTest/env/war/WEB-INF/classes/handler/registration">
+			<fileset dir="env/war/WEB-INF/classes/handler/registration" />
+		</copy>
+	   <!-- temporary code end -->
 	</target>
 
 	<target name="startserver" depends="setUpEnvironment" description="Starts the new server." >
