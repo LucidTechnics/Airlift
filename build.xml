@@ -343,6 +343,11 @@
 	<target name="echo">
 	  <echo message="testing new environment" />
 	</target>
+
+	<target name="serverRunningTest" if="isServerRunning">
+	  <echo message="THE SERVER WAS RESOLVED TO TRUE" />
+	</target>
+
 	<target name="cinttest" depends="setUpEnvironment, trydownload" description="Starts the new server." >
  <parallel>
 	<exec dir="AntTest/env" executable="ant" newenvironment="true">
@@ -356,6 +361,14 @@
 	    </and>
 	   </waitfor> -->
 	  <sleep seconds="30" />
+	  <condition property="isServerRunning">
+	    <or>
+	    <http url="http://127.0.0.1:8080/_ah/admin/" />
+	    <http url="http://localhost:8080/_ah/admin/" />
+	    <http url="http://localhost:8080/a/registration/" />
+	    </or>
+	  </condition>
+	  <antcall target="serverRunningTest" />
 	   <!-- <condition property="isTimeOut"> 
 	      <isset property="timeout" />
 	     </condition> 
@@ -454,7 +467,7 @@
 	   </javadoc>
 	</target>
 	
-	<target name="test2" depends="cinttest" />
+	<target name="test" depends="cinttest" />
 
 	<target name="trydownload">
 	  <sequential>
@@ -465,7 +478,7 @@
 	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
 	  </sequential>
 	</target>
-	<target name="test" depends="redeploy"> <!--trydownload-->
+	<target name="test2" depends="redeploy"> <!--trydownload-->
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">
