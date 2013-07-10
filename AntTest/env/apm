@@ -1,2 +1,0 @@
-cd war/WEB-INF/classes;
-npm --prefix ./extlib $1 $2 $3;

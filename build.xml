@@ -309,19 +309,20 @@
 	</target>
 
 	<target name="setUpEnvironment" depends="env" >
-	  <delete dir ="AntTest/env" />
-	  <mkdir dir="AntTest/env" />
-	  <unzip src = "${downloads}/${jar}-env.zip" dest = "AntTest/env" />
-	  <!-- temporary code -->
-	  <mkdir dir="AntTest/env/war/WEB-INF/classes/handler/registration" />
-	  <copy todir="AntTest/env/war/WEB-INF/classes/handler/registration">
-			<fileset dir="env/war/WEB-INF/classes/handler/registration" />
+	  <delete dir ="workspace/env" />
+	  <mkdir dir="workspace/env" />
+	  <unzip src = "${downloads}/${jar}-env.zip" dest = "workspace/env" />
+	  <mkdir dir = "workspace/env/war/WEB-INF/classes" />
+	  <mkdir dir = "workspace/env/war/WEB-INF/classes/handler" />
+	  <mkdir dir = "workspace/env/war/WEB-INF/classes/handler/registration" />
+	  <copy todir="workspace/env/war/WEB-INF/classes/handler/registration">
+			<fileset dir="${src}/test/script/javascript/handler/registration" />
 		</copy>
-	   <!-- temporary code end -->
+
 	</target>
 
 	<target name="startserver" depends="setUpEnvironment" description="Starts the new server." >
-	  <exec dir="AntTest/env" executable="ant" newenvironment="true">
+	  <exec dir="workspace/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
 	</exec>
 	</target>
@@ -339,7 +340,7 @@
 	     </condition>
 	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
+	   <exec dir="workspace/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtestns" />
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
@@ -356,7 +357,7 @@
 
 	<target name="cinttest" depends="setUpEnvironment, trydownload" description="Starts the new server." >
  <parallel>
-	<exec dir="AntTest/env" executable="ant" newenvironment="true">
+	<exec dir="workspace/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
 	</exec>
 	<sequential>
@@ -381,7 +382,7 @@
 	   <echo message="...The TEST SERVER is RUNNING..." />
 	   <antcall target="doExist" />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="AntTest/env" executable="ant" newenvironment="true">
+	   <exec dir="workspace/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtest" />
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
@@ -394,39 +395,39 @@
 
 	<target name="checkDir">
 	  <condition property="handler1" value="true" else="false">
-	    <available file="AntTest/env" type="dir" property="handlerA"/>
+	    <available file="workspace/env" type="dir" property="handlerA"/>
 	  </condition>
-	  <echo message="AntTest/env found?: ${handler1}" />
+	  <echo message="workspace/env found?: ${handler1}" />
 	 
           <condition property="handler2" value="true" else="false">
-	      <available file="AntTest/env/war" type="dir" property="blah"/>
+	      <available file="workspace/env/war" type="dir" property="blah"/>
 	  </condition>
-	  <echo message="AntTest/env/war found?: ${handler2}" />
+	  <echo message="workspace/env/war found?: ${handler2}" />
 
 	  <condition property="handler3" value="true" else="false">
-	      <available file="AntTest/env/war/WEB-INF" type="dir" property="blaha"/>
+	      <available file="workspace/env/war/WEB-INF" type="dir" property="blaha"/>
 	  </condition>
-	  <echo message="AntTest/env/war/WEB-INF found?: ${handler3}" />
+	  <echo message="workspace/env/war/WEB-INF found?: ${handler3}" />
 
 	  <condition property="handler4" value="true" else="false">
-	      <available file="AntTest/env/war/WEB-INF/classes" type="dir" property="blahaa"/>
+	      <available file="workspace/env/war/WEB-INF/classes" type="dir" property="blahaa"/>
 	  </condition>
-	  <echo message="AntTest/env/war/WEB-INF/classes found?: ${handler4}" />
+	  <echo message="workspace/env/war/WEB-INF/classes found?: ${handler4}" />
 
 	  <condition property="handler5" value="true" else="false">
-	      <available file="AntTest/env/war/WEB-INF/classes/handler" type="dir" property="blahaaa"/>
+	      <available file="workspace/env/war/WEB-INF/classes/handler" type="dir" property="blahaaa"/>
 	  </condition>
-	  <echo message="AntTest/env/war/WEB-INF/classes/handler found?: ${handler5}" />
+	  <echo message="workspace/env/war/WEB-INF/classes/handler found?: ${handler5}" />
 
 	  <condition property="handler6" value="true" else="false">
-	      <available file="AntTest/env/war/WEB-INF/classes/handler/registration" type="dir" property="blaaaaah"/>
+	      <available file="workspace/env/war/WEB-INF/classes/handler/registration" type="dir" property="blaaaaah"/>
 	  </condition>
-	  <echo message="AntTest/env/war/WEB-INF/classes/handler/registration found?: ${handler6}" />
+	  <echo message="workspace/env/war/WEB-INF/classes/handler/registration found?: ${handler6}" />
 	</target>
 
 	<target name="doExist">
 	  <property name="myprop" value="GET.js,POST.js,COLLECT.js,DELETE.js,PUT.js"/>
-<filelist id="my.files" dir="AntTest/env/war/WEB-INF/classes/handler/registration" files="${myprop}" />
+<filelist id="my.files" dir="workspace/env/war/WEB-INF/classes/handler/registration" files="${myprop}" />
 
 <restrict id="missing.files">
   <filelist refid="my.files"/>
@@ -444,13 +445,13 @@
 	<target name="exitDev" depends="exitDevML, exitDevWin" />
 
 	<target name="exitDevML" depends="checkos" if="isLinuxMac">
-	  <exec dir="AntTest/env/src/bash" executable="bash" failonerror="false">
+	  <exec dir="workspace/env/src/bash" executable="bash" failonerror="false">
 	  <arg value="killserver.sh" />
 	</exec>
 </target>
 
 <target name="exitDevWin" depends="checkos" if="isWindows">
-<exec dir="AntTest/env/src/bash" executable="bash" failonerror="false">
+<exec dir="workspace/env/src/bash" executable="bash" failonerror="false">
 	  <arg value="killserver.bat" />
 	</exec>
 </target>
