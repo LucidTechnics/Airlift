@@ -367,6 +367,7 @@
 	   <!-- <http url="http://localhost:8080/a/registration/" /> -->
 	  </condition>
 	  <antcall target="serverRunningTest" />
+	  <antcall target="checkDir" />
 	   <!-- <condition property="isTimeOut"> 
 	      <isset property="timeout" />
 	     </condition> 
@@ -379,11 +380,44 @@
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	   <delete dir="${src}/AppEngineSDK" />
-	   <antcall target="exitDev" />
+	   <!-- <antcall target="exitDev" /> -->
 	</sequential>
 </parallel>
 
 	</target>
+
+	<target name="checkDir">
+	  <condition property="handler1" value="true" else="false">
+	    <available file="AntTest/env" type="dir" property="handlerA"/>
+	  </condition>
+	  <echo message="AntTest/env found?: ${handler1}" />
+	 
+          <condition property="handler2" value="true" else="false">
+	      <available file="AntTest/env/war" type="dir" property="blah"/>
+	  </condition>
+	  <echo message="AntTest/env/war found?: ${handler2}" />
+
+	  <condition property="handler3" value="true" else="false">
+	      <available file="AntTest/env/war/WEB-INF" type="dir" property="blaha"/>
+	  </condition>
+	  <echo message="AntTest/env/war/WEB-INF found?: ${handler3}" />
+
+	  <condition property="handler4" value="true" else="false">
+	      <available file="AntTest/env/war/WEB-INF/classes" type="dir" property="blahaa"/>
+	  </condition>
+	  <echo message="AntTest/env/war/WEB-INF/classes found?: ${handler4}" />
+
+	  <condition property="handler5" value="true" else="false">
+	      <available file="AntTest/env/war/WEB-INF/classes/handler" type="dir" property="blahaaa"/>
+	  </condition>
+	  <echo message="AntTest/env/war/WEB-INF/classes/handler found?: ${handler5}" />
+
+	  <condition property="handler6" value="true" else="false">
+	      <available file="AntTest/env/war/WEB-INF/classes/handler/registration" type="dir" property="blaaaaah"/>
+	  </condition>
+	  <echo message="AntTest/env/war/WEB-INF/classes/handler/registration found?: ${handler6}" />
+	</target>
+
 	<target name="doExist">
 	  <property name="myprop" value="GET.js,POST.js,COLLECT.js,DELETE.js,PUT.js"/>
 <filelist id="my.files" dir="AntTest/env/war/WEB-INF/classes/handler/registration" files="${myprop}" />
