@@ -520,7 +520,7 @@
 	   </javadoc>
 	</target>
 	
-	<target name="test" depends="cinttest" />
+	<target name="test2" depends="cinttest" />
 
 	<target name="trydownload">
 	  <sequential>
@@ -531,7 +531,7 @@
 	  <unzip src="${src}/AppEngineSDK/appengine-java-sdk-1.8.1.1.zip" dest="${src}/AppEngineSDK" />
 	  </sequential>
 	</target>
-	<target name="test2" depends="redeploy"> <!--trydownload-->
+	<target name="test" depends="redeploy"> <!--trydownload-->
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">
