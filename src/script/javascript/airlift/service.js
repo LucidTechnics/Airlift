@@ -86,9 +86,9 @@ function CacheService()
 	};
 }
 
-exports.getQueueService = function(_name)
+exports.getQueueService = function(_name, _method)
 {
-	return new QueueService(_name);
+        return new QueueService(_name, _method);
 };
 
 exports.getAppIdentityService = function()
