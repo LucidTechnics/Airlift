@@ -199,6 +199,12 @@
 		<delete dir="${stage}" />
 	</target>
 
+	<target name="clean-ds">
+	    <delete>
+		   <fileset dir="${war}/WEB-INF/appengine-generated" includes="**/*"  />
+		</delete>
+	</target>
+
 	<target name="clean-war"	 >
 		<delete>
 		   <fileset dir="${classes}" >
