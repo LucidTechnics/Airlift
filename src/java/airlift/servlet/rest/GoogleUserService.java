@@ -20,7 +20,7 @@ package airlift.servlet.rest;
 public class GoogleUserService
    implements UserService
 {
-	
+	protected RestContext restContext;
 	/** The http servlet request. */
 	private javax.servlet.http.HttpServletRequest httpServletRequest;
 	
@@ -34,6 +34,7 @@ public class GoogleUserService
 	 */
 	private javax.servlet.http.HttpServletRequest getHttpServletRequest() { return httpServletRequest; }
 	
+	public RestContext getRestContext(){return restContext;}
 	/**
 	 * Gets the user service.
 	 *
@@ -46,6 +47,7 @@ public class GoogleUserService
 	 */
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest) { httpServletRequest = _httpServletRequest; }
 	
+	public void setRestContext(RestContext _restContext){restContext=_restContext;}
 	/**
 	 * Sets the user service.
 	 *

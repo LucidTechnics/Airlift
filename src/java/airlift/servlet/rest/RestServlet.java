@@ -353,7 +353,7 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 
-		UserService userService = getUserService(_request);
+		UserService userService = getUserService(_request,restContext);
 		AbstractUser user = userService.getCurrentUser();
 
 		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"));
@@ -1040,7 +1040,7 @@ public class RestServlet
 	 * @param _httpServletRequest the _http servlet request
 	 * @return the user service
 	 */
-	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest)
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest, RestContext _restContext)
 	{
 		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
 
@@ -1050,6 +1050,7 @@ public class RestServlet
 		{
 			userService = (userServiceClassName != null) ? (UserService) Class.forName(userServiceClassName).newInstance() : new GoogleUserService();
 			userService.setHttpServletRequest(_httpServletRequest);
+			userService.setRestContext(_restContext);
 		}
 		catch(Throwable t)
 		{
