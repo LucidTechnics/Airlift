@@ -103,50 +103,53 @@ public class RestfulSecurityContext
 	 * @param _uriIsACollection the _uri is a collection
 	 * @return true, if successful
 	 */
-	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _domainName, boolean _uriIsACollection)
+	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _resourceName, boolean _uriIsACollection)
 	{
 		boolean allowed = true;
 		
 		try
 		{
-/*			airlift.generator.Securable securable = (airlift.generator.Securable) _appProfile.getAnnotation(_domainName, airlift.generator.Securable.class);
-
-			if (securable!= null && securable.isSecurable() == true)
+			Class appProfileClass = Class.forName("airlift.app.AppProfile");
+			airlift.AppProfile appProfile = (airlift.AppProfile) appProfileClass.newInstance();
+			java.util.Map<String, java.util.Set<String>> securityRoles = appProfile.getSecurityRoles(_resourceName);
+			java.util.Set<String> roleSet = securityRoles.get(_method);
+			
+			if (securityRoles != null && securityRoles.isEmpty() == false)
 			{
 				if ("GET".equalsIgnoreCase(_method) == true)
 				{
 					if (_uriIsACollection == true)
 					{
-						allowed = checkAllowed(createRoleSet(securable.collectRoles()), _user);
+						allowed = checkAllowed(securityRoles.get("COLLECT"), _user);
 					}
 					else
 					{
-						allowed = checkAllowed(createRoleSet(securable.getRoles()), _user);
+						allowed = checkAllowed(securityRoles.get("GET"), _user);
 					}
 				}
 				else if ("POST".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.postRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("POST"), _user);
 				}
 				else if ("PUT".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.putRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("PUT"), _user);
 				}
 				else if ("DELETE".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.deleteRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("DELETE"), _user);
 				}
 				else if ("TRACE".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.traceRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("TRACE"), _user);
 				}
 				else if ("HEAD".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.headRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("HEAD"), _user);
 				}
 				else if ("OPTIONS".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(createRoleSet(securable.optionsRoles()), _user);
+					allowed = checkAllowed(securityRoles.get("OPTIONS"), _user);
 				}
 			}
 
@@ -154,12 +157,12 @@ public class RestfulSecurityContext
 			
 			if (allowed == false)
 			{
-				log.warning("User: " + userId + " is not allowed method: " + _method + " access to this domain: " + _domainName);
+				log.warning("User: " + userId + " is not allowed method: " + _method + " access to this resource: " + _resourceName);
 			}
 			else
 			{
-				log.info("User: " + userId + " is allowed method: " + _method + " access to this domain: " + _domainName);
-			} */
+				log.info("User: " + userId + " is allowed method: " + _method + " access to this resource: " + _resourceName);
+			}
 		}
 		catch(Throwable t)
 		{
@@ -198,11 +201,13 @@ public class RestfulSecurityContext
 	 */
 	private boolean checkAllowed(java.util.Set<String> _roleSet, AirliftUser _user)
 	{
+		java.util.Set<String> roleSet = (_roleSet != null) ? new java.util.HashSet<String>(_roleSet) : new java.util.HashSet<String>();
+		
 		boolean allowed = false;
 		
-		if (_roleSet.contains("noone") == false)
+		if (roleSet.contains("noone") == false)
 		{
-			if (_roleSet.contains("all") == true)
+			if (roleSet.contains("all") == true)
 			{
 				allowed = true;
 			}
@@ -212,7 +217,7 @@ public class RestfulSecurityContext
 
 				if (userRoleSet.isEmpty() == false)
 				{
-					boolean changeSet = userRoleSet.retainAll(_roleSet);					
+					boolean changeSet = userRoleSet.retainAll(roleSet);					
 					allowed = (userRoleSet.isEmpty() == false);
 				}
 			}
