@@ -10,11 +10,9 @@ before_script:
   - cd workspace/AppEngineSDK
   - wget http://googleappengine.googlecode.com/files/@APP.ENGINE.SDK@.zip
   - unzip @APP.ENGINE.SDK@.zip
-  - cd @APP.ENGINE.SDK@
-  - mv * .[^.]* ..
-  - cd ../../..
-  - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/lib/agent/app-engine-agent.jar
-  - export AIRLIFT_APP_ENGINE_DEV_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK
+  - cd ../..
+  - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@/lib/agent/app-engine-agent.jar
+  - export AIRLIFT_APP_ENGINE_DEV_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@
 
 # whitelist
 branches:
