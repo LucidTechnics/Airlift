@@ -1,4 +1,23 @@
-var log = Packages.java.util.logging.Logger.getLogger('airlift');
+var print = function print(_message)
+{
+	Packages.java.lang.System.out.println(_message);
+};
+try{
+    var log = Packages.java.util.logging.Logger.getLogger('airlift');
+
+    var handlerArray = log.getHandlers();
+    if(handlerArray.length == 0){
+	log.setLevel(Packages.java.util.logging.Level.ALL);
+	var handler = new Packages.java.util.logging.ConsoleHandler();
+	handler.setFormatter(new Packages.java.util.logging.SimpleFormatter());
+	handler.setLevel(Packages.java.util.logging.Level.ALL);
+	log.addHandler(handler);
+    }
+}
+catch(e){
+    print(e.message);
+    print(e.stack);
+}
 
 exports.typeOf = function typeOf(value)
 {

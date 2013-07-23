@@ -77,13 +77,13 @@ exports.run = function(_name, _test)
 	Packages.java.lang.System.out.println('\nMODULE: ' + _name);
 	var assertion = new Assert(), status = 'succeeded', message = '';
 	
-	if (_test.setUp)  { try { _test.setUp(); } catch(_e) { 	status = 'setup failed'; message = _e.message; } }
+	if (_test.setUp)  { try { _test.setUp(assertion); } catch(_e) { 	status = 'setup failed'; message = _e.message; } }
 
-	var testCount = 0;
-	var failedAssertionCount= 0;
-					
+        var testCount = 0;
+	var failedAssertionCount= 0;		
 	if (status === 'succeeded')
 	{
+	    util.info("succeeded is true");
 		for (var item in _test)
 		{
 			if (typeof _test[item] === 'function' && /^test/i.test(item) === true)
@@ -105,7 +105,7 @@ exports.run = function(_name, _test)
 			}
 		}
 
-		if (_test.tearDown) { try { _test.tearDown(); } catch(_e) { status = 'tear down failed'; message = _e.message; } }
+		if (_test.tearDown) { try { _test.tearDown(assertion); } catch(_e) { status = 'tear down failed'; message = _e.message; } }
 	}
 
 	Packages.java.lang.System.out.println('... module run completed.');

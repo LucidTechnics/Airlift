@@ -1,7 +1,6 @@
 ##
 ## Build specific variables
 ##
-
 ##
 ## appName and package name are pushed via token replacement into web.xml.
 ##

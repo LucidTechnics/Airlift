@@ -1,7 +1,7 @@
 <project default="generate" basedir=".">
 	<basename property="appName" file="analytics-web" />
 	<property environment="env"/>
-	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_HOME}" />
+	<property name="newsdk.dir" location="${env.AIRLIFT_APP_ENGINE_DEV_HOME}" />
 
 	<condition property="airlift.production.mode" value="yes">
 		<and><equals arg1="${airlift.cache}" arg2="yes" casesensitive="false" trim="true"/></and>
@@ -60,7 +60,6 @@
 	<property name="src.test" location="${src}/test" />
 	<property name="src.cfg" location="${src}/cfg" />
 	<property name="src.doc" location="${src}/doc" />
-	<property name="newsdk.dir" location="../../src/AppEngineSDK/appengine-java-sdk-1.8.1.1" />
 
 	<property name="timeout" value=""/>
 
@@ -75,10 +74,11 @@
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${newsdk.dir}/lib">
-			<include name="shared/**/*.jar" />
-			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+		<fileset dir="${newsdk.dir}">
+			<include name="lib/shared/**/*.jar" />
+			<include name="lib/appengine-remote-api.jar" />
+			<include name="lib/appengine-tools-api.jar" />
+			<include name="lib/testing/appengine-testing.jar" />
 		</fileset>
 	</path>
 
@@ -90,12 +90,38 @@
 		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
 		</fileset>
 		<fileset dir="${dist}">
 			<include name="**/*scripts.jar"/>
 		</fileset>
 	</path>
+
+	<path id="appserver.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${newsdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />
+			<include name="impl/**/*.jar" />
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- TEMPORARY -->
+	<property name="appserver.classpath" refid="appserver.classpath" />
+	<property name="airlift.devtest.port" value="8080" />
+	<!-- TEMPORARY-END -->
 
 	<path id="precompile.classpath">
 	<pathelement path="${classes}" />
@@ -108,6 +134,7 @@
 		<fileset dir="${basedir}/">
 			<include name="airlift-*core.jar" />
 		</fileset>
+				
 	</path>
 	
 	<path id="test.class.path">
@@ -118,7 +145,8 @@
 		<fileset dir="${newsdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
 		</fileset>
 		<fileset dir="${dist}">
 			<include name="**/*test*.jar"/>
@@ -233,11 +261,12 @@
 	
 	<target name="copyjars" description="Copies the App Engine jars to the war file.">
 		<copy todir="${war}/WEB-INF/lib" flatten="true">
-			<fileset dir="${newsdk.dir}/lib/user">
-				<include name="**/*.jar" />
-				<exclude name="orm/**/*.jar" />
+			<fileset dir="${newsdk.dir}/lib">
+				<include name="user/**/*.jar" />
+				<exclude name="user/orm/**/*.jar" />
 			</fileset>
 		</copy>
+		<!-- I added -->
 	</target>
 
 	<target name="clean-appengine-generated">
@@ -308,12 +337,13 @@
 
 	<target name="compile" depends="copyjars, prepareSource"	description="Compiles Java source">
 		<javac includeantruntime="false" srcdir="src"	destdir="${classes}" classpathref="project.classpath" debug="on" />
+
 	</target>
 
-	<target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
+	  <target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
 	  <dev_appserver war="${war}">
 		 <options>
-			    <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
+			   <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
 		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
 				<arg value="--jvm_flag=-Xmx1024m"/>
 
@@ -385,7 +415,7 @@
 	</target>
 
 	<!-- Jar -->
-	<target name="test-jar"> <!-- temp removed depends="discoverNodeModules" -->
+	<target name="test-jar" depends="discoverNodeModules">
 
 		<jar destfile="${dist}/lib/${jar}-test.jar"
 		       basedir="${src.test}/airlift/test"
@@ -428,19 +458,17 @@
 	</target> 
 
 <target name="integrationtest" depends="test-jar">
-	   	<property name="run.class.path" refId="test.class.path"/>
-		<echo message="${run.class.path}"/>
-		<sleep seconds="60" />
+		<echo message="${appserver.classpath}"/>
 		<script language="javascript" src="airlift/integrationtest.js">
-		    <classpath refid="test.class.path"/> 			
+		    <classpath refid="appserver.classpath"/> 			
 		</script>
 	</target>
 
-<target name="integrationtestns" depends="test-jar">
-	   	<property name="run.class.path" refId="test.class.path"/>
-		<echo message="${run.class.path}"/>
-		<script language="javascript" src="airlift/integrationtest.js">
-		    <classpath refid="test.class.path"/> 			
+<target name="inttest" depends="test-jar">
+	   	<echo message="${appserver.classpath}"/>
+		<sleep seconds = "20" />
+		<script language="javascript" src="airlift/inttest.js">
+		    <classpath refid="appserver.classpath"/> 			
 		</script>
 	</target>
 

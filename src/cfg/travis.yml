@@ -1,0 +1,26 @@
+# Make sure to edit this file within src/cfg/travis.yml to ensure that your modifications are not overwritten by the build.
+
+language: java
+jdk:
+  - openjdk7
+
+before_script:
+  - mkdir workspace/AppEngineSDK
+  - cd workspace/AppEngineSDK
+  - wget http://googleappengine.googlecode.com/files/@APP.ENGINE.SDK@.zip
+  - unzip @APP.ENGINE.SDK@.zip
+  - cd ../..
+  - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/lib/agent/app-engine-agent.jar
+  - export AIRLIFT_APP_ENGINE_DEV_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK
+
+# whitelist
+branches:
+  only:
+    - master
+    - airlift_2.0_development
+    - testEnhance
+    - testEnhance2
+
+notifications:
+  email:
+    - ci@lucidtechnics.com
