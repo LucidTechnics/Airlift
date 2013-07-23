@@ -328,13 +328,17 @@
 	<target name="setUpEnvironment" depends="env" >
 	  <delete dir ="workspace/env" />
 	  <mkdir dir="workspace/env" />
-	  <unzip src = "${downloads}/${jar}-env.zip" dest = "workspace/env" />
-	  <mkdir dir = "workspace/env/war/WEB-INF/classes" />
-	  <mkdir dir = "workspace/env/war/WEB-INF/classes/handler" />
-	  <mkdir dir = "workspace/env/war/WEB-INF/classes/handler/registration" />
+	  <exec dir="." executable="unzip" newenvironment="false">
+	    <arg value="-u" />
+	    <arg value="${downloads}/${jar}-env.zip" />
+	    <arg value="-d" />
+	    <arg value= "${rootDir}/workspace/env"/>
+	  </exec>
+	  <!-- <unzip src = "${downloads}/${jar}-env.zip" dest = "workspace/env" /> -->
+	  <antcall target="checkDir" />
 	  <copy todir="workspace/env/war/WEB-INF/classes/handler/registration">
 			<fileset dir="${src}/test/script/javascript/handler/registration" />
-		</copy>
+	  </copy>
 	</target>
 
 	<target name="startserver" depends="setUpEnvironment" description="Starts the new server WITHOUT running integration tests." >
@@ -364,45 +368,31 @@
 	</target>
 
 	<target name="cinttest" depends="setUpEnvironment" description="Starts the new server." >
-	  <antcall target="checkDir" />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   <exec dir="workspace/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtest" />
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
-	   <delete dir="workspace/env" />
+	   <!-- <delete dir="workspace/env" /> -->
 	</target>
 
 	<target name="checkDir">
+
 	  <condition property="handler1" value="true" else="false">
-	    <available file="workspace/env" type="dir" property="handlerA"/>
+	      <available file="workspace/env/dist" type="dir" property="X"/>
 	  </condition>
-	  <echo message="workspace/env found?: ${handler1}" />
-	 
-          <condition property="handler2" value="true" else="false">
-	      <available file="workspace/env/war" type="dir" property="blah"/>
+	  <echo message="workspace/env/dist found?: ${handler1}" />
+
+	  <condition property="handler2" value="true" else="false">
+	      <available file="workspace/env/${jar}-env" type="dir" property="X2"/>
 	  </condition>
-	  <echo message="workspace/env/war found?: ${handler2}" />
+	  <echo message="workspace/env/airlift-beta-0.70_rc_108_734-env found (SHOULD BE FALSE!!)?: ${handler2}" />
 
 	  <condition property="handler3" value="true" else="false">
-	      <available file="workspace/env/war/WEB-INF" type="dir" property="blaha"/>
+	      <available file="workspace/env/airlift" type="dir" property="X3"/>
 	  </condition>
-	  <echo message="workspace/env/war/WEB-INF found?: ${handler3}" />
+	  <echo message="workspace/env/airlift found?: ${handler3}" />
 
-	  <condition property="handler4" value="true" else="false">
-	      <available file="workspace/env/war/WEB-INF/classes" type="dir" property="blahaa"/>
-	  </condition>
-	  <echo message="workspace/env/war/WEB-INF/classes found?: ${handler4}" />
-
-	  <condition property="handler5" value="true" else="false">
-	      <available file="workspace/env/war/WEB-INF/classes/handler" type="dir" property="blahaaa"/>
-	  </condition>
-	  <echo message="workspace/env/war/WEB-INF/classes/handler found?: ${handler5}" />
-
-	  <condition property="handler6" value="true" else="false">
-	      <available file="workspace/env/war/WEB-INF/classes/handler/registration" type="dir" property="blaaaaah"/>
-	  </condition>
-	  <echo message="workspace/env/war/WEB-INF/classes/handler/registration found?: ${handler6}" />
 	</target>
 
 	<target name="createRootPackageDirProperty" >
