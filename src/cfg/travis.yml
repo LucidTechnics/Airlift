@@ -11,7 +11,7 @@ before_script:
   - wget http://googleappengine.googlecode.com/files/@APP.ENGINE.SDK@.zip
   - unzip @APP.ENGINE.SDK@.zip
   - cd ../..
-  - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@/lib/agent/app-engine-agent.jar
+  - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@/lib/agent/appengine-agent.jar
   - export AIRLIFT_APP_ENGINE_DEV_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@
 
 # whitelist
