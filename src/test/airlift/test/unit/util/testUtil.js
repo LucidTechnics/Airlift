@@ -38,13 +38,13 @@ exports['test hasValue exists and isDefined doesn\'t'] = function(_assert)
 exports['test hasValue'] = function(_assert)
 {
 
-     _assert.eq(true, util.hasValue(''), 'hasValue false for empty string');
-     _assert.eq(false, util.hasValue(null), 'hasValue true for null');
-     _assert.eq(true, util.hasValue(true), 'hasValue false for boolean');
-     _assert.eq(true, util.hasValue([]), 'hasValue false for empty array');
-     _assert.eq(true, util.hasValue(-1), 'hasValue false for number');
-     _assert.eq(true, util.hasValue({}), 'hasValue false for empty object');
-     _assert.eq(false, util.hasValue(undefined), 'hasValue true for undefined');
+        _assert.eq(true, util.hasValue(''), 'hasValue false for empty string');
+        _assert.eq(false, util.hasValue(null), 'hasValue true for null');
+        _assert.eq(true, util.hasValue(true), 'hasValue false for boolean');
+        _assert.eq(true, util.hasValue([]), 'hasValue false for empty array');
+        _assert.eq(true, util.hasValue(-1), 'hasValue false for number');
+        _assert.eq(true, util.hasValue({}), 'hasValue false for empty object');
+        _assert.eq(false, util.hasValue(undefined), 'hasValue true for undefined');
 
 };
 
@@ -113,6 +113,25 @@ exports['test create timezone'] = function(_assert)
 	var date = util.date();
 
 	_assert.eq(timezone1.getOffset(date.getTime()), timezone2.getOffset(date.getTime()), 'create timezone did not create the right timezone object');
+};
+
+exports['test formatDate'] = function(_assert)
+{
+        var date = new Date(1375110037982);
+        var formattedDate = util.formatDate(date, 'MMMM dd, yyyy');
+        _assert.eq("July 29, 2013", formattedDate, 'formatted date was incorrect');
+
+        var formattedDate = util.formatDate(date, 'MM/dd/yyyy');
+        _assert.eq("07/29/2013", formattedDate, 'formatted date was incorrect');
+
+        var formattedDate = util.formatDate(date, 'YYYY-MM-dd');
+        _assert.eq("2013-07-29", formattedDate, 'formatted date was incorrect');
+
+        var formattedDate = util.formatDate(date, 'MM/dd/yyyy hh:mm:ss');
+        _assert.eq("07/29/2013 11:00:37", formattedDate, 'formatted date was incorrect');
+
+        var formattedDate = util.formatDate(date, 'EEE, dd MMM yyyy hh:mm:ss zzz');
+        _assert.eq("Mon, 29 Jul 2013 11:00:37 EDT", formattedDate, 'formatted date was incorrect');
 };
 
 exports['test adjust UTC date'] = function(_assert)
