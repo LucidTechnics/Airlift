@@ -35,6 +35,19 @@ exports['test hasValue exists and isDefined doesn\'t'] = function(_assert)
 	_assert.eq(false, !!util.isDefined, 'isDefined function does exist on util. It should not and you should use hasValue instead.');
 };
 
+exports['test hasValue'] = function(_assert)
+{
+
+     _assert.eq(true, util.hasValue(''), 'hasValue false for empty string');
+     _assert.eq(false, util.hasValue(null), 'hasValue true for null');
+     _assert.eq(true, util.hasValue(true), 'hasValue false for boolean');
+     _assert.eq(true, util.hasValue([]), 'hasValue false for empty array');
+     _assert.eq(true, util.hasValue(-1), 'hasValue false for number');
+     _assert.eq(true, util.hasValue({}), 'hasValue false for empty object');
+     _assert.eq(false, util.hasValue(undefined), 'hasValue true for undefined');
+
+};
+
 exports['test create error reporter'] = function(_assert)
 {
 	var errorReporter = util.createErrorReporter();
