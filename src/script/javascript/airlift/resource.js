@@ -8,7 +8,7 @@ function Resource(_web)
 	{
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
 		{
-			throw 'Resource name must be a valid resource';
+			throw 'Resource name must be a valid resource' + _resourceName;
 		}
 		
 		var context = _context || {};
@@ -27,6 +27,7 @@ function Resource(_web)
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
+		context.hasErrors = reporter.hasErrors;
 		
 		if (util.typeOf(context.attributes) === 'object')
 		{
