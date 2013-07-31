@@ -27,6 +27,7 @@ function Resource(_web)
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
+		context.hasErrors = reporter.hasErrors;
 		
 		if (util.typeOf(context.attributes) === 'object')
 		{

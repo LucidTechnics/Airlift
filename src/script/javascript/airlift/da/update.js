@@ -72,7 +72,7 @@ function Update(_web)
 		}
 		catch(e)
 		{
-			util.severe(resourceName, 'encountered exception', e);
+			util.severe(resourceName, 'encountered exception', e.message, e.toString());
 			util.severe('... while inserting', res.json(_resource));
 
 			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));
