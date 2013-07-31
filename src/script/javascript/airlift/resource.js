@@ -8,7 +8,7 @@ function Resource(_web)
 	{
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
 		{
-			throw 'Resource name must be a valid resource';
+			throw 'Resource name must be a valid resource' + _resourceName;
 		}
 		
 		var context = _context || {};
@@ -148,10 +148,10 @@ function Resource(_web)
 
 	this.toString = function toString(_resourceName, _resource, _context)
 	{
-		return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
+		return (this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 		{
 			return _base.append(_name).append(": ").append(_value||"").append("\n");
-		}, _context).toString();
+		}, _context) + ']').toString();
 	};
 
 	this.watch = function watch()
