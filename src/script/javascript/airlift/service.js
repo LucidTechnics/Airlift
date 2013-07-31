@@ -48,7 +48,7 @@ function QueueService(_name, _method)
 					taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
 				}
 			}
-			else if (parameters && parameters.push)
+			else if (parameters && parameters.forEach)
 			{
 				parameters.forEach(function _item)
 				{
