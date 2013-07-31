@@ -39,7 +39,24 @@ function QueueService(_name, _method)
 		
 		for (parameter in _parameters)
 		{
-			taskOptions = taskOptions.param(parameter, _parameters[parameter] + new Packages.java.lang.String(''));
+			if (_parameters[parameter] instanceof Packages.java.util.Collection)
+			{
+				for (var value in Iterator(_parameters[parameter]))
+				{
+					taskOptions = taskOptions.param(parameter, value + new Packages.java.lang.String(''));
+				}
+			}
+			else if (_parameters[parameter].forEach)
+			{
+				_parameters[parameter].forEach(function(_value)
+				{
+					taskOptions = taskOptions.param(parameter, _value + new Packages.java.lang.String(''));
+				});
+			}
+			else
+			{
+				taskOptions = taskOptions.param(parameter, _parameters[parameter] + new Packages.java.lang.String(''));
+			}
 		}
 
 		queue.add(taskOptions);
