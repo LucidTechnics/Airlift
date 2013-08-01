@@ -1,3 +1,5 @@
+var util = require('airlift/util');
+
 function AppIdentityService()
 {
 	var service = com.google.appengine.api.appidentity.AppIdentityServiceFactory.getAppIdentityService();
@@ -40,24 +42,27 @@ function QueueService(_name, _method)
 		for (parameter in _parameters)
 		{
 			var parameters = _parameters[parameter];
-			
-			if (parameters instanceof java.util.Collection)
+
+			if (util.hasValue(parameters) === true)
 			{
-				for (var item in Iterator(parameters))
+				if (parameters instanceof java.util.Collection)
 				{
-					taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
+					for (var item in Iterator(parameters))
+					{
+						taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
+					}
 				}
-			}
-			else if (parameters && parameters.forEach)
-			{
-				parameters.forEach(function (_item)
+				else if (parameters && parameters.forEach)
 				{
-					taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
-				});
-			}
-			else
-			{
-				taskOptions = taskOptions.param(parameter, parameters + new Packages.java.lang.String(''));
+					parameters.forEach(function(_item)
+					{
+						taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
+					});
+				}
+				else
+				{
+					taskOptions = taskOptions.param(parameter, parameters + new Packages.java.lang.String(''));
+				}
 			}
 		}
 
