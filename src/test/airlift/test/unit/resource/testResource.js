@@ -330,23 +330,24 @@ exports['test compose'] = function(_assert)
 
 exports['test toString'] = function(_assert)
 {
-	util.info(res.toString('person', bediako, context));
-
 	var result = '[** person\n'+
-				'fullName: Bediako George\n' +
-				'shortName: Bediako\n' +
-				'status: middle aged\n' +
-				'birthDate: Thu Jan 01 00:00:00 EST 1970\n' +
-				'age: 43.0\n' +
-				'friendList: [friend1, friend2, friend3]\n' +
-				'familySet: [family1]\n' +
-				'auditPostDate: \n' +
-				'auditPutDate: \n' +
-				'auditUserId: \n' +
-				'id: 6524d6f79d19\n' +
-				']'
-		
-	_assert.eq(res.toString('person', bediako, context), result, 'string representation was not created correctly');
+					'fullName: Bediako George\n' +
+					'shortName: Bediako\n' +
+					'status: middle aged\n' +
+					'birthDate: \n' +
+					'age: 43.0\n' +
+					'friendList: [friend1, friend2, friend3]\n' +
+					'familySet: [family1]\n' +
+					'auditPostDate: \n' +
+					'auditPutDate: \n' +
+					'auditUserId: \n' +
+					'id: 6524d6f79d19\n' +
+				']';
+
+	var person = bediako;
+	delete person.birthDate;
+	
+	_assert.eq(res.toString('person', person, context), result, 'string representation was not created correctly');
 };
 
 exports['test watch'] = function(_assert)
