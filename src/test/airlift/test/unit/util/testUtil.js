@@ -118,20 +118,18 @@ exports['test create timezone'] = function(_assert)
 exports['test formatDate'] = function(_assert)
 {
         var date = new Date(1375110037982);
+        var utcDate = util.adjustUTCDate(date, 'UTC');
+
+//      var timezone = Packages.java.util.TimeZone.getDefault().getID();
+
         var formattedDate = util.formatDate(date, 'MMMM dd, yyyy');
-        _assert.eq("July 29, 2013", formattedDate, 'formatted date was incorrect');
+        _assert.eq(util.string('July 29, 2013'), formattedDate, 'formatted date was incorrect');
 
         var formattedDate = util.formatDate(date, 'MM/dd/yyyy');
-        _assert.eq("07/29/2013", formattedDate, 'formatted date was incorrect');
+        _assert.eq(util.string('07/29/2013'), formattedDate, 'formatted date was incorrect');
 
         var formattedDate = util.formatDate(date, 'YYYY-MM-dd');
-        _assert.eq("2013-07-29", formattedDate, 'formatted date was incorrect');
-
-        //var formattedDate = util.formatDate(date, 'MM/dd/yyyy hh:mm:ss');
-        //_assert.eq("07/29/2013 11:00:37", formattedDate, 'formatted date was incorrect');
-
-        //var formattedDate = util.formatDate(date, 'EEE, dd MMM yyyy hh:mm:ss zzz');
-        //_assert.eq("Mon, 29 Jul 2013 11:00:37 EDT", formattedDate, 'formatted date was incorrect');
+        _assert.eq(util.string('2013-07-29'), formattedDate, 'formatted date was incorrect');
 };
 
 exports['test adjust UTC date'] = function(_assert)
@@ -187,6 +185,25 @@ exports['test guid creation'] = function(_assert)
 exports['test string trim'] = function(_assert)
 {
 	_assert.eq("Bediako", util.trim(" Bediako "), 'util trim function is not working correctly');
+};
+
+exports['test value'] = function(_assert)
+{
+    var result = util.value(['a','b','c'], ['default']);
+    //=> ['a','b','c']
+    _assert.deepEqual(['a','b','c'], result, 'value method did not return correct argument');
+
+    var result = util.value(undefined, 0);
+    //=> 0
+    _assert.deepEqual(0, result, 'value method did not return correct argument');
+
+    var result = util.value('Serena', undefined);
+    //=> 'Serena'
+    _assert.eq('Serena', result, 'value method did not return correct argument');
+
+    var result = util.value(undefined, null);
+    //=> null
+    _assert.eq(null, result, 'value method did not return correct argument');
 };
 
 exports['test primitive'] = function(_assert)
@@ -294,7 +311,7 @@ exports['test convert JavaScript string to Java string'] = function(_assert)
 	var javaString = util.string(string);
 
 	_assert.eq(new Packages.java.lang.String(string), javaString, 'string conversion not correct');
-	_assert.eq("java.lang.String", javaString.getClass().getName(), 'string conversion did not produce java.lang.String');
+        _assert.eq(util.string('java.lang.String'), javaString.getClass().getName(), 'string conversion did not produce java.lang.String');
 };
 
 exports['test convert JavaScript string to Java boolean'] = function(_assert)
