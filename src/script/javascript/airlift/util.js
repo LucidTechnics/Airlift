@@ -76,7 +76,9 @@ var ErrorReporter = function()
 		}
 		
 		return errors[_name];
-	}
+	};
+
+	this.hasErrors = function() { return (exports.isEmpty(this.allErrors()) === false); };
 
 	this.report = function(_name, _error)
 	{

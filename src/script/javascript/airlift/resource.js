@@ -5,10 +5,10 @@ function Resource(_web)
 	var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
 	this.each = function each(_resourceName, _resource, _function, _callback, _context)
-	{
+	{		
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
 		{
-			throw 'Resource name must be a valid resource';
+			throw 'Resource name must be a valid resource: ' + _resourceName;
 		}
 		
 		var context = _context || {};
@@ -27,6 +27,7 @@ function Resource(_web)
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
+		context.hasErrors = reporter.hasErrors;
 		
 		if (util.typeOf(context.attributes) === 'object')
 		{
@@ -87,7 +88,7 @@ function Resource(_web)
 		return _base;
 	};
 
-	this.sequence = function sequence()
+	this.sequence = this.seq = function sequence()
 	{
 		var functions = Array.prototype.slice.call(arguments, 0);		
 
@@ -123,7 +124,7 @@ function Resource(_web)
 		};
 	};
 
-	this.compose = function compose()
+	this.compose = this.com = function compose()
 	{
 		var functions = Array.prototype.slice.call(arguments, 0);
 
@@ -147,10 +148,10 @@ function Resource(_web)
 
 	this.toString = function toString(_resourceName, _resource, _context)
 	{
-		return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
+		return (this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 		{
 			return _base.append(_name).append(": ").append(_value||"").append("\n");
-		}, _context).toString();
+		}, undefined, _context) + ']').toString();
 	};
 
 	this.watch = function watch()

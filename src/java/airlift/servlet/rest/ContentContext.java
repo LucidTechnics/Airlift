@@ -199,7 +199,7 @@ public abstract class ContentContext
 	{
 		addHeader("Content-Disposition", "attachment; filename=" + _downloadFileName);
 	}
-	
+
 	public void isJson()
 	{
 		setType(JSON_TYPE);
