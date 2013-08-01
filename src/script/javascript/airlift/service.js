@@ -43,14 +43,14 @@ function QueueService(_name, _method)
 			
 			if (parameters instanceof Packages.java.util.Collection)
 			{
-				for (var item in parameters)
+				for (var item in Iterator(parameters))
 				{
 					taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
 				}
 			}
 			else if (parameters && parameters.forEach)
 			{
-				parameters.forEach(function _item)
+				parameters.forEach(function (_item)
 				{
 					taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
 				});
