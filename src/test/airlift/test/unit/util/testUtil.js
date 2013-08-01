@@ -354,8 +354,19 @@ exports['test createKeysCollection'] = function(_assert)
 
 exports['test createKeysIterable'] = function(_assert)
 {
+    var list = util.list();
+    list.add({getKey: function() { return 'ichi'; }});
+    list.add({getKey: function() { return 'ni'; }});
+    list.add({getKey: function() { return 'san'; }});
 
+    var iterable = util.createKeysIterable(list);
+    var iterator = iterable.iterator();
+
+    _assert.eq(util.string('ichi'), iterator.next(), 'createKeysIterator did not return the correct first key');
+    _assert.eq(util.string('ni'), iterator.next(), 'createKeysIterator did not return the correct second key');
+    _assert.eq(util.string('san'), iterator.next(), 'createKeysIterator did not return the correct third key');
 }
+
 exports['test convert JavaScript string to Java string'] = function(_assert)
 {
     var string = new String('Hello');
