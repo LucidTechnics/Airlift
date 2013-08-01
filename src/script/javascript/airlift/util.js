@@ -405,7 +405,7 @@ exports.set = function set(_parameter)
 	return set;
 };
 
-exports.orderedSet = function orderedSet(_parameter)
+exports.orderedSet = oSet = function orderedSet(_parameter)
 {
 	var set;
 
