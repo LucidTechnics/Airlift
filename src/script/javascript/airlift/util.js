@@ -518,7 +518,7 @@ exports.getAttributesMetadata = function(_name)
 	return require('meta/a/' + _name).create();
 };
 
-exports.getWebRequestId = function(_name)
+exports.getWebRequestId = function()
 {
 	return Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 };

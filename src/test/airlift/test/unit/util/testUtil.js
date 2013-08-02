@@ -440,6 +440,19 @@ exports['test padding'] = function(_assert)
     _assert.eq(util.string(util.rightPad(string1, 5, '0')), '' + util.rightPad(string2, 5, '0'), 'right pad JavaScript string and Java string failed');
 };
 
+exports['test hash'] = function(_assert)
+{
+    var hash12 = util.hash('SHA1', 'Pandas are the best', 12);
+    var hash24 = util.hash('SHA1', 'Pandas are the best', 24);
+
+    _assert.eq(12, hash12.length(), 'hash was not of the correct length');
+    _assert.eq(24, hash24.length(), 'hash was not of the correct length');
+    _assert.eq(hash12, hash24.substring(12), 'hash did not generate the same last 12 chars twice for the same string');
+
+    var hash12b = util.hash('SHA1', 'Pandas are the best', 12);
+    _assert.eq(hash12, hash12b, 'hash did not generate the same hash twice for the same string');
+}
+
 exports['test load resource'] = function(_assert)
 {
     var assertResourceString = util.load('airlift/assert.js');
@@ -478,6 +491,20 @@ exports['test get java exception'] = function(_assert)
 	_assert.ok((exception instanceof java.lang.RuntimeException), 'embedded java runtime exception was not returned');
     }	
 };
+
+exports['test sanitize'] = function(_assert)
+{
+    var resource =
+        {
+            name: 'ex bookkeeping metadata',
+            auditUserId: '1a2b3c4d',
+            auditRequestId: '5e6f7g8h',
+            auditPostDate: new Date(1375110037982),
+            auditPostDate: new Date(1375110051100),
+        };
+    var sanitizedResource = util.sanitize(resource);
+    _assert.deepEqual({name: 'ex bookkeeping metadata'}, sanitizedResource, 'sanitize did not work correctly');
+}
 
 exports['test print stack trace to string'] = function(_assert)
 {
