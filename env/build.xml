@@ -67,18 +67,18 @@
 	<property name="classes" location="${war}/WEB-INF/classes" />
 	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
 	
-	<import file="../../../apps/appengine/appengine-java-sdk-1.8.0/config/user/ant-macros.xml" />
-	<!-- <import file="${sdk.dir}/config/user/ant-macros.xml" /> -->
+	<import file="${sdk.dir}/config/user/ant-macros.xml" />
   
 	<path id="project.classpath">
 		<pathelement path="${classes}" />
 		<fileset dir="${war}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${sdk.dir}/lib">
-			<include name="shared/**/*.jar" />
-			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+		<fileset dir="${sdk.dir}">
+			<include name="lib/shared/**/*.jar" />
+			<include name="lib/appengine-remote-api.jar" />
+			<include name="lib/appengine-tools-api.jar" />
+			<include name="lib/testing/appengine-testing.jar" />
 		</fileset>
 	</path>
 
@@ -90,12 +90,38 @@
 		<fileset dir="${sdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
 		</fileset>
 		<fileset dir="${dist}">
 			<include name="**/*scripts.jar"/>
 		</fileset>
 	</path>
+
+	<path id="appserver.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />
+			<include name="impl/**/*.jar" />
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- TEMPORARY -->
+	<property name="appserver.classpath" refid="appserver.classpath" />
+	<property name="airlift.devtest.port" value="8080" />
+	<!-- TEMPORARY-END -->
 
 	<path id="precompile.classpath">
 	<pathelement path="${classes}" />
@@ -108,6 +134,7 @@
 		<fileset dir="${basedir}/">
 			<include name="airlift-*core.jar" />
 		</fileset>
+				
 	</path>
 	
 	<path id="test.class.path">
@@ -118,7 +145,8 @@
 		<fileset dir="${sdk.dir}/lib">
 			<include name="shared/**/*.jar" />
 			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />			
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
 		</fileset>
 		<fileset dir="${dist}">
 			<include name="**/*test*.jar"/>
@@ -233,11 +261,12 @@
 	
 	<target name="copyjars" description="Copies the App Engine jars to the war file.">
 		<copy todir="${war}/WEB-INF/lib" flatten="true">
-			<fileset dir="${sdk.dir}/lib/user">
-				<include name="**/*.jar" />
-				<exclude name="orm/**/*.jar" />
+			<fileset dir="${sdk.dir}/lib">
+				<include name="user/**/*.jar" />
+				<exclude name="user/orm/**/*.jar" />
 			</fileset>
 		</copy>
+		<!-- I added -->
 	</target>
 
 	<target name="clean-appengine-generated">
@@ -308,12 +337,13 @@
 
 	<target name="compile" depends="copyjars, prepareSource"	description="Compiles Java source">
 		<javac includeantruntime="false" srcdir="src"	destdir="${classes}" classpathref="project.classpath" debug="on" />
+
 	</target>
 
-	<target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
+	  <target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
 	  <dev_appserver war="${war}">
 		 <options>
-			    <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
+			   <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
 		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
 				<arg value="--jvm_flag=-Xmx1024m"/>
 
@@ -427,20 +457,10 @@
 		</script>
 	</target> 
 
-<target name="integrationtest" depends="test-jar">
-	   	<property name="run.class.path" refId="test.class.path"/>
-		<echo message="${run.class.path}"/>
-		<sleep seconds="60" />
+	<target name="integrationtest" depends="test-jar">
+		<echo message="${appserver.classpath}"/>
 		<script language="javascript" src="airlift/integrationtest.js">
-		    <classpath refid="test.class.path"/> 			
-		</script>
-	</target>
-
-<target name="integrationtestns" depends="test-jar">
-	   	<property name="run.class.path" refId="test.class.path"/>
-		<echo message="${run.class.path}"/>
-		<script language="javascript" src="airlift/integrationtest.js">
-		    <classpath refid="test.class.path"/> 			
+		    <classpath refid="appserver.classpath"/> 			
 		</script>
 	</target>
 

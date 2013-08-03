@@ -39,7 +39,7 @@ importClass(Packages.java.net.URI);
 //http ... we ultimately just use the path of this
 //URI to find the resource in the jar.
 uris.add(new URI("http://localhost:80/test/airlift/"));
-uris.add(new URI("http://localhost:80/test/airlift/test"));
+uris.add(new URI("http://localhost:80/test/airlift/test/"));
 uris.add(new URI("http://localhost:80/airlift"));
 uris.add(new URI("http://localhost:80/"));
 uris.add(new URI("http://localhost:80//airlift/lib/"));
@@ -63,8 +63,13 @@ var includes = 	Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.
 includes[0] = "test*.js";
 includes[1] = "**/test*.js";
 
+var excludes = 	Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.String, 2);
+excludes[0] = "integration/*.js";
+excludes[1] = "integration/**/*.js";
+
 var baseDir = project.getBaseDir().getPath() + "/src/test/airlift/test/";
 directoryScanner.setIncludes(includes);
+directoryScanner.setExcludes(excludes);
 directoryScanner.setBasedir(new Packages.java.io.File(baseDir));
 directoryScanner.setCaseSensitive(true);
 directoryScanner.scan();
@@ -79,8 +84,8 @@ var totalTestCount = 0;
 for (var i = 0; i < files.length; i++)
 {
 	var testScript = new Packages.java.lang.String(files[i]);
+	print('running ' + testScript);
 	var harness = "var harness = require('harness'); var name = \"" + testScript.replaceAll(".js$", "") + "\"; var test = require(name); this.stats = harness.run(name, test);";	
-
 	var scope = resetScope(context, sharedScope);
 	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
 	require.install(scope);
@@ -114,4 +119,3 @@ else
 	print('');
 	print(totalTestCount + ' test(s) with ' + totalAssertions + ' assertion(s) passed.');
 }
-

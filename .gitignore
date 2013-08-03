@@ -7,3 +7,8 @@ dist
 dist/**/*
 deploy 
 deploy/**/*
+workspace
+workspace/**/*
+env/src/genjava
+env/src/genjava/**/*
+env/war/WEB-INF/lib/appengine-*.jar

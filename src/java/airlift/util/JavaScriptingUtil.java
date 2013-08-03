@@ -136,7 +136,6 @@ public class JavaScriptingUtil
 	public void executeScript(String _scriptResource, boolean _timeScript, Context _context)
 	{
 		Context context = (_context == null) ? createContext() : _context;
-		
 		long startTime = 0l;
 
 		try
@@ -149,6 +148,8 @@ public class JavaScriptingUtil
 			for (String key: getBindingsMap().keySet())
 			{
 				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
+			
+			     
 				ScriptableObject.putProperty(getScope(), key, object);
 			}
 
@@ -279,11 +280,9 @@ public class JavaScriptingUtil
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
 			require.install(getScope());
-			
 			// Now evaluate the string we've collected. We'll ignore
 			// the result.
 			_context.evaluateString(getScope(), requireHandler, scriptResource, 1, null);
-
 			Object handle = getScope().get("handle", getScope());
 			java.util.ArrayList argumentList = new java.util.ArrayList();
 

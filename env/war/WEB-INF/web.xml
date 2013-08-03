@@ -14,7 +14,7 @@
 		</init-param>
 		<init-param>
 			<param-name>a.production.mode</param-name>
-			<param-value>no</param-value>
+			<param-value>yes</param-value>
 		</init-param>
 		<init-param>
 			<param-name>airlift.truncated.sha1.id.length</param-name>

@@ -12,12 +12,10 @@
  specific language governing permissions and limitations under the License.
 -->
 <project default="createPackageStructure" basedir=".">
-
 	<description>  Build file </description>
   
 	<property file="desktop.build" />
 	<property environment="env"/>
-	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_DEV_HOME}" />
 	<property name="rootDir" value="${basedir}" />
 	
 	<property name="project" location="project" />
@@ -70,6 +68,8 @@
 	<property name="jar" value="${appName}-${version}_${revision}" />
 	<property name="testJar" value="${appName}Test-${version}_${revision}" />
 
+	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_HOME}" />
+
 	<path id="build.class.path">
 		<fileset dir="${runtime.lib}">
 			<include name="**/*.jar"/>
@@ -78,6 +78,11 @@
 		<fileset dir="${build.only.lib}">
 			<include name="**/*.jar"/>
 			<include name="**/*.zip"/>
+		</fileset>
+		<!-- Temporary addition for testing -->
+		<fileset dir="${sdk.dir}/lib">
+			<include name="testing/appengine-testing.jar"/>
+			<include name="appengine-tools-api.jar"/>
 		</fileset>
 	</path>
 
@@ -195,7 +200,7 @@
 	</target>
 
 	<!-- Prepare source -->
-	<target name="prepareSource" depends="createPackageStructure">
+	<target name="prepareSource" depends="createPackageStructure, copyYml">
 
 		<copy todir="${stage}" >
 			<fileset dir="${src}" includes="**/*.xml, **/*log4j.properties, **/*.bat, **/*.sh, **/*.0, **/*.cf, **/*.conf, **/*.st" />
@@ -208,7 +213,18 @@
 		  <replacefilter token="@APPNAME@" property="APPNAME"/>
 		</replace>
 
+		<replace dir="." propertyFile="token.properties">
+		  <include name=".travis.yml"/>
+		  
+		  <replacefilter token="@APP.ENGINE.SDK@" property="app.engine.sdk" />
+		</replace>
+
 	</target>
+
+	<target name="copyYml">
+	  <copy file="${src}/cfg/travis.yml" tofile=".travis.yml" overwrite="true" />
+	</target>
+	  
 
   	<!-- Compile -->
 	<target name="reCompile" depends="clean-classes, compile" />
@@ -309,95 +325,93 @@
 	</target>
 
 	<target name="setUpEnvironment" depends="env" >
-	  <delete dir ="../AntTest/env" />
-	  <mkdir dir="../AntTest/env" />
-	  <unzip src = "${downloads}/${jar}-env.zip" dest = "../AntTest/env" />
+	  <delete dir ="workspace/env" />
+	  <mkdir dir="workspace/env" />
+	  <mkdir dir="workspace/env/war/WEB-INF/classes" />
+	  <mkdir dir="workspace/env/war/WEB-INF/classes/handler" />
+	  <mkdir dir="workspace/env/war/WEB-INF/classes/handler/registration" />
+	  <mkdir dir="workspace/env/dist" />
+	  <mkdir dir="workspace/env/dist/lib" />
+	  <exec dir="." executable="unzip" newenvironment="false">
+	    <arg value="-u" />
+	    <arg value="${downloads}/${jar}-env.zip" />
+	    <arg value="-d" />
+	    <arg value= "${rootDir}/workspace/env"/>
+	  </exec>
+
+	  
+	  <antcall target="checkDir" />
+
+
+	  <copy todir="workspace/env/war/WEB-INF/classes/handler/registration">
+			<fileset dir="${src}/test/script/javascript/handler/registration" />
+	  </copy>
 	</target>
 
-	<target name="startserver" depends="setUpEnvironment" description="Starts the new server." >
-	  <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	<target name="startserver" depends="setUpEnvironment" description="Starts the new server WITHOUT running integration tests." >
+	  <exec dir="workspace/env" executable="ant" newenvironment="true">
 	  <arg value="runserver" />
 	</exec>
 	</target>
-	
-	<target name="inttest" description="Just does the integration test.  NEEDS RUNNING SERVER.">
-	  <sequential>
-	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
-	    <and>
-		<http url="http://localhost:8080/_ah/admin/" />
-		<socket server="localhost" port="8080"/>
-	    </and>
-	   </waitfor>
-	   <condition property="isTimeOut"> 
-	      <isset property="timeout" />
-	     </condition>
-	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
+
+	<path id="appserver.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${env}/war/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />
+			<include name="impl/**/*.jar" />
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
+
+	<property name="appserver.classpath" refid="appserver.classpath" />
+
+	<target name="inttest" description="Just does the integration test.  NEEDS RUNNING SERVER." depends="test">
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
-	     <arg value="integrationtestns" />
-	   </exec>
+	   	<echo message="${appserver.classpath}"/>
+		<script language="javascript" src="src/test/airlift/inttest.js">
+		    <classpath refid="appserver.classpath"/> 			
+		</script>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
-	   <!--<antcall target="exitDev" /> -->
-	</sequential>
 	</target>
 
 	<target name="cinttest" depends="setUpEnvironment" description="Starts the new server." >
- <parallel>
-	<exec dir="../AntTest/env" executable="ant" newenvironment="true">
-	  <arg value="runserver" />
-	</exec>
-	<sequential>
-	  <waitfor maxwait="20" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
-	    <and>
-		<http url="http://localhost:8080/_ah/admin/" />
-		<socket server="localhost" port="8080"/>
-	    </and>
-	   </waitfor>
-	   <condition property="isTimeOut"> 
-	      <isset property="timeout" />
-	     </condition>
-	   <fail message="...The server has failed to start.  Integration test has been aborted..." if="isTimeOut" />
-	   <echo message="...The TEST SERVER is RUNNING..." />
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
-	   <exec dir="../AntTest/env" executable="ant" newenvironment="true">
+	   <exec dir="workspace/env" executable="ant" newenvironment="true">
 	     <arg value="integrationtest" />
-	     
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
-	   <antcall target="exitDev" />
-	</sequential>
-</parallel>
-
+	   <delete dir="workspace/env" />
 	</target>
 
-	<target name="exitDev" depends="exitDevML, exitDevWin" />
+	<target name="checkDir">
 
-	<target name="exitDevML" depends="checkos" if="isLinuxMac">
-<exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
-	  <arg value="killserver.sh" />
-	</exec>
-</target>
+	  <condition property="handler1" value="true" else="false">
+	      <available file="workspace/env/dist" type="dir" property="X"/>
+	  </condition>
+	  <echo message="workspace/env/dist found?: ${handler1}" />
 
-<target name="exitDevWin" depends="checkos" if="isWindows">
-<!-- <exec dir="../AntTest/env/src/bash" executable="bash" failonerror="true">
-	  <arg value="killserver.bat" />
-	</exec> -->
-</target>
+	  <condition property="handler2" value="true" else="false">
+	      <available file="workspace/env/${jar}-env" type="dir" property="X2"/>
+	  </condition>
+	  <echo message="workspace/env/airlift-beta-0.70_rc_108_734-env found (SHOULD BE FALSE!!)?: ${handler2}" />
 
-<target name="checkos">
-	<condition property="isWindows">
-		<os family="windows" />
-	</condition>
+	  <condition property="handler3" value="true" else="false">
+	      <available file="workspace/env/airlift" type="dir" property="X3"/>
+	  </condition>
+	  <echo message="workspace/env/airlift found?: ${handler3}" />
 
-	<condition property="isLinuxMac">
-	  <or>
-		<os family="unix" />
-		<os family="mac" />
-	  </or>
-	</condition>
-
-
-</target>
+	</target>
 
 	<target name="createRootPackageDirProperty" >
 
@@ -449,8 +463,12 @@
 		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
 	   </javadoc>
 	</target>
-	<target name="test" depends="cinttest" />
-	<target name="test2" depends="redeploy">
+	
+	<target name="travis-test" depends="cinttest">
+	  <echo message = "Integration test completed.  Server successfully shut down." />
+	</target>
+	
+	<target name="test" depends="redeploy">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">

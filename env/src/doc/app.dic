@@ -1,4 +1,4 @@
-package example
+package airlift.app
 
 A Person
 has a first name
@@ -29,3 +29,4 @@ has a full name
 has an email address
 has a mobile phone number which is not required
 has a "password"
+can be viewed or collected or created or updated by a person
