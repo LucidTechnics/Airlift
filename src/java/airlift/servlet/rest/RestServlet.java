@@ -353,12 +353,11 @@ public class RestServlet
 			sendCodedPage("404", "Not Found", _response);
 		}
 
-		UserService userService = getUserService(_request,restContext);
+		UserService userService = getUserService(_request,restContext, _response);
 		AbstractUser user = userService.getCurrentUser();
 
 		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"));
 		restContext.setSecurityContext(securityContext);
-
 		securityContext.populate(user);
 		restContext.setUser(user);
 
@@ -377,13 +376,6 @@ public class RestServlet
 		}
 		else if (!success && user != null)
 		{
-			//if user has an id then there is an AirliftUser in the database.
-			if (user.getId() != null)
-			{
-				securityContext.update(user, false);
-				log.info("Unauthorized user is now: " + user);
-			}
-
 			sendCodedPage("401", "UnAuthorized - User " + user.getEmail() + " does not have " + method + " access to this resource. You may <a href=\"" + userService.createLogoutURL(_request.getRequestURI()) + "\">logout</a> and login as another user.", _response);
 		}
 		else if (success && timedOut(user) == true)
@@ -396,12 +388,6 @@ public class RestServlet
 			{
 				log.info("Time out incepted log out failed");
 				sendCodedPage("408", "Request Timeout", _response);
-			}
-			else
-			{
-				log.info("Time out incepted log out succeeded");
-				user.setTimeOutDate(null);
-				securityContext.update(user, true);
 			}
 		}
 		else if (success)
@@ -425,14 +411,6 @@ public class RestServlet
 	{
 		try
 		{
-			//if user id is null there is no AirliftUser for this user.
-			if (_user != null && _user.getId() != null)
-			{
-				_user.setTimeOutDate(calculateNextTimeOutDate());
-				_securityContext.update(_user, true);
-				log.info("Successful user is now: " + _user);
-			}
-
 			processRequest(_request, _response, _method, _restContext, _uriParameterMap);
 		}
 		catch(Throwable t)
@@ -1040,7 +1018,7 @@ public class RestServlet
 	 * @param _httpServletRequest the _http servlet request
 	 * @return the user service
 	 */
-	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest, RestContext _restContext)
+	public UserService getUserService(javax.servlet.http.HttpServletRequest _httpServletRequest, RestContext _restContext, javax.servlet.http.HttpServletResponse _httpServletResponse)
 	{
 		String userServiceClassName = this.getServletConfig().getInitParameter("a.user.service");
 
@@ -1051,6 +1029,7 @@ public class RestServlet
 			userService = (userServiceClassName != null) ? (UserService) Class.forName(userServiceClassName).newInstance() : new GoogleUserService();
 			userService.setHttpServletRequest(_httpServletRequest);
 			userService.setRestContext(_restContext);
+            userService.setHttpServletResponse(_httpServletResponse);
 		}
 		catch(Throwable t)
 		{

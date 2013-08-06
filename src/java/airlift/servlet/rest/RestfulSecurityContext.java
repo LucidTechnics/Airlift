@@ -237,8 +237,12 @@ public class RestfulSecurityContext
 		if (_user != null)
 		{
 			String externalUserId = (_user.getExternalUserId() != null) ? _user.getExternalUserId().toLowerCase() : null;
-			AirliftUser user = getUser(externalUserId);
-
+			java.util.List<AirliftUser> users = collectByExternalUserId(externalUserId,0,1,"auditPostDate",true);
+			AirliftUser user=null;
+			if(users!=null&&!users.isEmpty())
+			{
+				user=users.get(0);
+			}
 			//Only return active users ...
 			if (user != null && user.getActive() == true)
 			{
@@ -398,6 +402,14 @@ public class RestfulSecurityContext
 		{
 			entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 		}
+		/*if (_airliftUser.getCookieId() != null)
+		{
+			entity.setProperty("cookieId", org.apache.commons.lang.StringUtils.trim(_airliftUser.getCookieId().toLowerCase()));
+		}
+		else
+		{
+			entity.setProperty("cookieId", _airliftUser.getcookieId());
+		}*/
 
 		if (_airliftUser.getEmail() != null)
 		{

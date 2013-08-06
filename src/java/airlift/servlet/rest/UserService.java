@@ -117,4 +117,5 @@ public interface UserService
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
 	public void setRestContext(RestContext _restContext);
 	public RestContext getRestContext();
+	public void setHttpServletResponse(javax.servlet.http.HttpServletResponse _httpServletResponse);
 }

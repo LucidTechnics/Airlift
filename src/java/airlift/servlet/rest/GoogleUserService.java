@@ -23,7 +23,7 @@ public class GoogleUserService
 	protected RestContext restContext;
 	/** The http servlet request. */
 	private javax.servlet.http.HttpServletRequest httpServletRequest;
-	
+	javax.servlet.http.HttpServletResponse httpServletResponse;
 	/** The user service. */
 	private com.google.appengine.api.users.UserService userService;
 
@@ -146,5 +146,9 @@ public class GoogleUserService
 	public String getUserKind()
 	{
 		return "AirliftUser";
+	}
+	public void setHttpServletResponse(javax.servlet.http.HttpServletResponse _httpServletResponse)
+	{
+		httpServletResponse=_httpServletResponse;
 	}
 }
