@@ -9,3 +9,5 @@ deploy
 deploy/**/*
 .DS_Store
 .DS_Store/**/*
+workspace/**/*
+workspace
