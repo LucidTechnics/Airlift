@@ -412,14 +412,31 @@ function Incoming(_web)
 		this["java.lang.Byte"] = function() { throw new Error("Airlift currently does not support java.lang.Byte. Try using String instead or file a feature request."); };
 		this["java.lang.Character"] = function() { throw new Error("Airlift currently does not support java.lang.Character objects. Try using String instead or file a feature request."); };
 
-		this["java.util.Set"] = function(_parameterValue) { var collection = new Packages.java.util.HashSet(); return convertToMultiValue(_parameterValue, collection); }
+		this["java.util.Set"] = function(_parameterValue) { var collection = (new CollectionType()).create('java.util.Set'); return convertToMultiValue(_parameterValue, collection); }
 		this["java.util.HashSet"] = this["java.util.Set"];
-		this["java.util.List"] = function(_parameterValue) { var collection = new Packages.java.util.ArrayList(); return convertToMultiValue(_parameterValue, collection); }
+		this["java.util.List"] = function(_parameterValue) { var collection = (new CollectionType()).create('java.util.List'); return convertToMultiValue(_parameterValue, collection); }
 		this["java.util.ArrayList"] = this["java.util.List"];
 		this["java.util.List<java.lang.String>"] = this["java.util.List"];
 		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
 		this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
 		this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
+	}
+
+	function CollectionType()
+	{
+		this["java.util.Set"] = function(_parameterValue) { return new Packages.java.util.HashSet(); }
+		this["java.util.HashSet"] = this["java.util.Set"];
+		this["java.util.List"] = function(_parameterValue) { return new Packages.java.util.ArrayList(); }
+		this["java.util.ArrayList"] = this["java.util.List"];
+		this["java.util.List<java.lang.String>"] = this["java.util.List"];
+		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+		this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
+		this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
+
+		this.create = function(_type)
+		{
+			return this[_type]();
+		}
 	}
 
 	function CollectionTypes()
@@ -436,7 +453,7 @@ function Incoming(_web)
 
 	var converter = new Converter();
 	var collectionTypes = new CollectionTypes();
-
+	
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
 	{
 		var request = _web.getRequest();
@@ -459,7 +476,12 @@ function Incoming(_web)
 						parameterValue = request.getParameterValues(_attributeName + '[]');
 					}
 
-					value = converter[type](parameterValue) || null;
+					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+
+					if (collectionTypes[type] && util.hasValue(value) === false)
+					{
+						value = (new CollectionType()).create(type);
+					}
 				}
 				else
 				{
