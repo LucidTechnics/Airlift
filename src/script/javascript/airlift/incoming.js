@@ -459,7 +459,7 @@ function Incoming(_web)
 						parameterValue = request.getParameterValues(_attributeName + '[]');
 					}
 
-					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+					value = converter[type](parameterValue) || null;
 				}
 				else
 				{
