@@ -1,12 +1,8 @@
-var da = require('./da/delete');
-var web = require('../web');
+var da = require('airlift/da/delete');
 
-exports.delete = function(_config)
+exports['delete'] = exports.del = function del(_web, _config)
 {
 	var config = _config||{};
-
-	var resourceName = config.resourceName||this.resourceName;
-	var id = config.id||web.getId();
 	
-	da['delete'](resourceName, id);
+	da['delete'](config.resourceName||_web.getResourceName(), config.id||_web.getId());
 };

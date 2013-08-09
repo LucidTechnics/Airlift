@@ -241,6 +241,36 @@ exports['test sequence'] = function(_assert)
 	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
+
+	results = [];
+	sequence = res.seq(function() { results.push(1); });
+	sequence = res.seq(function() { results.push(2); }, sequence);
+	sequence = res.seq(function() { results.push(3); }, sequence);
+	sequence = res.seq(function() { results.push(4); }, sequence);
+
+	sequence();
+
+	_assert.deepEqual([4,3,2,1], results, 'all sequence of a sequence functions did not appear to run in sequence');
+
+	results = [];
+	sequence = res.seq(function(w,x,y,z) { results.push(w); });
+	sequence = res.seq(function(w,x,y,z) { results.push(x); }, sequence);
+	sequence = res.seq(function(w,x,y,z) { results.push(y); }, sequence);
+	sequence = res.seq(function(w,x,y,z) { results.push(z); }, sequence);
+
+	sequence(5,6,7,8);
+
+	_assert.deepEqual([8,7,6,5], results, 'all multiparameter sequence of sequence functions did not appear to run in sequence');
+
+	results = [];
+	sequence = res.seq.partial(function(w,x,y,z) { results.push(w); });	
+	sequence = sequence.partial(function(w,x,y,z) { results.push(x); });
+	sequence = sequence.partial(function(w,x,y,z) { results.push(y); });
+	sequence = sequence.partial(function(w,x,y,z) { results.push(z); });
+
+	sequence()(9,10,11,12);
+
+	_assert.deepEqual([9,10,11,12], results, 'all multiparameter partial sequence functions did not appear to run in sequence');
 };
 
 exports['test json'] = function(_assert)
