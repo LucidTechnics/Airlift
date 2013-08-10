@@ -105,6 +105,11 @@ var ErrorReporter = function()
 
 		errors[_name] = errorList;
 	};
+
+	this.clear = function()
+	{
+		errors = {};
+	};
 };
 
 exports.createErrorReporter = function()

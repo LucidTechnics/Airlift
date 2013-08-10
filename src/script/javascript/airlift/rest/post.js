@@ -26,24 +26,24 @@ exports.post = function(_web, _config)
 			var da = require('airlift/da/insert').create(_web);
 			da.insert(resourceName, resource);
 			_web.setResponseCode('201');
-			_web.setContent(resourceSerialize(_resource));
+			_web.setContent(serializeResource(_resource));
 		}
 		else
 		{
 			errors = this.allErrors();
 			util.info('ERRORS', JSON.stringify(this.allErrors()));
 			_web.setResponseCode('400');
-			_web.setContent(errorSerialize(this.allErrors()));
+			_web.setContent(serializeError(this.allErrors()));
 		}
 	};
 
-	var sequence = (config.pre && res.sequence(inc.convert, config.pre, inc.validate)) || res.sequence(inc.convert, inc.validate);
-	sequence = (config.post && res.sequence(sequence, config.post)) || sequence;
+	var sequence = (config.pre && res.sequence.partial(inc.convert, config.pre, inc.validate)) || res.sequence.partial(inc.convert, inc.validate);
+	sequence = (config.post && res.sequence.partial(sequence, config.post)) || sequence;
 
-	var callbackSequence = (config.preInsert && res.sequence(config.preInsert, callback)) || callback;
+	var callbackSequence = (config.preInsert && res.sequence.partial(config.preInsert, callback)) || res.sequence.partial(callback);
 
-	util.info('calling resource.each', JSON.stringify(sequence()), JSON.stringify(callbackSequence()));
-	res.each(resourceName, resource, sequence, callbackSequence, context);
+	util.info('calling resource.each on ', JSON.stringify(resource));
+	res.each(resourceName, resource, sequence(), callbackSequence(), config.context);
 	util.info('finished with resource.each');
 	
 	return {resource: resource, errors: errors};

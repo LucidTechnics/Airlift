@@ -34,7 +34,7 @@ function Incoming(_web)
 
 	var allowedValue = function(_errors, _metadata, _name, _value)
 	{
-		!_metadata.allowedValues[_value] && _errors.push(validationError(_name, "This value is not allowed."));
+		!_metadata.allowedValues[new Packages.java.lang.String(_value)] && _errors.push(validationError(_name, "This value is not allowed."));
 
 		return _errors;
 	};
@@ -456,82 +456,84 @@ function Incoming(_web)
 	
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
 	{
-		var request = _web.getRequest();
-
-		var resourceName = this.resourceName;
-		var value;
-
-		var type = _attributeMetadata.type;
-
-		if ("id".equals(_attributeName) !== true)
+		var value = _resource[_attributeName];
+		
+		if (util.hasValue(value) === false)
 		{
-			try
-			{
-				if (converter[type])
-				{
-					var parameterValue = request.getParameterValues(_attributeName);
+			var request = _web.getRequest();
+			var resourceName = this.resourceName;
+			var type = _attributeMetadata.type;
 
-					if (util.hasValue(parameterValue) === false && collectionTypes[type])
+			if ("id".equals(_attributeName) !== true)
+			{
+				try
+				{
+					if (converter[type])
 					{
-						parameterValue = request.getParameterValues(_attributeName + '[]');
+						var parameterValue = request.getParameterValues(_attributeName);
+
+						if (util.hasValue(parameterValue) === false && collectionTypes[type])
+						{
+							parameterValue = request.getParameterValues(_attributeName + '[]');
+						}
+
+						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+
+						if (collectionTypes[type] && util.hasValue(value) === false)
+						{
+							value = (new CollectionType()).create(type);
+						}
+					}
+					else
+					{
+						throw new Error('no converter found for type: ' + type);
+					}
+				}
+				catch(e)
+				{
+					if (e.javaException)
+					{
+						util.warning(e.javaException.getMessage());
+					}
+					else
+					{
+						util.warning(e.message);
 					}
 
-					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
-
-					if (collectionTypes[type] && util.hasValue(value) === false)
-					{
-						value = (new CollectionType()).create(type);
-					}
-				}
-				else
-				{
-					throw new Error('no converter found for type: ' + type);
-				}
-			}
-			catch(e)
-			{
-				if (e.javaException)
-				{
-					util.warning(e.javaException.getMessage());
-				}
-				else
-				{
-					util.warning(e.message);
+					this.report(_attributeName, "This value is not correct.", "conversion");
 				}
 
-				this.report(_attributeName, "This value is not correct.", "conversion");
-			}
-			
-			if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
-			{
-				/* Form value overrides what is in the URI.  This is done for
-				 * security reasons.  The foreign key may be protected via TLS
-				 * by including it in the form and not in the URI.  If it is
-				 * included in the form the expectation is that the URI should
-				 * be overridden.
+				if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
+				{
+					/* Form value overrides what is in the URI.  This is done for
+					 * security reasons.  The foreign key may be protected via TLS
+					 * by including it in the form and not in the URI.  If it is
+					 * included in the form the expectation is that the URI should
+					 * be overridden.
+					 */
+
+					var restContext = _web.getRestContext();
+					var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+					value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
+				}
+
+				/* There is no way to represent mapToMany in a URI
+				 * therefore the form value is taken. 
 				 */
-
+			}
+			else
+			{
 				var restContext = _web.getRestContext();
-				var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+				var parameterValue = restContext.getParameter(resourceName);
+				//convert only works for the first id.  Multiple puts not
+				//supported at this time - Bediako
 				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 			}
 
-			/* There is no way to represent mapToMany in a URI
-			 * therefore the form value is taken. 
-			 */
-		}
-		else
-		{
-			var restContext = _web.getRestContext();
-			var parameterValue = restContext.getParameter(resourceName);
-			//convert only works for the first id.  Multiple puts not
-			//supported at this time - Bediako
-			value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
-		}
-		
-		_resource[_attributeName] = value;
+			_resource[_attributeName] = value;
 
-		var res = require('airlift/resource').create(_web);
+			var res = require('airlift/resource').create(_web);
+		}
 
 		return value;
 	};
@@ -573,7 +575,7 @@ function Incoming(_web)
 
 		if (!!validator[type] === true)
 		{
-			validator[type](_value, _name, _metadata, this.report);
+			validator[type](_resource[_name], _name, _metadata, this.report);
 		}
 		else
 		{

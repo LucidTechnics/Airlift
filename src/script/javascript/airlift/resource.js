@@ -28,6 +28,7 @@ function Resource(_web)
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
 		context.hasErrors = reporter.hasErrors;
+		context.clear = reporter.clear;
 		
 		if (util.typeOf(context.attributes) === 'object')
 		{
@@ -93,7 +94,6 @@ function Resource(_web)
 		var functions = Array.prototype.slice.call(arguments, 0);		
 
 		var length = functions && functions.length || 0;
-		if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 
 		return function()
 		{
@@ -102,11 +102,12 @@ function Resource(_web)
 
 			for (var i = 0; i < length; i++)
 			{
-				if (this.resourceName)
+				result = functions[i].apply(this, args);
+
+				/*if (this.resourceName)
 				{
 					if (args.length === 5) //this is reduce
-					{
-						
+					{						
 						result = functions[i].apply(this, [args[0], args[3][args[2]], args[2], args[3], args[4]]);
 					}
 					else if (args.length === 4) //basically each or map
@@ -116,8 +117,7 @@ function Resource(_web)
 				}
 				else //sequence is called outside of resource.each/map/reduce
 				{
-					result = functions[i].apply(this, args);
-				}
+				}*/
 			}
 
 			return result;
@@ -129,7 +129,6 @@ function Resource(_web)
 		var functions = Array.prototype.slice.call(arguments, 0);
 
 		var length = functions && functions.length || 0;
-		if (!functions || length < 1) { throw "please provide at least one function for compose to execute"; }
 
 		var value;
 

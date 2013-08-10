@@ -217,6 +217,10 @@ exports['test reduce'] = function(_assert)
 
 exports['test sequence'] = function(_assert)
 {
+	var emptySequence = res.sequence();
+
+	_assert.doesNotThrow(emptySequence, 'Empty sequence threw an exception');
+	
 	var results = [];
 	
 	var sequence = res.sequence(
@@ -271,6 +275,11 @@ exports['test sequence'] = function(_assert)
 	sequence()(9,10,11,12);
 
 	_assert.deepEqual([9,10,11,12], results, 'all multiparameter partial sequence functions did not appear to run in sequence');
+
+	sequence()(9,10,11,12);
+
+	_assert.deepEqual([9,10,11,12,9,10,11,12], results, 'all multiparameter partial sequence functions did not appear to run in sequence');
+
 };
 
 exports['test json'] = function(_assert)

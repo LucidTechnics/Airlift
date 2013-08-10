@@ -104,7 +104,7 @@ function Web(WEB_CONTEXT)
 		if (!uriBase)
 		{
 			var request = this.getRequest();
-			uriBase = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/";
+			uriBase = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		}
 
 		return uriBase; 
