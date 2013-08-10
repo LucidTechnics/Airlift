@@ -2,11 +2,11 @@ exports.get = function get(_web, _config)
 {
 	var config = _config||{};
 	var resource = require('airlift/da/get').create(_web).get(config.resourceName || _web.getResourceName(), config.id || _web.getId());
-	var serializeResource = resourceSerializer||JSON.stringify;
+	var serializeResource = config.resourceSerializer||JSON.stringify;
 	
 	if (resource)
 	{
-		_web.setContent(resourceSerializer(resource));
+		_web.setContent(serializeResource(resource));
 	}
 	else
 	{

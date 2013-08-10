@@ -1,4 +1,4 @@
-exports.post = function(_web, _config)
+exports.put = function(_web, _config)
 {
 	var res = require('airlift/resource').create(_web);
 	var inc = require('airlift/incoming').create(_web);

@@ -10,7 +10,7 @@ var stream = function stream(_web, _config, _results)
 
 	_web.stream(function(_write)
 	{
-		var serializer = config.serializer||config.keysOnly && function(_item) { return "\"" + _item + "\""; }||JSON.stringify;
+		var serializer = config.resourceSerializer||config.keysOnly && function(_item) { return "\"" + _item + "\""; }||JSON.stringify;
 		res.stream(_results, serializer, _write, ['{"cursor":"' + _results.cursor() + '","' + resourceName + '":[', ",", "]}"]);
 	}, mimeType);
 }
