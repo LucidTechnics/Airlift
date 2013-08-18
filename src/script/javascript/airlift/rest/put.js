@@ -30,11 +30,11 @@ exports.put = function(_web, _config)
 	};
 
 	var sequence = (config.pre && res.sequence.partial(inc.convert, config.pre, inc.validate)) || res.sequence.partial(inc.convert, inc.validate);
-	sequence = (config.post && res.sequence.partial(sequence, config.post)) || sequence;
+	sequence = (config.post && res.sequence.partial(sequence(), config.post)) || sequence;
 
 	var callbackSequence = (config.preUpdate && res.sequence.partial(config.preUpdate, callback)) || res.sequence.partial(callback);
 	
-	res.each(resourceName, resource, sequence(), callbackSequence(), config.context);
+	res.each(resourceName, resource, sequence(), callbackSequence(), context);
 
 	return {resource: resource, errors: errors};
 };

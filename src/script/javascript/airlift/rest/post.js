@@ -38,12 +38,12 @@ exports.post = function(_web, _config)
 	};
 
 	var sequence = (config.pre && res.sequence.partial(inc.convert, config.pre, inc.validate)) || res.sequence.partial(inc.convert, inc.validate);
-	sequence = (config.post && res.sequence.partial(sequence, config.post)) || sequence;
+	sequence = (config.post && res.sequence.partial(sequence(), config.post)) || sequence;
 
 	var callbackSequence = (config.preInsert && res.sequence.partial(config.preInsert, callback)) || res.sequence.partial(callback);
 
 	util.info('calling resource.each on ', JSON.stringify(resource));
-	res.each(resourceName, resource, sequence(), callbackSequence(), config.context);
+	res.each(resourceName, resource, sequence(), callbackSequence(), context);
 	util.info('finished with resource.each');
 	
 	return {resource: resource, errors: errors};
