@@ -1030,6 +1030,7 @@ public class RestServlet
 			userService.setHttpServletRequest(_httpServletRequest);
 			userService.setRestContext(_restContext);
             userService.setHttpServletResponse(_httpServletResponse);
+            userService.setServletConfig(this.getServletConfig());
 		}
 		catch(Throwable t)
 		{
