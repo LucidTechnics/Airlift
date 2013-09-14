@@ -56,7 +56,7 @@ airlift.initial.vector=
 ##Airlift will not compile JavaScript scripts when not in production
 ##mode.  For optimal performance set this parameter to yes.
 ##
-airlift.production.mode=yes
+airlift.production.mode=no
 
 ##
 ##Development user security is only turned off when production mode
