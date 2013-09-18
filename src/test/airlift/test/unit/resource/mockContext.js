@@ -28,9 +28,9 @@ exports.person = function(_id, _fullName, _status, _birthDate, _age)
 		this.attributes['age'] = require('airlift/AttributeMetadata').create({ minValue: 18, maxValue: 110, name:"age", type:"java.lang.Integer", isIndexable:true, displayOrder:50, label:"age" }); 
 		this.attributes['friendList'] = require('airlift/AttributeMetadata').create({ name:"friendList", type:"java.util.List<java.lang.String>", isIndexable:true, displayOrder:60, label:"friend list" }); 
 		this.attributes['familySet'] = require('airlift/AttributeMetadata').create({ name:"familySet", type:"java.util.Set<java.lang.String>", isIndexable:true, displayOrder:70, label:"family set" }); 
-		this.attributes['auditPostDate'] = require('airlift/AttributeMetadata').create({ name:"auditPostDate", type:"java.util.Date", isSearchable:true, isIndexable:true, nullable:true, label:"record created date" }); 
-		this.attributes['auditPutDate'] = require('airlift/AttributeMetadata').create({ name:"auditPutDate", type:"java.util.Date", isSearchable:true, isIndexable:true, nullable:true, label:"record updated date" }); 
-		this.attributes['auditUserId'] = require('airlift/AttributeMetadata').create({ name:"auditUserId", type:"java.lang.String", nullable:true, label:"changed by user id", isPresentable:false }); 
+		this.attributes['auditPostDate'] = require('airlift/AttributeMetadata').create({ name:"auditPostDate", type:"java.util.Date", isSearchable:true, isIndexable:true, required:false, label:"record created date" }); 
+		this.attributes['auditPutDate'] = require('airlift/AttributeMetadata').create({ name:"auditPutDate", type:"java.util.Date", isSearchable:true, isIndexable:true, required:false, label:"record updated date" }); 
+		this.attributes['auditUserId'] = require('airlift/AttributeMetadata').create({ name:"auditUserId", type:"java.lang.String", required:false, label:"changed by user id", isPresentable:false }); 
 		this.attributes['id'] = require('airlift/AttributeMetadata').create({ name:"id", type:"java.lang.String", isPrimaryKey:true, displayOrder:0, label:"record id" }); 
 	}
 

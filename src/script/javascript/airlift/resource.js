@@ -46,14 +46,7 @@ function Resource(_web)
 		{
 			var name = context.attributes[i];
 
-			if ((name.equalsIgnoreCase('auditPostDate') === false
-				  && name.equalsIgnoreCase('auditPutDate') === false
-				  && name.equalsIgnoreCase('auditRequestId') === false
-				 name.equalsIgnoreCase('auditUserId') === false) ||
-				  util.hasValue(context.resource[name]) === true)
-			{
-				_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
-			}
+			_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
 		}
 
 		if (_callback)
