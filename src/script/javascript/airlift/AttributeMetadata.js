@@ -26,11 +26,7 @@ var AttributeMetadata = function(_config)
 	this.isPrimaryKey = util.value(_config.isPrimaryKey, false);
 	this.isUniqueKey = util.value(_config.isUniqueKey, false);
 	this.concept = util.value(_config.concept, '');
-
-	//required is represented by the value nullable ... I have made
-	//required opposite of nullable for convenience sake.
-	this.nullable = util.value(_config.nullable, false);
-	this.required = !this.nullable;
+	this.required = util.value(_config.required, true);
 
 	this.immutable = util.value(_config.immutable, false);
 	this.ranged = util.value(_config.ranged, false);

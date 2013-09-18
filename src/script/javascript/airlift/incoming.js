@@ -101,7 +101,7 @@ function Incoming(_web)
 			value = _value + '';
 		}
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -136,7 +136,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -159,7 +159,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -173,7 +173,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -206,7 +206,7 @@ function Incoming(_web)
 			value = _value;
 		}
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -220,7 +220,7 @@ function Incoming(_web)
 		var errors = [];
 		var collection = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, collection);
 			message && errors.push(validationError(_name, message));

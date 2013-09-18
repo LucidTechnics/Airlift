@@ -12,7 +12,7 @@
  specific language governing permissions and limitations under the License.
 */
 package airlift.servlet.rest;
-
+import javax.servlet.*;
 // TODO: Auto-generated Javadoc
 /**
  * The Class GoogleUserService.
@@ -26,6 +26,7 @@ public class GoogleUserService
 	javax.servlet.http.HttpServletResponse httpServletResponse;
 	/** The user service. */
 	private com.google.appengine.api.users.UserService userService;
+	private ServletConfig servletConfig;
 
 	/**
 	 * Gets the http servlet request.
@@ -151,4 +152,5 @@ public class GoogleUserService
 	{
 		httpServletResponse=_httpServletResponse;
 	}
+	public void setServletConfig(ServletConfig _servletConfig){servletConfig=_servletConfig;}
 }
