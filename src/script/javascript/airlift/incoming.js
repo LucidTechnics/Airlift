@@ -375,7 +375,7 @@ function Incoming(_web)
 	{
 		var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
 
-		return convertUtil.convert(value, util.createClass(_type));
+		return (value && convertUtil.convert(value, util.createClass(_type)))||value;
 	};
 
 	var convertToByteArray  = function(_parameterValue, _type, _index)
