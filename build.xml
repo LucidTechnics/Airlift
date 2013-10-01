@@ -338,20 +338,18 @@
 	    <arg value="-d" />
 	    <arg value= "${rootDir}/workspace/env"/>
 	  </exec>
-
 	  
 	  <antcall target="checkDir" />
-
 
 	  <copy todir="workspace/env/war/WEB-INF/classes/handler/registration">
 			<fileset dir="${src}/test/script/javascript/handler/registration" />
 	  </copy>
 	</target>
 
-	<target name="startserver" depends="setUpEnvironment" description="Starts the new server WITHOUT running integration tests." >
+	<target name="startServer" depends="setUpEnvironment" description="Starts the new server WITHOUT running integration tests." >
 	  <exec dir="workspace/env" executable="ant" newenvironment="true">
-	  <arg value="runserver" />
-	</exec>
+		 <arg value="runserver" />
+	  </exec>
 	</target>
 
 	<path id="appserver.classpath">
@@ -385,10 +383,10 @@
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	</target>
 
-	<target name="cinttest" depends="setUpEnvironment" description="Starts the new server." >
+	<target name="cinttest" depends="startServer" description="Starts the new server." >
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   <exec dir="workspace/env" executable="ant" newenvironment="true">
-	     <arg value="integrationtest" />
+	     <arg value="inttest" />
 	   </exec>
 	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	   <delete dir="workspace/env" />

@@ -1,0 +1,17 @@
+# Can also ignore all directories and files in a directory.
+.DS_Store
+**/.DS_Store
+*.class
+stage
+stage/**/*
+dist
+dist/**/*
+deploy 
+deploy/**/*
+*.class
+war/WEB-INF/appengine-generated
+war/WEB-INF/appengine-generated/**/*
+war/WEB-INF/appengine-web.xml
+war/WEB-INF/queue.xml
+war/WEB-INF/web.xml
+**/npm-debug.log

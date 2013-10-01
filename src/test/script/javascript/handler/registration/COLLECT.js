@@ -8,11 +8,14 @@ var util = require('airlift/util');
 exports.handle = function(_web)
 {
     var da = require('airlift/da/collect').create(_web);
-    var listRegistration=da.collect(_web.getResourceName());
+    var listRegistration = da.collect(_web.getResourceName());
     var items = [];
-    for(var item in Iterator(listRegistration))
+
+	for (var item in Iterator(listRegistration))
 	{
-	    items.push(item);
+		util.info('pushing item', item);
+		item && items.push(item);
 	}
-    _web.setContent(JSON.stringify(items));
+
+	_web.setContent(JSON.stringify(items));
 };

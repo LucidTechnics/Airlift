@@ -27,9 +27,22 @@ function Delete(_web)
 				transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
 			}
 
-			util.multiTry(function() { if (transaction) { datastore['delete'](transaction, key); } else { datastore['delete'](key); } },
-						  5,
-						  function(_tries, _e) { util.severe("Encountered this error while deleting", resourceName, "identified by:", _id); }
+			util.multiTry(function()
+							{
+								if (transaction)
+								{
+									datastore['delete'](transaction, key);
+								}
+								else
+								{
+									datastore['delete'](key);
+								}
+							},
+							5,
+							function(_tries, _e)
+							{
+								util.severe("Encountered this error while deleting", resourceName, "identified by:", _id);
+							}
 			);
 
 			cache['delete'](key);

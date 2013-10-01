@@ -31,46 +31,35 @@ try {
 
 function getFromServer(_uri, _verbose, _assert)
 {
-     try {
-	 _assert.ok(_uri, 'URI is not defined');
-	 var url = new Packages.java.net.URL(_uri);
-	 _assert.ok(url, 'The URL is not defined');
-	 var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(url.openStream()));
-	 _assert.ok(reader, 'The BufferedReader is not defined');
-	 var line = new Packages.java.lang.String();
-	 var result = "", done = false;
+	var line, result = "";
+	
+	try
+	{
+		 _assert.ok(_uri, 'URI is not defined');
+		 var url = new Packages.java.net.URL(_uri);
+		 _assert.ok(url, 'The URL is not defined');
+		 var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(url.openStream()));
+		 _assert.ok(reader, 'The BufferedReader is not defined');
 
-	 while (!done)
-	 {
-		 line = reader.readLine();
-		 util.info('This is line', line);
-
-		 if (line)
+		 do
 		 {
-			 result += line;
+			 line = reader.readLine();
+			 result += line||"";
 		 }
-		 else
-		 {
-			 done = true;
-		 }
-	 }
-	 
-	 util.info('got this result', result);
-	 var parseResult = result && JSON.parse(result) || undefined;
-	 _assert.ok(parseResult, 'ParseResult is not defined');
-	 }
-	 
-    catch (e) {
-	print("There was an error with testGET/COLLECT");
-	print(e.message);
-	print(e.stack);
-    }
-    finally
-    {
-	reader && reader.close();
-    }
+		 while (line)
+	}	 
+	catch (e)
+	{
+		print("Encountered exception in GET");
+		print(e.message);
+		print(e.stack);
+	}
+	finally
+	{
+		reader && reader.close();
+	}
     
-    return parseResult;
+    return result;
 };
 
 function placeInServer(_method, _uri, _data, _assert)
