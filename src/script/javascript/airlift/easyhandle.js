@@ -7,26 +7,33 @@ var util = require('airlift/util');
 
 function deleteFromServer(_uri, _assert)
 {
+	try
+	{  
+		var url = new Packages.java.net.URL(_uri);
+		var connection = Packages.java.net.HttpURLConnection(url.openConnection());
+		connection.setDoInput(true);
+		connection.setRequestMethod("DELETE");
+		connection.connect();
 
-try {  
-    _assert.ok(_uri, 'URI is not OK');
-    var URL = Packages.java.net.URL;
-    var theUrl = new URL(_uri);
-    _assert.ok(theUrl, 'The URL is not defined');
-    var connection = Packages.java.net.HttpURLConnection(theUrl.openConnection());
-    _assert.ok(connection, 'The HTTPURLConnection is not defined');
-    connection.setDoOutput(true);
-    connection.setRequestMethod("DELETE");
-    connection.connect();
-    
-    print("The HTTP response code is equal to: " + connection.getResponseCode());
-} catch (e){
-    print("There was an error with testDELETE");
-    print(e.message);
-    print(e.stack);
-}
-    return connection.getResponseCode();
+		var line, result;
 
+		var responseCode = connection.getResponseCode();
+		var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(connection.getInputStream()));
+
+		do
+		{
+			line = reader.readLine();
+			result += line||"";
+		}
+		while (line)
+
+	} catch (e){
+		print("There was an error with testDELETE");
+		print(e.message);
+		print(e.stack);
+	}
+
+	return {responseCode: connection.getResponseCode(), result: result};
 };
 
 function getFromServer(_uri, _verbose, _assert)
@@ -35,18 +42,19 @@ function getFromServer(_uri, _verbose, _assert)
 	
 	try
 	{
-		 _assert.ok(_uri, 'URI is not defined');
-		 var url = new Packages.java.net.URL(_uri);
-		 _assert.ok(url, 'The URL is not defined');
-		 var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(url.openStream()));
-		 _assert.ok(reader, 'The BufferedReader is not defined');
+		var url = new Packages.java.net.URL(_uri);
+		var connection = Packages.java.net.HttpURLConnection(url.openConnection());
+		connection.setDoInput(true);
+		connection.setRequestMethod('GET');
 
-		 do
-		 {
-			 line = reader.readLine();
-			 result += line||"";
-		 }
-		 while (line)
+		var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(connection.getInputStream()));
+
+		do
+		{
+			line = reader.readLine();
+			result += line||"";
+		}
+		while (line)
 	}	 
 	catch (e)
 	{
@@ -59,42 +67,55 @@ function getFromServer(_uri, _verbose, _assert)
 		reader && reader.close();
 	}
     
-    return result;
+    return {responseCode: connection.getResponseCode(), result: result};
 };
 
 function placeInServer(_method, _uri, _data, _assert)
 {
-    try {
-	_assert.ok(_uri, 'URI is not defined');
-	var URL = Packages.java.net.URL;
-	var theUrl = new URL(_uri);
-	_assert.ok(theUrl, 'The URL is not defined');
-	var connection = Packages.java.net.HttpURLConnection(theUrl.openConnection());
-	_assert.ok(connection, 'The HTTPURLConnection is not defined');
-	connection.setDoOutput(true);
-	connection.setRequestMethod(_method);
-	if(_method == "PUT"){connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");}
-	connection.connect();
+	var reader, writer;
+	try
+	{
+		var url = new Packages.java.net.URL(_uri);
+		var connection = Packages.java.net.HttpURLConnection(url.openConnection());
+		connection.setDoOutput(true);
+		connection.setDoInput(true);
+		connection.setRequestMethod(_method);
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		connection.connect();
 	
-	var OutputStreamWriter = Packages.java.io.OutputStreamWriter;
-	var writer = new OutputStreamWriter(connection.getOutputStream());
-	_assert.ok(writer, 'OutputStreamWriter is not set up properly');
-	writer.write(_data);
-	writer.flush();
-	print("The HTTP response code is equal to: " + connection.getResponseCode());
-	
-	return connection.getResponseCode();
+		var OutputStreamWriter = Packages.java.io.OutputStreamWriter;
+		writer = new OutputStreamWriter(connection.getOutputStream());
+		writer.write(_data);
+		writer.flush();
+		print("The HTTP response code is equal to: " + connection.getResponseCode());
+
+		var line, result="";
+		
+		var responseCode = connection.getResponseCode();
+		reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(connection.getInputStream()));
+
+		do
+		{
+			line = reader.readLine();
+			result += line||"";
+		}
+		while (line)
+
+		util.info('HALLOWEEN', 'got this result', result);
+			
+		return { responseCode: responseCode, result: result }; 
     }
-    catch (e){
-	print("There was an error with test" + _method);
-	print(e.message);
-	print(e.stack);
+	catch (e)
+	{
+		print("There was an error with test" + _method);
+		print(e.message);
+		print(e.stack);
     }
     finally
-    {
-	(writer && writer.close());
+	{
+		reader && reader.close();
+		writer && writer.close();
     }
-    
 };
 
 exports.serverDelete = function serverDelete(_urlString, _assert)

@@ -61,6 +61,8 @@ function Insert(_web)
 			 */
 
 			var id = _resource.id || provideUniqueId(resourceName);
+			_resource.id = _resource.id || id;
+			
 			var entity = incoming.createEntity(resourceName, id);
 			var result = {};
 			var callback = function()

@@ -13,8 +13,8 @@ exports.handle = function(_web)
 
 	for (var item in Iterator(listRegistration))
 	{
-		util.info('pushing item', item);
-		item && items.push(item);
+		util.info('PUSHING ITEM', item);
+		items.push(item);
 	}
 
 	_web.setContent(JSON.stringify(items));
