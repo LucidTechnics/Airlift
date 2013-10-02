@@ -7,6 +7,7 @@ jdk:
 before_script:
   - mkdir workspace
   - mkdir workspace/AppEngineSDK
+  - mkdir dist
   - cd workspace/AppEngineSDK
   - wget http://googleappengine.googlecode.com/files/appengine-java-sdk-1.8.1.1.zip
   - unzip appengine-java-sdk-1.8.1.1.zip
