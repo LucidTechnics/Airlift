@@ -12,7 +12,7 @@
  specific language governing permissions and limitations under the License.
 */
 package airlift.servlet.rest;
-
+import javax.servlet.*;
 // TODO: Auto-generated Javadoc
 /**
  * The Class GoogleUserService.
@@ -20,12 +20,13 @@ package airlift.servlet.rest;
 public class GoogleUserService
    implements UserService
 {
-	
+	protected RestContext restContext;
 	/** The http servlet request. */
 	private javax.servlet.http.HttpServletRequest httpServletRequest;
-	
+	javax.servlet.http.HttpServletResponse httpServletResponse;
 	/** The user service. */
 	private com.google.appengine.api.users.UserService userService;
+	private ServletConfig servletConfig;
 
 	/**
 	 * Gets the http servlet request.
@@ -34,6 +35,7 @@ public class GoogleUserService
 	 */
 	private javax.servlet.http.HttpServletRequest getHttpServletRequest() { return httpServletRequest; }
 	
+	public RestContext getRestContext(){return restContext;}
 	/**
 	 * Gets the user service.
 	 *
@@ -46,6 +48,7 @@ public class GoogleUserService
 	 */
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest) { httpServletRequest = _httpServletRequest; }
 	
+	public void setRestContext(RestContext _restContext){restContext=_restContext;}
 	/**
 	 * Sets the user service.
 	 *
@@ -145,4 +148,9 @@ public class GoogleUserService
 	{
 		return "AirliftUser";
 	}
+	public void setHttpServletResponse(javax.servlet.http.HttpServletResponse _httpServletResponse)
+	{
+		httpServletResponse=_httpServletResponse;
+	}
+	public void setServletConfig(ServletConfig _servletConfig){servletConfig=_servletConfig;}
 }

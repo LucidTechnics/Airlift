@@ -1,4 +1,4 @@
-var util = require('./util');
+var util = require('airlift/util');
 
 function AppIdentityService()
 {
@@ -41,7 +41,29 @@ function QueueService(_name, _method)
 		
 		for (parameter in _parameters)
 		{
-			taskOptions = taskOptions.param(parameter, _parameters[parameter] + new Packages.java.lang.String(''));
+			var parameters = _parameters[parameter];
+
+			if (util.hasValue(parameters) === true)
+			{
+				if (parameters instanceof java.util.Collection)
+				{
+					for (var item in Iterator(parameters))
+					{
+						taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
+					}
+				}
+				else if (parameters && parameters.forEach)
+				{
+					parameters.forEach(function(_item)
+					{
+						taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
+					});
+				}
+				else
+				{
+					taskOptions = taskOptions.param(parameter, parameters + new Packages.java.lang.String(''));
+				}
+			}
 		}
 
 		queue.add(taskOptions);
@@ -59,38 +81,99 @@ function CacheService()
 	
 	this.get = function(_key)
 	{
-		return service.get(_key);
+		var item = null;
+
+		try
+		{
+			item = service.get(_key);
+		}
+		catch(e)
+		{
+			util.warning('cache get of key:', _key, 'threw an exception');
+			util.warning(e.message, e.stack);
+		}
+
+		return item;
 	};
 
 	this.getAll = function(_keys)
 	{
-		return service.getAll(_keys);
+		var items;
+		
+		try
+		{
+			items = service.getAll(_keys);
+		}
+		catch(e)
+		{
+			util.warning('cache getAll of key:', _keys, 'threw an exception');
+			util.warning(e.message, e.stack);
+		}
+
+		return items;
 	};
 
 	this.put = function(_key, _value)
 	{
-		service.put(_key, _value);
+		try
+		{
+			service.put(_key, _value);
+		}
+		catch(e)
+		{
+			util.warning('cache put of key:', _key, '-', value, 'threw an exception');
+			util.warning(e.message, e.stack);
+		}
 	};
 
 	this.putAll = function(_map)
 	{
-		service.putAll(_map);
+		try
+		{
+			service.putAll(_map);
+		}
+		catch(e)
+		{
+			util.warning('cache putAll of key value map:', _map, 'threw an exception');
+			util.warning(e.message, e.stack);
+		}
 	};
 
     this['delete'] = function(_key)
-    {
-        service['delete'](_key);
+	{
+		try
+		{
+			service['delete'](_key);
+		}
+		catch(e)
+		{
+			util.warning('cache delete of key:', _key, 'threw an exception');
+			util.warning(e.message, e.stack);
+		}
     };
 
+	this.clearAll = function()
+	{
+		try
+		{
+			service.clearAll(_key);
+		}
+		catch(e)
+		{
+			util.warning('cache clearAll threw an exception');
+			util.warning(e.message, e.stack);
+		}
+	};
+	
 	this.service = function()
 	{
 		return service;
 	};
 }
 
-exports.getQueueService = function(_name)
+exports.getQueueService = function(_name, _method)
 {
-	return new QueueService(_name);
+        return new QueueService(_name, _method);
 };
 
 exports.getAppIdentityService = function()

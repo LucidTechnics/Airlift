@@ -5,10 +5,10 @@ function Resource(_web)
 	var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
 	this.each = function each(_resourceName, _resource, _function, _callback, _context)
-	{
+	{		
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
 		{
-			throw 'Resource name must be a valid resource';
+			throw 'Resource name must be a valid resource: ' + _resourceName;
 		}
 		
 		var context = _context || {};
@@ -27,6 +27,8 @@ function Resource(_web)
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
 		context.getErrors = reporter.getErrors;
+		context.hasErrors = reporter.hasErrors;
+		context.clear = reporter.clear;
 		
 		if (util.typeOf(context.attributes) === 'object')
 		{
@@ -43,6 +45,7 @@ function Resource(_web)
 		for (var i = 0; i < length; i++)
 		{
 			var name = context.attributes[i];
+
 			_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
 		}
 
@@ -87,12 +90,11 @@ function Resource(_web)
 		return _base;
 	};
 
-	this.sequence = function sequence()
+	this.sequence = this.seq = function sequence()
 	{
 		var functions = Array.prototype.slice.call(arguments, 0);		
 
 		var length = functions && functions.length || 0;
-		if (!functions || length < 1) { throw "please provide at least one function for sequence to execute"; }
 
 		return function()
 		{
@@ -101,11 +103,12 @@ function Resource(_web)
 
 			for (var i = 0; i < length; i++)
 			{
-				if (this.resourceName)
+				result = functions[i].apply(this, args);
+
+				/*if (this.resourceName)
 				{
 					if (args.length === 5) //this is reduce
-					{
-						
+					{						
 						result = functions[i].apply(this, [args[0], args[3][args[2]], args[2], args[3], args[4]]);
 					}
 					else if (args.length === 4) //basically each or map
@@ -115,20 +118,18 @@ function Resource(_web)
 				}
 				else //sequence is called outside of resource.each/map/reduce
 				{
-					result = functions[i].apply(this, args);
-				}
+				}*/
 			}
 
 			return result;
 		};
 	};
 
-	this.compose = function compose()
+	this.compose = this.com = function compose()
 	{
 		var functions = Array.prototype.slice.call(arguments, 0);
 
 		var length = functions && functions.length || 0;
-		if (!functions || length < 1) { throw "please provide at least one function for compose to execute"; }
 
 		var value;
 
@@ -147,10 +148,10 @@ function Resource(_web)
 
 	this.toString = function toString(_resourceName, _resource, _context)
 	{
-		return this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
+		return (this.reduce(new Packages.java.lang.StringBuffer("[** ").append(_resourceName||"no resource name!!!").append("\n"), _resourceName, _resource, function(_base, _value, _name, _resource)
 		{
 			return _base.append(_name).append(": ").append(_value||"").append("\n");
-		}, _context).toString();
+		}, undefined, _context) + ']').toString();
 	};
 
 	this.watch = function watch()

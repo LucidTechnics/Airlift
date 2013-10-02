@@ -61,8 +61,12 @@ function Update(_web)
 
 					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
 								function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "update", _e); });
-					if (util.hasValue(written) === true) { cache.put(entity.getKey(), entity); }
 
+					if (util.hasValue(written) === true)
+					{
+						cache.put(entity.getKey(), entity);
+					}
+					
 					if (this.resourceMetadata.isAudited === true)
 					{
 						res.audit({entity: entity, action: 'UPDATE'});
@@ -72,7 +76,7 @@ function Update(_web)
 		}
 		catch(e)
 		{
-			util.severe(resourceName, 'encountered exception', e);
+			util.severe(resourceName, 'encountered exception', e.message, e.toString());
 			util.severe('... while inserting', res.json(_resource));
 
 			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));

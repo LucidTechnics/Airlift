@@ -1,8 +1,3 @@
-var print = function print(_message)
-{
-	Packages.java.lang.System.out.println(_message);
-};
-
 var util = require('airlift/util');
 
 function deleteFromServer(_uri, _assert)
@@ -27,10 +22,10 @@ function deleteFromServer(_uri, _assert)
 		}
 		while (line)
 
-	} catch (e){
-		print("There was an error with testDELETE");
-		print(e.message);
-		print(e.stack);
+	} catch (e)
+	{
+		util.severe(e.message);
+		util.severe(e.stack);
 	}
 
 	return {responseCode: connection.getResponseCode(), result: result};
@@ -58,9 +53,8 @@ function getFromServer(_uri, _verbose, _assert)
 	}	 
 	catch (e)
 	{
-		print("Encountered exception in GET");
-		print(e.message);
-		print(e.stack);
+		util.severe("Encountered exception in GET");
+		util.severe(e.message, e.stack);
 	}
 	finally
 	{
@@ -87,7 +81,6 @@ function placeInServer(_method, _uri, _data, _assert)
 		writer = new OutputStreamWriter(connection.getOutputStream());
 		writer.write(_data);
 		writer.flush();
-		print("The HTTP response code is equal to: " + connection.getResponseCode());
 
 		var line, result="";
 		
@@ -100,16 +93,13 @@ function placeInServer(_method, _uri, _data, _assert)
 			result += line||"";
 		}
 		while (line)
-
-		util.info('HALLOWEEN', 'got this result', result);
 			
 		return { responseCode: responseCode, result: result }; 
     }
 	catch (e)
 	{
-		print("There was an error with test" + _method);
-		print(e.message);
-		print(e.stack);
+		util.severe("There was an error with test" + _method);
+		util.severe(e.message, e.stack);
     }
     finally
 	{

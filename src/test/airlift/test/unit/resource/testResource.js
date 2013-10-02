@@ -217,6 +217,10 @@ exports['test reduce'] = function(_assert)
 
 exports['test sequence'] = function(_assert)
 {
+	var emptySequence = res.sequence();
+
+	_assert.doesNotThrow(emptySequence, 'Empty sequence threw an exception');
+	
 	var results = [];
 	
 	var sequence = res.sequence(
@@ -241,6 +245,41 @@ exports['test sequence'] = function(_assert)
 	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct');
+
+	results = [];
+	sequence = res.seq(function() { results.push(1); });
+	sequence = res.seq(function() { results.push(2); }, sequence);
+	sequence = res.seq(function() { results.push(3); }, sequence);
+	sequence = res.seq(function() { results.push(4); }, sequence);
+
+	sequence();
+
+	_assert.deepEqual([4,3,2,1], results, 'all sequence of a sequence functions did not appear to run in sequence');
+
+	results = [];
+	sequence = res.seq(function(w,x,y,z) { results.push(w); });
+	sequence = res.seq(function(w,x,y,z) { results.push(x); }, sequence);
+	sequence = res.seq(function(w,x,y,z) { results.push(y); }, sequence);
+	sequence = res.seq(function(w,x,y,z) { results.push(z); }, sequence);
+
+	sequence(5,6,7,8);
+
+	_assert.deepEqual([8,7,6,5], results, 'all multiparameter sequence of sequence functions did not appear to run in sequence');
+
+	results = [];
+	sequence = res.seq.partial(function(w,x,y,z) { results.push(w); });	
+	sequence = sequence.partial(function(w,x,y,z) { results.push(x); });
+	sequence = sequence.partial(function(w,x,y,z) { results.push(y); });
+	sequence = sequence.partial(function(w,x,y,z) { results.push(z); });
+
+	sequence()(9,10,11,12);
+
+	_assert.deepEqual([9,10,11,12], results, 'all multiparameter partial sequence functions did not appear to run in sequence');
+
+	sequence()(9,10,11,12);
+
+	_assert.deepEqual([9,10,11,12,9,10,11,12], results, 'all multiparameter partial sequence functions did not appear to run in sequence');
+
 };
 
 exports['test json'] = function(_assert)
@@ -326,6 +365,28 @@ exports['test compose'] = function(_assert)
 	}), undefined, context);
 
 	_assert.deepEqual(attributes, context.attributes, 'attribute list is not correct after second compose test');
+};
+
+exports['test toString'] = function(_assert)
+{
+	var result = '[** person\n'+
+					'fullName: Bediako George\n' +
+					'shortName: Bediako\n' +
+					'status: middle aged\n' +
+					'birthDate: \n' +
+					'age: 43.0\n' +
+					'friendList: [friend1, friend2, friend3]\n' +
+					'familySet: [family1]\n' +
+					'auditPostDate: \n' +
+					'auditPutDate: \n' +
+					'auditUserId: \n' +
+					'id: 6524d6f79d19\n' +
+				']';
+
+	var person = bediako;
+	delete person.birthDate;
+	
+	_assert.eq(res.toString('person', person, context), result, 'string representation was not created correctly');
 };
 
 exports['test watch'] = function(_assert)

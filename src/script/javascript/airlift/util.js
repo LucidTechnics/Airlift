@@ -2,16 +2,19 @@ var print = function print(_message)
 {
 	Packages.java.lang.System.out.println(_message);
 };
-try{
-    var log = Packages.java.util.logging.Logger.getLogger('airlift');
 
+try
+{
+    var log = Packages.java.util.logging.Logger.getLogger('airlift');
     var handlerArray = log.getHandlers();
-    if(handlerArray.length == 0){
-	log.setLevel(Packages.java.util.logging.Level.ALL);
-	var handler = new Packages.java.util.logging.ConsoleHandler();
-	handler.setFormatter(new Packages.java.util.logging.SimpleFormatter());
-	handler.setLevel(Packages.java.util.logging.Level.ALL);
-	log.addHandler(handler);
+
+	if (handlerArray.length == 0)
+	{
+		log.setLevel(Packages.java.util.logging.Level.ALL);
+		var handler = new Packages.java.util.logging.ConsoleHandler();
+		handler.setFormatter(new Packages.java.util.logging.SimpleFormatter());
+		handler.setLevel(Packages.java.util.logging.Level.ALL);
+		log.addHandler(handler);
     }
 }
 catch(e){
@@ -95,7 +98,9 @@ var ErrorReporter = function()
 		}
 		
 		return errors[_name];
-	}
+	};
+
+	this.hasErrors = function() { return (exports.isEmpty(this.allErrors()) === false); };
 
 	this.report = function(_name, _error)
 	{
@@ -121,6 +126,11 @@ var ErrorReporter = function()
 		}
 
 		errors[_name] = errorList;
+	};
+
+	this.clear = function()
+	{
+		errors = {};
 	};
 };
 
@@ -422,7 +432,7 @@ exports.set = function set(_parameter)
 	return set;
 };
 
-exports.orderedSet = function orderedSet(_parameter)
+exports.orderedSet = oSet = function orderedSet(_parameter)
 {
 	var set;
 
@@ -535,7 +545,7 @@ exports.getAttributesMetadata = function(_name)
 	return require('meta/a/' + _name).create();
 };
 
-exports.getWebRequestId = function(_name)
+exports.getWebRequestId = function()
 {
 	return Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 };

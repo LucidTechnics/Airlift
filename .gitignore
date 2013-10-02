@@ -1,15 +1,17 @@
 # Can also ignore all directories and files in a directory.
+.DS_Store
+.DS_Store/**/*
 appengine-generated
 classes
 classes/**/*
-stage
-stage/**/*
-dist
-dist/**/*
 deploy 
 deploy/**/*
-workspace
-workspace/**/*
+dist
+dist/**/*
 env/src/genjava
 env/src/genjava/**/*
 env/war/WEB-INF/lib/appengine-*.jar
+stage
+stage/**/*
+workspace
+workspace/**/*

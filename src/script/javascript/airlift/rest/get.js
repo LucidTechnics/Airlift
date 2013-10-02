@@ -1,12 +1,17 @@
-var da = require('./da/get');
-var web = require('../web');
-
-exports.get = function(_config)
+exports.get = function get(_web, _config)
 {
 	var config = _config||{};
-
-	var resourceName = config.resourceName||this.resourceName;
-	var id = config.id||web.getId();
+	var resource = require('airlift/da/get').create(_web).get(config.resourceName || _web.getResourceName(), config.id || _web.getId());
+	var serializeResource = config.resourceSerializer||JSON.stringify;
 	
-	return da.get(resourceName, id);
+	if (resource)
+	{
+		_web.setContent(serializeResource(resource));
+	}
+	else
+	{
+		_web.setResponseCode('404');
+	}
+	
+	return resource; 
 };

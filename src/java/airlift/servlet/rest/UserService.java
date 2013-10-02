@@ -12,7 +12,7 @@
  specific language governing permissions and limitations under the License.
 */
 package airlift.servlet.rest;
-
+import javax.servlet.*;
 // TODO: Auto-generated Javadoc
 /**
  * The Interface UserService.
@@ -115,4 +115,8 @@ public interface UserService
 	 * @param _httpServletRequest the new http servlet request
 	 */
 	public void setHttpServletRequest(javax.servlet.http.HttpServletRequest _httpServletRequest);
+	public void setRestContext(RestContext _restContext);
+	public RestContext getRestContext();
+	public void setHttpServletResponse(javax.servlet.http.HttpServletResponse _httpServletResponse);
+	public void setServletConfig(ServletConfig _servletConfig);
 }

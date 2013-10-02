@@ -52,6 +52,9 @@ exports['test validator'] = function(_assert)
 	res.each('person', bediakoCopy, res.sequence(incoming.validate, res.watch(function() { errors = this.allErrors(); })), undefined, context);
 
 	_assert.eq(true, !!errors, 'error object not returned');
+
+	util.info(JSON.stringify(errors));
+	
 	_assert.eq(true, util.isEmpty(errors), 'validation failed unexpectedly');
 
 	bediakoCopy.fullName = null;

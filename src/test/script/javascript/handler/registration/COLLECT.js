@@ -1,8 +1,3 @@
-var print = function print(_message)
-{
-	Packages.java.lang.System.out.println(_message);
-};
-
 var util = require('airlift/util');
 
 exports.handle = function(_web)
@@ -13,7 +8,6 @@ exports.handle = function(_web)
 
 	for (var item in Iterator(listRegistration))
 	{
-		util.info('PUSHING ITEM', item);
 		items.push(item);
 	}
 

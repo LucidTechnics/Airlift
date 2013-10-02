@@ -1,17 +1,50 @@
-var da = require('./da/insert');
-var res = require('../resource');
-var ingest = require('../ingest');
+var util = require('airlift/util');
 
-exports.post = function(_config)
+exports.post = function(_web, _config)
 {
+	var res = require('airlift/resource').create(_web);
+	var inc = require('airlift/incoming').create(_web);
+
 	var config = _config||{};
 
-	var resourceName = config.resourceName||this.resourceName;
-	var resource = {};
-	var errors = config.errors||{};
-	var sequence = config.sequence||res.sequence.partial(errors);
+	var resourceName = config.resourceName||_web.getResourceName();
+	var id = config.id||_web.getId();
+	var resource = config.resource||{};
+	var context = config.context || undefined;
+	var errors;
+	var serializeResource = config.resourceSerializer||JSON.stringify;
+	var serializeError = config.errorSerializer||JSON.stringify;
+	
+	var callback = function(_resourceName, _resource)
+	{
+		util.info('calling callback', _resourceName, JSON.stringify(_resource));
+		
+		if (this.hasErrors() === false)
+		{
+			util.info('no validation errors');
+			
+			var da = require('airlift/da/insert').create(_web);
+			da.insert(resourceName, resource);
+			_web.setResponseCode('201');
+			_web.setContent(serializeResource(_resource));
+		}
+		else
+		{
+			errors = this.allErrors();
+			util.info('ERRORS', JSON.stringify(this.allErrors()));
+			_web.setResponseCode('400');
+			_web.setContent(serializeError(this.allErrors()));
+		}
+	};
 
-	da.insert(resourceName, resource, sequence.partial(ingest.convert, ingest.validate));
+	var sequence = (config.pre && res.sequence.partial(inc.convert, config.pre, inc.validate)) || res.sequence.partial(inc.convert, inc.validate);
+	sequence = (config.post && res.sequence.partial(sequence(), config.post)) || sequence;
 
-	return {resource: resource, errors: sequence.errors};
+	var callbackSequence = (config.preInsert && res.sequence.partial(config.preInsert, callback)) || res.sequence.partial(callback);
+
+	util.info('calling resource.each on ', JSON.stringify(resource));
+	res.each(resourceName, resource, sequence(), callbackSequence(), context);
+	util.info('finished with resource.each');
+	
+	return {resource: resource, errors: errors};
 };

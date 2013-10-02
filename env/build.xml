@@ -172,6 +172,8 @@
 		<mkdir dir="${src.genjava}/airlift/app" />
 		<mkdir dir="${war}/WEB-INF/classes/gen/meta/r" />
 		<mkdir dir="${war}/WEB-INF/classes/gen/meta/a" />
+		<mkdir dir="${war}/WEB-INF/classes/handler" />
+		<mkdir dir="${war}/WEB-INF/classes/template" />
 	    <mkdir dir="${war}/gen/javascript/validation" />
 		<mkdir dir="${dist}" />
 		<mkdir dir="${dist}/lib" />
@@ -228,6 +230,12 @@
 		</delete>
 				
 		<delete dir="${stage}" />
+	</target>
+
+	<target name="clean-ds">
+	    <delete>
+		   <fileset dir="${war}/WEB-INF/appengine-generated" includes="**/*"  />
+		</delete>
 	</target>
 
 	<target name="clean-war"	 >

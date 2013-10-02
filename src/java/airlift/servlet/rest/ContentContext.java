@@ -197,9 +197,9 @@ public abstract class ContentContext
 	 */
 	public void setDownloadFile(String _downloadFileName)
 	{
-		addHeader("Content-Disposition", "attachment; filename=" + _downloadFileName);
+		addHeader("Content-Disposition", "attachment; filename=\"" + _downloadFileName + "\"");
 	}
-	
+
 	public void isJson()
 	{
 		setType(JSON_TYPE);

@@ -810,7 +810,7 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 
 	var postDatePersistable = Packages.airlift.generator.Annotation();
 	postDatePersistable.name = "persistable";
-	postDatePersistable.addParameterValue("nullable", new Packages.java.lang.Boolean(true).booleanValue());
+	postDatePersistable.addParameterValue("required", new Packages.java.lang.Boolean(false).booleanValue());
 	postDatePersistable.addParameterValue("isIndexable", new Packages.java.lang.Boolean(true).booleanValue());
 	postDatePersistable.addParameterValue("isSearchable", new Packages.java.lang.Boolean(true).booleanValue());
 	
@@ -828,7 +828,7 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 
 	var putDatePersistable = Packages.airlift.generator.Annotation();
 	putDatePersistable.name = "persistable";
-	putDatePersistable.addParameterValue("nullable", new Packages.java.lang.Boolean(true).booleanValue());
+	putDatePersistable.addParameterValue("required", new Packages.java.lang.Boolean(false).booleanValue());
 	putDatePersistable.addParameterValue("isIndexable", new Packages.java.lang.Boolean(true).booleanValue());
 	putDatePersistable.addParameterValue("isSearchable", new Packages.java.lang.Boolean(true).booleanValue());
 	
@@ -846,7 +846,7 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 
 	var auditUserPersistable = Packages.airlift.generator.Annotation();
 	auditUserPersistable.name = "persistable";
-	auditUserPersistable.addParameterValue("nullable", new Packages.java.lang.Boolean(true).booleanValue());
+	auditUserPersistable.addParameterValue("required", new Packages.java.lang.Boolean(false).booleanValue());
 	auditUserPersistable.addParameterValue("isIndexable", new Packages.java.lang.Boolean(true).booleanValue());
 	auditUserPersistable.addParameterValue("isSearchable", new Packages.java.lang.Boolean(true).booleanValue());
 
@@ -865,7 +865,7 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 
 	var auditUserPersistable = Packages.airlift.generator.Annotation();
 	auditUserPersistable.name = "persistable";
-	auditUserPersistable.addParameterValue("nullable", new Packages.java.lang.Boolean(true).booleanValue());
+	auditUserPersistable.addParameterValue("required", new Packages.java.lang.Boolean(false).booleanValue());
 	auditUserPersistable.addParameterValue("isIndexable", new Packages.java.lang.Boolean(true).booleanValue());
 	auditUserPersistable.addParameterValue("isSearchable", new Packages.java.lang.Boolean(true).booleanValue());
 
@@ -980,7 +980,7 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 	//Primary Key
 	var persistable = Packages.airlift.generator.Annotation();
 	persistable.name = "persistable";
-	persistable.addParameterValue("nullable", new Packages.java.lang.Boolean(true).booleanValue());
+	persistable.addParameterValue("required", new Packages.java.lang.Boolean(false).booleanValue());
 	persistable.addParameterValue("isIndexable", new Packages.java.lang.Boolean(false).booleanValue());
 	persistable.addParameterValue("isSearchable", new Packages.java.lang.Boolean(false).booleanValue());
 	

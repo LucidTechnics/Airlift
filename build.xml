@@ -377,6 +377,7 @@
 	<target name="inttest" description="Just does the integration test.  NEEDS RUNNING SERVER." depends="test">
 	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   	<echo message="${appserver.classpath}"/>
+		<delete dir ="workspace/env/war/WEB-INF/appengine-generated" />
 		<script language="javascript" src="src/test/airlift/inttest.js">
 		    <classpath refid="appserver.classpath"/> 			
 		</script>
@@ -384,11 +385,9 @@
 	</target>
 
 	<target name="cinttest" depends="startServer" description="Starts the new server." >
-	   <echo message="...The INTEGRATION TEST has BEGUN..." />
 	   <exec dir="workspace/env" executable="ant" newenvironment="true">
 	     <arg value="inttest" />
 	   </exec>
-	   <echo message="...The INTEGRATION TEST has ENDED..." />
 	   <delete dir="workspace/env" />
 	</target>
 

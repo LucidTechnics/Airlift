@@ -83,14 +83,9 @@ function Insert(_web)
 					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
 												function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
 
-					if (util.hasValue(written) === true) {
-					    try{
-					    cache.put(entity.getKey(), entity);
-					    }
-					    catch(e){
-						util.info("ERROR in insert.js");
-						util.info(e.message, e.stack);
-					    }
+					if (util.hasValue(written) === true)
+					{
+						cache.put(entity.getKey(), entity);
 					}
 
 					if (this.resourceMetadata.isAudited === true)
@@ -100,12 +95,11 @@ function Insert(_web)
 				}
 			};
 
-			//var post = _post && res.sequence.partial(callback, _post) || res.sequence.partial(callback);
 			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
 		}
 		catch(e)
 		{
-			util.severe(resourceName, 'encountered exception', e);
+			util.severe(resourceName, 'encountered exception', e.message, e.toString());
 			util.severe('... while inserting', res.json(_resource));
 			
 			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));

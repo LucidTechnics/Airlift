@@ -143,11 +143,11 @@ assert.eq = function eq(actual, expected, message)
 {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === false) { fail(actual, expected, message, '===', assert.equal); }
+		if (actual.equals(expected) === false) { fail(actual, expected, message, '!==', assert.eq); }
 	}
 	else
 	{
-		if (actual != expected) { fail(actual, expected, message, '===', assert.equal); }
+		if (actual !== expected) { fail(actual, expected, message, '!==', assert.eq); }
 	}
 };
 
@@ -158,12 +158,12 @@ assert.notEq = function notEq(actual, expected, message)
 {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === true) { fail(actual, expected, message, '!==', assert.equal); }
+		if (actual.equals(expected) === true) { fail(actual, expected, message, '===', assert.notEq); }
 	}
 	else
 	{
-		if (actual == expected) {
-			fail(actual, expected, message, '!==', assert.notEqual);
+		if (actual === expected) {
+			fail(actual, expected, message, '===', assert.notEq);
 		}
 	} 
 };
@@ -278,34 +278,28 @@ assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
   }
 };
 
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-
 assert.kindaEqual = function kindaEqual(actual, expected, message) {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === false) { fail(actual, expected, message, '==', assert.equal); }
+		if (actual.equals(expected) == false) { fail(actual, expected, message, '==', assert.equal); }
 	}
 	else
 	{
-		if (actual !== expected) {
-			fail(actual, expected, message, '==', assert.strictEqual);
+		if (actual != expected) {
+			fail(actual, expected, message, '==', assert.kindaEqual);
 		}
 	}
 };
 
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-
 assert.notKindaEqual = function notKindaEqual(actual, expected, message) {
 	if (actual && actual instanceof Packages.java.lang.Object)
 	{
-		if (actual.equals(expected) === true) { fail(actual, expected, message, '==', assert.equal); }
+		if (actual.equals(expected) == true) { fail(actual, expected, message, '==', assert.equal); }
 	}
 	else
 	{
-	  if (actual === expected) {
-		fail(actual, expected, message, '!=', assert.notStrictEqual);
+	  if (actual == expected) {
+		fail(actual, expected, message, '!=', assert.notKindaEqual);
 	  }
 	}
 };

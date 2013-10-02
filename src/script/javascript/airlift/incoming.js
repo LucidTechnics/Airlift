@@ -34,7 +34,7 @@ function Incoming(_web)
 
 	var allowedValue = function(_errors, _metadata, _name, _value)
 	{
-		!_metadata.allowedValues[_value] && _errors.push(validationError(_name, "This value is not allowed."));
+		!_metadata.allowedValues[new Packages.java.lang.String(_value)] && _errors.push(validationError(_name, "This value is not allowed."));
 
 		return _errors;
 	};
@@ -101,7 +101,7 @@ function Incoming(_web)
 			value = _value + '';
 		}
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -136,7 +136,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -159,7 +159,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -173,7 +173,7 @@ function Incoming(_web)
 		var errors = [];
 		var value = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -206,7 +206,7 @@ function Incoming(_web)
 			value = _value;
 		}
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -220,7 +220,7 @@ function Incoming(_web)
 		var errors = [];
 		var collection = _value;
 
-		if (_metadata.nullable === false)
+		if (_metadata.required === true)
 		{
 			var message = isRequired(errors, _metadata, _name, collection);
 			message && errors.push(validationError(_name, message));
@@ -319,9 +319,7 @@ function Incoming(_web)
 			}
 			else if (util.hasValue(_attributeMetadata.mapToMany) === true)
 			{
-				util.info('map to many resource', JSON.stringify( _resource));
-				util.info('map to many value is', _attributeName, value);
-				util.info('map to many class is', _attributeName, value && value.getClass && value.getClass());
+				if (!value) { value = util.list(); }
 				
 				if (value instanceof java.util.Collection === false) { throw 'Map to many property must be a java.util.Collection'; }
 				
@@ -377,7 +375,7 @@ function Incoming(_web)
 	{
 		var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
 
-		return convertUtil.convert(value, util.createClass(_type));
+		return (value && convertUtil.convert(value, util.createClass(_type)))||value;
 	};
 
 	var convertToByteArray  = function(_parameterValue, _type, _index)
@@ -414,14 +412,31 @@ function Incoming(_web)
 		this["java.lang.Byte"] = function() { throw new Error("Airlift currently does not support java.lang.Byte. Try using String instead or file a feature request."); };
 		this["java.lang.Character"] = function() { throw new Error("Airlift currently does not support java.lang.Character objects. Try using String instead or file a feature request."); };
 
-		this["java.util.Set"] = function(_parameterValue) { var collection = new Packages.java.util.HashSet(); return convertToMultiValue(_parameterValue, collection); }
+		this["java.util.Set"] = function(_parameterValue) { var collection = (new CollectionType()).create('java.util.Set'); return convertToMultiValue(_parameterValue, collection); }
 		this["java.util.HashSet"] = this["java.util.Set"];
-		this["java.util.List"] = function(_parameterValue) { var collection = new Packages.java.util.ArrayList(); return convertToMultiValue(_parameterValue, collection); }
+		this["java.util.List"] = function(_parameterValue) { var collection = (new CollectionType()).create('java.util.List'); return convertToMultiValue(_parameterValue, collection); }
 		this["java.util.ArrayList"] = this["java.util.List"];
 		this["java.util.List<java.lang.String>"] = this["java.util.List"];
 		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
 		this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
 		this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
+	}
+
+	function CollectionType()
+	{
+		this["java.util.Set"] = function(_parameterValue) { return new Packages.java.util.HashSet(); }
+		this["java.util.HashSet"] = this["java.util.Set"];
+		this["java.util.List"] = function(_parameterValue) { return new Packages.java.util.ArrayList(); }
+		this["java.util.ArrayList"] = this["java.util.List"];
+		this["java.util.List<java.lang.String>"] = this["java.util.List"];
+		this["java.util.ArrayList<java.lang.String>"] = this["java.util.List"];
+		this["java.util.HashSet<java.lang.String>"] = this["java.util.Set"];
+		this["java.util.Set<java.lang.String>"] = this["java.util.HashSet"];
+
+		this.create = function(_type)
+		{
+			return this[_type]();
+		}
 	}
 
 	function CollectionTypes()
@@ -438,80 +453,87 @@ function Incoming(_web)
 
 	var converter = new Converter();
 	var collectionTypes = new CollectionTypes();
-
+	
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
 	{
-		var request = _web.getRequest();
-
-		var resourceName = this.resourceName;
-		var value;
-
-		var type = _attributeMetadata.type;
-
-		if ("id".equals(_attributeName) !== true)
+		var value = _resource[_attributeName];
+		
+		if (util.hasValue(value) === false)
 		{
-			try
-			{
-				if (converter[type])
-				{
-				    var parameterValue = request.getParameterValues(_attributeName);
+			var request = _web.getRequest();
+			var resourceName = this.resourceName;
+			var type = _attributeMetadata.type;
 
-					if (util.hasValue(parameterValue) === false && collectionTypes[type])
+			if ("id".equals(_attributeName) !== true)
+			{
+				try
+				{
+					if (converter[type])
 					{
-						parameterValue = request.getParameterValues(_attributeName + '[]');
+						var parameterValue = request.getParameterValues(_attributeName);
+
+						if (util.hasValue(parameterValue) === false && collectionTypes[type])
+						{
+							parameterValue = request.getParameterValues(_attributeName + '[]');
+						}
+
+						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+
+						if (collectionTypes[type] && util.hasValue(value) === false)
+						{
+							value = (new CollectionType()).create(type);
+						}
+					}
+					else
+					{
+						throw new Error('no converter found for type: ' + type);
+					}
+				}
+				catch(e)
+				{
+					if (e.javaException)
+					{
+						util.warning(e.javaException.getMessage());
+					}
+					else
+					{
+						util.warning(e.message);
 					}
 
-					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
-				}
-				else
-				{
-					throw new Error('no converter found for type: ' + type);
-				}
-			}
-			catch(e)
-			{
-				if (e.javaException)
-				{
-					util.warning(e.javaException.getMessage());
-				}
-				else
-				{
-					util.warning(e.message);
+					this.report(_attributeName, "This value is not correct.", "conversion");
 				}
 
-				this.report(_attributeName, "This value is not correct.", "conversion");
-			}
-			
-			if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
-			{
-				/* Form value overrides what is in the URI.  This is done for
-				 * security reasons.  The foreign key may be protected via TLS
-				 * by including it in the form and not in the URI.  If it is
-				 * included in the form the expectation is that the URI should
-				 * be overridden.
+				if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
+				{
+					/* Form value overrides what is in the URI.  This is done for
+					 * security reasons.  The foreign key may be protected via TLS
+					 * by including it in the form and not in the URI.  If it is
+					 * included in the form the expectation is that the URI should
+					 * be overridden.
+					 */
+
+					var restContext = _web.getRestContext();
+					var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+					value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
+				}
+
+				/* There is no way to represent mapToMany in a URI
+				 * therefore the form value is taken. 
 				 */
-
+			}
+			else
+			{
 				var restContext = _web.getRestContext();
-				var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+				var parameterValue = restContext.getParameter(resourceName);
+				//convert only works for the first id.  Multiple puts not
+				//supported at this time - Bediako
 				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 			}
 
-			/* There is no way to represent mapToMany in a URI
-			 * therefore the form value is taken. 
-			 */
-		}
-		else
-		{
-			var restContext = _web.getRestContext();
-			var parameterValue = restContext.getParameter(resourceName);
-			//convert only works for the first id.  Multiple puts not
-			//supported at this time - Bediako
-			value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
-		}
-		
-		_resource[_attributeName] = value;
+			_resource[_attributeName] = value;
 
-		var res = require('airlift/resource').create(_web);
+			var res = require('airlift/resource').create(_web);
+		}
 
 		return value;
 	};
@@ -553,7 +575,7 @@ function Incoming(_web)
 
 		if (!!validator[type] === true)
 		{
-			validator[type](_value, _name, _metadata, this.report);
+			validator[type](_resource[_name], _name, _metadata, this.report);
 		}
 		else
 		{
