@@ -61,7 +61,6 @@
 	<property name="src.cfg" location="${src}/cfg" />
 	<property name="src.doc" location="${src}/doc" />
 
-	<property name="timeout" value=""/>
 
 	<property name="war" location="war" />
 	<property name="classes" location="${war}/WEB-INF/classes" />
@@ -348,7 +347,7 @@
 
 	</target>
 
-	  <target name="runserver" depends= "discoverNodeModules" description="Starts the development server.">
+	<target name="runserver" depends= "discoverNodeModules, test-jar" description="Starts the development server.">
 	  <dev_appserver war="${war}">
 		 <options>
 			   <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
@@ -356,15 +355,7 @@
 				<arg value="--jvm_flag=-Xmx1024m"/>
 
 		 </options>
-	   </dev_appserver>
-	</target>
-
-	<target name="startserver" description="Starts the development server with generation.">
-	   <dev_appserver war="${war}">
-		 <options>
-		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
-		 </options>
-	   </dev_appserver>
+	  </dev_appserver>
 	</target>
 
 	<target name="request_logs" description="Downloads log data from App Engine for the application.">
@@ -431,7 +422,7 @@
 
 		<jar destfile="${dist}/lib/${jar}-test.jar"
 		       basedir="${src.test}/airlift"
-			   includes="harness.js"
+			   includes="harness.js inttest.js"
 			   update="true"
 		  />
 
@@ -463,13 +454,50 @@
 		<script language="javascript" src="airlift/test.js">
 		    <classpath refid="test.class.path"/>			
 		</script>
-	</target> 
+	</target>	
 
-	<target name="integrationtest" depends="test-jar">
+	<target name="inttest">
+	   <sequential>
+		<waitfor maxwait="5" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+			<http url="http://localhost:8080/_ah/admin" />
+		</waitfor>
+		<fail message="...The server has failed to start.  Integration testjar has been aborted...">
+			<condition>
+			   <isset property="timeout" />
+			</condition>
+		</fail>
+		<echo message="...The INTEGRATION TEST has BEGUN..." />
 		<echo message="${appserver.classpath}"/>
-		<script language="javascript" src="airlift/integrationtest.js">
-		    <classpath refid="appserver.classpath"/> 			
+		<script language="javascript" src="airlift/inttest.js">
+			<classpath refid="appserver.classpath"/>
 		</script>
+		<echo message="...The INTEGRATION TEST has ENDED..." />
+		</sequential>
+	</target>
+
+	<target name="ci">
+		<parallel>
+			<exec dir="." executable="ant" newenvironment="true">
+			   <arg value="runserver" />
+			</exec>
+
+			<sequential>
+				<waitfor maxwait="60" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+					<http url="http://localhost:8080/_ah/admin" />
+				</waitfor>
+				<fail message="...The server has failed to start.  Integration testjar has been aborted...">
+					<condition>
+					   <isset property="timeout" />
+					</condition>
+				</fail>
+				<echo message="...The INTEGRATION TEST has BEGUN..." />
+				<echo message="${appserver.classpath}"/>
+				<script language="javascript" src="airlift/inttest.js">
+					<classpath refid="appserver.classpath"/>
+				</script>
+				<echo message="...The INTEGRATION TEST has ENDED..." />
+			</sequential>
+		</parallel>
 	</target>
 
 </project>

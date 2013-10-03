@@ -8,16 +8,18 @@ try
     var log = Packages.java.util.logging.Logger.getLogger('airlift');
     var handlerArray = log.getHandlers();
 
-	if (handlerArray.length == 0)
+	/*if (handlerArray.length == 0)
 	{
 		log.setLevel(Packages.java.util.logging.Level.ALL);
-		var handler = new Packages.java.util.logging.ConsoleHandler();
+		var handler = (new Packages.airlift.ConsoleHandler()).getConsoleHandler();
 		handler.setFormatter(new Packages.java.util.logging.SimpleFormatter());
 		handler.setLevel(Packages.java.util.logging.Level.ALL);
 		log.addHandler(handler);
-    }
+    }*/
 }
-catch(e){
+catch(e)
+{
+	//not reporting these 
     print(e.message);
     print(e.stack);
 }

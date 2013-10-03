@@ -1,8 +1,3 @@
-var print = function print(_message)
-{
-	Packages.java.lang.System.out.println(_message);
-};
-
 var createContext = function createContext()
 {
 		//Do not try to manage the context ... as it is managed by
@@ -77,7 +72,7 @@ directoryScanner.setBasedir(new Packages.java.io.File(baseDir));
 directoryScanner.setCaseSensitive(true);
 directoryScanner.scan();
 
-print("Executing tests ...");
+util.info("Executing tests ...");
 var files = directoryScanner.getIncludedFiles();
 
 var totalFailedAssertions = 0;
@@ -88,13 +83,13 @@ for (var i = 0; i < files.length; i++)
 {
 	var testScript = new Packages.java.lang.String(files[i]);
 	var harness = "var harness = require('harness'); var name = \"" + testScript.replaceAll(".js$", "") + "\"; var test = require(name); this.stats = harness.run(name, test);";	
-    print("...Now running: " + testScript.replaceAll(".js$", "") + "...");
+    util.info("...Now running: " + testScript.replaceAll(".js$", "") + "...");
 
 	var scope = resetScope(context, sharedScope);
 	var require = new Require(scope, sharedRequire, new Packages.java.util.HashMap(), true);
 	require.install(scope);
 
-	print('');
+	util.info('');
 
 	context.evaluateString(scope, harness, files[i], 1, null);
     Packages.java.lang.Thread.sleep(3000);
@@ -117,11 +112,11 @@ for (var i = 0; i < files.length; i++)
 
 if (totalFailedAssertions > 0)
 {
-	print('');
+	util.info('');
 	throw new Error('Test run ended with a total of ' + totalTestCount + ' tests with '+ totalFailedAssertions + ' failed assertions');
 }
 else
 {
-	print('');
-	print(totalTestCount + ' test(s) with ' + totalAssertions + ' assertion(s) passed.');
+	util.info('');
+	util.info(totalTestCount + ' test(s) with ' + totalAssertions + ' assertion(s) passed.');
 }

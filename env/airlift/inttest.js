@@ -43,9 +43,9 @@ uris.add(new URI("http://localhost:80/test/airlift/"));
 uris.add(new URI("http://localhost:80/test/airlift/test"));
 uris.add(new URI("http://localhost:80/airlift"));
 uris.add(new URI("http://localhost:80//airlift/lib/"));
-uris.add(new java.net.URI("http://localhost:80/handler/"));
-uris.add(new java.net.URI("http://localhost:80/extlib/"));
-uris.add(new java.net.URI("http://localhost:80/gen/"));
+uris.add(new URI("http://localhost:80/handler/"));
+uris.add(new URI("http://localhost:80/extlib/"));
+uris.add(new URI("http://localhost:80/gen/"));
 uris.add(new URI("http://localhost:80//node_modules/"));
 uris.add(new URI("http://localhost:80//"));
 
