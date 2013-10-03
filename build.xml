@@ -370,28 +370,6 @@
 		 <arg value="test" />
 	  </exec>
 	</target>
-
-	<path id="appserver.classpath">
-		<pathelement path="${classes}" />
-		<fileset dir="${env}/war/WEB-INF/lib">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${sdk.dir}/lib">
-			<include name="shared/**/*.jar" />
-			<include name="appengine-remote-api.jar" />
-			<include name="appengine-tools-api.jar" />
-			<include name="testing/appengine-testing.jar" />
-			<include name="impl/**/*.jar" />
-		</fileset>
-		<fileset dir="${dist}">
-			<include name="**/*scripts.jar"/>
-		</fileset>
-		<fileset dir="${dist}">
-			<include name="**/*test*.jar"/>
-		</fileset>
-	</path>
-
-	<property name="appserver.classpath" refid="appserver.classpath" />
 	
 	<target name="checkDir">
 
