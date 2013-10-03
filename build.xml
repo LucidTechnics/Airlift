@@ -121,6 +121,7 @@
 	<target name="clean-classes">
 		<delete dir="${classes}" />
 		<delete dir="${dist}" />
+		<mkdir dir="${dist}" />
 	</target>
 
 	<!-- Clean target -->
