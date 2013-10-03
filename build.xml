@@ -365,9 +365,9 @@
 	  </exec>
 	</target>
 
-	<target name="ci" description="Does the integration test. " depends="">	  
+	<target name="test" description="Does unit and integration tests. " depends="utest">	  
 	  <exec dir="workspace/env" executable="ant" newenvironment="true">
-		 <arg value="ci" />
+		 <arg value="test" />
 	  </exec>
 	</target>
 
@@ -441,8 +441,8 @@
 		<mkdir dir="${java.package.dir}/servlet" />
 		
 	</target>			
-	
-	<target name="test" depends="redeploy">
+
+	<target name="utest" depends="redeploy">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="test.js">

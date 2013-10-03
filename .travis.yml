@@ -5,7 +5,6 @@ jdk:
   - openjdk7
 
 before_script:
-  - mkdir dist
   - mkdir workspace
   - mkdir workspace/AppEngineSDK
   - cd workspace/AppEngineSDK
@@ -13,8 +12,7 @@ before_script:
   - unzip appengine-java-sdk-1.8.1.1.zip
   - cd ../..
   - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/appengine-java-sdk-1.8.1.1/lib/agent/appengine-agent.jar
-  - export AIRLIFT_APP_ENGINE_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/appengine-java-sdk-1.8.1.1
-  - ant runserver &
+  - export AIRLIFT_APP_ENGINE_DEV_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/appengine-java-sdk-1.8.1.1
 
 # whitelist
 branches:

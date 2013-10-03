@@ -448,7 +448,10 @@
 
     </target>
 
-	<target name="test" depends="test-jar">
+	<target name="test" depends="utest, inttest">
+	</target>	
+
+	<target name="utest" depends="test-jar">
 	   	<property name="run.class.path" refId="test.class.path"/>
 		<echo message="${run.class.path}"/>
 		<script language="javascript" src="airlift/test.js">
