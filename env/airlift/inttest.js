@@ -62,11 +62,14 @@ var testDir = project.getProperty("src.test");
 
 var directoryScanner = new org.apache.tools.ant.DirectoryScanner();
 var includes = 	Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.String, 2);
+var excludes = 	Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.String, 1);
 includes[0] = "test*.js";
 includes[1] = "**/test*.js";
+excludes[0] = "unit/**";
 
 var baseDir = project.getBaseDir().getPath() + "/src/test/airlift/test/";
 directoryScanner.setIncludes(includes);
+directoryScanner.setExcludes(excludes);
 directoryScanner.setBasedir(new Packages.java.io.File(baseDir));
 directoryScanner.setCaseSensitive(true);
 directoryScanner.scan();

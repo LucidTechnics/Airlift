@@ -448,8 +448,7 @@
 
     </target>
 
-	<target name="test" depends="utest, inttest">
-	</target>	
+	<target name="test" depends="utest, itest"> </target>	
 
 	<target name="utest" depends="test-jar">
 	   	<property name="run.class.path" refId="test.class.path"/>
@@ -459,7 +458,7 @@
 		</script>
 	</target>	
 
-	<target name="inttest">
+	<target name="itest">
 	   <sequential>
 		<waitfor maxwait="5" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
 			<http url="http://localhost:8080/_ah/admin" />

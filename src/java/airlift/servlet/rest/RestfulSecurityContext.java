@@ -33,6 +33,16 @@ public class RestfulSecurityContext
 	/** The caching context. */
 	private airlift.CachingContext cachingContext;
 
+	private boolean verbose = false;
+
+	private void logInfo(String _message)
+	{
+		if (verbose == true)
+		{
+			log.info(_message);
+		}
+	}
+
 	/**
 	 * Gets the caching context.
 	 *
@@ -76,6 +86,13 @@ public class RestfulSecurityContext
 	{
 		setKind(_kind);
 		setCachingContext(_cachingContext);
+	}
+
+	protected RestfulSecurityContext(String _kind, airlift.CachingContext _cachingContext, boolean _verbose)
+	{
+		setKind(_kind);
+		setCachingContext(_cachingContext);
+		verbose = _verbose;
 	}
 
 	/* (non-Javadoc)
@@ -161,7 +178,7 @@ public class RestfulSecurityContext
 			}
 			else
 			{
-				log.info("User: " + userId + " is allowed method: " + _method + " access to this resource: " + _resourceName);
+				logInfo("User: " + userId + " is allowed method: " + _method + " access to this resource: " + _resourceName);
 			}
 		}
 		catch(Throwable t)
@@ -309,7 +326,7 @@ public class RestfulSecurityContext
 			try
 			{
 				entity = datastore.get(key).get();
-				log.info("Retrieved airlift user entity from datastore: " + entity.toString());
+				logInfo("Retrieved airlift user entity from datastore: " + entity.toString());
 			}
 			catch(Throwable t)
 			{
@@ -319,12 +336,12 @@ public class RestfulSecurityContext
 		}
 		else
 		{
-			log.info("Cache hit on user entity of kind: " + getKind() + ".");
+			logInfo("Cache hit on user entity of kind: " + getKind() + ".");
 		}
 
 		if (entity != null)
 		{
-			log.info("Copy entity to user");
+			logInfo("Copy entity to user");
 			user = copyEntityToAirliftUser(entity);
 		}
 
@@ -537,13 +554,13 @@ public class RestfulSecurityContext
 
 			if (_writeThrough == true)
 			{
-				log.info("Writing user record through to the datastore");
+				logInfo("Writing user record through to the datastore");
 				transaction = datastore.beginTransaction().get();
 				datastore.put(entity);
 			}
 			else
 			{
-				log.info("Writing user record to the cache only");
+				logInfo("Writing user record to the cache only");
 			}
 
 			getCachingContext().put(entity.getKey(), entity);
@@ -624,7 +641,7 @@ public class RestfulSecurityContext
 			email = org.apache.commons.lang.StringUtils.trim(_email.toLowerCase());
 		}
 
-		log.info("looking for user with email: " + email + " lowercased from " + _email);
+		logInfo("looking for user with email: " + email + " lowercased from " + _email);
 		
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;

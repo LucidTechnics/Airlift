@@ -359,9 +359,9 @@
 	  </exec>
 	</target>
 
-	<target name="inttest" description="Just does the integration test. " depends="">	  
+	<target name="itest" description="Just does the integration test. " depends="">	  
 	  <exec dir="workspace/env" executable="ant" newenvironment="true">
-		 <arg value="inttest" />
+		 <arg value="itest" />
 	  </exec>
 	</target>
 

@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 public class RestServlet
    extends HttpServlet
 {
-	
 	/** The log. */
 	private static Logger log = Logger.getLogger(RestServlet.class.getName());
 	
@@ -45,6 +44,14 @@ public class RestServlet
 	/** The app profile. */
 	protected static airlift.AppProfile appProfile;
 
+	private void logInfo(String _message)
+	{
+		if ("true".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.verbose.log")) == true)
+		{
+			log.info(_message);
+		}
+	}
+	
 	/**
 	 * Gets the redirect context map.
 	 *
@@ -167,11 +174,11 @@ public class RestServlet
 	{
 		java.util.Enumeration<String> headerNames = _httpServletRequest.getHeaderNames();
 
-		log.info("reporting request header info ..."); 
+		logInfo("reporting request header info ..."); 
 		while (headerNames.hasMoreElements() == true)
 		{
 			String headerName = headerNames.nextElement();
-			log.info(headerName +  ":" + _httpServletRequest.getHeader(headerName));
+			logInfo(headerName +  ":" + _httpServletRequest.getHeader(headerName));
 		}
 
 		_httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
@@ -207,11 +214,11 @@ public class RestServlet
 		boolean timedOut = false;
 		long currentTimeMillis = System.currentTimeMillis();
 
-		log.info("Current time is: " + currentTimeMillis);
+		logInfo("Current time is: " + currentTimeMillis);
 
 		if (_user != null && _user.getTimeOutDate() != null)
 		{
-			log.info("user time out time is: " + _user.getTimeOutDate().getTime());
+			logInfo("user time out time is: " + _user.getTimeOutDate().getTime());
 			timedOut = (currentTimeMillis >= _user.getTimeOutDate().getTime());
 		}
 				
@@ -252,7 +259,7 @@ public class RestServlet
 				logoutSuccessful = true;
 				String logoutUrl = _userService.createLogoutURL(_request.getRequestURI());
 
-				log.info("User log out URL is: " + logoutUrl);
+				logInfo("User log out URL is: " + logoutUrl);
 				
 				_response.sendRedirect(logoutUrl);
 			}
@@ -303,11 +310,11 @@ public class RestServlet
 		
 		java.util.Enumeration<String> headerNames = _request.getHeaderNames();
 
-		log.info("reporting request header info ..."); 
+		logInfo("reporting request header info ..."); 
 		while (headerNames.hasMoreElements() == true)
 		{
 			String headerName = headerNames.nextElement();
-			log.info(headerName +  ":" + _request.getHeader(headerName));
+			logInfo(headerName +  ":" + _request.getHeader(headerName));
 		}
 			
 		String namespace = this.getServletConfig().getInitParameter("a.namespace");
@@ -316,7 +323,7 @@ public class RestServlet
 			com.google.appengine.api.NamespaceManager.set(namespace);
 		}
 		com.google.appengine.api.quota.QuotaService quotaService = com.google.appengine.api.quota.QuotaServiceFactory.getQuotaService();
-		log.info("RestServlet START " + quotaService.getCpuTimeInMegaCycles());
+		logInfo("RestServlet START " + quotaService.getCpuTimeInMegaCycles());
 		
 		java.util.List<String> acceptValueList = new java.util.ArrayList<String>();
 		java.util.Enumeration<String> acceptHeaderValues = _request.getHeaders("Accept");
@@ -351,14 +358,14 @@ public class RestServlet
 		UserService userService = getUserService(_request,restContext, _response);
 		AbstractUser user = userService.getCurrentUser();
 
-		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"));
+		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"), "true".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.verbose.log")));
 		restContext.setSecurityContext(securityContext);
 		securityContext.populate(user);
 		restContext.setUser(user);
 
 		boolean success = allowed(user, restContext, securityContext);
 
-		log.info("User is: " + user);
+		logInfo("User is: " + user);
 
 		if (!success && user == null)
 		{
@@ -375,13 +382,13 @@ public class RestServlet
 		}
 		else if (success && timedOut(user) == true)
 		{			
-			log.info("Timed out user is now: " + user);
+			logInfo("Timed out user is now: " + user);
 
 			boolean logoutSuccessful = logUserOut(_request, _response, userService);
 
 			if (logoutSuccessful == false)
 			{
-				log.info("Time out incepted log out failed");
+				logInfo("Time out incepted log out failed");
 				sendCodedPage("408", "Request Timeout", _response);
 			}
 		}
@@ -396,8 +403,8 @@ public class RestServlet
 		}
 
 		long totalMegaCycles = quotaService.getCpuTimeInMegaCycles();
-		log.info("RestServlet Megacycles: " + totalMegaCycles);
-		log.info("RestServlet CPU Seconds: " + quotaService.convertMegacyclesToCpuSeconds(totalMegaCycles));
+		logInfo("RestServlet Megacycles: " + totalMegaCycles);
+		logInfo("RestServlet CPU Seconds: " + quotaService.convertMegacyclesToCpuSeconds(totalMegaCycles));
 		
 		return restContext;
 	}

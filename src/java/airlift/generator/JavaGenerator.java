@@ -58,8 +58,6 @@ public class JavaGenerator
 		
 		for (ResourceModel resourceModel: _elementNameToResourceModelMap.values())
 		{
-			System.out.println(resourceModel.toString());
-			
 			if (resourceModel.isAbstractResource() == false)
 			{
 				if (isHighLevelAttributesSet == false)

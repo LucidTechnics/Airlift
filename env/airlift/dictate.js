@@ -708,8 +708,6 @@ function determineDisplayOrder(_resourceName, _propertyName, _propertyDisplayOrd
 
 function convertToResourceModel(_dictationResource, _dictationResourceMap)
 {
-	print(_dictationResource);
-	
 	var resourceModel = new Packages.airlift.generator.ResourceModel();
 
 	resourceModel.setPackageName(_dictationResource.packageName);
@@ -888,7 +886,6 @@ function convertToResourceModel(_dictationResource, _dictationResourceMap)
 		var relationshipName = orderedRelationshipListIterator.next();
 		var key = relationshipName;
 		var relationships = relationshipNameToRelationshipMap.get(relationshipName);
-		print('processing relationships: ' + relationshipName + ':' + relationships);
 
 		var relationshipsIterator = relationships.iterator();
 		while (relationshipsIterator.hasNext() === true)
@@ -1101,7 +1098,6 @@ var fileSeparator = Packages.java.io.File.separator;
 var dictationFile = project.getProperty("src.doc") + fileSeparator + 'app.dic';
 var appName = project.getProperty("appName");
 
-print ("Starting dictation: for file: " + dictationFile);
 var dictationLexer = new com.lucidlabs.dsl.dictation.DictationLexer(new ANTLRFileStream(dictationFile, "UTF8"));
 var tokens = new CommonTokenStream(dictationLexer);
 var dictationParser = new com.lucidlabs.dsl.dictation.DictationParser(tokens);
@@ -1165,7 +1161,6 @@ while (resourceNameToResourceMapEntrySetIterator.hasNext() === true)
 
 	populatePropertyDisplayOrder(resource);
 
-	print('Processing resource: ' + resourceName);
 	var resourceModel = convertToResourceModel(resource, resourceNameToResourceMap);
 	resourceModel.setAppName(appName);
 	resourceNameToResourceModelMap.put(resource.name, resourceModel);
@@ -1174,9 +1169,6 @@ while (resourceNameToResourceMapEntrySetIterator.hasNext() === true)
 var javaGenerator = new Packages.airlift.generator.JavaGenerator();
 var appProfileString = javaGenerator.generateApplicationProfile(resourceNameToResourceModelMap);
 
-print('');
-print('App Profile Source');
-print(appProfileString);
 writeAppProfile(appProfileString);
 
 var resourceNameToResourceModelMapEntrySetIterator = resourceNameToResourceModelMap.entrySet().iterator();
