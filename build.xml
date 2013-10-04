@@ -126,7 +126,6 @@
 
 	<!-- Clean target -->
 	<target name="clean-target">
-
 	    <delete dir="${archive}" />
 		<delete dir="${deployDir.bin}" />
 		<delete dir="${deployDir.lib}" />
@@ -134,7 +133,6 @@
 		<delete dir="${deployDir.log}" />
 		<delete dir="${deployDir.html}" />
 		<delete dir="${stage}" />
-
 	</target>
 
 	<target name="copyjars" description="Copies the App Engine jars to the war file.">
