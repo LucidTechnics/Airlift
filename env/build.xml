@@ -422,7 +422,7 @@
 
 		<jar destfile="${dist}/lib/${jar}-test.jar"
 		       basedir="${src.test}/airlift"
-			   includes="harness.js inttest.js"
+			   includes="harness.js"
 			   update="true"
 		  />
 
@@ -475,31 +475,6 @@
 		</script>
 		<echo message="...The INTEGRATION TEST has ENDED..." />
 		</sequential>
-	</target>
-
-	<target name="ci">
-		<parallel>
-			<exec dir="." executable="ant" newenvironment="true">
-			   <arg value="runserver" />
-			</exec>
-
-			<sequential>
-				<waitfor maxwait="60" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
-					<http url="http://localhost:8080/_ah/admin" />
-				</waitfor>
-				<fail message="...The server has failed to start.  Integration testjar has been aborted...">
-					<condition>
-					   <isset property="timeout" />
-					</condition>
-				</fail>
-				<echo message="...The INTEGRATION TEST has BEGUN..." />
-				<echo message="${appserver.classpath}"/>
-				<script language="javascript" src="airlift/inttest.js">
-					<classpath refid="appserver.classpath"/>
-				</script>
-				<echo message="...The INTEGRATION TEST has ENDED..." />
-			</sequential>
-		</parallel>
 	</target>
 
 </project>
