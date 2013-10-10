@@ -1,6 +1,6 @@
 var util = require('airlift/util');
 
-function deleteFromServer(_uri, _assert)
+function deleteFromServer(_uri, _headers)
 {
 	try
 	{  
@@ -31,9 +31,9 @@ function deleteFromServer(_uri, _assert)
 	return {responseCode: connection.getResponseCode(), result: result};
 };
 
-function getFromServer(_uri, _verbose, _assert)
+function getFromServer(_uri, _headers)
 {
-	var line, result = "";
+	var line, result = "", headers = _headers||{};
 	
 	try
 	{
@@ -41,6 +41,11 @@ function getFromServer(_uri, _verbose, _assert)
 		var connection = Packages.java.net.HttpURLConnection(url.openConnection());
 		connection.setDoInput(true);
 		connection.setRequestMethod('GET');
+
+		for (var header in headers)
+		{
+			connection.setRequestProperty(header, _headers[header]);
+		}
 
 		var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(connection.getInputStream()));
 
@@ -64,9 +69,9 @@ function getFromServer(_uri, _verbose, _assert)
     return {responseCode: connection.getResponseCode(), result: result};
 };
 
-function placeInServer(_method, _uri, _data, _assert)
+function placeInServer(_method, _uri, _data, _headers)
 {
-	var reader, writer;
+	var reader, writer, headers = _headers||{};
 	try
 	{
 		var url = new Packages.java.net.URL(_uri);
@@ -75,6 +80,12 @@ function placeInServer(_method, _uri, _data, _assert)
 		connection.setDoInput(true);
 		connection.setRequestMethod(_method);
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+		for (var header in headers)
+		{
+			connection.setRequestProperty(header, _headers[header]);
+		}
+		
 		connection.connect();
 	
 		var OutputStreamWriter = Packages.java.io.OutputStreamWriter;
@@ -108,27 +119,27 @@ function placeInServer(_method, _uri, _data, _assert)
     }
 };
 
-exports.serverDelete = function serverDelete(_urlString, _assert)
+exports.serverDelete = function serverDelete(_urlString, _headers)
 {
-    return deleteFromServer(_urlString, _assert);
+    return deleteFromServer(_urlString, _headers);
 };
 
-exports.serverGet = function serverGet(_urlString, _verbose, _assert)
+exports.serverGet = function serverGet(_urlString, _headers)
 {
-    return getFromServer(_urlString, _verbose, _assert);
+    return getFromServer(_urlString, _headers);
 };
 
-exports.serverCollect = function serverCollect(_urlString, _verbose, _assert)
+exports.serverCollect = function serverCollect(_urlString, _headers)
 {
-    return getFromServer(_urlString, _verbose, _assert);
+    return getFromServer(_urlString, _headers);
 };
 
-exports.serverPut = function serverPut(_urlString, _data, _assert)
+exports.serverPut = function serverPut(_urlString, _data, _headers)
 {
-    return placeInServer("PUT",_urlString,_data, _assert); 
+    return placeInServer("PUT",_urlString, _data, _headers); 
 };
 
-exports.serverPost = function serverPost(_urlString, _data, _assert)
+exports.serverPost = function serverPost(_urlString, _data, _headers)
 {
-    return placeInServer("POST", _urlString, _data, _assert); 
+    return placeInServer("POST", _urlString, _data, _headers); 
 };
