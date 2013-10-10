@@ -44,7 +44,7 @@ function getFromServer(_uri, _headers)
 
 		for (var header in headers)
 		{
-			connection.setRequestProperty(header, _headers[header]);
+			connection.setRequestProperty(header, headers[header]);
 		}
 
 		var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(connection.getInputStream()));
@@ -83,7 +83,7 @@ function placeInServer(_method, _uri, _data, _headers)
 
 		for (var header in headers)
 		{
-			connection.setRequestProperty(header, _headers[header]);
+			connection.setRequestProperty(header, headers[header]);
 		}
 		
 		connection.connect();
