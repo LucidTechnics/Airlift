@@ -43,6 +43,11 @@ function join(_name, _function, _separator)
 
 var rule = {};
 
+rule.defaultValue = function()
+{
+	this.persistable.addParameterValue("default", quoteString(this.value));
+}
+
 rule.display = function()
 {
 	this.presentable.addParameterValue("isPresentable", new Packages.java.lang.Boolean(this.value).booleanValue());

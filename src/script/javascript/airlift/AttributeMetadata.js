@@ -27,7 +27,7 @@ var AttributeMetadata = function(_config)
 	this.isUniqueKey = util.value(_config.isUniqueKey, false);
 	this.concept = util.value(_config.concept, '');
 	this.required = util.value(_config.required, true);
-
+	this.defaultValue = util.value(_config.default, null);
 	this.immutable = util.value(_config.immutable, false);
 	this.ranged = util.value(_config.ranged, false);
 	this.minValue = util.value(_config.minValue, null);
