@@ -477,7 +477,8 @@ function Incoming(_web)
 							parameterValue = request.getParameterValues(_attributeName + '[]');
 						}
 
-						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) || null;
+						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
+								(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
 
 						if (collectionTypes[type] && util.hasValue(value) === false)
 						{
