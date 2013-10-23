@@ -9,8 +9,7 @@ before_script:
   - mkdir workspace
   - mkdir workspace/AppEngineSDK
   - cd workspace/AppEngineSDK
-  - wget http://googleappengine.googlecode.com/files/@APP.ENGINE.SDK@.zip
-  - unzip @APP.ENGINE.SDK@.zip
+  - travis_retry wget http://googleappengine.googlecode.com/files/@APP.ENGINE.SDK@.zip; unzip @APP.ENGINE.SDK@.zip
   - cd ../..
   - export ANT_OPTS=-javaagent:$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@/lib/agent/appengine-agent.jar
   - export AIRLIFT_APP_ENGINE_HOME=$HOME/build/LucidTechnics/Airlift/workspace/AppEngineSDK/@APP.ENGINE.SDK@
