@@ -13,6 +13,12 @@ function Delete(_web)
 	this.del = function del(_resourceName, _id)
 	{
 		var resourceName = _resourceName;
+
+		if (_web.getAppProfile().isValidResource(resourceName) === false)
+		{
+			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+		}
+
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 

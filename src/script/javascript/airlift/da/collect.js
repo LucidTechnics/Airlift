@@ -68,6 +68,12 @@ function Collect(_web)
 		var config = _config||{};
 		
 		var resourceName = _resourceName;
+
+		if (_web.getAppProfile().isValidResource(resourceName) === false)
+		{
+			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+		}
+		
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 		

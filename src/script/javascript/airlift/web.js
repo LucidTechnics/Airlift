@@ -364,7 +364,7 @@ function Web(WEB_CONTEXT)
 	{
 		if (!appProfile)
 		{
-			appProfile = airlift.app.AppProfile.class.newInstance();
+			appProfile = new Packages.airlift.app.AppProfile();
 		}
 
 		return appProfile;

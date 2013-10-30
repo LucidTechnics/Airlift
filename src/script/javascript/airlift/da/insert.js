@@ -38,6 +38,12 @@ function Insert(_web)
 	this.insert = function(_resourceName, _resource, _pre, _post)
 	{	 
 		var resourceName = _resourceName;
+
+		if (_web.getAppProfile().isValidResource(resourceName) === false)
+		{
+			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+		}
+
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { 
 		    resourceName = metadata.lookingAt; 
@@ -71,7 +77,6 @@ function Insert(_web)
 				result.errors = this.allErrors();
 
 				incoming.bookkeeping(entity);
-			    util.info("bookkeeping completed");
 
 				if (util.isEmpty(result.errors) === true)
 				{

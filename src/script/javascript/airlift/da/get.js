@@ -36,6 +36,12 @@ function Get(_web)
 	this.get = function(_resourceName, _id)
 	{
 		var resourceName = _resourceName;
+
+		if (_web.getAppProfile().isValidResource(resourceName) === false)
+		{
+			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+		}
+
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 
@@ -72,6 +78,12 @@ function Get(_web)
 	this.getAll = function(_resourceName, _entityList)
 	{
 		var resourceName = _resourceName;
+
+		if (_web.getAppProfile().isValidResource(resourceName) === false)
+		{
+			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+		}
+
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 
