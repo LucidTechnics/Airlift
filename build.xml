@@ -324,7 +324,7 @@
 	</target>
 
 	<target name="setUpEnvironment" depends="env" >
-	  <delete dir ="workspace/env" />
+	  <delete dir ="workspace/env" failonerror="false" includeEmptyDirs="true"/>
 	  <mkdir dir="workspace/env" />
 	  <mkdir dir="workspace/env/war/WEB-INF/classes" />
 	  <mkdir dir="workspace/env/war/WEB-INF/classes/handler" />
