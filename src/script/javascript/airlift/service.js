@@ -171,6 +171,27 @@ function CacheService()
 	};
 }
 
+function URLFetchService()
+{
+	var service = Packages.com.google.appengine.api.urlfetch.URLFetchServiceFactory.getURLFetchService();
+
+	this.fetch = function(_request)
+	{
+		var response = fetchService.fetch(_request);
+		return response.getContent();
+	};
+
+	this.service = function()
+	{
+		return service;
+	};
+}
+
+exports.getURLFetchService = function()
+{
+	return new URLFetchService();
+}
+
 exports.getQueueService = function(_name, _method)
 {
         return new QueueService(_name, _method);
