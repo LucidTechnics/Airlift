@@ -195,6 +195,7 @@
 
 		<mkdir dir="${junit-result}" />
 		<mkdir dir="${workspace}" />
+		<mkdir dir="${workspace}/env" />
 
 	</target>
 
@@ -310,7 +311,7 @@
 		
 	</target>
 
-	<target name="env" depends="test" >
+	<target name="env" >
 		<delete>
 			<fileset dir="${env}/war/WEB-INF/lib" includes="airlift-*core.jar"/>
 		</delete>
@@ -322,6 +323,8 @@
 		<zip destfile="${downloads}/${jar}-env.zip" basedir="${env}" />
 	
 	</target>
+
+	<target name="create-download" depends="env, test" />
 
 	<target name="setUpEnvironment" depends="env" >
 	  <delete dir ="workspace/env" failonerror="false" includeEmptyDirs="true"/>
