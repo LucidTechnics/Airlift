@@ -310,7 +310,7 @@
 		
 	</target>
 
-	<target name="env" depends="redeploy" >
+	<target name="env" depends="test" >
 		<delete>
 			<fileset dir="${env}/war/WEB-INF/lib" includes="airlift-*core.jar"/>
 		</delete>
@@ -323,7 +323,6 @@
 	
 	</target>
 
-	
 	<target name="setUpEnvironment" depends="env" >
 	  <delete dir ="workspace/env" />
 	  <mkdir dir="workspace/env" />
