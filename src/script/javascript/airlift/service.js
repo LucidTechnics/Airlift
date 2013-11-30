@@ -177,7 +177,7 @@ function URLFetchService()
 
 	this.fetch = function(_request)
 	{
-		var response = fetchService.fetch(_request);
+		var response = service.fetch(_request);
 		return response.getContent();
 	};
 
