@@ -33,40 +33,57 @@ function QueueService(_name, _method)
 	
 	var queue = Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(_name);
 
-	this.add = function(_path, _parameters)
+	this.add = function()
 	{
-		var taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(_path);
-
-		taskOptions = taskOptions.method(com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
+		var parameters, taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withMethod(com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
 		
-		for (parameter in _parameters)
+		function addParameters(_parameters)
 		{
-			var parameters = _parameters[parameter];
-
-			if (util.hasValue(parameters) === true)
+			for (parameter in _parameters)
 			{
-				if (parameters instanceof java.util.Collection)
+				var parameters = _parameters[parameter];
+
+				if (util.hasValue(parameters) === true)
 				{
-					for (var item in Iterator(parameters))
+					if (parameters instanceof java.util.Collection)
 					{
-						taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
+						for (var item in Iterator(parameters))
+						{
+							taskOptions = taskOptions.param(parameter, item + new Packages.java.lang.String(''));
+						}
 					}
-				}
-				else if (parameters && parameters.forEach)
-				{
-					parameters.forEach(function(_item)
+					else if (parameters && parameters.forEach)
 					{
-						taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
-					});
-				}
-				else
-				{
-					taskOptions = taskOptions.param(parameter, parameters + new Packages.java.lang.String(''));
+						parameters.forEach(function(_item)
+						{
+							taskOptions = taskOptions.param(parameter, _item + new Packages.java.lang.String(''));
+						});
+					}
+					else
+					{
+						taskOptions = taskOptions.param(parameter, parameters + new Packages.java.lang.String(''));
+					}
 				}
 			}
 		}
 
+		if (/^pull$/i.test(this.method) === false)
+		{
+			parameters = arguments[1];
+			taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.url(arguments[0]);
+		}
+		else
+		{
+			parameters = arguments[0];
+		}
+
+		addParameters(parameters);
 		queue.add(taskOptions);
+	};
+
+	this['delete'] = function(_name)
+	{
+		queue.deleteTask(_name);
 	};
 
 	this.service = function()

@@ -90,7 +90,14 @@ function Insert(_web)
 
 					if (util.hasValue(written) === true)
 					{
-						cache.put(entity.getKey(), entity);
+						try
+						{
+							cache.put(entity.getKey(), entity);
+						}
+						catch(e)
+						{
+							util.warning('unable to cache entity during insert for resource', resourceName);
+						}
 					}
 
 					if (this.resourceMetadata.isAudited === true)
