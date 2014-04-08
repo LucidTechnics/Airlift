@@ -488,7 +488,8 @@ public class RestServlet
 				{
 					if (contentContext.streamed != true)
 					{
-						if (responseCode < 400)
+						if (responseCode < 400 ||
+						   contentContext.getContent() != null && contentContext.getContent().length > 0)
 						{
 							for (java.util.Map.Entry<String, String[]> header: contentContext.getHeaderMap().entrySet())
 							{

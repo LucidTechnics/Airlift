@@ -1,5 +1,6 @@
 var util = require('airlift/util');
 var javaArray = require('airlift/javaArray');
+var isBlankRegex = /^\s*$/;
 
 function Incoming(_web)
 {
@@ -23,8 +24,9 @@ function Incoming(_web)
 	var isRequired = function(_errors, _metadata, _name, _value)
 	{
 		var error;
+		isBlankRegex.lastIndex = 0;
 
-		if (_value === '' || _value === null || _value === undefined)
+		if (_value === '' || _value === null || _value === undefined || isBlankRegex.test(_value))
 		{
 			error = "This is a required field.";
 		}
@@ -453,14 +455,40 @@ function Incoming(_web)
 
 	var converter = new Converter();
 	var collectionTypes = new CollectionTypes();
-	
+
 	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
+	{
+		function source(_attributeName, _type)
+		{
+			var request = _web.getRequest();
+
+			var parameterValue = request.getParameterValues(_attributeName);
+
+			if (util.hasValue(parameterValue) === false && collectionTypes[_type])
+			{
+				parameterValue = request.getParameterValues(_attributeName + '[]');
+			}
+
+			return parameterValue;
+		}
+
+		function sourceKey(_attributeName)
+		{
+			var restContext = _web.getRestContext();
+			var parameterValue = restContext.getParameter(_attributeName);
+
+			return parameterValue;
+		}
+
+		return exports.convertFromSource(source, sourceKey, sourceKey, _value, _attributeName, _resource, _attributeMetaData);
+	};
+	
+	this.convertFromSource = function convert(_source, _sourceForeignKey, _sourceId, _value, _attributeName, _resource, _attributeMetadata)
 	{
 		var value = _resource[_attributeName];
 		
 		if (util.hasValue(value) === false)
 		{
-			var request = _web.getRequest();
 			var resourceName = this.resourceName;
 			var type = _attributeMetadata.type;
 
@@ -470,12 +498,7 @@ function Incoming(_web)
 				{
 					if (converter[type])
 					{
-						var parameterValue = request.getParameterValues(_attributeName);
-
-						if (util.hasValue(parameterValue) === false && collectionTypes[type])
-						{
-							parameterValue = request.getParameterValues(_attributeName + '[]');
-						}
+						var parameterValue = _source(_attributeName, type);
 
 						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
 								(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
@@ -513,8 +536,7 @@ function Incoming(_web)
 					 * be overridden.
 					 */
 
-					var restContext = _web.getRestContext();
-					var parameterValue = restContext.getParameter(_attributeMetadata.mapTo);
+					var parameterValue = _sourceForeignKey(_attributeMetadata.mapTo);
 					value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
 				}
 
@@ -524,8 +546,8 @@ function Incoming(_web)
 			}
 			else
 			{
-				var restContext = _web.getRestContext();
-				var parameterValue = restContext.getParameter(resourceName);
+				//get the id
+				var parameterValue = _sourceId(resourceName);
 				//convert only works for the first id.  Multiple puts not
 				//supported at this time - Bediako
 				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...

@@ -320,6 +320,14 @@
 			<fileset dir="${dist}/lib/" includes="${jar}-core.jar" />
 		</copy>
 
+		<copy todir="${env}/war/scripts/airlift">
+			<fileset dir="${src}/script/javascript/airlift" includes="*Metadata.js" />
+		</copy>
+
+		<copy todir="${env}/war/scripts/airlift">
+			<fileset dir="${src}/script/javascript/airlift" includes="value.js" />
+		</copy>
+
 		<zip destfile="${downloads}/${jar}-env.zip" basedir="${env}" />
 	
 	</target>

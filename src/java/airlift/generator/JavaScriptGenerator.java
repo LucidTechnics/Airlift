@@ -43,16 +43,21 @@ public class JavaScriptGenerator
 		//transitioning from the Java 6 compiler to dictate.js
 	}
 	
-	/**
-	 * Generate active record.
-	 *
-	 * @param _domainObjectModel the _domain object model
-	 * @return the string
-	 */
 	public String generateResourceMetadata(ResourceModel _resourceModel)
 	{
+		return generateRMD(_resourceModel, "airlift/language/javascript/ResourceMetadata");
+	}
+
+	public String generateBrowserResourceMetadata(ResourceModel _resourceModel)
+	{
+		return generateRMD(_resourceModel, "airlift/language/javascript/BrowserResourceMetadata");
+	}	
+
+	private String generateRMD(ResourceModel _resourceModel, String _templateName)
+	{
 		String resourceName = _resourceModel.getClassName().toLowerCase();
-		StringTemplate resourceMetadataStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/ResourceMetadata");
+		StringTemplate resourceMetadataStringTemplate = getStringTemplateGroup().getInstanceOf(_templateName);
+
 		StringTemplate configTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/JavaScriptObject");
 		
 		for (String annotationName: _resourceModel.getResourceAnnotationMap().keySet())
@@ -111,16 +116,20 @@ public class JavaScriptGenerator
 		return resourceMetadataStringTemplate.toString();
 	}
 
-	/**
-	 * Generate validation object.
-	 *
-	 * @param _resourceModel the _resource object model
-	 * @return the string
-	 */
 	public String generateAttributeMetadata(ResourceModel _resourceModel)
 	{
+		return generateAMD(_resourceModel, "airlift/language/javascript/AttributeMetadata");
+	}
+
+	public String generateBrowserAttributeMetadata(ResourceModel _resourceModel)
+	{
+		return generateAMD(_resourceModel, "airlift/language/javascript/BrowserAttributeMetadata");
+	}	
+
+	public String generateAMD(ResourceModel _resourceModel, String _templateName)
+	{
 		String resourceName = _resourceModel.getClassName().toLowerCase();
-		StringTemplate attributeMetadataStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/javascript/AttributeMetadata");
+		StringTemplate attributeMetadataStringTemplate = getStringTemplateGroup().getInstanceOf(_templateName);
 		attributeMetadataStringTemplate.setAttribute("resourceName", resourceName);
 		
 		java.util.Iterator attributes = _resourceModel.getAttributes();

@@ -24,6 +24,27 @@ catch(e)
     print(e.stack);
 }
 
+exports.hasValue = function hasValue(_value)
+{
+	return (_value !== null && _value !== undefined);
+};
+
+exports.value = function value(_candidate, _default)
+{
+	var candidate;
+
+	if (this.hasValue(_candidate) === true)
+	{
+		candidate = _candidate;
+	}
+	else
+	{
+		candidate = _default;
+	}
+
+	return candidate;
+};
+
 exports.typeOf = function typeOf(value)
 {
 	var s = typeof value;
@@ -82,11 +103,6 @@ exports.isWhitespace = function isWhitespace(_string)
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 };
 
-exports.hasValue = function hasValue(_value)
-{
-	return (_value !== null && _value !== undefined);
-};
-
 var ErrorReporter = function()
 {
 	var errors = {};
@@ -123,7 +139,7 @@ var ErrorReporter = function()
 		}
 		else if (_error && typeof _error === 'string')
 		{
-			var error = {name: _name, message: _error, category: arguments[2]||''};
+			var error = {name: _name, message: _error, category: arguments[2]||'validation'};
 			errorList.push(error);
 		}
 
@@ -347,23 +363,6 @@ exports.severe = function severe()
 	log.severe(severe);
 };
 
-
-exports.value = function value(_candidate, _default)
-{
-	var candidate;
-
-	if (this.hasValue(_candidate) === true)
-	{
-		candidate = _candidate;
-	}
-	else
-	{
-		candidate = _default;
-	}
-
-	return candidate;
-};
-
 function PrimitiveConverter()
 {
 	this["java.lang.Integer"] = function(_value) { return (exports.hasValue(_value) === true) ?  _value.intValue() : null; };
@@ -552,9 +551,22 @@ exports.getWebRequestId = function()
 	return Packages.com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
 };
 
-exports.string = function(_stringOrJavaByteArray)
+exports.string = function(_stringOrJavaByteArray, _charSet)
 {
-	return new Packages.java.lang.String(_stringOrJavaByteArray);
+	var charSet = _charSet||'UTF-8', string;
+
+	if (exports.hasValue(_stringOrJavaByteArray) === true &&
+		  _stringOrJavaByteArray.getClass &&
+		  _stringOrJavaByteArray.getClass().isArray() === true)
+	{
+		string = new Packages.java.lang.String(_stringOrJavaByteArray, charSet);
+	}
+	else
+	{
+		string = new Packages.java.lang.String(_stringOrJavaByteArray);
+	}
+	
+	return string;
 };
 
 exports.boolean = function(_booleanString)
