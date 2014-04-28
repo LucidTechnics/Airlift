@@ -4,6 +4,7 @@ var isBlankRegex = /^\s*$/;
 
 function Incoming(_web)
 {
+	var regexes = {};
 	var that = this;
 	var res = require('airlift/resource').create(_web);
 	
@@ -43,7 +44,9 @@ function Incoming(_web)
 
 	var hasFormat = function(_errors, _metadata, _name, _value)
 	{
-		var format = new RegExp(_metadata.hasFormat);
+		var format = regexes[_metadata.hasFormat]||new RegExp(_metadata.hasFormat);
+		regexes[_metadata.hasFormat] = format;
+		format.lastIndex = 0;
 
 		if (format.test(_value) === false)
 		{
@@ -373,9 +376,36 @@ function Incoming(_web)
 		}
 	};
 
+	function isCollection(_value)
+	{
+		return (_value instanceof java.util.Collection);
+	}
+	
 	var convertToSingleValue = function(_parameterValue, _type, _index)
 	{
-		var value = _parameterValue && (util.isWhitespace(_parameterValue[_index]) === false) && util.trim(_parameterValue[_index]) || null;
+		var parameterValue = _parameterValue;
+
+		if (parameterValue && util.isArray(parameterValue) === true)
+		{
+			parameterValue = _parameterValue[_index];
+		}
+		
+		var value, numericTypes = {
+			'java.lang.Integer': 1,
+			'java.lang.Long': 1,
+			'java.lang.Double': 1,
+			'java.lang.Float': 1,
+			'java.lang.Short': 1
+		};
+
+		if (numericTypes[_type] && parameterValue && /^\s*[0-9\+-\.].*\s*$/.test(parameterValue + '') === false)
+		{
+			value = null;
+		}
+		else
+		{
+			value = parameterValue && (util.isWhitespace(parameterValue) === false) && util.trim(parameterValue) || null;
+		}
 
 		return (value && convertUtil.convert(value, util.createClass(_type)))||value;
 	};
@@ -403,7 +433,7 @@ function Incoming(_web)
 		this["java.lang.Integer"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Integer", 0); return util.primitive(value); };
 		this["java.lang.Boolean"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Boolean", 0); return util.primitive(value); };
 		this["java.lang.Long"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Long", 0); return util.primitive(value) };
-		this["java.lang.Double"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Double", 0); return util.primitive(value) };
+		this["java.lang.Double"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Double", 0); return util.primitive(value); };
 		this["java.lang.Float"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Float", 0); return util.primitive(value) };
 		this["java.lang.Short"] = function(_parameterValue) { var value = convertToSingleValue(_parameterValue, "java.lang.Short", 0); return util.primitive(value) };
 
@@ -485,78 +515,92 @@ function Incoming(_web)
 	
 	this.convertFromSource = function convert(_source, _sourceForeignKey, _sourceId, _value, _attributeName, _resource, _attributeMetadata)
 	{
-		var value = _resource[_attributeName];
-		
-		if (util.hasValue(value) === false)
+		var value, resourceName = this.resourceName;
+		var type = _attributeMetadata.type;
+
+		if ("id".equals(_attributeName) !== true)
 		{
-			var resourceName = this.resourceName;
-			var type = _attributeMetadata.type;
-
-			if ("id".equals(_attributeName) !== true)
+			try
 			{
-				try
+				if (converter[type])
 				{
-					if (converter[type])
+					var parameterValue = _source(_attributeName, type);
+					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
+							(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
+
+					if (util.hasValue(parameterValue) && util.isWhitespace(parameterValue) === false && util.hasValue(value) === false)
 					{
-						var parameterValue = _source(_attributeName, type);
-
-						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
-								(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
-
-						if (collectionTypes[type] && util.hasValue(value) === false)
-						{
-							value = (new CollectionType()).create(type);
-						}
+						this.report(_attributeName, ['unable to convert this value', parameterValue].join(' '), 'conversion');
+						value = parameterValue;
 					}
-					else
+					
+					if (collectionTypes[type] && util.hasValue(value) === false)
 					{
-						throw new Error('no converter found for type: ' + type);
+						value = (new CollectionType()).create(type);
 					}
 				}
-				catch(e)
+				else
 				{
-					if (e.javaException)
-					{
-						util.warning(e.javaException.getMessage());
-					}
-					else
-					{
-						util.warning(e.message);
-					}
+					throw new Error('no converter found for type: ' + type);
+				}
+			}
+			catch(e)
+			{
+				util.warning('conversion exception thrown');
 
-					this.report(_attributeName, "This value is not correct.", "conversion");
+				if (e.javaException)
+				{
+					util.warning(e.javaException.getMessage());
+				}
+				else
+				{
+					util.warning(e.message);
 				}
 
-				if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
-				{
-					/* Form value overrides what is in the URI.  This is done for
-					 * security reasons.  The foreign key may be protected via TLS
-					 * by including it in the form and not in the URI.  If it is
-					 * included in the form the expectation is that the URI should
-					 * be overridden.
-					 */
+				this.report(_attributeName, 'This value is not correct.', 'conversion');
+			}
 
-					var parameterValue = _sourceForeignKey(_attributeMetadata.mapTo);
-					value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
-				}
-
-				/* There is no way to represent mapToMany in a URI
-				 * therefore the form value is taken. 
+			if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
+			{
+				/* Form value overrides what is in the URI.  This is done for
+				 * security reasons.  The foreign key may be protected via TLS
+				 * by including it in the form and not in the URI.  If it is
+				 * included in the form the expectation is that the URI should
+				 * be overridden.
 				 */
-			}
-			else
-			{
-				//get the id
-				var parameterValue = _sourceId(resourceName);
-				//convert only works for the first id.  Multiple puts not
-				//supported at this time - Bediako
-				value = (parameterValue && util.hasValue(parameterValue.get(0)) && parameterValue.get(0)) || null; //rest context parameters are always strings ...
+
+				var parameterValue = _sourceForeignKey(_attributeMetadata.mapTo);
+
+				if (parameterValue && isCollection(parameterValue) === true)
+				{
+					parameterValue = parameterValue.get(0);
+				}
+				
+				value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
 			}
 
-			_resource[_attributeName] = value;
-
-			var res = require('airlift/resource').create(_web);
+			/* There is no way to represent mapToMany in a URI
+			 * therefore the form value is taken. 
+			 */
 		}
+		else
+		{
+			//get the id
+			var parameterValue = _sourceId(resourceName);
+			//convert only works for the first id.  Multiple puts not
+			//supported at this time - Bediako
+
+			if (parameterValue && isCollection(parameterValue) === true)
+			{
+				parameterValue = parameterValue.get(0);
+			}
+
+			value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
+		}
+
+		_resource[_attributeName] = value;
+
+		var res = require('airlift/resource').create(_web);
 
 		return value;
 	};

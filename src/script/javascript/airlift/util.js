@@ -152,6 +152,21 @@ var ErrorReporter = function()
 	};
 };
 
+exports.isJavaArray = function(_value)
+{
+	return (_value.getClass && _value.getClass().isArray() === true);
+}
+
+exports.isJavaScriptArray = function(_value)
+{
+	return Array.isArray(_value);
+};
+
+exports.isArray = function(_value)
+{
+	return exports.isJavaScriptArray(_value) || exports.isJavaArray(_value);
+};
+
 exports.createErrorReporter = function()
 {
 	return new ErrorReporter();
