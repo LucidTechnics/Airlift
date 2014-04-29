@@ -105,7 +105,7 @@ function Collect(_web)
 
 		filterList.forEach(function(_filter)
 		{
-			var o = _filter.operator || _filter.op || _filter.o || _filter.c || 'EQUAL';
+			var o = _filter.operator || _filter.comparator || _filter.op || _filter.o || _filter.c || 'EQUAL';
 			var n = _filter.name || _filter.n;
 			var v = _filter.value || _filter.v;
 
@@ -148,9 +148,21 @@ function Collect(_web)
 
 	this.collectByMembership = function(_resourceName, _attributeName, _membershipList, _config)
 	{
-		if (_membershipList instanceof java.lang.Iterable === false)
+		var membershipList = _membershipList;
+		
+		if (_membershipList instanceof java.lang.Iterable === false && Array.isArray(_membershipList) === false)
 		{
-			throw Error("Membership list must implement java.lang.Iterable");
+			throw Error("Membership list must implement java.lang.Iterable or be a JavaScript array");
+		}
+
+		if (Array.isArray(_membershipList) === true)
+		{
+			membershipList = util.list();
+			
+			for (var i = 0; i < _membershipList.length; i++)
+			{
+				membershipList.add(_membershipList[i]);
+			}
 		}
 
 		var config = _config || {}; 

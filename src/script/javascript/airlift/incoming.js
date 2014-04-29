@@ -191,6 +191,11 @@ function Incoming(_web)
 				errors = allowedValue(errors, _metadata, _name, value + '');
 			}
 
+			if (_metadata.hasFormat)
+			{
+				errors = hasFormat(errors, _metadata, _name, value + '');
+			}
+
 			if (value)
 			{
 				errors = (_metadata.maxValue && maxValue(errors, _metadata, _name, value)) || errors;
