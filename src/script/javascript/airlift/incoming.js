@@ -112,7 +112,7 @@ function Incoming(_web)
 			message && errors.push(validationError(_name, message));
 		}
 
-		if (errors.length === 0)
+		if (errors.length === 0 && util.hasValue(value) === true)
 		{
 			if (util.isEmpty(_metadata.allowedValues) === false)
 			{
@@ -147,7 +147,7 @@ function Incoming(_web)
 			message && errors.push(validationError(_name, message));
 		}
 
-		if (errors.length === 0)
+		if (errors.length === 0 && util.hasValue(value) === true)
 		{
 			if (value)
 			{
@@ -184,7 +184,7 @@ function Incoming(_web)
 			message && errors.push(validationError(_name, message));
 		}
 
-		if (errors.length === 0)
+		if (errors.length === 0 && util.hasValue(value) === true)
 		{
 			if (util.isEmpty(_metadata.allowedValues) === false)
 			{
@@ -216,7 +216,7 @@ function Incoming(_web)
 			value = _value;
 		}
 
-		if (_metadata.required === true)
+		if (_metadata.required === true && util.hasValue(value) === true)
 		{
 			var message = isRequired(errors, _metadata, _name, value);
 			message && errors.push(validationError(_name, message));
@@ -491,34 +491,7 @@ function Incoming(_web)
 	var converter = new Converter();
 	var collectionTypes = new CollectionTypes();
 
-	this.convert = function convert(_value, _attributeName, _resource, _attributeMetadata)
-	{
-		function source(_attributeName, _type)
-		{
-			var request = _web.getRequest();
-
-			var parameterValue = request.getParameterValues(_attributeName);
-
-			if (util.hasValue(parameterValue) === false && collectionTypes[_type])
-			{
-				parameterValue = request.getParameterValues(_attributeName + '[]');
-			}
-
-			return parameterValue;
-		}
-
-		function sourceKey(_attributeName)
-		{
-			var restContext = _web.getRestContext();
-			var parameterValue = restContext.getParameter(_attributeName);
-
-			return parameterValue;
-		}
-
-		return exports.convertFromSource(source, sourceKey, sourceKey, _value, _attributeName, _resource, _attributeMetaData);
-	};
-	
-	this.convertFromSource = function convert(_source, _sourceForeignKey, _sourceId, _value, _attributeName, _resource, _attributeMetadata)
+	this.convertFromSource = function (_source, _sourceForeignKey, _sourceId, _value, _attributeName, _resource, _attributeMetadata)
 	{
 		var value, resourceName = this.resourceName;
 		var type = _attributeMetadata.type;
@@ -530,6 +503,7 @@ function Incoming(_web)
 				if (converter[type])
 				{
 					var parameterValue = _source(_attributeName, type);
+					
 					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
 							(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
 
@@ -608,6 +582,32 @@ function Incoming(_web)
 		var res = require('airlift/resource').create(_web);
 
 		return value;
+	};
+
+	this.convert = function (_value, _attributeName, _resource, _attributeMetadata)
+	{
+		function source(_attributeName, _type)
+		{
+			var request = _web.getRequest();
+			var parameterValue = request.getParameterValues(_attributeName);
+
+			if (util.hasValue(parameterValue) === false && collectionTypes[_type])
+			{
+				parameterValue = request.getParameterValues(_attributeName + '[]');
+			}
+			
+			return parameterValue;
+		}
+
+		function sourceKey(_attributeName)
+		{
+			var restContext = _web.getRestContext();
+			var parameterValue = restContext.getParameter(_attributeName);
+
+			return parameterValue;
+		}
+
+		return that.convertFromSource.call(this, source, sourceKey, sourceKey, _value, _attributeName, _resource, _attributeMetadata);
 	};
 
 	function Validator()

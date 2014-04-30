@@ -14,9 +14,13 @@ function Insert(_web)
 	{
 		var test = function(_tries, e)
 		{
-			var id = Packages.airlift.util.IdGenerator.generate(12);
+			var truncatedShaLength = _web.getTruncatedShaLength();
+			
+			var id = Packages.airlift.util.IdGenerator.generate(truncatedShaLength);
 				//Make sure this randomly generated id has not already been
 				//assigned to a resource in this table.
+
+			util.info('generated this id', id);
 			try
 			{
 				var result = datastore.get(Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, id)).get();

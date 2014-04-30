@@ -761,6 +761,8 @@ exports.throw = function(_assertion, _message, _responseCode)
 		var r = _responseCode||'400';
 		var h = httpCodes[r];
 
-		throw {r: r, h: h, m: m};
+		m && exports.severe(m);
+
+		throw {r: r, h: h, message: m};
 	}
 };

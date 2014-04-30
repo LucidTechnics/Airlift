@@ -454,6 +454,11 @@ function Web(WEB_CONTEXT)
 		this.getContentContext().setResponseCode(_code);
 	};
 
+	this.getTruncatedShaLength = function(_length)
+	{
+		return parseInt(this.getServlet().getInitParameter('airlift.truncated.sha1.id.length'), 10)||_length;
+	}
+	
 	this.setContent = function(_content)
 	{
 		this.getContentContext().setContent(_content);
