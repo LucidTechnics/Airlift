@@ -276,7 +276,7 @@ public class JavaScriptingUtil
 		try
 		{
 			String scriptResource = "/" + _scriptResource.replaceAll("^/", "");
-			String requireHandler = "var handle = function(_WEB_CONTEXT) { var web = require('airlift/web').create(_WEB_CONTEXT); require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle(web); }";
+			String requireHandler = "var handle = function(_WEB_CONTEXT) { var web = require('airlift/web').create(_WEB_CONTEXT); try { require(\"" + scriptResource.replaceAll(".js$", "") + "\").handle(web); } catch(e) { if (e.r && e.h) { web.setResponseCode(e.r); e.rhinoException && e.rhinoException.printStackTrace(); } else if (e.rhinoException) { e.rhinoException.printStackTrace(); } else if (e.javaException) { e.javaException.printStackTrace(); } throw e; } }";
 			
 			Require require = new Require(getScope(), sharedRequire, getBindingsMap(), this.cacheScript);
 			require.install(getScope());
