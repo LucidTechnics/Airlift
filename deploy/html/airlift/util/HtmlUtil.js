@@ -785,7 +785,7 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 	
 	if (airlift.isDefined(_activeRecord[_propertyName]) === true)
 	{
-		if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true &&
+		if ("Type.CHECKBOX".equalsIgnoreCase(widget) === true &&
 		   (type.startsWith("java.util.List") === true || type.startsWith("java.util.Set") === true))
 		{			
 			for (var value in Iterator(_activeRecord[_propertyName]))
@@ -794,18 +794,18 @@ airlift.populateFormTemplate = function(_formTemplate, _groupName, _propertyName
 				_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, value), "checked=\"\"");
 			}
 		}
-		else if ("airlift.generator.Presentable.Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
-			 "airlift.generator.Presentable.Type.RADIO".equalsIgnoreCase(widget) === true)
+		else if ("Type.CHECKBOX".equalsIgnoreCase(widget) === true ||
+			 "Type.RADIO".equalsIgnoreCase(widget) === true)
 		{
 			LOG.info(_propertyName + " checked value: " + airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]));
 			_formTemplate.setAttribute(airlift.createCheckedTarget(_propertyName, _activeRecord[_propertyName]), "checked=\"\"");
 		}
-		else if ("airlift.generator.Presentable.Type.SELECT".equalsIgnoreCase(widget) === true)
+		else if ("Type.SELECT".equalsIgnoreCase(widget) === true)
 		{
 			LOG.info(_propertyName + " selected value: " + airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]));
 			_formTemplate.setAttribute(airlift.createSelectedTarget(_propertyName, _activeRecord[_propertyName]), "selected=\"\"");
 		}
-		else if ("airlift.generator.Presentable.Type.MULTISELECT".equalsIgnoreCase(widget) === true)
+		else if ("Type.MULTISELECT".equalsIgnoreCase(widget) === true)
 		{
 			var multiSelectCollection = _activeRecord[_propertyName]||airlift.s();
 			for (var collectionValue in Iterator(multiSelectCollection))

@@ -328,33 +328,35 @@ public class Compiler
 			{
 				rootPackageNameSet.add(domainObjectModel.getRootPackageName());
 
-				Generator generator = new SqlGenerator();
+				/*Generator generator = new SqlGenerator();
 				generator.processingEnv = _processingEnvironment;
 				generator.generate(appName, "gensql", element, domainObjectModel, _elementNameToDomainObjectModelMap);
-				
-				generator = new JavaScriptGenerator();
+				*/
+				Generator generator = new JavaScriptGenerator();
 				generator.processingEnv = _processingEnvironment;
 				generator.generate(appName, "genscript", element, domainObjectModel, _elementNameToDomainObjectModelMap);
 
-				generator = new JavaGenerator();
+				/*generator = new JavaGenerator();
 				generator.processingEnv = _processingEnvironment;
-				generator.generate(appName, "genjava", element, domainObjectModel, _elementNameToDomainObjectModelMap);
 
+				generator.generate(appName, "genjava", element, domainObjectModel, _elementNameToDomainObjectModelMap);
+				*/
 			}
 		}
 
+		/*
 		JavaGenerator javaGenerator = new JavaGenerator();
 		javaGenerator.processingEnv = _processingEnvironment;
 
 		String generatedString = javaGenerator.generateApplicationProfile(_elementNameToDomainObjectModelMap);
 		String fileName =  "genjava" + "." + _processingEnvironment.getOptions().get("package") + ".AppProfile";
 		javaGenerator.writeJavaFile(fileName, generatedString, null);
-
+*/
 		JavaScriptGenerator javaScriptGenerator = new JavaScriptGenerator();
 		javaScriptGenerator.processingEnv = _processingEnvironment;
 
-		generatedString = javaScriptGenerator.generateDomainConstructors(_elementNameToDomainObjectModelMap);
-		fileName =  appName + "/airlift/DomainConstructors.js";
+		String generatedString = javaScriptGenerator.generateDomainConstructors(_elementNameToDomainObjectModelMap);
+		String fileName =  appName + "/airlift/DomainConstructors.js";
 		javaScriptGenerator.writeResourceFile(fileName, "genscript", generatedString, null);
 	}
 
@@ -884,6 +886,7 @@ public class Compiler
 	 */
 	private void generateInterfaceFiles(Element _element)
 	{
+		/*
 		JavaGenerator generator = new JavaGenerator();
 		
 		if (getPreGenerationMap().isEmpty() == false)
@@ -898,7 +901,7 @@ public class Compiler
 			}
 
 			getPreGenerationMap().clear();
-		}
+		}*/
 	}
 	
 	/**

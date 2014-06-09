@@ -99,7 +99,7 @@ public class JavaGenerator
 				//TODO Need to refactor annotations into class level
 				//and attribute level annotations.
 				String urnRoot = "urn-" + domainObjectModel.getAppName() + "-" + domainObjectModel.getClassName().toLowerCase();
-				template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \"" + urnRoot  + "\");");
+				//template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "\" , \"" + urnRoot  + "\");");
 				
 				for (Attribute attribute: domainObjectModel.getAttributeList())
 				{
@@ -107,12 +107,25 @@ public class JavaGenerator
 					template.setAttribute("addToDomainAttributeTypeMap", "domainAttributeTypeMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + attribute.getType() + "\");");
 
 					Annotation persist = domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
-					String concept = findValue(persist, "concept()");
+					String concept = findValue(persist, "concept");
 					if (concept != null && "".equals(concept) != true) { concept += ","; }
-					template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + urnRoot + "-"  + concept + attribute.getName() + "\");");
+					//template.setAttribute("addToConceptMap", "conceptMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + urnRoot + "-"  + concept + attribute.getName() + "\");");
 
 					Annotation present = domainObjectModel.getAnnotation(attribute, "airlift.generator.Presentable");
-					String inputType = findValue(present, "inputType()");
+					String inputType = findValue(present, "inputType");
+
+					if (inputType == null)
+					{
+						System.out.println("HALLOWEEN NULL input type");
+						System.out.println("domainObjectModel " + domainObjectModel);
+						System.out.println("annotation present " + present);
+						inputType = "Type.TEXT";
+					}
+					else
+					{
+						System.out.println("inputType is NOT null " + inputType);
+					}
+					
 					template.setAttribute("addToDomainAttributeWidgetMap", "widgetMap.put(\"" + domainObjectModel.getClassName().toLowerCase() + "." + attribute.getName() + "\", \"" + inputType + "\");");
 				}
 			}
@@ -130,7 +143,7 @@ public class JavaGenerator
 	public String generateDomainSubInterface(DomainObjectModel _domainObjectModel)
 	{
 		String json = airlift.util.AirliftUtil.toJson(_domainObjectModel);
-		printMessage("JSON is: " + json);
+		//printMessage("JSON is: " + json);
 		
 		StringTemplate domainSubInterfaceStringTemplate = getStringTemplateGroup().getInstanceOf("airlift/language/java/DomainSubInterface");
 
@@ -157,7 +170,7 @@ public class JavaGenerator
 
 		domainSubInterfaceStringTemplate.setAttribute("generatorComment", comment);
 		domainSubInterfaceStringTemplate.setAttribute("package", _domainObjectModel.getRootPackageName());
-		domainSubInterfaceStringTemplate.setAttribute("fullClassName", _domainObjectModel.getFullyQualifiedClassName());
+		domainSubInterfaceStringTemplate.setAttribute("fullClassName", _domainObjectModel.getRootPackageName() + ".domaininterface." + _domainObjectModel.getClassName());
 		domainSubInterfaceStringTemplate.setAttribute("className", upperTheFirstCharacter(_domainObjectModel.getClassName()));
 
 		return domainSubInterfaceStringTemplate.toString();
@@ -341,7 +354,7 @@ public class JavaGenerator
 			setterStringTemplate.setAttribute("setterName", setterName);
 			setterStringTemplate.setAttribute("name", name);
 
-			printMessage("Checking is type: " + type);
+			//printMessage("Checking is type: " + type);
 			
 			if (isArrayType(type) == true)
 			{
@@ -389,7 +402,7 @@ public class JavaGenerator
 			Attribute attribute = (Attribute) attributes.next();
 
 			Annotation persist = _domainObjectModel.getAnnotation(attribute, "airlift.generator.Persistable");
-			String isSearchable = findValue(persist, "isSearchable()");
+			String isSearchable = findValue(persist, "isSearchable");
 
 			String name = attribute.getName();
 			String type = attribute.getType();
@@ -424,7 +437,7 @@ public class JavaGenerator
 			setterStringTemplate.setAttribute("setterName", setterName);
 			setterStringTemplate.setAttribute("name", name);
 			
-			printMessage("Checking is type: " + type);
+			//printMessage("Checking is type: " + type);
 
 			if (isArrayType(type) == true)
 			{
@@ -437,7 +450,7 @@ public class JavaGenerator
 
 			stringBufferStringTemplate.setAttribute("name", name);
 
-			String encrypted = findValue(persist, "encrypted()");
+			String encrypted = findValue(persist, "encrypted");
 
 			if ("true".equalsIgnoreCase(encrypted) == true)
 			{
@@ -525,10 +538,10 @@ public class JavaGenerator
 			Annotation search = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Searchable");
 			Annotation undo = (Annotation) _domainObjectModel.getAnnotation(attribute,"airlift.generator.Undoable");
 
-			isUndoable = (undo != null) ? findValue(undo, "isUndoable()") : "false";
+			isUndoable = (undo != null) ? findValue(undo, "isUndoable") : "false";
 						
-			String requestPersistence = findValue(persist, "isPersistable()");
-			String requestSearchable = findValue(persist, "isSearchable()");			
+			String requestPersistence = findValue(persist, "isPersistable");
+			String requestSearchable = findValue(persist, "isSearchable");			
 
 			if ("true".equals(requestPersistence) == true)
 			{
@@ -540,13 +553,13 @@ public class JavaGenerator
 
 				String fieldName = attribute.getName();
 				String name = attribute.getName();
-				String isPrimaryKey = findValue(persist, "isPrimaryKey()");
-				String rangeable = findValue(persist, "rangeable()");
-				String isImmutable = findValue(persist, "immutable()");
+				String isPrimaryKey = findValue(persist, "isPrimaryKey");
+				String rangeable = findValue(persist, "rangeable");
+				String isImmutable = findValue(persist, "immutable");
 
 				if (search != null)
 				{
-					isSearchable = findValue(search, "isSearchable()");
+					isSearchable = findValue(search, "isSearchable");
 				}
 
 				hasPrimaryKey = true;
