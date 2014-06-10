@@ -103,6 +103,8 @@ function Collect(_web)
 
 		var filter = new Packages.java.util.ArrayList();
 
+		util.assert(!filterList.forEach, 'filter list must be a JavaScript array');
+		
 		filterList.forEach(function(_filter)
 		{
 			var o = _filter.operator || _filter.comparator || _filter.op || _filter.o || _filter.c || 'EQUAL';
