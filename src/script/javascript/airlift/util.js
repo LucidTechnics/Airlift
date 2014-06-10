@@ -753,16 +753,20 @@ var httpCodes = {
 '505':'HTTP Version Not Supported',
 };
 
-exports.throw = function(_assertion, _message, _responseCode)
+exports.assert = function(_assertion, _config)
 {	
 	if (_assertion)
 	{
-		var m = _message||undefined;
-		var r = _responseCode||'400';
+		var n = _config.n||_config.name||'';
+		var m = _config.m||_config.message||'';
+		var c = _config.c||_config.category||'validation';
+		var r = _config.r||_config.responseCode||'400';
 		var h = httpCodes[r];
+		var e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
 
 		m && exports.severe(m);
+		e && exports.severe(JSON.stringify(e));
 
-		throw {r: r, h: h, message: m};
+		throw {r: r, h: h, message: m, error: e};
 	}
 };
