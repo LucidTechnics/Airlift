@@ -493,93 +493,96 @@ function Incoming(_web)
 
 	this.convertFromSource = function (_source, _sourceForeignKey, _sourceId, _value, _attributeName, _resource, _attributeMetadata)
 	{
-		var value, resourceName = this.resourceName;
+		var value = _resource[_attributeName], resourceName = this.resourceName;
 		var type = _attributeMetadata.type;
 
-		if ("id".equals(_attributeName) !== true)
+		if (util.hasValue(value) !== true)
 		{
-			try
+			if ("id".equals(_attributeName) !== true)
 			{
-				if (converter[type])
+				try
 				{
-					var parameterValue = _source(_attributeName, type);
-					
-					value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
-							(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
-
-					if (util.hasValue(parameterValue) && util.isWhitespace(parameterValue) === false && util.hasValue(value) === false)
+					if (converter[type])
 					{
-						this.report(_attributeName, ['unable to convert this value', parameterValue].join(' '), 'conversion');
-						value = parameterValue;
+						var parameterValue = _source(_attributeName, type);
+
+						value = (util.hasValue(parameterValue) && converter[type](parameterValue)) ||
+								(util.hasValue(_attributeMetadata.default) && converter[type](_attributeMetadata.default)) || null;
+
+						if (util.hasValue(parameterValue) && util.isWhitespace(parameterValue) === false && util.hasValue(value) === false)
+						{
+							this.report(_attributeName, ['unable to convert this value', parameterValue].join(' '), 'conversion');
+							value = parameterValue;
+						}
+
+						if (collectionTypes[type] && util.hasValue(value) === false)
+						{
+							value = (new CollectionType()).create(type);
+						}
 					}
-					
-					if (collectionTypes[type] && util.hasValue(value) === false)
+					else
 					{
-						value = (new CollectionType()).create(type);
+						throw new Error('no converter found for type: ' + type);
 					}
 				}
-				else
+				catch(e)
 				{
-					throw new Error('no converter found for type: ' + type);
-				}
-			}
-			catch(e)
-			{
-				util.warning('conversion exception thrown');
+					util.warning('conversion exception thrown');
 
-				if (e.javaException)
-				{
-					util.warning(e.javaException.getMessage());
-				}
-				else
-				{
-					util.warning(e.message);
+					if (e.javaException)
+					{
+						util.warning(e.javaException.getMessage());
+					}
+					else
+					{
+						util.warning(e.message);
+					}
+
+					this.report(_attributeName, 'This value is not correct.', 'conversion');
 				}
 
-				this.report(_attributeName, 'This value is not correct.', 'conversion');
-			}
+				if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
+				{
+					/* Form value overrides what is in the URI.  This is done for
+					 * security reasons.  The foreign key may be protected via TLS
+					 * by including it in the form and not in the URI.  If it is
+					 * included in the form the expectation is that the URI should
+					 * be overridden.
+					 */
 
-			if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
-			{
-				/* Form value overrides what is in the URI.  This is done for
-				 * security reasons.  The foreign key may be protected via TLS
-				 * by including it in the form and not in the URI.  If it is
-				 * included in the form the expectation is that the URI should
-				 * be overridden.
+					var parameterValue = _sourceForeignKey(_attributeMetadata.mapTo);
+
+					if (parameterValue && isCollection(parameterValue) === true)
+					{
+						parameterValue = parameterValue.get(0);
+					}
+
+					value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
+				}
+
+				/* There is no way to represent mapToMany in a URI
+				 * therefore the form value is taken. 
 				 */
-
-				var parameterValue = _sourceForeignKey(_attributeMetadata.mapTo);
+			}
+			else
+			{
+				//get the id
+				var parameterValue = _sourceId(resourceName);
+				//convert only works for the first id.  Multiple puts not
+				//supported at this time - Bediako
 
 				if (parameterValue && isCollection(parameterValue) === true)
 				{
 					parameterValue = parameterValue.get(0);
 				}
-				
+
 				value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
 			}
 
-			/* There is no way to represent mapToMany in a URI
-			 * therefore the form value is taken. 
-			 */
+			_resource[_attributeName] = value;
+
+			var res = require('airlift/resource').create(_web);
 		}
-		else
-		{
-			//get the id
-			var parameterValue = _sourceId(resourceName);
-			//convert only works for the first id.  Multiple puts not
-			//supported at this time - Bediako
-
-			if (parameterValue && isCollection(parameterValue) === true)
-			{
-				parameterValue = parameterValue.get(0);
-			}
-
-			value = (util.hasValue(parameterValue) && parameterValue) || null; //rest context parameters are always strings ...
-		}
-
-		_resource[_attributeName] = value;
-
-		var res = require('airlift/resource').create(_web);
 
 		return value;
 	};

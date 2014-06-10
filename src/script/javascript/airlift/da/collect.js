@@ -157,7 +157,7 @@ function Collect(_web)
 
 		if (Array.isArray(_membershipList) === true)
 		{
-			membershipList = util.list();
+			membershipList = util.set();
 			
 			for (var i = 0; i < _membershipList.length; i++)
 			{
