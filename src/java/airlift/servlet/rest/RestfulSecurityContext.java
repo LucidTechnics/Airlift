@@ -22,8 +22,7 @@ import java.util.logging.Logger;
  */
 public class RestfulSecurityContext
    implements airlift.SecurityContext
-{
-	
+{	
 	/** The Constant log. */
 	private static final Logger log = Logger.getLogger(RestfulSecurityContext.class.getName());
 		
@@ -34,6 +33,8 @@ public class RestfulSecurityContext
 	private airlift.CachingContext cachingContext;
 
 	private boolean verbose = false;
+
+	private RoleSetManager roleSetManager;
 
 	private void logInfo(String _message)
 	{
@@ -88,11 +89,23 @@ public class RestfulSecurityContext
 		setCachingContext(_cachingContext);
 	}
 
-	protected RestfulSecurityContext(String _kind, airlift.CachingContext _cachingContext, boolean _verbose)
+	protected RestfulSecurityContext(String _kind, airlift.CachingContext _cachingContext, String _roleSetManager, boolean _verbose)
 	{
 		setKind(_kind);
 		setCachingContext(_cachingContext);
-		verbose = _verbose;
+		this.verbose = _verbose;
+
+		try
+		{
+			if (_roleSetManager != null && org.apache.commons.lang.StringUtils.isWhitespace(_roleSetManager) == false)
+			{	
+				this.roleSetManager = (RoleSetManager) getClass().forName(_roleSetManager).newInstance();
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +120,7 @@ public class RestfulSecurityContext
 			domainName = domainName.substring(4, domainName.length());
 		}
 
-		return allowed(_user, _restContext.getMethod(), _appProfile, domainName, _restContext.uriIsACollection());
+		return allowed(_user, _restContext.getMethod(), _appProfile, domainName, _restContext.uriIsACollection(), _restContext);
 	}
 
 	/**
@@ -120,7 +133,7 @@ public class RestfulSecurityContext
 	 * @param _uriIsACollection the _uri is a collection
 	 * @return true, if successful
 	 */
-	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _resourceName, boolean _uriIsACollection)
+	public boolean allowed(AirliftUser _user, String _method, airlift.AppProfile _appProfile, String _resourceName, boolean _uriIsACollection, RestContext _restContext)
 	{
 		boolean allowed = true;
 		
@@ -129,7 +142,6 @@ public class RestfulSecurityContext
 			Class appProfileClass = Class.forName("airlift.app.AppProfile");
 			airlift.AppProfile appProfile = (airlift.AppProfile) appProfileClass.newInstance();
 			java.util.Map<String, java.util.Set<String>> securityRoles = appProfile.getSecurityRoles(_resourceName);
-			java.util.Set<String> roleSet = securityRoles.get(_method);
 			
 			if (securityRoles != null && securityRoles.isEmpty() == false)
 			{
@@ -137,36 +149,36 @@ public class RestfulSecurityContext
 				{
 					if (_uriIsACollection == true)
 					{
-						allowed = checkAllowed(securityRoles.get("COLLECT"), _user);
+						allowed = checkAllowed(securityRoles.get("COLLECT"), _user, _restContext);
 					}
 					else
 					{
-						allowed = checkAllowed(securityRoles.get("GET"), _user);
+						allowed = checkAllowed(securityRoles.get("GET"), _user, _restContext);
 					}
 				}
 				else if ("POST".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("POST"), _user);
+					allowed = checkAllowed(securityRoles.get("POST"), _user, _restContext);
 				}
 				else if ("PUT".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("PUT"), _user);
+					allowed = checkAllowed(securityRoles.get("PUT"), _user, _restContext);
 				}
 				else if ("DELETE".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("DELETE"), _user);
+					allowed = checkAllowed(securityRoles.get("DELETE"), _user, _restContext);
 				}
 				else if ("TRACE".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("TRACE"), _user);
+					allowed = checkAllowed(securityRoles.get("TRACE"), _user, _restContext);
 				}
 				else if ("HEAD".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("HEAD"), _user);
+					allowed = checkAllowed(securityRoles.get("HEAD"), _user, _restContext);
 				}
 				else if ("OPTIONS".equalsIgnoreCase(_method) == true)
 				{
-					allowed = checkAllowed(securityRoles.get("OPTIONS"), _user);
+					allowed = checkAllowed(securityRoles.get("OPTIONS"), _user, _restContext);
 				}
 			}
 
@@ -216,21 +228,21 @@ public class RestfulSecurityContext
 	 * @param _user the _user
 	 * @return true, if successful
 	 */
-	private boolean checkAllowed(java.util.Set<String> _roleSet, AirliftUser _user)
+	private boolean checkAllowed(java.util.Set<String> _roleSet, AirliftUser _user, RestContext _restContext)
 	{
 		java.util.Set<String> roleSet = (_roleSet != null) ? new java.util.HashSet<String>(_roleSet) : new java.util.HashSet<String>();
 		
 		boolean allowed = false;
 		
 		if (roleSet.contains("noone") == false)
-		{
+		{			
 			if (roleSet.contains("all") == true)
 			{
 				allowed = true;
 			}
 			else
 			{
-				java.util.Set<String> userRoleSet = fetchUserRoleSet(_user);
+				java.util.Set<String> userRoleSet = fetchUserRoleSet(_user, _restContext);
 
 				if (userRoleSet.isEmpty() == false)
 				{
@@ -293,13 +305,26 @@ public class RestfulSecurityContext
 	 * @param _user the _user
 	 * @return the java.util. set
 	 */
-	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user)
+	public java.util.Set<String> fetchUserRoleSet(AirliftUser _user, RestContext _restContext)
 	{
-		java.util.Set<String> roleSet = new java.util.HashSet<String>();
+		//check to see if there is a user role set class ... if not
+		//use this user role set as the default.
 
-		if (_user != null)
+		java.util.Set<String> roleSet = new java.util.HashSet<String>();
+		java.util.Set<String> userRoles = new java.util.HashSet<String>();
+		
+		if (this.roleSetManager != null)
 		{
-			roleSet.addAll(_user.getRoleSet());
+			userRoles = roleSetManager.getRoles(_user, _restContext);
+		}
+		else if (_user != null)
+		{
+			userRoles = _user.getRoleSet();
+		}
+
+		if (userRoles != null)
+		{
+			roleSet.addAll(userRoles);
 		}
 
 		return roleSet;
@@ -394,7 +419,7 @@ public class RestfulSecurityContext
 		airliftUser.setAuditPostDate((java.util.Date) _entity.getProperty("auditPostDate"));
 		airliftUser.setAuditPutDate((java.util.Date) _entity.getProperty("auditPutDate"));
 		airliftUser.setTimeOutDate((java.util.Date) _entity.getProperty("timeOutDate"));
-
+		
 		return airliftUser;
 	}
 
@@ -419,14 +444,6 @@ public class RestfulSecurityContext
 		{
 			entity.setProperty("externalUserId", _airliftUser.getExternalUserId());
 		}
-		/*if (_airliftUser.getCookieId() != null)
-		{
-			entity.setProperty("cookieId", org.apache.commons.lang.StringUtils.trim(_airliftUser.getCookieId().toLowerCase()));
-		}
-		else
-		{
-			entity.setProperty("cookieId", _airliftUser.getcookieId());
-		}*/
 
 		if (_airliftUser.getEmail() != null)
 		{
@@ -442,7 +459,7 @@ public class RestfulSecurityContext
 		entity.setProperty("auditPostDate", _airliftUser.getAuditPostDate());
 		entity.setProperty("auditPutDate", _airliftUser.getAuditPutDate());
 		entity.setProperty("timeOutDate", _airliftUser.getTimeOutDate());
-
+		
 		return entity;
 	}
 
@@ -640,8 +657,6 @@ public class RestfulSecurityContext
 		{
 			email = org.apache.commons.lang.StringUtils.trim(_email.toLowerCase());
 		}
-
-		logInfo("looking for user with email: " + email + " lowercased from " + _email);
 		
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;

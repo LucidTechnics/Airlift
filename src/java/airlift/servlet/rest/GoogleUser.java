@@ -149,6 +149,6 @@ public class GoogleUser
 	 */
 	public java.lang.String	toString()
 	{
-		return getUser().toString();
+		return super.toString();
 	}
 }

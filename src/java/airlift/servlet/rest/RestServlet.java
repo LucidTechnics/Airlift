@@ -358,7 +358,10 @@ public class RestServlet
 		UserService userService = getUserService(_request,restContext, _response);
 		AbstractUser user = userService.getCurrentUser();
 
-		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(), this.cachingContextMap.get("user.session"), "true".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.verbose.log")));
+		RestfulSecurityContext securityContext = new RestfulSecurityContext(userService.getUserKind(),
+			this.cachingContextMap.get("user.session"),
+			this.getServletConfig().getInitParameter("a.roleset.manager"),
+			"true".equalsIgnoreCase(this.getServletConfig().getInitParameter("a.verbose.log")));
 		restContext.setSecurityContext(securityContext);
 		securityContext.populate(user);
 		restContext.setUser(user);

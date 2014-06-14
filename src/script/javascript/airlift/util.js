@@ -754,15 +754,24 @@ var httpCodes = {
 };
 
 exports.assert = function(_assertion, _config)
-{	
+{
+	var n,m,c,r,h,e;
+	
 	if (_assertion)
 	{
-		var n = _config.n||_config.name||'';
-		var m = _config.m||_config.message||'';
-		var c = _config.c||_config.category||'validation';
-		var r = _config.r||_config.responseCode||'400';
-		var h = httpCodes[r];
-		var e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
+		if (typeof _config === 'string')
+		{
+			m = _config;
+		}
+		else
+		{
+			n = _config.n||_config.name||'';
+			m = _config.m||_config.message||'';
+			c = _config.c||_config.category||'validation';
+			r = _config.r||_config.responseCode||'400';
+			h = httpCodes[r];
+			e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
+		}
 
 		m && exports.severe(m);
 		e && exports.severe(JSON.stringify(e));
