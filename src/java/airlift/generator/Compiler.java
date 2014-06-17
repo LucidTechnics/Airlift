@@ -29,7 +29,7 @@ import java.util.*;
  */
 @SupportedAnnotationTypes("airlift.generator.*")
 @SupportedOptions({"appName", "package"})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
 
 public class Compiler
    extends AbstractProcessor
