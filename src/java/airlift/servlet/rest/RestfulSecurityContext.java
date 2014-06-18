@@ -268,9 +268,10 @@ public class RestfulSecurityContext
 			String externalUserId = (_user.getExternalUserId() != null) ? _user.getExternalUserId().toLowerCase() : null;
 			java.util.List<AirliftUser> users = collectByExternalUserId(externalUserId,0,1,"auditPostDate",true);
 			AirliftUser user=null;
-			if(users!=null&&!users.isEmpty())
+
+			if(users != null && !users.isEmpty())
 			{
-				user=users.get(0);
+				user = users.get(0);
 			}
 			//Only return active users ...
 			if (user != null && user.getActive() == true)
@@ -316,6 +317,11 @@ public class RestfulSecurityContext
 		if (this.roleSetManager != null)
 		{
 			userRoles = roleSetManager.getRoles(_user, _restContext);
+
+			if (userRoles != null && userRoles.isEmpty() == false)
+			{
+				_user.getRoleSet().addAll(userRoles);
+			}
 		}
 		else if (_user != null)
 		{
@@ -414,8 +420,25 @@ public class RestfulSecurityContext
 		{
 			airliftUser.setRoleSet(new java.util.HashSet<String>());
 		}
+
+		if (_entity.getProperty("active") != null)
+		{
+			airliftUser.setActive((Boolean) _entity.getProperty("active"));
+		}
+		else if (_entity.getProperty("status") != null)
+		{
+			String status = (String)_entity.getProperty("status");
+
+			if ("active".equalsIgnoreCase(status) == true)
+			{
+				airliftUser.setActive(true);
+			}
+			else
+			{
+				airliftUser.setActive(false);
+			}
+		}
 		
-		airliftUser.setActive((Boolean) _entity.getProperty("active"));
 		airliftUser.setAuditPostDate((java.util.Date) _entity.getProperty("auditPostDate"));
 		airliftUser.setAuditPutDate((java.util.Date) _entity.getProperty("auditPutDate"));
 		airliftUser.setTimeOutDate((java.util.Date) _entity.getProperty("timeOutDate"));
@@ -623,7 +646,10 @@ public class RestfulSecurityContext
 	{
 		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
 		com.google.appengine.api.datastore.Query.SortDirection sort = (_asc == true) ? com.google.appengine.api.datastore.Query.SortDirection.ASCENDING : com.google.appengine.api.datastore.Query.SortDirection.DESCENDING;
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("externalUserId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);;
+
+		//TODO ... why use the external user id?  Either we rename this
+		//field or we make this configurable via web.xml
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(getKind()).addSort(_orderBy, sort).addFilter("externalUserId", com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, _value);
 		java.util.Iterator<com.google.appengine.api.datastore.Entity> queryResults = datastore.prepare(query).asIterator(com.google.appengine.api.datastore.FetchOptions.Builder.withLimit(_limit).offset(_offset));
 
 		java.util.List<AirliftUser> results = new java.util.ArrayList<AirliftUser>();

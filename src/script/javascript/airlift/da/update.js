@@ -45,6 +45,7 @@ function Update(_web)
 			if (previousRecord)
 			{
 				incoming.bookkeeping(entity, _web.getUserId()||null, previousRecord.auditPostDate, util.createDate());
+				incoming.reconcileBookkeeping(entity, _resource);
 			}
 			else
 			{

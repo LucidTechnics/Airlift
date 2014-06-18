@@ -339,7 +339,7 @@ public class RestContext
 		String value = null;
 		List list = getIdValue(_id);
 
-		if (list.isEmpty() == false)
+		if (list != null && list.isEmpty() == false)
 		{
 			java.util.ArrayList arrayList = new java.util.ArrayList(list);
 			value = (String)arrayList.get(0);

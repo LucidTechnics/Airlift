@@ -286,6 +286,16 @@ function Incoming(_web)
 		_entity.setProperty("auditPutDate", _putDate||_entity.getProperty("auditPostDate"));
 	};
 
+	this.reconcileBookkeeping = function reconcileBookkeeping(_entity, _resource)
+	{
+		_resource.auditUserId = _entity.getProperty("auditUserId");
+		_resource.auditRequestId = _entity.getProperty("auditRequestId");
+		_resource.auditPostDate = _entity.getProperty("auditPostDate");
+		_resource.auditPutDate = _entity.getProperty("auditPutDate");
+
+		return _resource;
+	};
+
 	this.entify = function entify(_entity, _value, _attributeName, _resource, _attributeMetadata)
 	{
 		if (util.isEmpty(this.allErrors()) === true && "id".equalsIgnoreCase(_attributeName) === false)

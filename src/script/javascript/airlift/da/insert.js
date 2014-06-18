@@ -81,6 +81,7 @@ function Insert(_web)
 				result.errors = this.allErrors();
 
 				incoming.bookkeeping(entity);
+				incoming.reconcileBookkeeping(entity, _resource);
 
 				if (util.isEmpty(result.errors) === true)
 				{
