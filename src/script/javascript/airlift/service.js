@@ -210,7 +210,9 @@ function ChannelService()
 
 	this.create = function(_id)
 	{
-		return service.createChannel(_id);
+		var token = service.createChannel(_id);
+
+		return ['{{', token, '}}'].join(' ');
 	};
 
 	this.send = function(_key, _message)
