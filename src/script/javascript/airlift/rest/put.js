@@ -11,6 +11,7 @@ exports.put = function(_web, _config)
 	var errors;
 	var serializeResource = config.resourceSerializer||JSON.stringify;
 	var serializeError = config.errorSerializer||JSON.stringify;
+	var context = config.context||undefined;
 
 	var callback = function(_resourceName, _resource)
 	{

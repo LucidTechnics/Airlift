@@ -204,6 +204,26 @@ function URLFetchService()
 	};
 }
 
+function ChannelService()
+{
+	var service = Packages.com.google.appengine.api.channel.ChannelServiceFactory.getChannelService();
+
+	this.create = function(_id)
+	{
+		return service.createChannel(_id);
+	};
+
+	this.send = function(_key, _message)
+	{
+		service.sendMessage(new Packages.com.google.appengine.api.channel.ChannelMessage(_key, _message));
+	};
+}
+
+exports.getChannelService = function()
+{
+	return new ChannelService();
+}
+
 exports.getURLFetchService = function()
 {
 	return new URLFetchService();

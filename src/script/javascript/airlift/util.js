@@ -762,16 +762,19 @@ exports.assert = function(_assertion, _config)
 		if (typeof _config === 'string')
 		{
 			m = _config;
+			r = '400';
+			e = {category: 'validation', m: m};
 		}
 		else
 		{
+			r = _config.r||_config.responseCode||'400';
 			n = _config.n||_config.name||'';
 			m = _config.m||_config.message||'';
 			c = _config.c||_config.category||'validation';
-			r = _config.r||_config.responseCode||'400';
-			h = httpCodes[r];
 			e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
 		}
+
+		h = httpCodes[r];
 
 		m && exports.severe(m);
 		e && exports.severe(JSON.stringify(e));
