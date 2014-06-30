@@ -181,7 +181,7 @@ function Web(WEB_CONTEXT)
 			resourcePath = this.getResourceName();
 			var ids = this.getIds();
 
-			if ("POST".equals(this.getMethod()) === false && ids !== null && ids.isEmpty() === false)
+			if ("POST".equals(this.getMethod()) === false && util.hasValue(ids) && ids.isEmpty() === false)
 			{
 				resourcePath = resourcePath + "/" + this.convertToString(ids);
 			}
@@ -316,7 +316,7 @@ function Web(WEB_CONTEXT)
 		{
 			user = this.getRestContext().getUser();
 
-			if (user != null && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
+			if (util.hasValue(user) === true && user.getEmail() != null) { user.setEmail(user.getEmail().toLowerCase()); }
 		}
 
 		return user;
@@ -327,7 +327,7 @@ function Web(WEB_CONTEXT)
 		if (userId === undefined)
 		{
 			var user = this.getUser();
-			userId = (user != null) ? user.getId() : null;
+			userId = (util.hasValue(user) === true) ? user.getId() : null;
 		}
 
 		return userId;
@@ -509,7 +509,7 @@ function Web(WEB_CONTEXT)
 				{
 					var content = _content;
 
-					if (content.length !== undefined && content.length !== null && typeof content.length !== 'function')
+					if (util.hasValue(content.length) && typeof content.length !== 'function')
 					{
 						//this is a byte array or JavaScript String.
 						content = new Packages.java.lang.String(_content);

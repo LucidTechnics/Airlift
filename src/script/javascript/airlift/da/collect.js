@@ -103,7 +103,7 @@ function Collect(_web)
 
 		var filter = new Packages.java.util.ArrayList();
 
-		util.assert(!filterList.forEach, 'filter list must be a JavaScript array');
+		util.assert(filterList.forEach, {m: 'filter list must be a JavaScript array', r: '500'});
 		
 		filterList.forEach(function(_filter)
 		{

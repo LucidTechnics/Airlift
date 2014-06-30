@@ -757,7 +757,7 @@ exports.assert = function(_assertion, _config)
 {
 	var n,m,c,r,h,e;
 	
-	if (_assertion)
+	if (!_assertion)
 	{
 		if (typeof _config === 'string')
 		{
