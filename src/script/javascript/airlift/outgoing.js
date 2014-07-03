@@ -54,16 +54,17 @@ function Outgoing(_web)
 			
 			if (getFirstValue(value) instanceof com.google.appengine.api.datastore.EmbeddedEntity)
 			{
-				var objectList = new Packages.java.util.ArrayList();
+				
+				var objectCollection = (_attributeMetadata.type + '' === 'list') ? new Packages.java.util.ArrayList() : new Packages.java.util.HashSet();
 				
 				for (var embeddedEntity in Iterator(value))
 				{
 					var object = {};
 					res.each(_attributeMetadata.mapToMany, object, that.deentify.partial(embeddedEntity));
-					objectList.add(object);
+					objectCollection.add(object);
 				}
 				
-				value = objectList;
+				value = objectCollection;
 			}
 		}
 		else
