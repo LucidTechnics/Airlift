@@ -35,7 +35,24 @@ function Outgoing(_web)
 		}
 		else if (value instanceof java.util.Collection && value.isEmpty() === false)
 		{
-			if (value.get(0) instanceof com.google.appengine.api.datastore.EmbeddedEntity)
+			function getFirstValue(_collection)
+			{
+				var value;
+				
+				if (_collection.get)
+				{
+					value = _collection.get(0);
+				}
+				else
+				{
+					var iterator = _collection.iterator();
+					value =  iterator.hasNext() && iterator.next();
+				}
+
+				return value;
+			}
+			
+			if (getFirstValue(value) instanceof com.google.appengine.api.datastore.EmbeddedEntity)
 			{
 				var objectList = new Packages.java.util.ArrayList();
 				
@@ -45,6 +62,7 @@ function Outgoing(_web)
 					res.each(_attributeMetadata.mapToMany, object, that.deentify.partial(embeddedEntity));
 					objectList.add(object);
 				}
+				
 				value = objectList;
 			}
 		}

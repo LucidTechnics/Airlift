@@ -44,7 +44,7 @@ function Collect(_web)
 
 			if (!keysOnly && !fetchedResources)
 			{
-				fetchedResources = require('./get').create(_web).getAll(_resourceName, _entities);
+				fetchedResources = require('./get').create(_web).__getAll(_resourceName, _entities);
 			}
 
 			result = keys.next().getName();

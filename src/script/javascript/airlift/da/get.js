@@ -1,7 +1,9 @@
 var service = require('airlift/service');
+var collection = require('airlift/collection');
 
 function Get(_web)
 {
+	var incoming = require('airlift/incoming').create(_web);
 	var outgoing = require('airlift/outgoing').create(_web);
 	var util = require('airlift/util');
 	var res = require('airlift/resource').create(_web);
@@ -13,7 +15,6 @@ function Get(_web)
 	var populateCache = function(_key, _value)
 	{
 		cache.put(_key, _value);
-
 		return _value;
 	};
 
@@ -75,7 +76,7 @@ function Get(_web)
 		return result;
 	};
 
-	this.getAll = function(_resourceName, _entityList)
+	this.__getAll = function(_resourceName, _entityList)
 	{
 		var resourceName = _resourceName;
 
@@ -136,6 +137,14 @@ function Get(_web)
 			util.getJavaException(_e) && util.severe(util.printStackTraceToString(util.getJavaException(_e)));
 		});
 	};
+
+	this.getAll = function(_resourceName, _ids)
+	{
+		var entities = collection.map(_ids, function(_id) { return incoming.createEntity(_resourceName, _id); });
+
+		return this.__getAll(_resourceName, entities); 
+	};
+
 }
 
 exports.create = function(_web)
