@@ -54,7 +54,6 @@ function Outgoing(_web)
 			
 			if (getFirstValue(value) instanceof com.google.appengine.api.datastore.EmbeddedEntity)
 			{
-				
 				var objectCollection = (_attributeMetadata.type + '' === 'list') ? new Packages.java.util.ArrayList() : new Packages.java.util.HashSet();
 				
 				for (var embeddedEntity in Iterator(value))
