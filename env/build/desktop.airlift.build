@@ -21,6 +21,11 @@ airlift.namespace=
 airlift.default.mime.type=text/html
 
 ##
+## Cross site scripting
+##
+airlift.allow.control.origin=*
+
+##
 ## Default time zone for all requests
 ##
 airlift.timezone=America/New_York

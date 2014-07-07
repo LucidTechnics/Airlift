@@ -300,7 +300,8 @@
 			
 			<!-- mime type tokens -->
 			<replacefilter token="@AIRLIFT_DEFAULT_MIME_TYPE@" value="${airlift.default.mime.type}"/>
-
+			<replacefilter token="@AIRLIFT_ALLOW_CONTROL_ORIGIN@" value="${airlift.allow.control.origin}"/>
+			
 			<!-- auditing tokens -->
 			<replacefilter token="@AIRLIFT_AUDITING_INSERT@" value="${airlift.auditing.insert}"/>
 			<replacefilter token="@AIRLIFT_AUDITING_GET@" value="${airlift.auditing.get}"/>

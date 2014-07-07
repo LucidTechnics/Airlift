@@ -73,6 +73,8 @@ public class JavaGenerator
 
 				if (resourceModel.getIsView() == true)
 				{
+					template.setAttribute("hasViewName", resourceModel.getLookingAt());
+
 					template.setAttribute("viewName", resourceName);
 					template.setAttribute("viewResourceName", resourceModel.getLookingAt());
 				}

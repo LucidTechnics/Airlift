@@ -76,6 +76,10 @@
 			<param-name>a.user.service</param-name>
 			<param-value>@AIRLIFT_USER_SERVICE@</param-value>
 		</init-param>
+		<init-param>
+			<param-name>a.allow.control.origin</param-name>
+			<param-value>@AIRLIFT_ALLOW_CONTROL_ORIGIN@</param-value>
+		</init-param>
 
 		<load-on-startup>1</load-on-startup>
 	</servlet>

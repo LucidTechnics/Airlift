@@ -13,11 +13,14 @@ public class AppProfile
 	public static final java.util.Map<String, java.util.Map<String, java.util.Set<String>>> resourceSecurityMetadataMap = new java.util.HashMap<String, java.util.Map<String, java.util.Set<String>>>();
 	public static final java.util.Map<String, String> viewMap = new java.util.HashMap<String, String>();
 	public static final java.util.Set<String> viewSet = new java.util.HashSet<String>();
-	
+	public static final java.util.Map<String, java.util.Set<String>> hasViewMap = new java.util.HashMap<String, java.util.Set<String>>();
+
 	static
 	{
 		$viewName, viewResourceName : {v, vr | viewMap.put("$v$", "$vr$"); }; separator="\n"$
+		$viewName, hasViewName : {v, hv | addHasView("$hv$", "$v$"); }; separator="\n"$
 		$viewName : {v | viewSet.add("$v$"); }; separator="\n"$
+		
 		
 		$resourceName : {d | resourceSecurityMetadataMap.put("$d$", new java.util.HashMap<String, java.util.Set<String>>()); }; separator="\n"$
 
@@ -35,6 +38,16 @@ public class AppProfile
 		return appName;
 	}
 
+	public static final void addHasView(String _resource, String _view)
+	{
+		if (hasViewMap.get(_resource) == null)
+		{
+			hasViewMap.put(_resource, new java.util.HashSet());
+		}
+
+		hasViewMap.get(_resource).add(_view);
+	}
+
 	public boolean isView(String _resourceName)
 	{
 		return viewSet.contains(_resourceName.toLowerCase());
@@ -43,6 +56,11 @@ public class AppProfile
 	public String getLookingAt(String _resourceName)
 	{
 		return viewMap.get(_resourceName.toLowerCase());
+	}
+
+	public java.util.Set<String> getViews(String _resourceName)
+	{
+		return hasViewMap.get(_resourceName);
 	}
 	
 	public java.util.Set<String> getValidResources()

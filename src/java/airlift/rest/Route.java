@@ -215,6 +215,16 @@ public class Route
 		}
 	}
 
+	public static void removeDomainName(Map _bindings, String _domainName)
+	{
+		List<String> domainList = (List<String>) _bindings.get("a.domain.list");
+
+		if (domainList != null)
+		{
+			domainList.remove(_domainName.toLowerCase());
+		}
+	}
+
 	public static void addSuffix(Map _bindings, String _suffix)
 	{
 		_bindings.put("a.suffix", _suffix);

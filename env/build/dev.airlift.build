@@ -74,8 +74,8 @@ airlift.dev.user.security=no
 ##
 ## Sets the application version on upload
 ##
-airlift.application=demo-airlift-env
-airlift.application.version=demo-20130424-0
+airlift.application=dev-airlift-env
+airlift.application.version=dev-20130424-0
 airlift.base=http://${airlift.application}.appspot.com
 
 ##

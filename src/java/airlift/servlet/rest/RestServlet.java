@@ -302,11 +302,16 @@ public class RestServlet
 	protected RestContext applySecurityChecks(HttpServletRequest _request, HttpServletResponse _response, Method _method)
 	{
 		//Deal with COR headers
-		_response.addHeader("Access-Control-Allow-Origin", "*");
-		_response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
-		_response.addHeader("Access-Control-Allow-Credentials",  "true");
-		_response.addHeader("Access-Control-Max-Age", "86400");
-		_response.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+		String allowControlOrigin = this.getServletConfig().getInitParameter("a.allow.control.origin");
+
+		if (allowControlOrigin != null)
+		{
+			_response.addHeader("Access-Control-Allow-Origin", allowControlOrigin);
+			_response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+			_response.addHeader("Access-Control-Allow-Credentials",  "true");
+			_response.addHeader("Access-Control-Max-Age", "86400");
+			_response.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
+		}
 		
 		java.util.Enumeration<String> headerNames = _request.getHeaderNames();
 
@@ -348,7 +353,8 @@ public class RestServlet
 
 		String method = determineMethod(_method, _request);
 		Map uriParameterMap = new java.util.HashMap();
-		RestContext restContext = prepareRestContext(method, acceptValueList, _request, uriParameterMap, getServletName());
+		String uri = reconstructUri(getServletName(), _request);
+		RestContext restContext = prepareRestContext(method, acceptValueList, uri, uriParameterMap, getServletName());
 
 		if (restContext.getHandlerPathList().isEmpty() == true)
 		{
@@ -367,6 +373,41 @@ public class RestServlet
 		restContext.setUser(user);
 
 		boolean success = allowed(user, restContext, securityContext);
+
+		if (success == false && getAppProfile().getViews(restContext.getThisDomain()) != null)
+		{
+			java.util.Iterator views = getAppProfile().getViews(restContext.getThisDomain()).iterator();
+			boolean done = false;
+			
+			while (views.hasNext() && !done)
+			{
+				String view = (String)views.next();
+				String candidateUri = uri.toLowerCase().replace(restContext.getThisDomain().toLowerCase(), view.toLowerCase());
+				Map candidateUriParameterMap = new java.util.HashMap();
+				RestContext candidateRestContext = prepareRestContext(method, acceptValueList, candidateUri, candidateUriParameterMap, getServletName());
+
+				if (candidateRestContext.getHandlerPathList().isEmpty() == true)
+				{
+					done = true;
+				}
+				else
+				{
+					candidateRestContext.setSecurityContext(securityContext);
+					candidateRestContext.setUser(user);
+
+					success = allowed(user, candidateRestContext, securityContext);
+
+					if (success)
+					{
+						log.info("Using alias " + view + " instead of " + restContext.getThisDomain());
+						
+						done = true;
+						restContext = candidateRestContext;
+						uriParameterMap = candidateUriParameterMap;
+					}
+				}
+			}
+		}
 
 		logInfo("User is: " + user);
 
@@ -737,20 +778,20 @@ public class RestServlet
 	 * @param _appName the _app name
 	 * @return the rest context
 	 */
-	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap, String _appName)
+	public RestContext prepareRestContext(String _method, java.util.List<String> _acceptValueList, String _uri, java.util.Map _uriParameterMap, String _appName)
 	{
 		String handlerPath = null;
 
-		String uri = reconstructUri(_appName, _httpServletRequest);
-		String prefix = determinePrefix(uri, _appName, _method, _httpServletRequest, _uriParameterMap);
+		String prefix = determinePrefix(_uri, _method);
 
-		populateDomainInformation(uri, _uriParameterMap);
+		_uriParameterMap.clear();
+		populateDomainInformation(_uri, _uriParameterMap);
 		
 		RestContext restContext = new RestContext(_uriParameterMap, this.cachingContextMap);
-		restContext.setIsUriACollection(isUriACollection(uri));
-		restContext.setIsUriANewDomain(isUriANewDomain(uri));
+		restContext.setIsUriACollection(isUriACollection(_uri));
+		restContext.setIsUriANewDomain(isUriANewDomain(_uri));
 		restContext.setMethod(_method);
-		restContext.setUri(uri);
+		restContext.setUri(_uri);
 		restContext.setAppName(_appName);
 
 		String suffix = (String) _uriParameterMap.get("a.suffix");
@@ -968,20 +1009,8 @@ public class RestServlet
 		return _appName + "/" + path;
 	}
 	
-	/**
-	 * Determine prefix.
-	 *
-	 * @param _uri the _uri
-	 * @param _appName the _app name
-	 * @param _method the _method
-	 * @param _httpServletRequest the _http servlet request
-	 * @param _uriParameterMap the _uri parameter map
-	 * @return the string
-	 */
-	public String determinePrefix(String _uri, String _appName, String _method, HttpServletRequest _httpServletRequest, java.util.Map _uriParameterMap)
+	public String determinePrefix(String _uri, String _method)
 	{
-		_uriParameterMap.clear();
-
 		String prefix = _method.toUpperCase();
 		
 		if (isUriACollection(_uri) == true && "GET".equals(prefix) == true)

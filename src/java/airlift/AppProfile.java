@@ -18,6 +18,7 @@ public interface AppProfile
 {
 	public String getAppName();
 	public boolean isView(String _resourceName);
+	public java.util.Set<String> getViews(String _resourceName);
 	public String getLookingAt(String _viewName);
 	public java.util.Set<String> getValidResources();
 	public boolean isValidResource(String _resourceName);
