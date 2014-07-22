@@ -490,3 +490,19 @@ exports.reduce = function(_collection, _function, _initialValue, _this)
 	
 	return result;
 };
+
+exports.size = function(_collection)
+{
+	var size;
+	
+	if (_collection && _collection.size)
+	{
+		size = _collection.size();
+	}
+	else if (_collection && _collection.length !== null && _collection.length !== undefined)
+	{
+		size = _collection.length;
+	}
+	
+	return size;
+};

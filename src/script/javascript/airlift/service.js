@@ -33,7 +33,7 @@ function QueueService(_name, _method)
 	
 	var queue = Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(_name);
 
-	this.add = function()
+	this.add = function(/* this depends on whether it is a push or pull */)
 	{
 		var parameters, taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withMethod(com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
 		
@@ -70,7 +70,7 @@ function QueueService(_name, _method)
 		if (/^pull$/i.test(this.method) === false)
 		{
 			parameters = arguments[1];
-			taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.url(arguments[0]);
+			taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(arguments[0]);
 		}
 		else
 		{
@@ -194,8 +194,40 @@ function URLFetchService()
 
 	this.fetch = function(_request)
 	{
-		var response = service.fetch(_request);
+		return service.fetch(_request);
+	};
+
+	this.fetchAsync = function(_request)
+	{
+		return service.fetchAsync(_request);
+	};
+
+	this.fetchContent = function(_request)
+	{
+		var response = this.fetch(_request);
+
+		if (response.getResponseCode() > 400)
+		{
+			util.severe(response.getResponseCode(), response.getContent());
+			throw {responseCode: response.getResponseCode(), response: response};
+		}
+
 		return response.getContent();
+	};
+
+	this.request = function(_uri, _headers)
+	{
+		var request = new Packages.com.google.appengine.api.urlfetch.HTTPRequest(new Packages.java.net.URL(_uri));
+
+		if (_headers)
+		{
+			for (var header in _headers)
+			{
+				request.addHeader(new Packages.com.google.appengine.api.urlfetch.HTTPHeader(header, _headers[header]));
+			}
+		}
+
+		return request;
 	};
 
 	this.service = function()
@@ -221,6 +253,46 @@ function ChannelService()
 	};
 }
 
+function MailService()
+{
+	this.send = function(_from, _users, _subject, _message)
+	{
+		if (_message &&
+			  "".equals(_message) === false &&
+			  airlift.isWhitespace(_message) === false)
+		{
+			var users = _users||[]; //[{ email: 'c.george@lucidtechnics.com', fullName: 'Admin' }, { email: 'b.george@example.com', fullName: 'Admin' }]
+			var from = _from //{ email: 'b.george@example.com', fullName: 'Admin' };
+			var subject = _subject||"For your information";
+			var message = _message||"";
+
+			var properties = new Packages.java.util.Properties();
+			var session = Packages.javax.mail.Session.getDefaultInstance(properties, null);
+
+			users.forEach(function(_user)
+			{
+				if (_user && _user.email)
+				{
+					var mimeMessage = new Packages.javax.mail.internet.MimeMessage(session);
+
+					mimeMessage.setFrom(new Packages.javax.mail.internet.InternetAddress(from.email, from.fullName));
+					mimeMessage.addRecipient(Packages.javax.mail.Message.RecipientType.TO,
+											 new Packages.javax.mail.internet.InternetAddress(_user.email, _user.fullName||""));
+					mimeMessage.setSubject(subject);
+					mimeMessage.setText(message);
+
+					Packages.javax.mail.Transport.send(mimeMessage);
+				}
+			});
+		}
+	};
+}
+
+exports.getMailService = function()
+{
+	return new MailService();
+};
+
 exports.getChannelService = function()
 {
 	return new ChannelService();
@@ -233,7 +305,7 @@ exports.getURLFetchService = function()
 
 exports.getQueueService = function(_name, _method)
 {
-        return new QueueService(_name, _method);
+    return new QueueService(_name, _method);
 };
 
 exports.getAppIdentityService = function()

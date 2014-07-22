@@ -1,5 +1,6 @@
 var util = require('../util');
 var service = require('../service');
+var collection = require('airlift/collection');
 
 function Update(_web)
 {
@@ -11,7 +12,27 @@ function Update(_web)
 	var datastore = factory.getAsyncDatastoreService();
 	var cache = service.getCacheService();
 
-	this.update = function(_resourceName, _resource, _pre, _post)
+	this.update = function(_resourceName, _toUpdate, _pre, _post)
+	{
+		var resources;
+
+		if ((_toUpdate.add && _toInsert.iterate) || (_toUpdate.push && _toUpdate.forEach) || (_toUpdate.hasNext && _toUpdate.next))
+		{
+			resources = _toUpdate;
+		}
+		else if (typeof _toUpdate === 'object')
+		{
+			resources = [_toUpdate];
+		}
+		else
+		{
+			throw 'update accepts a resource, an iterator of resources, a Java Collection of resources, or a JavaScript array of resources only';
+		}
+
+		return this.updateAll(_resourceName, resources, _pre, _post);
+	};
+
+	this.updateAll = function(_resourceName, _resources, _pre, _post)
 	{
 		var resourceName = _resourceName;
 
@@ -24,23 +45,25 @@ function Update(_web)
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 
 		//_post functionality not yet implemented
-		var errorStatus = false;
-
-		if (util.hasValue(_resource.id) !== true)
+		var errorStatus = false, list = util.list(), map = util.map();
+		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
+		var results = {};
+		
+		collection.each(_resources, function(_resource)
 		{
-			throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(resourceName, _resource) };
-		}
+			/*
+			 * Important functionality of update.  If the incoming resource does
+			 * not have an id OR the resource does not exist
+			 * in the datastore, update will throw an exception.
+			 */
 
-		try
-		{
-			var result = {}, transaction = datastore.getCurrentTransaction(null);
+			if (util.hasValue(_resource.id) !== true)
+			{
+				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(resourceName, _resource) };
+			}
 
-			var id = _resource.id;
-			var pre = _pre && res.sequence.partial(_pre) || res.sequence;
-			//var post = _post && res.sequence.partial(undefined, _post) || res.sequence;
 			var previousRecord = getter.get(resourceName, _resource.id);
-
-			var entity = incoming.createEntity(resourceName, id);
+			var entity = incoming.createEntity(resourceName, _resource.id);
 
 			if (previousRecord)
 			{
@@ -52,46 +75,66 @@ function Update(_web)
 				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Trying to update a resource that does not exist: " + res.toString(resourceName, _resource) };
 			}
 
-			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), function()
+			var callback = function(n,r)
 			{
-				result.id = id;
-				result.errors = this.allErrors();
-
-				incoming.bookkeeping(entity);
-
-				if (util.isEmpty(result.errors) === true)
+				if (!this.hasErrors())
 				{
-					if (!transaction && this.resourceMetadata.isAudited === true)
-					{
-						transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
-					}
+					list.add(entity);
+					map.put(entity.getKey(), entity);
+					results[r.id] = null;
+				}
+				else
+				{
+					results[r.id] = this.allErrors();
+				}
+			};
 
-					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
-								function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "update", _e); });
+			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
+		});
 
-					if (util.hasValue(written) === true)
+		try
+		{
+			if (list.size() > 0)
+			{
+				util.info('Writing', list.size(), resourceName, 'entiti(es) to the datastore');
+
+				var transaction = datastore.getCurrentTransaction(null);
+
+				if (!transaction && metadata.isAudited === true)
+				{
+					transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+				}
+
+				var written = util.multiTry(function() { datastore.put(transaction, list); return true; }, 5,
+											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
+
+				if (util.hasValue(written) === true)
+				{
+					try
 					{
-						try
-						{
-							cache.put(entity.getKey(), entity);
-						}
-						catch(e)
-						{
-							util.warning('unable to cache entity during update for resource', resourceName);
-						}
+						cache.putAll(map);
 					}
-					
-					if (this.resourceMetadata.isAudited === true)
+					catch(e)
 					{
-						res.audit({entity: entity, action: 'UPDATE'});
+						util.warning('unable to cache entit(ies) during insert for resource', resourceName);
 					}
 				}
-			});
+
+				if (metadata.isAudited === true)
+				{
+					res.audit({entities: list, action: 'UPDATE'});
+				}
+
+				if (!transaction && metadata.isAudited === true)
+				{
+					transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+				}
+			}
 		}
 		catch(e)
 		{
 			util.severe(resourceName, 'encountered exception', e.message, e.toString());
-			util.severe('... while inserting', res.json(_resource));
+			util.severe('... while updating', JSON.stringify(_resources));
 
 			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));
 
@@ -104,7 +147,7 @@ function Update(_web)
 			if (transaction && !errorStatus) { transaction.commitAsync(); } 
 		}
 
-		return result;
+		return results;
 	};
 }
 

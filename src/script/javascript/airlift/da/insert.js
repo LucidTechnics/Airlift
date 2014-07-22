@@ -1,10 +1,11 @@
-var util = require('../util');
-var service = require('../service');
+var util = require('airlift/util');
+var service = require('airlift/service');
+var collection = require('airlift/collection');
 
 function Insert(_web)
 {
-	var res = require('../resource').create(_web);
-	var incoming = require('../incoming').create(_web);
+	var res = require('airlift/resource').create(_web);
+	var incoming = require('airlift/incoming').create(_web);
 
 	var factory = Packages.com.google.appengine.api.datastore.DatastoreServiceFactory;
 	var datastore = factory.getAsyncDatastoreService();
@@ -20,15 +21,12 @@ function Insert(_web)
 				//Make sure this randomly generated id has not already been
 				//assigned to a resource in this table.
 
-			util.info('generated this id', id);
 			try
 			{
 				var result = datastore.get(Packages.com.google.appengine.api.datastore.KeyFactory.createKey(_resourceName, id)).get();
-
 			}
 			catch(e if e.javaException.getCause && (e.javaException.getCause() instanceof Packages.com.google.appengine.api.datastore.EntityNotFoundException))
 			{
-				util.info("Got a unique id: " + id + " after trying this many times: " +  _tries);
 			}
 
 			if (result) { throw new Packages.java.lang.RuntimeException("Found entity of type: " +  _resourceName +  " with id: " + id); }
@@ -36,11 +34,31 @@ function Insert(_web)
 			return id;
 		}
 
-		return util.multiTry(test, 100, function() { util.severe("After 100 tries, we were unable to generate a random unique id for creation of resource:", _resourceName + '.', "Are ids saturated?"); });
+		return util.multiTry(test, 10, function() { util.severe("After 10 tries, we were unable to generate a random unique id for creation of resource:", _resourceName + '.', "Are ids saturated?"); });
 	};
 
-	this.insert = function(_resourceName, _resource, _pre, _post)
-	{	 
+	this.insert = function(_resourceName, _toInsert, _pre, _post)
+	{
+		var resources;
+
+		if ((_toInsert.add && _toInsert.iterate) || (_toInsert.push && _toInsert.forEach) || (_toInsert.hasNext && _toInsert.next))
+		{
+			resources = _toInsert;
+		}
+		else if (typeof _toInsert === 'object')
+		{
+			resources = [_toInsert];
+		}
+		else
+		{
+			throw 'insert accepts a resource, an iterator of resources, a Java Collection of resources, or a JavaScript array of resources only';
+		}
+			
+		return this.insertAll(_resourceName, resources, _pre, _post);
+	};
+
+	this.insertAll = function (_resourceName, _resources, _pre, _post)
+	{
 		var resourceName = _resourceName;
 
 		if (_web.getAppProfile().isValidResource(resourceName) === false)
@@ -49,76 +67,95 @@ function Insert(_web)
 		}
 
 		var metadata = util.getResourceMetadata(resourceName);
+		
 		if (metadata.isView === true) { 
-		    resourceName = metadata.lookingAt; 
+			resourceName = metadata.lookingAt; 
 		}
 
-		var errorStatus = false;
+		var errorStatus = false, list = util.list(), map = util.map();
+		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
+		var results = {};
 
-		try
+		collection.each(_resources, function(_resource)
 		{
-			var transaction = datastore.getCurrentTransaction(null);
-
-			var pre = _pre && res.sequence.partial(_pre) || res.sequence;
-
 			/*
 			 * Important functionality of insert.  If the resource has
 			 * an id, insert acts as if the resource did not previously
-			 * exist.  As such it will clobber and existing entity in
+			 * exist.  As such it will clobber an existing entity in
 			 * the database.  This functionality is in place to support
 			 * use cases when the client is responsible for providing
 			 * the identifier for the resource.
 			 */
 
 			var id = _resource.id || provideUniqueId(resourceName);
-			_resource.id = _resource.id || id;
-			
+			_resource.id = id;
+
 			var entity = incoming.createEntity(resourceName, id);
-			var result = {};
+
+			incoming.bookkeeping(entity);
+			incoming.reconcileBookkeeping(entity, _resource);
+
 			var callback = function()
 			{
-			    result.id = id;
-				result.errors = this.allErrors();
-
-				incoming.bookkeeping(entity);
-				incoming.reconcileBookkeeping(entity, _resource);
-
-				if (util.isEmpty(result.errors) === true)
+				if (!this.hasErrors())
 				{
-					if (!transaction && this.resourceMetadata.isAudited === true)
-					{
-						transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
-					}
-
-					var written = util.multiTry(function() { datastore.put(transaction, entity); return true; }, 5,
-												function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
-
-					if (util.hasValue(written) === true)
-					{
-						try
-						{
-							cache.put(entity.getKey(), entity);
-						}
-						catch(e)
-						{
-							util.warning('unable to cache entity during insert for resource', resourceName);
-						}
-					}
-
-					if (this.resourceMetadata.isAudited === true)
-					{
-						res.audit({entity: entity, action: 'INSERT'});
-					}
+					list.add(entity);
+					map.put(entity.getKey(), entity);
+					results[id] = null;
+				}
+				else
+				{
+					results[id] = this.allErrors();
 				}
 			};
-
+			
 			res.each(resourceName, _resource, pre(incoming.entify.partial(entity), incoming.encrypt.partial(entity)), callback);
+		});
+		
+		try
+		{
+			if (list.size() > 0)
+			{
+				util.info('Writing', list.size(), resourceName, 'entiti(es) to the datastore');
+				
+				var transaction = datastore.getCurrentTransaction(null);
+
+				if (!transaction && metadata.isAudited === true)
+				{
+					transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+				}
+
+				var written = util.multiTry(function() { datastore.put(transaction, list); return true; }, 5,
+											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
+
+				if (util.hasValue(written) === true)
+				{
+					try
+					{
+						cache.putAll(map);
+					}
+					catch(e)
+					{
+						util.warning('unable to cache entit(ies) during insert for resource', resourceName);
+					}
+				}
+
+				if (metadata.isAudited === true)
+				{
+					res.audit({entities: list, action: 'INSERT'});
+				}
+
+				if (!transaction && metadata.isAudited === true)
+				{
+					transaction = datastore.beginTransaction(Packages.com.google.appengine.api.datastore.TransactionOptions.Builder.withXG(true)).get();
+				}
+			}
 		}
 		catch(e)
 		{
 			util.severe(resourceName, 'encountered exception', e.message, e.toString());
-			util.severe('... while inserting', res.json(_resource));
-			
+			util.severe('... while inserting', JSON.stringify(_resources));
+
 			util.getJavaException(e) && util.severe(util.printStackTraceToString(util.getJavaException(e)));
 
 			errorStatus = true;
@@ -130,8 +167,19 @@ function Insert(_web)
 			if (transaction && !errorStatus) { transaction.commitAsync(); } 
 		}
 
-		return result;
-	};
+		var result = {};
+
+		if (collection.size(_resources) === 1)
+		{
+			for (var id in results)
+			{
+				results.id = id;
+				results.errors = results[id];
+			}
+		}
+
+		return results;
+	}
 }
 
 exports.create = function(_web)

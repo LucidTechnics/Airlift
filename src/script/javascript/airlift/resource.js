@@ -293,39 +293,39 @@ function Resource(_web)
 
 	this.audit = function audit(_config)
 	{
-		var entity = _config.entity;
-		var id = _config.id||_config.entity && _config.entity.getKey().getName();
+		var entities = _config.entities;
 		var action = _config.action;
-		var resourceName = _config.resourceName||entity.getKind();	
-		var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
-
-		auditTrail.id = util.guid();
-		auditTrail.resourceId = id;
-
-		if (entity)
-		{
-			var propertiesMap = new Packages.java.util.HashMap(entity.getProperties());
-			propertiesMap.put('AIRLIFT_RESOURCE_NAME', resourceName);
-			auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(this.json(propertiesMap));
-		}
-		else
-		{
-			auditTrail.data = null;
-		}
-
+		var resourceName = _config.resourceName||entity.getKind();
+		var requestId = com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
+		var collection = require('airlift/collection'), auditTrails = util.list();
 		var currentDate = util.createDate();
 
-		auditTrail.setAction(action);
-		auditTrail.setMethod(_web.getMethod());
-		auditTrail.setResource(resourceName);
-		auditTrail.setUri(_web.getUri());
-		auditTrail.setHandlerName(_web.getHandlerName());
-		auditTrail.setUserId(_web.getUserId());
-		auditTrail.setActionDate(currentDate);
-		auditTrail.setRecordDate(currentDate);
-		auditTrail.requestId = com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id");
+		collection.each(entities, function(_entity)
+		{
+			var auditTrail = new Packages.airlift.servlet.rest.AirliftAuditTrail();
+			auditTrail.id = util.guid();
+			var id = _entity.getKey().getName();
 
-		_web.getAuditContext().insert(auditTrail);
+			auditTrail.resourceId = id;
+
+			var propertiesMap = new Packages.java.util.HashMap(_entity.getProperties());
+			propertiesMap.put('AIRLIFT_RESOURCE_NAME', resourceName);
+			auditTrail.data = new Packages.com.google.appengine.api.datastore.Text(this.json(propertiesMap));
+
+			auditTrail.setAction(action);
+			auditTrail.setMethod(_web.getMethod());
+			auditTrail.setResource(resourceName);
+			auditTrail.setUri(_web.getUri());
+			auditTrail.setHandlerName(_web.getHandlerName());
+			auditTrail.setUserId(_web.getUserId());
+			auditTrail.setActionDate(currentDate);
+			auditTrail.setRecordDate(currentDate);
+			auditTrail.requestId = requestId;
+
+			auditTrails.add(auditTrail);
+		});
+		
+		_web.getAuditContext().insert(auditTrails);
 
 		util.println('Finished audit');
 	};

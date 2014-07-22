@@ -130,7 +130,6 @@ rule.type = function()
 	else if (this.value.toLowerCase().contains("text") === true)
 	{
 		type = "java.lang.String";
-		this.persistable.addParameterValue("semanticType", "Semantic.VERYLONGTEXT");
 		this.persistable.addParameterValue("maxLength", "10485760");   //10 MBs long :)
 	}
 	else if (this.value.toLowerCase().contains("email") === true)

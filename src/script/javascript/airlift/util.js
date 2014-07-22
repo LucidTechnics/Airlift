@@ -217,7 +217,11 @@ exports.createDate = function createDate(_milliseconds)
 {
 	var date;
 	
-	if (this.hasValue(_milliseconds) === true)
+	if (this.hasValue(_milliseconds) === true && _milliseconds.getTime)
+	{
+		date = new Packages.java.util.Date(_milliseconds.getTime());
+	}
+	else if (this.hasValue(_milliseconds) === true)
 	{
 		date = new Packages.java.util.Date(_milliseconds);
 	}
@@ -781,4 +785,16 @@ exports.assert = function(_assertion, _config)
 
 		throw {r: r, h: h, message: m, error: e};
 	}
+};
+
+exports.bool = function(_boolean)
+{
+	var boolean = _boolean;
+	
+	if (_boolean.booleanValue)
+	{
+		boolean = _boolean.booleanValue();
+	}
+
+	return boolean;
 };

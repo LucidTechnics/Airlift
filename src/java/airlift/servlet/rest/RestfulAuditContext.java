@@ -159,6 +159,42 @@ public class RestfulAuditContext
 		return _auditTrail.getId();
 	}
 
+	public java.util.List<String> insert(java.util.Collection<AirliftAuditTrail> _auditTrails)
+	{
+		com.google.appengine.api.datastore.AsyncDatastoreService datastore = com.google.appengine.api.datastore.DatastoreServiceFactory.getAsyncDatastoreService();
+		com.google.appengine.api.datastore.Transaction transaction = datastore.getCurrentTransaction(null);
+
+		if (transaction == null)
+		{
+			throw new RuntimeException("You can only create a Audit Trail record within a transaction. It is expected that the record you are persisting will be within this transaction");
+		}
+
+		java.util.List auditTrailEntities = new java.util.ArrayList();
+		java.util.List ids = new java.util.ArrayList();
+		
+		for (AirliftAuditTrail auditTrail: _auditTrails)
+		{
+			auditTrail.setId(airlift.util.IdGenerator.generate(32));
+			auditTrail.setRecordDate(new java.util.Date());
+			auditTrail.setRequestId((String)com.google.apphosting.api.ApiProxy.getCurrentEnvironment().getAttributes().get("com.google.appengine.runtime.request_log_id"));
+
+			com.google.appengine.api.datastore.Entity entity = copyAuditTrailToEntity(auditTrail);
+			auditTrailEntities.add(entity);
+			ids.add(auditTrail.getId());
+		}
+			
+		try
+		{
+			datastore.put(transaction, auditTrailEntities);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+
+		return ids;
+	}
+
 	/**
 	 * Exists.
 	 *
