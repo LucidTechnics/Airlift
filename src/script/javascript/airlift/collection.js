@@ -21,6 +21,7 @@
  *
  * var success = require('collection').every(users, function(_item, _index, _collection) { return true; });
  */
+
 exports.every = function(_collection, _function, _this)
 {
 	var success = true, iterator;
@@ -40,7 +41,7 @@ exports.every = function(_collection, _function, _this)
 		while (iterator.hasNext())
 		{
 			item = iterator.next();
-			success = _function.call(_this, item, index, _collection);
+			success = _function && _function.call(_this, item, index, _collection);
 			
 			if (success === false) { break; } else { index++; }
 		}
@@ -52,6 +53,14 @@ exports.every = function(_collection, _function, _this)
 	else if (_collection && _collection.replace)
 	{
 		success = Array.every(_collection + "", _function);
+	}
+	else if (typeof _collection === 'object')
+	{
+		for (var item in _collection)
+		{
+			success = _function && _function.call(_this, _collection[item], item, _collection);
+			if (success === false) { break; }
+		}
 	}
 
 	return success;
@@ -107,6 +116,13 @@ exports.forEach = function(_collection, _function, _this)
 	{
 		Array.forEach(_collection + "", _function);
 	}
+	else if (typeof _collection === 'object')
+	{
+		for (var item in _collection)
+		{
+			_function && _function.call(_this, _collection[item], item, _collection);
+		}
+	}
 };
 
 exports.each = exports.forEach;
@@ -136,7 +152,7 @@ exports.each = exports.forEach;
  */
 exports.filter = function(_collection, _function, _this)
 {
-	var iterator;
+	var iterator, result;
 	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -149,7 +165,7 @@ exports.filter = function(_collection, _function, _this)
 
 	if (iterator)
 	{
-		var result = new Packages.java.util.ArrayList();
+		result = new Packages.java.util.ArrayList();
 		
 		var index = 0, item;
 		while (iterator.hasNext())
@@ -161,11 +177,23 @@ exports.filter = function(_collection, _function, _this)
 	}
 	else if (_collection && _collection.filter)
 	{
-		var result = _collection.filter(_function);
+		result = _collection.filter(_function);
 	}
 	else if (_collection && _collection.replace)
 	{
-		var result = Array.filter(_collection + "", _function);
+		result = Array.filter(_collection + "", _function);
+	}
+	else if (typeof _collection === 'object')
+	{
+		result = {};
+		
+		for (var item in _collection)
+		{
+			if (_function && (_function.call(_this, _collection[item], item, _collection) === true))
+			{
+				result[item] = _collection[item];
+			}
+		}
 	}
 
 	return result;
@@ -228,6 +256,15 @@ exports.map = function(_collection, _function, _this)
 	{
 		results = Array.map(_collection + "", _function);
 	}
+	else if (typeof _collection === 'object')
+	{
+		var results = {};
+		
+		for (var item in _collection)
+		{
+			results[item] = _function && _function.call(_this, _collection[item], item, _collection);
+		}
+	}
 
 	return results;
 };
@@ -285,6 +322,14 @@ exports.some = function(_collection, _function, _this)
 	else if (_collection && _collection.replace)
 	{
 		success = Array.some(_collection + "", _function);
+	}
+	else if (typeof _collection === 'object')
+	{
+		for (var item in _collection)
+		{
+			success = _function.call(_this, _collection[item], item, _collection);
+			if (success === true) { break; }
+		}
 	}
 
 	return success;
@@ -357,6 +402,13 @@ exports.split = function(_collection, _function, _this)
 			(_function.call(_this, _item, _index, _collection) === true) ? success.push(_item) : fail.push(_item);
 		});
 	}
+	else if (typeof _collection === 'object')
+	{
+		for (var item in _collection)
+		{
+			(_function.call(_this, _collection[item], item, _collection) === true) ? success.push(_collection[item]) : fail.push(_collection[item]);
+		}
+	}
 	
 	return {success: success, fail: fail};
 };
@@ -388,7 +440,7 @@ exports.split = function(_collection, _function, _this)
  */
 exports.partition = function(_collection, _attribute)
 {
-	var iterator;
+	var iterator, partitionMap, orderedKeys;
 	
 	if (_collection && _collection.hasNext && _collection.next)
 	{
@@ -401,8 +453,8 @@ exports.partition = function(_collection, _attribute)
 
 	if (iterator)
 	{
-		var partitionMap = new Packages.java.util.HashMap();
-		var orderedKeys = new Packages.java.util.ArrayList();
+		partitionMap = new Packages.java.util.HashMap();
+		orderedKeys = new Packages.java.util.ArrayList();
 
 		var item;
 		while (iterator.hasNext())
@@ -427,13 +479,38 @@ exports.partition = function(_collection, _attribute)
 	}
 	else if (_collection && _collection.push)
 	{
-		var partitionMap = {};
-		var orderedKeys = [];
+		partitionMap = {};
+		orderedKeys = [];
 
 		for (var i =0; i < _collection.length; i++)
 		{
 			var item = _collection[i];
 			var value = item[_attribute];
+
+			if (value)
+			{
+				var list = partitionMap[value];
+
+				if (!list)
+				{
+					list = [];
+					partitionMap[value] = list;
+					orderedKeys.push(value);
+				}
+
+				list.push(item);
+			}
+		}
+	}
+	else if (typeof _collection === 'object')
+	{
+		partitionMap = {};
+		orderedKeys = [];
+		
+		for (var item in _collection)
+		{
+			var thing = _collection[item];
+			var value = thing[_attribute];
 
 			if (value)
 			{
@@ -483,9 +560,18 @@ exports.reduce = function(_collection, _function, _initialValue, _this)
 	{
 		result = _collection.reduce(_function, _initialValue);
 	}
+	else if (typeof _collection === 'object')
+	{
+		result = _initialValue;
+		
+		for (var item in _collection)
+		{
+			result = _function && _function.call(_this, result, _collection[item], item, _collection);
+		}
+	}
 	else
 	{
-		throw TypeError('Must provide a JavaScript array, java.util.Collection, java.lang.Iterable, or java.util.Iterator');
+		throw TypeError('Must provide a JavaScript array, a JavaScript object, java.util.Collection, java.lang.Iterable, or java.util.Iterator');
 	}
 	
 	return result;
@@ -494,15 +580,51 @@ exports.reduce = function(_collection, _function, _initialValue, _this)
 exports.size = function(_collection)
 {
 	var size;
-	
+
 	if (_collection && _collection.size)
 	{
 		size = _collection.size();
 	}
 	else if (_collection && _collection.length !== null && _collection.length !== undefined)
 	{
-		size = _collection.length;
+		if (typeof _collection.length == 'function')
+		{
+			size = _collection.length();
+		}
+		else
+		{
+			size = _collection.length;
+		}
+	}
+	else if (typeof _collection === 'object')
+	{
+		size = 0;
+		
+		for (var item in _collection)
+		{
+			size++;
+		}
+	}
+	else
+	{
+		//cannot tell size of an iterator.
 	}
 	
 	return size;
+};
+
+exports.isEmpty = function(_collection)
+{
+	var isEmpty = false;
+
+	if (_collection.hasNext)
+	{
+		isEmpty = _collection.hasNext();
+	}
+	else
+	{
+		isEmpty = exports.size(_collection) === 0;
+	}
+
+	return isEmpty;
 };

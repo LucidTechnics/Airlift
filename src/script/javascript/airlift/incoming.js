@@ -306,23 +306,32 @@ function Incoming(_web)
 			
 			if (util.hasValue(value) && util.hasValue(_attributeMetadata.mapTo) === false && util.hasValue(_attributeMetadata.mapToMany) === false)
 			{
-				if (type === 'java.lang.String')
+				if (_web.getAppProfile().isValidResource(type) === true)
 				{
-					//500 is the Google App Engine limitation for Strings
-					//persisted to the datastore.
-					if (_attributeMetadata.maxLength > 500)
+					var embeddedEntity = new Packages.com.google.appengine.api.datastore.EmbeddedEntity();
+					res.each(type, value, that.entify.partial(embeddedEntity));
+					_entity.setUnindexedProperty(_attributeName, embeddedEntity);
+				}
+				else
+				{
+					if (type === 'java.lang.String')
+					{
+						//500 is the Google App Engine limitation for Strings
+						//persisted to the datastore.
+						if (_attributeMetadata.maxLength > 500)
+						{
+							isIndexable = false;
+							value = new Packages.com.google.appengine.api.datastore.Text(value);
+						}
+					}
+					else if (type === 'bytes')
 					{
 						isIndexable = false;
-						value = new Packages.com.google.appengine.api.datastore.Text(value);
+						value = new Packages.com.google.appengine.api.datastore.Blob(value);					
 					}
-				}
-				else if (type === 'bytes')
-				{
-					isIndexable = false;
-					value = new Packages.com.google.appengine.api.datastore.Blob(value);					
-				}
 
-				(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
+					(isIndexable === true) ? _entity.setProperty(_attributeName, value) : _entity.setUnindexedProperty(_attributeName, value);
+				}
 			}
 			else if (util.hasValue(value) && util.hasValue(_attributeMetadata.mapTo) === true)
 			{
@@ -530,8 +539,65 @@ function Incoming(_web)
 							value = (new CollectionType()).create(type);
 						}
 					}
+					else if (_web.getAppProfile().isValidResource(type))
+					{
+						var source = function(_name, _type)
+						{
+							var request = _web.getRequest();
+							var name = [_attributeName, '[', _name, ']'].join('');
+							
+							var parameterValue = request.getParameterValues(name);
+
+							if (util.hasValue(parameterValue) === false && collectionTypes[_type])
+							{
+								parameterValue = request.getParameterValues(name + '[]');
+							}
+
+							return parameterValue;
+						};
+
+						var sourceKey = function(_name)
+						{
+							var restContext = _web.getRestContext();
+							var parameterValue = restContext.getParameter(_name);
+
+							return parameterValue;
+						};
+
+						var sourceId = function() { return null; }
+
+						var res = require('airlift/resource').create(_web);
+						var embeddedConvertFromSource = that.convertFromSource.partial(source, sourceKey, sourceId);
+						var reporter = util.createErrorReporter(_attributeName);
+						var report = this.report;
+						var embeddedValue = {};
+						
+						res.each(type, embeddedValue, res.seq(embeddedConvertFromSource), function(n,r)
+						{
+							if (this.hasErrors())
+							{
+								var embeddedErrors = this.allErrors();
+								
+								for (name in embeddedErrors)
+								{
+									report(name, embeddedErrors[name]);
+								}
+							}
+						}, {reporter: reporter});
+
+						value = embeddedValue;
+					}
 					else
 					{
+						util.severe('TYPE', type);
+						util.severe('VALUE', value);
+
+						var request = _web.getRequest();
+						var parameterValue = request.getParameterValues(_attributeName);
+
+						util.severe('PARAMETER VALUE', parameterValue);
+						util.severe('PARAMETERS', request.getParameterMap());
+						
 						throw new Error('no converter found for type: ' + type);
 					}
 				}
@@ -551,7 +617,9 @@ function Incoming(_web)
 					this.report(_attributeName, 'This value is not correct.', 'conversion');
 				}
 
-				if ((!value || util.isWhitespace(value) === true) && (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false))
+				if ((!value || util.isWhitespace(value) === true) &&
+					  (_attributeMetadata.mapTo && util.isWhitespace(_attributeMetadata.mapTo) === false)
+					   && (_attributeName + '' === _attributeMetadata.mapTo + ''))
 				{
 					/* Form value overrides what is in the URI.  This is done for
 					 * security reasons.  The foreign key may be protected via TLS
@@ -593,7 +661,7 @@ function Incoming(_web)
 
 			var res = require('airlift/resource').create(_web);
 		}
-
+		
 		return value;
 	};
 
@@ -661,6 +729,28 @@ function Incoming(_web)
 		if (!!validator[type] === true)
 		{
 			validator[type](_resource[_name], _name, _metadata, this.report);
+		}
+		else if (_web.getAppProfile().isValidResource(type) === true)
+		{
+			var res = require('airlift/resource').create(_web);
+			var reporter = util.createErrorReporter(_name);
+			var report = this.report;
+			
+			res.each(type, _resource[_name], res.seq(that.validate), function(n,r)
+			{
+				if (this.hasErrors())
+				{
+					var embeddedErrors = this.allErrors();
+
+					for (name in embeddedErrors)
+					{
+						report(name, embeddedErrors[name]);
+					}
+				}
+
+				_value = r;
+
+			}, {reporter: reporter});
 		}
 		else
 		{

@@ -1,5 +1,6 @@
 var util = require('../util');
 var service = require('../service');
+var collection = require('../collection');
 
 function Collect(_web)
 {
@@ -85,18 +86,54 @@ function Collect(_web)
 			if (!originalConfig) { throw 'unable to find cursor identified by: ' + config.cursorId; }
 			originalConfig = JSON.parse(originalConfig);
 		}
-		
+
 		var config = originalConfig||config||{};
 		var limit = util.value(config.limit, 0);
-		var asc = (util.hasValue(config.asc) === true) ? config.asc : true;
-		var orderBy = config.orderBy||"auditPutDate";
 		var filterList = config.filterList||[];
 		var keysOnly = (util.hasValue(config.keysOnly) === true) ? config.keysOnly : false;
 
+		var orderBy, asc;
+		
+		if (util.hasValue(config.orderBy) === false)
+		{
+			orderBy = ['auditPutDate'];
+		}
+		else if (util.hasValue(config.orderBy) && (config.orderBy.get || config.orderBy.forEach))
+		{
+			orderBy = config.orderBy;
+		}
+		else if (util.hasValue(config.orderBy) === true)
+		{
+			orderBy = [config.orderBy];
+		}
+
+		if (util.hasValue(config.asc) === false)
+		{
+			asc = collection.map(orderBy, function() { return true; });
+		}
+		else if (util.hasValue(config.asc) && (config.asc.get || config.asc.forEach))
+		{
+			asc = config.asc;
+		}
+		else if (util.hasValue(config.asc))
+		{
+			asc = [config.asc];
+		}
+
 		var Query = Packages.com.google.appengine.api.datastore.Query;
+
+		util.assert(collection.size(orderBy) === collection.size(asc), 'orderBy array and asc array need to be of equal length');
+		
 		var sort = (asc && Query.SortDirection.ASCENDING)||Query.SortDirection.DESCENDING;
 
-		var query = new Query(resourceName).addSort(orderBy, sort).setKeysOnly();
+		var query = new Query(resourceName);
+
+		collection.each(orderBy, function(_orderBy, _index)
+		{
+			query.addSort(_orderBy, asc[_index] && Query.SortDirection.ASCENDING||Query.SortDirection.DESCENDING);
+		});
+
+		query.setKeysOnly();
 
 		var FilterPredicate = com.google.appengine.api.datastore.Query.FilterPredicate;
 		var FilterOperator = com.google.appengine.api.datastore.Query.FilterOperator;

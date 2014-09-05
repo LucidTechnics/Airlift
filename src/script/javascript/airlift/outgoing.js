@@ -30,7 +30,7 @@ function Outgoing(_web)
 		else if (value instanceof com.google.appengine.api.datastore.EmbeddedEntity)
 		{
 			var object = {};
-			res.each(_attributeMetadata.mapTo, object, that.deentify.partial(value));
+			res.each(_attributeMetadata.mapTo||_attributeMetadata.type, object, that.deentify.partial(value));
 			value = object;
 		}
 		else if (value instanceof java.util.Collection && value.isEmpty() === false)

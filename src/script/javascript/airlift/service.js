@@ -191,7 +191,8 @@ function CacheService()
 function URLFetchService()
 {
 	var service = Packages.com.google.appengine.api.urlfetch.URLFetchServiceFactory.getURLFetchService();
-
+	var collection = require('airlift/collection');
+	
 	this.fetch = function(_request)
 	{
 		return service.fetch(_request);
@@ -215,9 +216,12 @@ function URLFetchService()
 		return response.getContent();
 	};
 
-	this.request = function(_uri, _headers)
+	this.request = function(_uri, _headers, _method)
 	{
-		var request = new Packages.com.google.appengine.api.urlfetch.HTTPRequest(new Packages.java.net.URL(_uri));
+		var request;
+		
+		var method = Packages.com.google.appengine.api.urlfetch.HTTPMethod[_method]||Packages.com.google.appengine.api.urlfetch.HTTPMethod.GET;
+		request = new Packages.com.google.appengine.api.urlfetch.HTTPRequest(new Packages.java.net.URL(_uri), method);
 
 		if (_headers)
 		{
@@ -228,6 +232,20 @@ function URLFetchService()
 		}
 
 		return request;
+	};
+
+	this.addParams = this.addParameters = function(_params, _request)
+	{
+		var payload, params = [];
+
+		collection.each(_params, function(v,n)
+		{
+			params.push([n,v].join('='));
+		});
+
+		payload = params.join('&');
+
+		_request.setPayload(util.string(payload, 'UTF-8').getBytes());
 	};
 
 	this.service = function()
@@ -259,7 +277,7 @@ function MailService()
 	{
 		if (_message &&
 			  "".equals(_message) === false &&
-			  airlift.isWhitespace(_message) === false)
+			  util.isWhitespace(_message) === false)
 		{
 			var users = _users||[]; //[{ email: 'c.george@lucidtechnics.com', fullName: 'Admin' }, { email: 'b.george@example.com', fullName: 'Admin' }]
 			var from = _from //{ email: 'b.george@example.com', fullName: 'Admin' };
@@ -269,7 +287,9 @@ function MailService()
 			var properties = new Packages.java.util.Properties();
 			var session = Packages.javax.mail.Session.getDefaultInstance(properties, null);
 
-			users.forEach(function(_user)
+			var collection = require('airlift/collection');
+			
+			collection.each(users, function(_user)
 			{
 				if (_user && _user.email)
 				{
@@ -296,12 +316,14 @@ exports.getMailService = function()
 exports.getChannelService = function()
 {
 	return new ChannelService();
-}
+};
 
 exports.getURLFetchService = function()
 {
 	return new URLFetchService();
-}
+};
+
+exports.getUrlFetchService = exports.getURLFetchService;
 
 exports.getQueueService = function(_name, _method)
 {

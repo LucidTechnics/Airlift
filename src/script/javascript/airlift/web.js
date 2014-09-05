@@ -7,6 +7,8 @@ function Web(WEB_CONTEXT)
 	var userId;
 	var userEmail;
 	var userName;
+	var shortName;
+	var userRoles;
 	var uriBase;
 	var path;
 	var uri;
@@ -242,6 +244,16 @@ function Web(WEB_CONTEXT)
 		return foreignKeyList && foreignKeyList.get(0);
 	};
 
+	this.getForeignKeys = function(_resourceName)
+	{
+		if (!_resourceName)
+		{
+			throw 'getForeignKeys expects resource name to be defined';
+		}
+
+		return this.getRestContext().getParameter(_resourceName.toLowerCase());
+	};
+
 	this.getResourceName = function()
 	{
 
@@ -333,15 +345,26 @@ function Web(WEB_CONTEXT)
 		return userId;
 	};
 
-	this.getUserName = function()
+	this.getUserName = this.getFullName = function()
 	{
 		if (userName === undefined)
 		{
 			var user = this.getUser();
-			userName = (user != null) ? user.getFullName() : null;
+			userName = (user !== null) ? user.getFullName() : null;
 		}
 
 		return userName;
+	};
+
+	this.getShortName = function()
+	{
+		if (shortName === undefined)
+		{
+			var user = this.getUser();
+			shortName = (user !== null) ? user.getShortName() : null;
+		}
+
+		return shortName;
 	};
 
 	this.getUserEmail = function()
@@ -349,16 +372,27 @@ function Web(WEB_CONTEXT)
 		if (userEmail === undefined)
 		{
 			var user = this.getUser();
-			userEmail = (user != null && user.getEmail() != null) ? user.getEmail().toLowerCase() : null;
+			userEmail = (user !== null && user.getEmail() !== null) ? user.getEmail().toLowerCase() : null;
 		}
 
 		return userEmail;
 	};
 
+	this.getUserRoles = this.getRoles = function()
+	{
+		if (userRoles === undefined)
+		{
+			var user = this.getUser();
+			userRoles = (user !== null && user.getRoleSet() !== null) ? user.getRoleSet() : util.set();
+		}
+
+		return userRoles;
+	};
+	
 	this.getUserService = function()
 	{
 		return this.getServlet().getUserService(this.getRequest());
-	}
+	};
 
 	this.getAppProfile = function()
 	{

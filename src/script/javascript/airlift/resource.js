@@ -22,7 +22,7 @@ function Resource(_web)
 		context.web = _web;
 		context.WEB_CONTEXT = _web.WEB_CONTEXT;
 
-		var reporter = util.createErrorReporter();
+		var reporter = context.reporter||util.createErrorReporter();
 
 		context.report = reporter.report;
 		context.allErrors = reporter.allErrors;
@@ -33,10 +33,12 @@ function Resource(_web)
 		if (util.typeOf(context.attributes) === 'object')
 		{
 			var attributes = [];
+			
 			for (item in context.attributes)
 			{
 				attributes.push(item);
 			}
+
 			context.attributes = attributes;
 		}
 		
@@ -104,21 +106,6 @@ function Resource(_web)
 			for (var i = 0; i < length; i++)
 			{
 				result = functions[i].apply(this, args);
-
-				/*if (this.resourceName)
-				{
-					if (args.length === 5) //this is reduce
-					{						
-						result = functions[i].apply(this, [args[0], args[3][args[2]], args[2], args[3], args[4]]);
-					}
-					else if (args.length === 4) //basically each or map
-					{
-						result = functions[i].apply(this, [args[2][args[1]], args[1], args[2], args[3]]);
-					}
-				}
-				else //sequence is called outside of resource.each/map/reduce
-				{
-				}*/
 			}
 
 			return result;
@@ -333,6 +320,30 @@ function Resource(_web)
 	this.copy = function copy(_target, _value, _attributeName)
 	{
 		_target[_attributeName] = _value;
+	};
+
+	this.override = function override(_target, _value, _attributeName)
+	{
+		if (util.hasValue(_value))
+		{
+			_target[_attributeName] = _value;
+		}
+	};
+
+	this.cover = function cover(_target, _value, _attributeName)
+	{
+		if (!util.hasValue(_target[attribute]))
+		{
+			_target[_attributeName] = _value;
+		}
+	};
+
+	this.fill = function fill(_target, _value, _attributeName)
+	{
+		if (!util.hasValue(_target[attribute]) && util.hasValue(_value))
+		{
+			_target[_attributeName] = _value;
+		}
 	};
 
 	this.clone = function clone(_value)

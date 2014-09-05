@@ -38,17 +38,15 @@ function Update(_web)
 
 		if (_web.getAppProfile().isValidResource(resourceName) === false)
 		{
-			throw 'Invalid resource name: ' + resourceName + ' provided for collect. ' + ' Please make sure first parameter is a valid resource name.'
+			throw 'Invalid resource name: ' + resourceName + ' provided for update. ' + ' Please make sure first parameter is a valid resource name.'
 		}
 
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
-
 		//_post functionality not yet implemented
 		var errorStatus = false, list = util.list(), map = util.map();
 		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
 		var results = {};
-		
 		collection.each(_resources, function(_resource)
 		{
 			/*

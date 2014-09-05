@@ -7,15 +7,6 @@ try
 {
     var log = Packages.java.util.logging.Logger.getLogger('airlift');
     var handlerArray = log.getHandlers();
-
-	/*if (handlerArray.length == 0)
-	{
-		log.setLevel(Packages.java.util.logging.Level.ALL);
-		var handler = (new Packages.airlift.ConsoleHandler()).getConsoleHandler();
-		handler.setFormatter(new Packages.java.util.logging.SimpleFormatter());
-		handler.setLevel(Packages.java.util.logging.Level.ALL);
-		log.addHandler(handler);
-    }*/
 }
 catch(e)
 {
@@ -33,7 +24,7 @@ exports.value = function value(_candidate, _default)
 {
 	var candidate;
 
-	if (this.hasValue(_candidate) === true)
+	if (exports.hasValue(_candidate) === true)
 	{
 		candidate = _candidate;
 	}
@@ -103,10 +94,11 @@ exports.isWhitespace = function isWhitespace(_string)
 	return Packages.org.apache.commons.lang.StringUtils.isWhitespace(_string);
 };
 
-var ErrorReporter = function()
+var ErrorReporter = function(_prefix)
 {
 	var errors = {};
-
+	var prefix = _prefix;
+	
 	this.allErrors = function() { return errors; };
 	this.getErrors = function(_name)
 	{
@@ -114,8 +106,10 @@ var ErrorReporter = function()
 		{
 			throw new Error('getErrors expects an error name.  To get allErrors use allErrors instead');
 		}
+
+		var name = exports.hasValue(prefix) ? [prefix, '.', _name].join('') : _name; 
 		
-		return errors[_name];
+		return errors[name];
 	};
 
 	this.hasErrors = function() { return (exports.isEmpty(this.allErrors()) === false); };
@@ -126,24 +120,26 @@ var ErrorReporter = function()
 		{
 			throw new Error('Cannot report and error with an undefined or null name');
 		}
+
+		var name = exports.hasValue(prefix) ? [prefix, '[', _name, ']'].join('') : _name;
 		
-		var errorList = errors[_name]||[];
+		var errorList = errors[name]||[];
 
 		if (_error && Array.isArray(_error) === true)
 		{
 			errorList = errorList.concat(_error);
 		}
-		else if (_error && _error.name !== null && _error.name !== undefined)
+		else if (_error && exports.hasValue(_error.name))
 		{
 			errorList.push(_error);
 		}
 		else if (_error && typeof _error === 'string')
 		{
-			var error = {name: _name, message: _error, category: arguments[2]||'validation'};
+			var error = {name: name, message: _error, category: arguments[2]||'validation'};
 			errorList.push(error);
 		}
 
-		errors[_name] = errorList;
+		errors[name] = errorList;
 	};
 
 	this.clear = function()
@@ -167,9 +163,9 @@ exports.isArray = function(_value)
 	return exports.isJavaScriptArray(_value) || exports.isJavaArray(_value);
 };
 
-exports.createErrorReporter = function()
+exports.createErrorReporter = function(_prefix)
 {
-	return new ErrorReporter();
+	return new ErrorReporter(_prefix);
 }
 
 exports.multiTry = function multiTry(_executable, _tryCount, _callback)
@@ -217,11 +213,11 @@ exports.createDate = function createDate(_milliseconds)
 {
 	var date;
 	
-	if (this.hasValue(_milliseconds) === true && _milliseconds.getTime)
+	if (exports.hasValue(_milliseconds) === true && _milliseconds.getTime)
 	{
 		date = new Packages.java.util.Date(_milliseconds.getTime());
 	}
-	else if (this.hasValue(_milliseconds) === true)
+	else if (exports.hasValue(_milliseconds) === true)
 	{
 		date = new Packages.java.util.Date(_milliseconds);
 	}
@@ -266,7 +262,7 @@ exports.createCalendar = function createCalendar(_config)
 	var timezone = (_config && _config.timezone) ? exports.timezone(_config.timezone) : exports.timezone('UTC');
 	var locale = (_config && _config.locale) ? _config.locale : Packages.java.util.Locale.getDefault();
 	
-	if (this.hasValue(date) === true)
+	if (exports.hasValue(date) === true)
 	{
 		var calendar = Packages.java.util.Calendar.getInstance(timezone, locale);
 		calendar.setTime(date);
@@ -671,7 +667,7 @@ exports.hash = function(_algorithm, _message, _length)
 
 exports.load = function(_resourcePath)
 {
-	return (new Packages.airlift.util.ResourceUtil).load(_resourcePath);
+	return '' + (new Packages.airlift.util.ResourceUtil).load(_resourcePath);
 };
 
 exports.stringBuffer = function(_string)
@@ -771,11 +767,33 @@ exports.assert = function(_assertion, _config)
 		}
 		else
 		{
-			r = _config.r||_config.responseCode||'400';
-			n = _config.n||_config.name||'';
-			m = _config.m||_config.message||'';
-			c = _config.c||_config.category||'validation';
-			e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
+			var validationErrors = false;
+			
+			for (var item in _config)
+			{
+				if (exports.hasValue(_config[item].length) === true)
+				{
+					validationErrors = true;
+					break;
+				}
+			}
+
+			if (validationErrors)
+			{
+				r = '400';
+				n = '';
+				m = 'Validation errors encountered';
+				c = 'validation';
+				e = _config;
+			}
+			else
+			{				
+				r = _config.r||_config.responseCode||'400';
+				n = _config.n||_config.name||'';
+				m = _config.m||_config.message||'';
+				c = _config.c||_config.category||'validation';
+				e = _config.e||_config.error||_config.errors||{name: n, category: c, message: m};
+			}
 		}
 
 		h = httpCodes[r];
