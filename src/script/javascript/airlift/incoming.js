@@ -539,53 +539,67 @@ function Incoming(_web)
 							value = (new CollectionType()).create(type);
 						}
 					}
-					else if (_web.getAppProfile().isValidResource(type))
+					else if (_web.getAppProfile().isValidResource(type) === true)
 					{
-						var source = function(_name, _type)
+						function foundEmbedded(_attributeName)
 						{
-							var request = _web.getRequest();
-							var name = [_attributeName, '[', _name, ']'].join('');
-							
-							var parameterValue = request.getParameterValues(name);
-
-							if (util.hasValue(parameterValue) === false && collectionTypes[_type])
+							var collection = require('airlift/collection');
+							var foundEmbedded = collection.some(_web.getRequest().getParameterMap().keySet(), function(_key)
 							{
-								parameterValue = request.getParameterValues(name + '[]');
-							}
+								return _key.startsWith(util.string(_attributeName + '['));
+							});
 
-							return parameterValue;
-						};
-
-						var sourceKey = function(_name)
-						{
-							var restContext = _web.getRestContext();
-							var parameterValue = restContext.getParameter(_name);
-
-							return parameterValue;
-						};
-
-						var sourceId = function() { return null; }
-
-						var res = require('airlift/resource').create(_web);
-						var embeddedConvertFromSource = that.convertFromSource.partial(source, sourceKey, sourceId);
-						var reporter = util.createErrorReporter(_attributeName);
-						var report = this.report;
-						var embeddedValue = {};
+							return foundEmbedded;
+						}
 						
-						res.each(type, embeddedValue, res.seq(embeddedConvertFromSource), function(n,r)
+						if (foundEmbedded(_attributeName) === true)
 						{
-							if (this.hasErrors())
+							var source = function(_name, _type)
 							{
-								var embeddedErrors = this.allErrors();
-								
-								for (name in embeddedErrors)
-								{
-									report(name, embeddedErrors[name]);
-								}
-							}
-						}, {reporter: reporter});
+								var request = _web.getRequest();
+								var name = [_attributeName, '[', _name, ']'].join('');
 
-						value = embeddedValue;
+								var parameterValue = request.getParameterValues(name);
+
+								if (util.hasValue(parameterValue) === false && collectionTypes[_type])
+								{
+									parameterValue = request.getParameterValues(name + '[]');
+								}
+
+								return parameterValue;
+							};
+
+							var sourceKey = function(_name)
+							{
+								var restContext = _web.getRestContext();
+								var parameterValue = restContext.getParameter(_name);
+
+								return parameterValue;
+							};
+
+							var sourceId = function() { return null; }
+
+							var res = require('airlift/resource').create(_web);
+							var embeddedConvertFromSource = that.convertFromSource.partial(source, sourceKey, sourceId);
+							var reporter = util.createErrorReporter(_attributeName);
+							var report = this.report;
+							var embeddedValue = {};
+
+							res.each(type, embeddedValue, res.seq(embeddedConvertFromSource), function(n,r)
+							{
+								if (this.hasErrors())
+								{
+									var embeddedErrors = this.allErrors();
+
+									for (name in embeddedErrors)
+									{
+										report(name, embeddedErrors[name]);
+									}
+								}
+							}, {reporter: reporter});
+
+							value = embeddedValue;
+						}
 					}
 					else
 					{
@@ -732,25 +746,37 @@ function Incoming(_web)
 		}
 		else if (_web.getAppProfile().isValidResource(type) === true)
 		{
-			var res = require('airlift/resource').create(_web);
-			var reporter = util.createErrorReporter(_name);
 			var report = this.report;
 			
-			res.each(type, _resource[_name], res.seq(that.validate), function(n,r)
+			if (_metadata.required === true)
 			{
-				if (this.hasErrors())
+				util.info('Checking to see if this is required', _name);
+				var errors = [];
+				var message = isRequired(errors, _metadata, _name, _resource[_name]);
+				message && report(_name, message);
+			}
+
+			if (_resource[_name])
+			{
+				var res = require('airlift/resource').create(_web);
+				var reporter = util.createErrorReporter(_name);
+
+				res.each(type, _resource[_name], res.seq(that.validate), function(n,r)
 				{
-					var embeddedErrors = this.allErrors();
-
-					for (name in embeddedErrors)
+					if (this.hasErrors())
 					{
-						report(name, embeddedErrors[name]);
+						var embeddedErrors = this.allErrors();
+
+						for (name in embeddedErrors)
+						{
+							report(name, embeddedErrors[name]);
+						}
 					}
-				}
 
-				_value = r;
+					_value = r;
 
-			}, {reporter: reporter});
+				}, {reporter: reporter});
+			}
 		}
 		else
 		{
