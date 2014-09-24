@@ -29,11 +29,11 @@ function AppIdentityService()
 function QueueService(_name, _method)
 {
 	this.name = _name;
-	this.method = _method||'POST';
+	this.method = _method && _method.toUpperCase()||'POST';
 	
 	var queue = Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(_name);
 
-	this.add = function(/* this depends on whether it is a push or pull */)
+	this._add = function(/* this depends on whether it is a push or pull */)
 	{
 		var parameters, taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withMethod(com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
 		
@@ -67,18 +67,45 @@ function QueueService(_name, _method)
 			}
 		}
 
+		function addHeaders(_headers)
+		{
+			for (header in _headers)
+			{
+				var value = _headers[header]||'';
+				taskOptions = taskOptions.header(util.string(header), util.string(value));
+			}
+		}
+
 		if (/^pull$/i.test(this.method) === false)
 		{
+			headers = arguments[2];
 			parameters = arguments[1];
 			taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(arguments[0]);
 		}
 		else
 		{
+			headers = arguments[1];
 			parameters = arguments[0];
 		}
 
 		addParameters(parameters);
-		queue.add(taskOptions);
+		addHeaders(headers);
+
+		return taskOptions;
+	};
+
+	this.add = function()
+	{
+		var args = Array.prototype.slice.call(arguments);		
+		var taskOptions = this._add.apply(this, args);
+		return queue.add(taskOptions);
+	};
+
+	this.addAsync = function()
+	{
+		var args = Array.prototype.slice.call(arguments);		
+		var taskOptions = this._add.apply(this, args);
+		return queue.addAsync(taskOptions);
 	};
 
 	this['delete'] = function(_name)
@@ -220,7 +247,7 @@ function URLFetchService()
 	{
 		var request;
 		
-		var method = Packages.com.google.appengine.api.urlfetch.HTTPMethod[_method]||Packages.com.google.appengine.api.urlfetch.HTTPMethod.GET;
+		var method = (_method && Packages.com.google.appengine.api.urlfetch.HTTPMethod[_method])||Packages.com.google.appengine.api.urlfetch.HTTPMethod.GET;
 		request = new Packages.com.google.appengine.api.urlfetch.HTTPRequest(new Packages.java.net.URL(_uri), method);
 
 		if (_headers)

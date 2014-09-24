@@ -185,7 +185,7 @@ public abstract class ContentContext
 
 		if (_seconds != null) { seconds = _seconds.intValue(); }
 
-		String cacheControl = "max-age=" + 172800 + ", public, must-revalidate";
+		String cacheControl = "max-age=" + seconds + ", public, must-revalidate";
 		//This basically says it has never been modified.
 		addHeader("Cache-Control", cacheControl);
 	}

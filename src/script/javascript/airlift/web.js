@@ -503,6 +503,26 @@ function Web(WEB_CONTEXT)
 		this.getContentContext().setType(_type);
 	};
 
+	this.getHeaders = function()
+	{
+		var headerMap = {}, header, headers = this.getRequest().getHeaderNames();
+
+		while (headers.hasMoreElements() === true)
+		{
+			header = headers.nextElement();
+			headerMap[header] = headerMap[header]||[];
+
+			var values = this.getRequest().getHeaders(header);
+
+			while (values.hasMoreElements() === true)
+			{
+				headerMap[header].push(values.nextElement());
+			}
+		}
+
+		return headerMap;
+	};
+
 	this.stream = function(_streamer, _type, _headers, _responseCode)
 	{
 		if (!_streamer || typeof _streamer !== 'function') throw 'Streamer is expected to be a function';

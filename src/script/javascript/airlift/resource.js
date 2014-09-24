@@ -4,6 +4,8 @@ function Resource(_web)
 	
 	var constructors = {}; //a cache for Java String, Collection, and primitive constructors
 
+	var TERMINATE = {};
+
 	this.each = function each(_resourceName, _resource, _function, _callback, _context)
 	{		
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
@@ -42,13 +44,19 @@ function Resource(_web)
 			context.attributes = attributes;
 		}
 		
-		var length = (context.attributes && context.attributes.length)||0;
+		var length = (context.attributes && context.attributes.length)||0, terminate;
 
 		for (var i = 0; i < length; i++)
 		{
 			var name = context.attributes[i];
 
-			_function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
+			terminate = _function.call(context, context.resource[name], name, context.resource, context.attributesMetadata.attributes[name]);
+
+			if (terminate === TERMINATE)
+			{
+				util.info('terminating early');
+				break;
+			}
 		}
 
 		if (_callback)
@@ -65,6 +73,42 @@ function Resource(_web)
 		{
 			result[_attributeName] = _function.call(this, _value, _attributeName, _resource, _metadata);
 		}, _callback, _context);
+
+		return result;
+	};
+
+	this.some = function some(_resourceName, _resource, _function, _context)
+	{
+		var result = false;
+
+		this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
+		{
+			result = _function.call(this, _value, _attributeName, _resource, _metadata);
+
+			if (result)
+			{
+				return TERMINATE;
+			}
+			
+		}, null, _context);
+
+		return result;
+	};
+
+	this.filter = function map(_resourceName, _resource, _function, _context)
+	{
+		var result = {}, filter = false;
+
+		this.each(_resourceName, _resource, function(_value, _attributeName, _resource, _metadata)
+		{
+			filter =  _function.call(this, _value, _attributeName, _resource, _metadata);
+
+			if (filter)
+			{
+				result[_attributeName] = _resource[_attributeName];
+			}
+			
+		}, null, _context);
 
 		return result;
 	};
