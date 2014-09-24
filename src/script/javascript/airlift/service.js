@@ -30,12 +30,14 @@ function QueueService(_name, _method)
 {
 	this.name = _name;
 	this.method = _method && _method.toUpperCase()||'POST';
+
+	util.info('processing queue against method', this.method);
 	
 	var queue = Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(_name);
 
 	this._add = function(/* this depends on whether it is a push or pull */)
 	{
-		var parameters, taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withMethod(com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
+		var parameters, taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withMethod(Packages.com.google.appengine.api.taskqueue.TaskOptions.Method[this.method]);
 		
 		function addParameters(_parameters)
 		{
@@ -76,21 +78,23 @@ function QueueService(_name, _method)
 			}
 		}
 
-		if (/^pull$/i.test(this.method) === false)
-		{
-			headers = arguments[2];
-			parameters = arguments[1];
-			taskOptions = Packages.com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl(arguments[0]);
-		}
-		else
+		if (/^pull$/i.test(this.method) === true)
 		{
 			headers = arguments[1];
 			parameters = arguments[0];
+		}
+		else
+		{
+			headers = arguments[2];
+			parameters = arguments[1];
+			taskOptions = taskOptions.url(arguments[0]);
 		}
 
 		addParameters(parameters);
 		addHeaders(headers);
 
+		util.info('Processing Queue task with this task options', taskOptions);
+		
 		return taskOptions;
 	};
 
