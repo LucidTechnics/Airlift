@@ -30,8 +30,6 @@ function QueueService(_name, _method)
 {
 	this.name = _name;
 	this.method = _method && _method.toUpperCase()||'POST';
-
-	util.info('processing queue against method', this.method);
 	
 	var queue = Packages.com.google.appengine.api.taskqueue.QueueFactory.getQueue(_name);
 
@@ -92,8 +90,6 @@ function QueueService(_name, _method)
 
 		addParameters(parameters);
 		addHeaders(headers);
-
-		util.info('Processing Queue task with this task options', taskOptions);
 		
 		return taskOptions;
 	};

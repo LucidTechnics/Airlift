@@ -253,7 +253,12 @@ exports.formatDate = function formatDate(_utcDate, _formatString, _timezoneStrin
 exports.adjustUTCDate = function adjustUTCDate(_utcDate, _timezone)
 {
 	var timezone = exports.timezone(_timezone);
-	return exports.createDate(_utcDate.getTime() + new Packages.airlift.util.TimeZoneWrapper(timezone).getOffset(_utcDate.getTime()));
+	return exports.createDate(_utcDate.getTime() + exports.getTimezoneOffset(timezone, _utcDate));
+};
+
+exports.getTimezoneOffset = function getTimezoneOffset(_timezone, _date)
+{
+	return new Packages.airlift.util.TimeZoneWrapper(_timezone).getOffset(_date.getTime());
 };
 
 exports.createCalendar = function createCalendar(_config)

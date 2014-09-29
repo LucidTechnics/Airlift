@@ -47,6 +47,19 @@ function Update(_web)
 		var errorStatus = false, list = util.list(), map = util.map();
 		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
 		var results = {};
+
+		var ids = collecton.map(_resources, function(_resource)
+		{
+			if (util.hasValue(_resource.id) !== true)
+			{
+				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(resourceName, _resource) };
+			}
+
+			return _resource.id;
+		});
+
+		var previousRecords = da.getAll(resourceName, ids);
+		
 		collection.each(_resources, function(_resource)
 		{
 			/*
@@ -55,12 +68,7 @@ function Update(_web)
 			 * in the datastore, update will throw an exception.
 			 */
 
-			if (util.hasValue(_resource.id) !== true)
-			{
-				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Null id found for object: " + res.toString(resourceName, _resource) };
-			}
-
-			var previousRecord = getter.get(resourceName, _resource.id);
+			var previousRecord = previousRecords.get(_resource.id);
 			var entity = incoming.createEntity(resourceName, _resource.id);
 
 			if (previousRecord)
