@@ -167,8 +167,6 @@ function Insert(_web)
 			if (transaction && !errorStatus) { transaction.commitAsync(); } 
 		}
 
-		var result = {};
-
 		if (collection.size(_resources) === 1)
 		{
 			for (var id in results)

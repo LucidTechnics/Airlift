@@ -335,6 +335,68 @@ function MailService()
 	};
 }
 
+function UserService()
+{
+	var service = Packages.com.google.appengine.api.users.UserServiceFactory.getUserService();
+
+	this.createLoginURL = function(destinationURL, authDomain, federatedIdentity, attributesRequest)
+	{
+		if (arguments.length === 1)
+		{
+			return service.createLoginURL(arguments[0]);
+		}
+		else if (arguments.length === 2)
+		{
+			return service.createLoginURL(arguments[0], arguments[1]);
+		}
+		else if (arguments.length === 3)
+		{
+			return service.createLoginURL(arguments[0], arguments[1], arguments[2]);
+		}
+		else if (arguments.length === 4)
+		{
+			return service.createLoginURL(arguments[0], arguments[1], arguments[2], arguments[3]);
+		}
+	};
+
+	this.createLogoutURL = function(destinationURL, authDomain, federatedIdentity, attributesRequest)
+	{
+		if (arguments.length === 1)
+		{
+			return service.createLogoutURL(arguments[0]);
+		}
+		else if (arguments.length === 2)
+		{
+			return service.createLogoutURL(arguments[0], arguments[1]);
+		}
+	};
+	
+	this.getCurrentUser = function()
+	{
+		return service.getCurrentUser();
+	};
+
+	this.isUserAdmin = function()
+	{
+		return service.isUserAdmin();
+	};
+
+	this.isUserLoggedIn = function()
+	{
+		return service.isUserLoggedIn();
+	};
+	
+	this.service = function()
+	{
+		return service;
+	};
+}
+
+exports.getUserService = function()
+{
+	return new UserService();
+};
+
 exports.getMailService = function()
 {
 	return new MailService();

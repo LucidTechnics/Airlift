@@ -39,14 +39,24 @@ Omni.prototype.collectByMembership = function(_resourceName, _attributeName, _me
 	return this.collector.collectByMembership(_resourceName, _attributeName, _membershipList, _config);
 };
 
-Omni.prototype.insert = function(_resourceName, _toInsert)
+Omni.prototype.insert = function(_resourceName, _toInsert, _pre, _post)
 {
-	return this.inserter.insert(_resourceName, _toInsert);
+	return this.inserter.insert(_resourceName, _toInsert, _pre, _post);
 };
 
-Omni.prototype.update = function(_resourceName, _toUpdate)
+Omni.prototype.insertAll = function(_resourceName, _toInsert, _pre, _post)
 {
-	return this.updater.update(_resourceName, _toUpdate);
+	return this.inserter.insertAll(_resourceName, _toInsert, _pre, _post);
+};
+
+Omni.prototype.update = function(_resourceName, _toUpdate, _pre, _post)
+{
+	return this.updater.update(_resourceName, _toUpdate, _pre, _post);
+};
+
+Omni.prototype.updateAll = function(_resourceName, _toUpdate, _pre, _post)
+{
+	return this.updater.updateAll(_resourceName, _toUpdate, _pre, _post);
 };
 
 Omni.prototype['delete'] = function(_resourceName, _id)

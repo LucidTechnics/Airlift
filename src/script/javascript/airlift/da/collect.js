@@ -15,7 +15,7 @@ function Collect(_web)
 	function QueryResultIterator(_resourceName, _entities, _keysOnly, _originalQueryConfigOptions)
 	{
 		var keys = util.createKeysCollection(_entities).iterator();
-		var keysOnly = _keysOnly;
+		var keysOnly = util.hasValue(_keysOnly) ? _keysOnly : false;
 		var fetchedResources;
 		var cursor = _entities.getCursor();
 		var originalQueryConfigOptions = _originalQueryConfigOptions;
@@ -62,7 +62,15 @@ function Collect(_web)
 		{
 			keys.remove();
 		}
-	};
+	}
+
+	function validateFilterAttribute(_name, _attributesMetadata)
+	{
+		util.assert(_attributesMetadata.attributes[_name] && _attributesMetadata.attributes[_name].isIndexable === true,
+					{m:'Invalid attribute ' + _name + '. Not a valid attribute or attribute is not indexable',
+							r: '500', c: 'data access'});
+
+	}
 	
 	this.collect = function(_resourceName, _config)
 	{
@@ -76,6 +84,7 @@ function Collect(_web)
 		}
 		
 		var metadata = util.getResourceMetadata(resourceName);
+		
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 		
 		var originalConfig;
@@ -90,7 +99,7 @@ function Collect(_web)
 		var config = originalConfig||config||{};
 		var limit = util.value(config.limit, 0);
 		var filterList = config.filterList||[];
-		var keysOnly = (util.hasValue(config.keysOnly) === true) ? config.keysOnly : false;
+		var keysOnly = (util.hasValue(config.keysOnly) === true) ? true : false;
 
 		var orderBy, asc;
 		
@@ -141,12 +150,16 @@ function Collect(_web)
 		var filter = new Packages.java.util.ArrayList();
 
 		util.assert(filterList.forEach, {m: 'filter list must be a JavaScript array', r: '500'});
-		
+
+		var attributesMetadata = util.getAttributesMetadata(resourceName);
+
 		filterList.forEach(function(_filter)
 		{
 			var o = _filter.operator || _filter.comparator || _filter.op || _filter.o || _filter.c || 'EQUAL';
 			var n = _filter.name || _filter.n;
 			var v = _filter.value || _filter.v;
+
+			validateFilterAttribute(n, attributesMetadata);
 
 			filter.add(new FilterPredicate(n, FilterOperator[o.toUpperCase()], v));
 		});

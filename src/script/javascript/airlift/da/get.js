@@ -150,7 +150,9 @@ function Get(_web)
 		var metadata = util.getResourceMetadata(resourceName);
 		if (metadata.isView === true) { resourceName = metadata.lookingAt; }
 
-		var entities = collection.map(_ids, function(_id) { return incoming.createEntity(resourceName, _id); });
+		var entities = util.list();
+		
+		collection.each(_ids, function(_id) { entities.add(incoming.createEntity(resourceName, _id)); });
 
 		return this.__getAll(resourceName, entities); 
 	};

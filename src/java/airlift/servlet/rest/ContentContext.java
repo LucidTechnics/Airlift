@@ -46,7 +46,7 @@ public abstract class ContentContext
 	public String redirectUri;
 	
 	/** The header map. */
-	public java.util.Map<String, String[]> headerMap = new java.util.HashMap<String, String[]>();
+	public java.util.Map<String, java.util.List<String>> headerMap = new java.util.HashMap<String, java.util.List<String>>();
 
 	public boolean streamed = false;
 	
@@ -62,7 +62,7 @@ public abstract class ContentContext
 	 *
 	 * @return the header map
 	 */
-	public java.util.Map<String, String[]> getHeaderMap() { return headerMap; }
+	public java.util.Map<String, java.util.List<String>> getHeaderMap() { return headerMap; }
 	
 	/**
 	 * Sets the redirect uri.
@@ -76,7 +76,7 @@ public abstract class ContentContext
 	 *
 	 * @param _headerMap the _header map
 	 */
-	public void setHeaderMap(java.util.Map<String, String[]> _headerMap) { headerMap = _headerMap; }
+	public void setHeaderMap(java.util.Map<String, java.util.List<String>> _headerMap) { headerMap = _headerMap; }
 
 	/**
 	 * Gets the content.
@@ -174,7 +174,7 @@ public abstract class ContentContext
 		//this says that the content is always expired.
 		addHeader("Expires",  "Sat, 1 Jan 2005 00:00:00 GMT");
 		//this says that the content can always be different.
-		addHeader("Cache-Control", " no-cache, must-revalidate");
+		addHeader("Cache-Control", "no-cache, must-revalidate");
 		//this says that the content should not be cached.
 		addHeader("Pragma",  "no-cache");
 	}
@@ -188,6 +188,8 @@ public abstract class ContentContext
 		String cacheControl = "max-age=" + seconds + ", public, must-revalidate";
 		//This basically says it has never been modified.
 		addHeader("Cache-Control", cacheControl);
+		addHeader("Vary", "Accept");
+		addHeader("Vary", "Accept-Encoding");
 	}
 
 	/**
@@ -238,28 +240,20 @@ public abstract class ContentContext
 	 */
 	public void addHeader(String _key, String _value)
 	{
-	    String[] valueArray = new String[1];
-	    valueArray[0] = _value;
-	    getHeaderMap().put(_key, valueArray		);
+		java.util.List<String> headers = getHeaderMap().get(_key);
+
+		if (headers == null)
+		{
+			headers = new java.util.ArrayList();
+		}
+
+		getHeaderMap().put(_key, headers);
+		headers.add(_value);
 	}
 
-	public void addHeader(String _key, String[] _value)
+	public void addHeaders(String _key, java.util.List<String> _value)
 	{
 	    getHeaderMap().put(_key, _value);
-	}
-
-	public void addHeader(String _key, java.util.List<String> _value)
-	{
-	    String[] valueArray = new String[_value.size()];
-	    int	 index = 0;
-	    
-	    for (String value: _value)
-	    {
-		valueArray[index] = value;
-		index++;
-	    }
-	
-	    getHeaderMap().put(_key, valueArray);
 	}
 
 	/**

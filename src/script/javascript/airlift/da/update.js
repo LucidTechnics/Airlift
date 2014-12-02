@@ -16,7 +16,7 @@ function Update(_web)
 	{
 		var resources;
 
-		if ((_toUpdate.add && _toInsert.iterate) || (_toUpdate.push && _toUpdate.forEach) || (_toUpdate.hasNext && _toUpdate.next))
+		if ((_toUpdate.add && _toUpdate.iterator) || (_toUpdate.push && _toUpdate.forEach) || (_toUpdate.hasNext && _toUpdate.next))
 		{
 			resources = _toUpdate;
 		}
@@ -48,7 +48,7 @@ function Update(_web)
 		var pre = _pre && res.sequence.partial(_pre) || res.sequence;
 		var results = {};
 
-		var ids = collecton.map(_resources, function(_resource)
+		var ids = collection.map(_resources, function(_resource)
 		{
 			if (util.hasValue(_resource.id) !== true)
 			{
@@ -58,8 +58,10 @@ function Update(_web)
 			return _resource.id;
 		});
 
-		var previousRecords = da.getAll(resourceName, ids);
-		
+		util.info('Ids', JSON.stringify(ids));
+
+		var previousRecords = getter.getAll(resourceName, ids);
+
 		collection.each(_resources, function(_resource)
 		{
 			/*
@@ -67,10 +69,8 @@ function Update(_web)
 			 * not have an id OR the resource does not exist
 			 * in the datastore, update will throw an exception.
 			 */
-
 			var previousRecord = previousRecords.get(_resource.id);
 			var entity = incoming.createEntity(resourceName, _resource.id);
-
 			if (previousRecord)
 			{
 				incoming.bookkeeping(entity, _web.getUserId()||null, previousRecord.auditPostDate, util.createDate());
@@ -78,7 +78,9 @@ function Update(_web)
 			}
 			else
 			{
-				throw { name: "AIRLIFT_DAO_EXCEPTION", message: "Cannot update. Trying to update a resource that does not exist: " + res.toString(resourceName, _resource) };
+				var message = "Cannot update. Trying to update a resource that does not exist: " + res.toString(resourceName, _resource);
+				util.severe(message);
+				throw { name: "AIRLIFT_DAO_EXCEPTION", message: message};
 			}
 
 			var callback = function(n,r)
@@ -114,6 +116,7 @@ function Update(_web)
 				var written = util.multiTry(function() { datastore.put(transaction, list); return true; }, 5,
 											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
 
+				
 				if (util.hasValue(written) === true)
 				{
 					try
@@ -125,6 +128,7 @@ function Update(_web)
 						util.warning('unable to cache entit(ies) during insert for resource', resourceName);
 					}
 				}
+
 
 				if (metadata.isAudited === true)
 				{
