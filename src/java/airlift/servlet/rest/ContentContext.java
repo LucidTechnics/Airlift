@@ -161,9 +161,7 @@ public abstract class ContentContext
 	 */
 	public void lastModified(java.util.Date _lastModifiedDate)
 	{
-		//This gives the developer a hook into setting the last
-		//modified date header
-		addHeader("Last-Modified", airlift.util.FormatUtil.format(_lastModifiedDate, "EEE, d MMM yyyy HH:mm:ss zzz"));
+		addHeader("Last-Modified", airlift.util.FormatUtil.format(_lastModifiedDate, "EEE, d MMM yyyy HH:mm:ss") + " GMT");
 	}
 
 	/**
@@ -181,12 +179,15 @@ public abstract class ContentContext
 
 	public void setCacheable(Integer _seconds)
 	{
-		int seconds = 172800;
-
-		if (_seconds != null) { seconds = _seconds.intValue(); }
+		int seconds = 60 * 60 * 24 * 7;
+		
+		if (_seconds != null)
+		{
+			seconds = _seconds.intValue();
+		}
 
 		String cacheControl = "max-age=" + seconds + ", public, must-revalidate";
-		//This basically says it has never been modified.
+		
 		addHeader("Cache-Control", cacheControl);
 		addHeader("Vary", "Accept");
 		addHeader("Vary", "Accept-Encoding");

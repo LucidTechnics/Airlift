@@ -116,7 +116,6 @@ function Update(_web)
 				var written = util.multiTry(function() { datastore.put(transaction, list); return true; }, 5,
 											function(_tries, _e) { util.severe("Encountered this error while accessing the datastore for ", resourceName, "insert", _e); });
 
-				
 				if (util.hasValue(written) === true)
 				{
 					try

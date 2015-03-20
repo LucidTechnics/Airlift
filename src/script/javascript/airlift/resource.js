@@ -6,11 +6,18 @@ function Resource(_web)
 
 	var TERMINATE = {};
 
+	var BUILDER_CACHE = {};
+
 	this.each = function each(_resourceName, _resource, _function, _callback, _context)
 	{		
 		if (util.hasValue(_resourceName) === false || util.isWhitespace(_resourceName) === true)
 		{
 			throw 'Resource name must be a valid resource: ' + _resourceName;
+		}
+
+		if (util.hasValue(_function) === false || typeof _function !== 'function')
+		{
+			throw 'Iterator function ' + _function + ' must be defined and must be a function';
 		}
 		
 		var context = _context || {};
@@ -402,18 +409,24 @@ function Resource(_web)
 		var start = separators[0]||"[";
 		var delimeter = separators[1]||",";
 		var end = separators[2]||"]";
+
+		util.info('Begin resource.stream');
 		
 		_write(start);
 		
 		if (_iterator.hasNext() === true)
 		{
+			util.info('Streaming first object ...');
 			_write(_serialize(_iterator.next()));
+			util.info('First object streamed');
 		}
 
+		util.info('Streaming rest ...');
 		while (_iterator.hasNext() === true)
 		{
 			_write(delimeter + _serialize(_iterator.next()));
 		}
+		util.info('Streaming complete');
 
 		_write(end);
 	};

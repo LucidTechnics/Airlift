@@ -165,7 +165,7 @@ function CacheService()
 		}
 		catch(e)
 		{
-			util.warning('cache put of key:', _key, '-', value, 'threw an exception');
+			util.warning('cache put of key:', _key, '-', _value, 'threw an exception');
 			util.warning(e.message, e.stack);
 		}
 	};

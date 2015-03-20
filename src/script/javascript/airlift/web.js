@@ -549,7 +549,7 @@ function Web(WEB_CONTEXT)
 		}
 
 		response.status = Packages.java.lang.Integer.parseInt(contentContext.getResponseCode());
-		response.setContentType(contentContext.getType());
+		response.setContentType(_type||contentContext.getType());
 
 		function Writer()
 		{
@@ -595,6 +595,15 @@ function Web(WEB_CONTEXT)
 	this.setCacheable = function(_seconds)
 	{
 		this.getContentContext().setCacheable(_seconds||86400);
+	};
+
+	this.setLastModified = function(_date)
+	{
+		var date = _date && util.createDate(_date);
+
+		if (!date) throw "Last modified date header value cannot be null";
+
+		this.getContentContext().lastModifiedDate(date);
 	};
 }
 

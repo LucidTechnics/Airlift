@@ -16,6 +16,7 @@ function Collect(_web)
 	{
 		var keys = util.createKeysCollection(_entities).iterator();
 		var keysOnly = util.hasValue(_keysOnly) ? _keysOnly : false;
+		
 		var fetchedResources;
 		var cursor = _entities.getCursor();
 		var originalQueryConfigOptions = _originalQueryConfigOptions;
@@ -43,15 +44,11 @@ function Collect(_web)
 		{
 			var result;
 
-			if (!keysOnly && !fetchedResources)
-			{
-				fetchedResources = require('./get').create(_web).__getAll(_resourceName, _entities);
-			}
-
 			result = keys.next().getName();
 
 			if (!keysOnly)
 			{
+				fetchedResources = fetchedResources||require('./get').create(_web).__getAll(_resourceName, _entities);
 				result = fetchedResources.get(result);
 			}
 
@@ -99,8 +96,10 @@ function Collect(_web)
 		var config = originalConfig||config||{};
 		var limit = util.value(config.limit, 0);
 		var filterList = config.filterList||[];
-		var keysOnly = (util.hasValue(config.keysOnly) === true) ? true : false;
+		var keysOnly = (util.hasValue(config.keysOnly)) ? config.keysOnly : false;
 
+		util.info('AIRLIFT COLLECT KEYS ONLY', resourceName, keysOnly);
+		
 		var orderBy, asc;
 		
 		if (util.hasValue(config.orderBy) === false)
