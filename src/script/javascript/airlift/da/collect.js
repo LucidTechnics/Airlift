@@ -222,6 +222,18 @@ function Collect(_web)
 
 		return this.collect(_resourceName, config);
 	};
+
+	this.collectLastUpdated = function(_resourceName, _filterList)
+	{
+		var last = this.collect(_resourceName, {limit: 1, filterList: _filterList, orderBy: 'auditPutDate', asc: false});
+
+		if (last.hasNext())
+		{
+			last = last.next(); 
+		}
+
+		return last;
+	};
 }
 
 exports.create = function(_web)

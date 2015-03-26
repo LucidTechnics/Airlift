@@ -599,12 +599,65 @@ function Web(WEB_CONTEXT)
 
 	this.setLastModified = function(_date)
 	{
-		var date = _date && util.createDate(_date);
-
+		var date = _date && util.date(_date);
 		if (!date) throw "Last modified date header value cannot be null";
-
-		this.getContentContext().lastModifiedDate(date);
+		this.getContentContext().lastModified(date);
 	};
+
+	this.isModifiedSince = function(_date, doWork)
+	{
+		var isModifiedByDate = true, lastModifiedDate;
+		
+		//Is this "[Tue, 10 Feb 2015 21:39:52 GMT]"
+		var ifModifiedSince = this.getHeaders()['If-Modified-Since'];
+		ifModifiedSince = ifModifiedSince && (ifModifiedSince[0] + '');
+		ifModifiedSince = ifModifiedSince && ifModifiedSince.replace(/[\[\]]/g, '');
+		//Is now this "Tue, 10 Feb 2015 21:39:52 GMT"
+	
+
+		util.info('FIRST IF-MODIFIED-SINCE is', ifModifiedSince, ifModifiedSince && ifModifiedSince.length);
+
+
+		if (ifModifiedSince)
+		{
+			ifModifiedSince = (new Packages.java.text.SimpleDateFormat('EEE, d MMM yyyy HH:mm:ss zzz')).
+							  parse(ifModifiedSince, new Packages.java.text.ParsePosition(0));
+
+			lastModifiedDate = Math.floor(_date.getTime()/1000) * 1000; 
+			util.info('LAST-MODIFIED is', lastModifiedDate);
+
+			isModifiedByDate = (lastModifiedDate > ifModifiedSince.getTime());
+		}
+
+
+		
+		if (isModifiedByDate)
+		{
+			this.setLastModified(lastModifiedDate);
+			doWork();
+		}
+		else
+		{
+			this.setLastModified(_date);
+			this.setResponseCode('304');
+		}
+	};
+
+	this.logRequest = function ()
+	{
+		//The intent here is to conveniently log things pertaining to
+		//this request ... feel free to add more here in the future ...
+		
+		var headers = this.getRequest().getHeaderNames();
+
+		util.info('REQUEST HEADERS');
+		
+		while (headers.hasMoreElements())
+		{
+			var header = headers.nextElement();
+			util.info(header, this.getRequest().getHeader(header));
+		}
+	};	
 }
 
 exports.create = function(WEB_CONTEXT)

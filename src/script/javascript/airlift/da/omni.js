@@ -39,6 +39,11 @@ Omni.prototype.collectByMembership = function(_resourceName, _attributeName, _me
 	return this.collector.collectByMembership(_resourceName, _attributeName, _membershipList, _config);
 };
 
+Omni.prototype.collectLastUpdated = function(_resourceName, _filterList)
+{
+	return this.collector.collectLastUpdated(_resourceName, _filterList);
+};
+
 Omni.prototype.insert = function(_resourceName, _toInsert, _pre, _post)
 {
 	return this.inserter.insert(_resourceName, _toInsert, _pre, _post);

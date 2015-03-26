@@ -162,6 +162,8 @@ public abstract class ContentContext
 	public void lastModified(java.util.Date _lastModifiedDate)
 	{
 		addHeader("Last-Modified", airlift.util.FormatUtil.format(_lastModifiedDate, "EEE, d MMM yyyy HH:mm:ss") + " GMT");
+		addHeader("Expires", "-1");
+		addHeader("Cache-Control", "must-revalidate, private");
 	}
 
 	/**
