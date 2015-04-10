@@ -188,7 +188,7 @@ public abstract class ContentContext
 			seconds = _seconds.intValue();
 		}
 
-		String cacheControl = "max-age=" + seconds + ", public, must-revalidate";
+		String cacheControl = "max-age=" + seconds + ", public";
 		
 		addHeader("Cache-Control", cacheControl);
 		addHeader("Vary", "Accept");
@@ -252,6 +252,14 @@ public abstract class ContentContext
 
 		getHeaderMap().put(_key, headers);
 		headers.add(_value);
+	}
+
+	public void overrideHeader(String _key, String _value)
+	{
+		java.util.List<String> l = new java.util.ArrayList<String>();
+		l.add(_value);
+
+		getHeaderMap().put(_key, l);
 	}
 
 	public void addHeaders(String _key, java.util.List<String> _value)

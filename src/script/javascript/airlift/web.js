@@ -592,6 +592,16 @@ function Web(WEB_CONTEXT)
 		writer.end();
 	};
 
+	this.addHeader = function (key, value)
+	{
+		this.getContentContext().addHeader(key, value);
+	};
+
+	this.overrideHeader = function (key, value)
+	{
+		this.getContentContext().overrideHeader(key, value);
+	};
+	
 	this.setCacheable = function(_seconds)
 	{
 		this.getContentContext().setCacheable(_seconds||86400);
@@ -628,8 +638,6 @@ function Web(WEB_CONTEXT)
 
 			isModifiedByDate = (lastModifiedDate > ifModifiedSince.getTime());
 		}
-
-
 		
 		if (isModifiedByDate)
 		{
