@@ -1,0 +1,479 @@
+<project default="generate" basedir=".">
+	<basename property="appName" file="analytics-web" />
+	<property environment="env"/>
+	<property name="sdk.dir" location="${env.AIRLIFT_APP_ENGINE_HOME}" />
+
+	<condition property="airlift.production.mode" value="yes">
+		<and><equals arg1="${airlift.cache}" arg2="yes" casesensitive="false" trim="true"/></and>
+	</condition>
+	
+	<condition property="airlift.environment" value="build/prod.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="prod" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/test.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="test" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/qa.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="qa" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/dev.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="dev" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/demo.airlift.build">
+		<and><equals arg1="${airlift.env}" arg2="demo" casesensitive="false" trim="true"/></and>
+	</condition>
+
+	<condition property="airlift.environment" value="build/desktop.airlift.build">
+		<and>
+		   <not><equals arg1="${airlift.env}" arg2="dev" casesensitive="false" trim="true"/></not>
+		   <not><equals arg1="${airlift.env}" arg2="test" casesensitive="false" trim="true"/></not>
+		   <not><equals arg1="${airlift.env}" arg2="prod" casesensitive="false" trim="true"/></not>
+		   <not><equals arg1="${airlift.env}" arg2="qa" casesensitive="false" trim="true"/></not>
+		</and>
+	</condition>
+
+	<echo>Here is the environment: ${airlift.environment}</echo>
+
+	<property file="${airlift.environment}" />
+
+	<condition property="operatingSystem" value="windows" else="unix">
+		<and><os family="windows"/></and>
+	</condition>
+
+	<property name="jar" value="${appName}" />
+	<property name="dist" location="dist" />
+	<property name="archive" location="archive" />
+	<property name="workspace" location="workspace" />
+	<property name="runtime.lib" location="runtime-lib" />
+	<property name="build.only.lib" location="build-only-lib" />
+	<property name="bin" location="bin" />
+	<property name="src" location="src" />
+	<property name="src.shl" location="${src}/shl" />
+	<property name="src.java" location="${src}/java" />
+	<property name="src.script" location="${src}/script" />	
+	<property name="src.javascript" location="${src.script}/javascript" />
+	<property name="src.genjava" location="${src}/genjava" />
+	<property name="src.test" location="${src}/test" />
+	<property name="src.cfg" location="${src}/cfg" />
+	<property name="src.doc" location="${src}/doc" />
+
+
+	<property name="war" location="war" />
+	<property name="classes" location="${war}/WEB-INF/classes" />
+	<property name="appengine-generated" location="${war}/WEB-INF/appengine-generated"/>
+	
+	<import file="${sdk.dir}/config/user/ant-macros.xml" />
+  
+	<path id="project.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}">
+			<include name="lib/shared/**/*.jar" />
+			<include name="lib/appengine-remote-api.jar" />
+			<include name="lib/appengine-tools-api.jar" />
+			<include name="lib/testing/appengine-testing.jar" />
+		</fileset>
+	</path>
+
+	<path id="hack.classpath">
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="precompile.classpath">
+	<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+		</fileset>
+		<fileset dir="${basedir}/">
+			<include name="airlift-*core.jar" />
+		</fileset>
+				
+	</path>
+
+	<path id="appserver.classpath">
+
+		<pathelement path="${classes}" />
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />
+			<include name="impl/**/*.jar" />
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*scripts.jar"/>
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="test.class.path">
+		<!-- pathelement path="${classes}" / --> 
+		<fileset dir="${war}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+			<include name="appengine-remote-api.jar" />
+			<include name="appengine-tools-api.jar" />
+			<include name="testing/appengine-testing.jar" />			
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*test*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="init">
+		
+		<mkdir dir="${src}" />
+		<mkdir dir="${src.shl}" />
+		<mkdir dir="${src.java}" />
+		<mkdir dir="${src.javascript}" />
+		<mkdir dir="${src.test}" />
+		<mkdir dir="${src.test}/airlift" />
+		<mkdir dir="${src.test}/airlift/test" />
+		<mkdir dir="${src.test}/airlift/test/unit" />
+		<mkdir dir="${src.test}/airlift/test/smoke" />
+		<mkdir dir="${src.test}/airlift/test/integration" />		
+		<mkdir dir="${src.cfg}" />
+		<mkdir dir="${src.cfg}/web" />
+		<mkdir dir="${src.script}" />
+		<mkdir dir="${src.genjava}" />
+		<mkdir dir="${src.genjava}/airlift/app" />
+		<mkdir dir="${war}/WEB-INF/classes/gen/meta/r" />
+		<mkdir dir="${war}/WEB-INF/classes/gen/meta/a" />
+		<mkdir dir="${war}/WEB-INF/classes/handler" />
+		<mkdir dir="${war}/WEB-INF/classes/template" />
+	    <mkdir dir="${war}/gen/javascript/validation" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/lib" />
+
+		<mkdir dir="${classes}" />
+		
+	</target>
+
+	<target name="createRootPackageDirProperty" >
+
+	   <pathconvert property="genjava.package.dir" targetos="${operatingSystem}" >
+		  <path path="${package}" />
+		  <mapper>
+			 <chainedmapper>
+				 <flattenmapper/>
+				 <unpackagemapper from="*" to="${src.genjava}${file.separator}*" casesensitive="yes"/>
+			 </chainedmapper>
+		  </mapper>
+	  </pathconvert>
+
+	  <pathconvert property="java.package.dir" targetos="${operatingSystem}" >
+		  <path path="${package}" />
+		  <mapper>
+			 <chainedmapper>
+				 <flattenmapper/>
+				 <unpackagemapper from="*" to="${src.java}${file.separator}*" casesensitive="yes"/>
+			 </chainedmapper>
+		  </mapper>
+	  </pathconvert>
+
+	</target>
+
+	<target name="createPackageStructure" depends="init, createRootPackageDirProperty" >
+	   
+		<mkdir dir="${genjava.package.dir}" />
+		
+		<mkdir dir="${java.package.dir}" />
+		<mkdir dir="${java.package.dir}/util" />
+		<mkdir dir="${java.package.dir}/exception" />				
+		
+		<mkdir dir="${src.doc}" />
+		<mkdir dir="${war}/WEB-INF/classes/handler" />
+		<mkdir dir="${war}/WEB-INF/classes/extlib" />
+		
+	</target>
+
+	<!-- Clean -->
+	<target name="clean" depends="init, clean-war, clean-generated" />
+
+	<target name="clean-generated" depends="createPackageStructure, createRootPackageDirProperty">
+
+	    <delete>
+		   <fileset dir="${src.genjava}" includes="**/*.*java*"  />
+		</delete>
+				
+		<delete dir="${stage}" />
+	</target>
+
+	<target name="clean-ds">
+	    <delete>
+		   <fileset dir="${war}/WEB-INF/appengine-generated" includes="**/*"  />
+		</delete>
+	</target>
+
+	<target name="clean-war"	 >
+		<delete>
+		   <fileset dir="${classes}" >
+			  <exclude name="handler/**/*" />
+			  <exclude name="*lib/**/*" />
+			  <exclude name="node_modules/**/*" />
+			  <exclude name="template/**/*" />
+		   </fileset>
+		</delete>
+		<delete>
+		   <fileset dir="${war}/WEB-INF/" >
+			  <include name="web.xml" />
+			  <include name="appengine-web.xml" />
+			  <include name="queue.xml" />
+		   </fileset>
+		</delete>
+		<delete>
+		   <fileset dir="${war}/gen/javascript/validation" >
+			  <include name="**/*.js" />
+		   </fileset>
+		</delete>
+		<delete>
+		   <fileset dir="${dist}" >
+			  <include name="**/*.*" />
+		   </fileset>
+		</delete>
+
+	</target>
+	
+	<target name="copyjars" description="Copies the App Engine jars to the war file.">
+		<copy todir="${war}/WEB-INF/lib" flatten="true">
+			<fileset dir="${sdk.dir}/lib">
+				<include name="user/**/*.jar" />
+				<exclude name="user/orm/**/*.jar" />
+			</fileset>
+		</copy>
+		<!-- I added -->
+	</target>
+
+	<target name="clean-appengine-generated">
+	    <delete>
+		   <fileset dir="${appengine-generated}" includes="**/*.*"  />
+		</delete>
+	</target>		
+
+	<target name="prepareSource" depends="createPackageStructure, generate">
+		<replace dir="${war}/WEB-INF" propertyFile="${airlift.environment}">
+			<include name="*.xml"/>
+			
+			<replacefilter token="@REPORT_JAVA_EXCEPTION@" value="${airlift.report.java.exception}"/>
+			<replacefilter token="@TRUNCATED_SHA1_ID_LENGTH@" value="${airlift.truncated.sha1.id.length}"/>
+			<replacefilter token="@SEARCH_INDEX_MAX_FIELD_LENGTH@" value="${airlift.search.index.max.field.length}"/>
+			<replacefilter token="@PACKAGE_NAME@" value="${package}"/>
+			<replacefilter token="@APP_NAME@" value="${appName}"/>
+			<replacefilter token="@AIRLIFT_PRODUCTION_MODE@" value="${airlift.production.mode}"/>
+			<replacefilter token="@AIRLIFT_APPLICATION@" value="${airlift.application}"/>
+			<replacefilter token="@AIRLIFT_APPLICATION_VERSION@" value="${airlift.application.version}"/>
+			<replacefilter token="@AIRLIFT_DEV_USER_SECURITY@" value="${airlift.dev.user.security}"/>
+			<replacefilter token="@AIRLIFT_SESSION_TIMEOUT_DURATION@" value="${airlift.session.timeout.duration}"/>
+
+			<!-- security tokens -->
+			<replacefilter token="@AIRLIFT_CIPHER_PASSWORD@" value="${airlift.cipher.password}"/>
+			<replacefilter token="@AIRLIFT_INITIAL_VECTOR@" value="${airlift.initial.vector}"/>
+			<replacefilter token="@AIRLIFT_USER_SERVICE@" value="${airlift.user.service}"/>
+			
+			<!-- mime type tokens -->
+			<replacefilter token="@AIRLIFT_DEFAULT_MIME_TYPE@" value="${airlift.default.mime.type}"/>
+
+			<!-- auditing tokens -->
+			<replacefilter token="@AIRLIFT_AUDITING_INSERT@" value="${airlift.auditing.insert}"/>
+			<replacefilter token="@AIRLIFT_AUDITING_GET@" value="${airlift.auditing.get}"/>
+			<replacefilter token="@AIRLIFT_AUDITING_UPDATE@" value="${airlift.auditing.update}"/>
+			<replacefilter token="@AIRLIFT_AUDITING_DELETE@" value="${airlift.auditing.delete}"/>
+
+			<!-- time zone -->
+			<replacefilter token="@AIRLIFT_TIMEZONE@" value="${airlift.timezone}"/>
+
+			<!-- use this to distinguish namespaces within the same
+			URI like "PHASE 1" or "PROD" or "DEV" etc ... -->
+			<replacefilter token="@AIRLIFT_NAMESPACE@" value="${airlift.namespace}"/>
+			
+			<!-- Thread Safety -->
+			<replacefilter token="@AIRLIFT_THREAD_SAFE@" value="${airlift.threadsafe}"/>
+
+			<!-- Queues -->
+			<replacefilter token="@QUEUE_STORAGE_LIMIT@" value="${queue.storage.limit}"/>
+			<replacefilter token="@QUEUE_RATE@" value="${queue.rate}"/>
+			<replacefilter token="@QUEUE_BUCKET_SIZE@" value="${queue.bucket.size}"/>
+			<replacefilter token="@QUEUE_CONCURRENT_REQUESTS@" value="${queue.concurrent.requests}"/>
+			<replacefilter token="@TASK_RETRY_LIMIT@" value="${task.retry.limit}"/>
+			<replacefilter token="@TASK_AGE_LIMIT@" value="${task.age.limit}"/>
+			<replacefilter token="@TASK_MIN_BACKOFF_SECONDS@" value="${task.min.backoff.seconds}"/>
+			<replacefilter token="@TASK_MAX_BACKOFF_SECONDS@" value="${task.max.backoff.seconds}"/>
+			<replacefilter token="@TASK_MAX_DOUBLINGS@" value="${task.max.doublings}"/>
+		</replace>
+	</target>
+
+	<target name="generate" depends="dictate" description="Generates Airlift classes and copies other source files to the WAR.">
+		<mkdir dir="${classes}" />
+		
+		<copy todir="${war}/WEB-INF">
+			<fileset dir="src/cfg/web/"></fileset>
+		</copy>
+	</target>
+
+	<target name="compile" depends="copyjars, prepareSource"	description="Compiles Java source">
+		<javac includeantruntime="false" srcdir="src"	destdir="${classes}" classpathref="project.classpath" debug="on" />
+
+	</target>
+
+	<target name="runserver" depends= "discoverNodeModules, test-jar" description="Starts the development server.">
+	  <dev_appserver war="${war}">
+		 <options>
+			   <arg value="--jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20"/>
+		        <arg value="--jvm_flag=-Dappengine.user.timezone=UTC"/>
+				<arg value="--jvm_flag=-Xmx1024m"/>
+
+		 </options>
+	  </dev_appserver>
+	</target>
+
+	<target name="request_logs" description="Downloads log data from App Engine for the application.">
+		<appcfg action="request_logs" war="${war}">
+			<options>
+			   <arg value="--num_days=5"/>
+			</options>
+			<args>
+				<arg value="logs.txt"/>
+			</args>
+		</appcfg>
+	</target>
+
+	<target name="runScript" depends="hack-jar">
+	   	<property name="run.class.path" refId="hack.classpath"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/hack.js">
+		    <classpath refid="hack.classpath"/>			
+		</script>
+	</target>
+
+	<target name="discoverNodeModules" depends="compile" description="discovers all node modules directory paths in classes directory">
+	   	<property name="run.class.path" refId="hack.classpath"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/packages.js">
+		    <classpath refid="hack.classpath"/>			
+		</script>
+	</target>
+
+	<target name="jslint">
+		<pathconvert pathsep=" " property="jsfiles">
+			<fileset dir="${war}/WEB-INF/classes">
+				<include name="**/*.js"/>
+			</fileset>
+		</pathconvert>
+		<exec dir="${basedir}" executable="java" failonerror="true">
+			<arg line="-jar ${war}/WEB-INF/lib/js.jar ${war}/WEB-INF/lib/jsLint.js ${jsfiles}"/>
+		</exec>
+	</target>
+	
+	<target name="dictate" depends="clean, createPackageStructure">
+	   	<property name="run.class.path" refId="precompile.classpath"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/dictate.js">
+		    <classpath refid="precompile.classpath"/>			
+		</script>
+	</target>
+
+	<target name="dictate-supportingResources" >
+	   	<property name="run.class.path" refId="precompile.classpath"/>
+		<var name="dictation.file" value="supportingResources.dic" />
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="dictate.js">
+		    <classpath refid="precompile.classpath"/>			
+		</script>
+	</target>
+
+	<!-- Jar -->
+	<target name="test-jar" depends="discoverNodeModules">
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift/test"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${src.test}/airlift"
+			   includes="harness.js"
+			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-test.jar"
+		       basedir="${classes}"
+			   includes="**/*.js"
+			   update="true"
+		  />
+
+    </target>
+
+	<target name="hack-jar" depends="compile">
+
+		<jar destfile="${dist}/lib/${jar}-scripts.jar"
+		       basedir="${src}/script/javascript"
+		  />
+
+		<jar destfile="${dist}/lib/${jar}-scripts.jar"
+		       basedir="${classes}"
+			   includes="**/*.js"
+			   update="true"
+		  />
+
+    </target>
+
+	<target name="test" depends="utest, itest"> </target>	
+
+	<target name="utest" depends="test-jar">
+	   	<property name="run.class.path" refId="test.class.path"/>
+		<echo message="${run.class.path}"/>
+		<script language="javascript" src="airlift/test.js">
+		    <classpath refid="test.class.path"/>			
+		</script>
+	</target>	
+	
+	<target name="itest">
+	   <sequential>
+		
+		<property name="appserver.classpath" refid="appserver.classpath" />
+
+		<waitfor maxwait="5" maxwaitunit="second" checkevery="500" timeoutproperty="timeout">
+			<http url="http://localhost:8080/_ah/admin" />
+		</waitfor>
+		<fail message="...The server has failed to start.  Integration testjar has been aborted...">
+			<condition>
+			   <isset property="timeout" />
+			</condition>
+		</fail>
+		<echo message="...The INTEGRATION TEST has BEGUN..." />
+		<echo message="${appserver.classpath}"/>
+		<script language="javascript" src="airlift/inttest.js">
+			<classpath refid="appserver.classpath"/>
+		</script>
+		<echo message="...The INTEGRATION TEST has ENDED..." />
+		</sequential>
+	</target>
+
+</project>

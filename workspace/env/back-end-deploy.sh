@@ -1,0 +1,1 @@
+$AIRLIFT_APP_ENGINE_HOME/bin/appcfg.sh backends war update accounting

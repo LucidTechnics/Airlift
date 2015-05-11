@@ -455,29 +455,37 @@ public class RestServlet
 	    throws ServletException, IOException
 	{
 		String userId = (_restContext.getUser() != null) ? _restContext.getUser().getUserId() : "";
-		
+
 		String appName = getServletName();
 		String domainName = _restContext.getThisDomain();
 		java.util.List<String> handlerPathList = _restContext.getHandlerPathList();
 
 		try
 		{
+			log.info("Here 1");
 			String defaultMimeType = (this.getServletConfig().getInitParameter("a.default.mime.type") != null) ? this.getServletConfig().getInitParameter("a.default.mime.type") : "text/html";
+			log.info("Here 2");
 			ContentContext contentContext = new SimpleContentContext(new byte[0], defaultMimeType);
-			
+			log.info("Here 3");
 			if (handlerPathList != null)
 			{
+				log.info("Here 4");
 				boolean handlerNotFound = false;
-
+				log.info("Here 5");
 				try
 				{
+					log.info("Here 6: " + _method + ":" + _restContext + ":" + _uriParameterMap);
 				    contentContext = getHandlerContext().execute(appName,
 									_restContext, _method, this, _httpServletRequest,
 									_httpServletResponse, _uriParameterMap,
 						null);
+					log.info("Here 7");
 				}
 				catch(airlift.servlet.rest.HandlerException _handlerException)
 				{
+					log.severe(_handlerException.getMessage());
+					log.severe(_handlerException.toString());
+					
 					if (_handlerException.getErrorCode() == airlift.servlet.rest.HandlerException.ErrorCode.HANDLER_NOT_FOUND)
 					{
 						handlerNotFound = true;
@@ -488,25 +496,32 @@ public class RestServlet
 					}
 				}
 
+				log.info("Here 8");
 				if (handlerNotFound == true )
 				{
+					log.info("Here 8.1");
 					sendCodedPage("405", "Method Not Allowed", _httpServletResponse);
 				}
 
+				log.info("Here 9");
 				int responseCode = Integer.parseInt(contentContext.getResponseCode());
-
+				log.info("Here 10");
 				_httpServletResponse.setStatus(responseCode);
-
+				log.info("Here 11");
 				if (responseCode == 301 || responseCode == 302 || responseCode == 303)
 					//TODO this should be checking to see if the method
 					//call is a POST PUT or DELETE.  At this point the
 				{
+					log.info("Here 12");
 					_httpServletResponse.sendRedirect(contentContext.getRedirectUri());
+					log.info("Here 13");
 				}
 				else
 				{
+					log.info("Here 14");
 					if (responseCode < 400)
 					{
+						log.info("Here 15");
 						for (java.util.Map.Entry<String, String> header: contentContext.getHeaderMap().entrySet())
 						{
 							_httpServletResponse.addHeader(header.getKey(), header.getValue());
@@ -524,17 +539,23 @@ public class RestServlet
 					}
 					else
 					{
+						log.info("Here 16");
 						sendCodedPage(contentContext.getResponseCode(), "", _httpServletResponse);
 					}
+					log.info("Here 17");
 				}
+				log.info("Here 18");
 			}
 			else
 			{
+				log.info("Here 19");
 				sendCodedPage("404", "Resource Not Found", _httpServletResponse);
 			}
+			log.info("Here 20");
 		}
 		catch(Throwable t)
 		{
+			log.info("Here 21");
 			//log exception
 			//log content generated so far
 			log.severe("Airlift encountered exception: " + t.toString());

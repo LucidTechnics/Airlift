@@ -535,7 +535,12 @@ public class RestfulSecurityContext
 		}
 		catch(Throwable t)
 		{
+			log.severe(t.getMessage());
+			log.severe(t.toString());
+			t.printStackTrace();
+			
 			if (transaction != null) { transaction.rollbackAsync(); }
+			
 			throw new RuntimeException(t);
 		}
 	}
