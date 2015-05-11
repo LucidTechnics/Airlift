@@ -610,43 +610,42 @@ function Web(WEB_CONTEXT)
 	this.setLastModified = function(_date)
 	{
 		var date = _date && util.date(_date);
-		if (!date) throw "Last modified date header value cannot be null";
+		if (!date) { throw 'Last modified date header value cannot be null'; }
 		this.getContentContext().lastModified(date);
 	};
 
-	this.isModifiedSince = function(_date, doWork)
+	this.isModifiedSince = function(_date, _doWork)
 	{
-		var isModifiedByDate = true, lastModifiedDate;
+		if (!_date) { throw 'last modified date cannot be null'; }
+		if (!_doWork) { throw 'must provide function for handling this if modified since request'; }
+		
+		var isModifiedSince = true, lastModifiedDate = Math.floor(_date.getTime()/1000) * 1000;
+
+		this.setLastModified(lastModifiedDate);
+		util.info('LAST-MODIFIED is', lastModifiedDate);
 		
 		//Is this "[Tue, 10 Feb 2015 21:39:52 GMT]"
-		var ifModifiedSince = this.getHeaders()['If-Modified-Since'];
-		ifModifiedSince = ifModifiedSince && (ifModifiedSince[0] + '');
-		ifModifiedSince = ifModifiedSince && ifModifiedSince.replace(/[\[\]]/g, '');
+		var ifModifiedSinceDate = this.getHeaders()['If-Modified-Since'];
 		//Is now this "Tue, 10 Feb 2015 21:39:52 GMT"
-	
 
-		util.info('FIRST IF-MODIFIED-SINCE is', ifModifiedSince, ifModifiedSince && ifModifiedSince.length);
+		util.info('FIRST IF-MODIFIED-SINCE is', ifModifiedSinceDate, ifModifiedSinceDate && ifModifiedSinceDate.length);
 
-
-		if (ifModifiedSince)
+		if (ifModifiedSinceDate)
 		{
-			ifModifiedSince = (new Packages.java.text.SimpleDateFormat('EEE, d MMM yyyy HH:mm:ss zzz')).
-							  parse(ifModifiedSince, new Packages.java.text.ParsePosition(0));
+			ifModifiedSinceDate = ifModifiedSinceDate && (ifModifiedSinceDate[0] + '');
+			ifModifiedSinceDate = ifModifiedSinceDate && ifModifiedSinceDate.replace(/[\[\]]/g, '');
+			ifModifiedSinceDate = (new Packages.java.text.SimpleDateFormat('EEE, d MMM yyyy HH:mm:ss zzz')).
+							  parse(ifModifiedSinceDate, new Packages.java.text.ParsePosition(0));
 
-			lastModifiedDate = Math.floor(_date.getTime()/1000) * 1000; 
-			util.info('LAST-MODIFIED is', lastModifiedDate);
-
-			isModifiedByDate = (lastModifiedDate > ifModifiedSince.getTime());
+			isModifiedSince = (lastModifiedDate > ifModifiedSinceDate.getTime());
 		}
-		
-		if (isModifiedByDate)
+  		
+		if (isModifiedSince)
 		{
-			this.setLastModified(lastModifiedDate);
-			doWork();
+			_doWork();
 		}
 		else
 		{
-			this.setLastModified(_date);
 			this.setResponseCode('304');
 		}
 	};
